@@ -1,39 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Login & Sign Up - StayNest</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: { DEFAULT: '#4bb59d', light: '#e6f7f3', dark: '#3a9a85', 50: '#f0fdf9', 100: '#ccf0e8' }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .tap-effect { transition: all 0.2s; }
-        .tap-effect:active { transform: scale(0.96); }
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
-        .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
-        .gradient-text { background: linear-gradient(135deg, #4bb59d 0%, #3a9a85 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        @media (max-width: 768px) { body { overflow-y: auto; -webkit-overflow-scrolling: touch; } }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen">
+@extends('user.layouts.app')
 
-    <!-- Main Content (No Header, No Footer) -->
-    <main>
+@section('title', 'Login & Sign Up - StayNest')
+
+@section('content')
+<div class="py-8">
         <!-- Mobile Content -->
         <div class="md:hidden py-8 px-4 min-h-screen flex flex-col justify-center">
             <!-- Back to Home Bar -->
@@ -404,9 +374,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
-    </main>
+</div>
+@endsection
+
+@push('scripts')
 
     <!-- ================= JAVASCRIPT FOR LOGIN/SIGNUP/FORGOT TABS ================= -->
     <script>
@@ -509,5 +481,4 @@
             window.location.href = "{{ route('user.profile') }}";
         }
     </script>
-</body>
-</html>
+@endpush

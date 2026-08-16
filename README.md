@@ -141,3 +141,8 @@ GitHub par push karein:
 
 cmd
 git push -u origin main
+
+
+---------------git config --global user.name "rishijadaun"
+git config --global user.email "imrishi6@gmail.com"
+-------------------------------------

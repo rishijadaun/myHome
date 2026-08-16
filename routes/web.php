@@ -44,6 +44,19 @@ Route::name('user.')->group(function () {
     Route::view('/profile', 'user.profile')->name('profile');
     Route::view('/pricing', 'user.pricing')->name('pricing');
     Route::view('/about', 'user.about')->name('about');
+    Route::view('/contact', 'user.contact')->name('contact');
+    Route::view('/contact-us', 'user.contact');
+    Route::view('/terms', 'user.terms')->name('terms');
+    Route::view('/terms-and-conditions', 'user.terms');
+    Route::view('/privacy', 'user.privacy')->name('privacy');
+    Route::view('/privacy-policy', 'user.privacy');
+    Route::view('/404', 'errors.404')->name('404');
     Route::view('/detail', 'user.detail')->name('detail');
     Route::view('/pg-details', 'user.detail');
 });
+
+// Fallback Route for 404 Not Found
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
+

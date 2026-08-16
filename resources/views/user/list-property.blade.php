@@ -1,102 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>List Your Property - StayNest</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
-                    colors: { 
-                        brand: { DEFAULT: '#4bb59d', light: '#e6f7f3', dark: '#3a9a85', 50: '#f0fdf9', 100: '#ccf0e8' } 
-                    } 
-                } 
-            } 
-        }
-    </script>
-    <style>
-        .tap-effect { transition: all 0.2s; } 
-        .tap-effect:active { transform: scale(0.96); }
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); } 
-        .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
-        .gradient-text { background: linear-gradient(135deg, #4bb59d 0%, #3a9a85 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        @media (max-width: 768px) { body { overflow-y: auto; -webkit-overflow-scrolling: touch; } }
-        
-        /* Custom checkbox styling */
-        .amenity-checkbox:checked + div {
-            border-color: #4bb59d;
-            background-color: #f0fdf9;
-        }
-        .amenity-checkbox:checked + div .check-icon {
-            opacity: 1;
-            transform: scale(1);
-        }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+@extends('user.layouts.app')
 
-    <!-- Mobile Header -->
-    <header class="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
-        <div class="px-4 py-1.5 flex justify-between items-center text-xs font-semibold text-gray-900 pt-safe">
-            <span>9:41</span>
-            <div class="flex items-center gap-1.5">
-                <i class="fas fa-signal text-[10px]"></i>
-                <i class="fas fa-wifi text-[10px]"></i>
-                <div class="flex items-center gap-1">
-                    <span class="text-[10px]">85%</span>
-                    <i class="fas fa-battery-three-quarters text-[10px]"></i>
-                </div>
-            </div>
-        </div>
-        <div class="px-4 py-3 flex items-center gap-3">
-            <button onclick="window.history.back()" class="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 tap-effect">
-                <i class="fas fa-arrow-left text-sm"></i>
-            </button>
-            <h1 class="text-lg font-bold text-gray-900">List Property</h1>
-        </div>
-    </header>
+@section('title', 'List Your Property - StayNest')
 
-    <!-- Desktop Header -->
-    <header class="hidden md:block bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center gap-12">
-                    <a href="{{ route('user.home') }}" class="flex items-center gap-2 cursor-pointer">
-                        <div class="w-10 h-10 bg-gradient-to-br from-brand to-brand-dark rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand/30">
-                            <i class="fas fa-home"></i>
-                        </div>
-                        <span class="font-bold text-2xl text-gray-900 tracking-tight">Stay<span class="gradient-text">Nest</span></span>
-                    </a>
-                    <nav class="flex space-x-8">
-                        <a href="{{ route('user.home') }}" class="text-gray-600 hover:text-brand font-medium transition text-sm">Home</a>
-                        <a href="{{ route('user.search') }}" class="text-gray-600 hover:text-brand font-medium transition text-sm">Find PG</a>
-                        <a href="{{ route('user.list-property') }}" class="text-brand font-semibold border-b-2 border-brand px-1 pt-1 text-sm">List Property</a>
-                        <a href="{{ route('user.pricing') }}" class="text-gray-600 hover:text-brand font-medium transition text-sm">Pricing</a>
-                        <a href="{{ route('user.about') }}" class="text-gray-600 hover:text-brand font-medium transition text-sm">About Us</a>
-                    </nav>
-                </div>
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('user.search') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition"><i class="fas fa-search"></i></a>
-                    <a href="{{ route('user.saved') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition relative"><i class="fas fa-heart text-red-500"></i></a>
-                    <a href="{{ route('user.bookings') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition relative">
-                        <i class="fas fa-bell"></i>
-                        <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                    </a>
-                    <a href="{{ route('user.login') }}" class="px-5 py-2.5 text-gray-700 font-medium hover:text-brand transition text-sm">Log In</a>
-                    <a href="{{ route('user.list-property') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-6 py-2.5 rounded-xl font-semibold transition tap-effect text-sm">Download App</a>
-                </div>
-            </div>
-        </div>
-    </header>
+@push('styles')
+<style>
+    /* Custom checkbox styling */
+    .amenity-checkbox:checked + div {
+        border-color: #4bb59d;
+        background-color: #f0fdf9;
+    }
+    .amenity-checkbox:checked + div .check-icon {
+        opacity: 1;
+        transform: scale(1);
+    }
+</style>
+@endpush
 
-    <main>
+@section('content')
         <!-- ================= MOBILE CONTENT ================= -->
-        <div class="md:hidden pt-[100px] pb-24 px-4">
+        <div class="md:hidden pt-[70px] pb-24 px-4">
             
             <!-- Mobile Progress Bar -->
             <div class="flex items-center gap-2 mb-6" id="mobile-progress">
@@ -595,10 +517,9 @@
                 </div>
             </div>
         </div>
-    </main>
+@endsection
 
-    @include('user.partials.footer')
-
+@push('scripts')
     <!-- ================= JAVASCRIPT FOR MULTI-STEP FORM ================= -->
     <script>
         let currentStep = 1;
@@ -696,5 +617,4 @@
             updateStep(1);
         });
     </script>
-</body>
-</html>
+@endpush

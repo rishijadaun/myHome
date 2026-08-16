@@ -236,53 +236,52 @@
             </div>
         </div>
 
-        <!-- Recommended for You Section -->
+        <!-- Recommended for You Section (Mobile 2-Column Grid) -->
         <section class="px-4 mb-6">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900">Recommended for You</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">Handpicked stays near you</p>
+                    <h2 class="text-base font-bold text-gray-900">Recommended for You</h2>
+                    <p class="text-[10px] text-gray-500 mt-0.5">Handpicked stays near you</p>
                 </div>
-                <a href="#" class="text-brand font-semibold text-xs">View All →</a>
+                <a href="{{ route('user.search') }}" class="text-brand font-semibold text-xs">View All →</a>
             </div>
 
-            <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
                 @foreach ([
-                    ['image' => 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'title' => 'Sunrise Premium PG', 'type' => 'BOYS', 'typeClass' => 'bg-blue-50 text-blue-600', 'location' => 'Sector 62, Noida • 1.2 km', 'price' => '₹8,500', 'rating' => '4.8', 'reviews' => '120', 'badge' => 'Verified', 'badgeClass' => 'bg-green-500', 'badgeIcon' => 'check-circle'],
-                    ['image' => 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'title' => 'Aura Women\'s Stay', 'type' => 'GIRLS', 'typeClass' => 'bg-pink-50 text-pink-600', 'location' => 'Indiranagar, Bangalore • 0.5 km', 'price' => '₹9,999', 'rating' => '4.9', 'reviews' => '98', 'badge' => 'Verified', 'badgeClass' => 'bg-green-500', 'badgeIcon' => 'check-circle'],
-                    ['image' => 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'title' => 'Urban Nest Co-living', 'type' => 'CO-ED', 'typeClass' => 'bg-purple-50 text-purple-600', 'location' => 'HSR Layout, Bangalore • 2.1 km', 'price' => '₹11,500', 'rating' => '4.7', 'reviews' => '75', 'badge' => 'Popular', 'badgeClass' => 'bg-orange-500', 'badgeIcon' => 'fire'],
+                    ['image' => 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Sunrise Premium', 'type' => 'BOYS', 'typeClass' => 'bg-blue-50 text-blue-600', 'location' => 'Sec 62, Noida', 'price' => '₹8,500', 'rating' => '4.8', 'reviews' => '120', 'badge' => 'Verified', 'badgeClass' => 'bg-green-500', 'badgeIcon' => 'check-circle'],
+                    ['image' => 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Aura Women\'s Stay', 'type' => 'GIRLS', 'typeClass' => 'bg-pink-50 text-pink-600', 'location' => 'Indiranagar, BLR', 'price' => '₹9,999', 'rating' => '4.9', 'reviews' => '98', 'badge' => 'Verified', 'badgeClass' => 'bg-green-500', 'badgeIcon' => 'check-circle'],
+                    ['image' => 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Urban Nest', 'type' => 'CO-ED', 'typeClass' => 'bg-purple-50 text-purple-600', 'location' => 'HSR Layout, BLR', 'price' => '₹11,500', 'rating' => '4.7', 'reviews' => '75', 'badge' => 'Popular', 'badgeClass' => 'bg-orange-500', 'badgeIcon' => 'fire'],
+                    ['image' => 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Green Valley PG', 'type' => 'BOYS', 'typeClass' => 'bg-blue-50 text-blue-600', 'location' => 'Malviya Nagar', 'price' => '₹7,200', 'rating' => '4.6', 'reviews' => '54', 'badge' => 'Verified', 'badgeClass' => 'bg-green-500', 'badgeIcon' => 'check-circle'],
                 ] as $card)
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 tap-effect">
-                        <div class="relative h-44">
-                            <img src="{{ $card['image'] }}" alt="PG" class="w-full h-full object-cover">
-                            <div class="absolute top-3 left-3 {{ $card['badgeClass'] }} text-white text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
-                                <i class="fas fa-{{ $card['badgeIcon'] }}"></i> {{ $card['badge'] }}
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 tap-effect flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-28">
+                                <img src="{{ $card['image'] }}" alt="PG" class="w-full h-full object-cover">
+                                <div class="absolute top-2 left-2 {{ $card['badgeClass'] }} text-white text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1 shadow-sm">
+                                    <i class="fas fa-{{ $card['badgeIcon'] }}"></i> {{ $card['badge'] }}
+                                </div>
+                                <a href="{{ route('user.saved') }}" class="absolute top-2 right-2 w-6 h-6 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 tap-effect text-xs shadow-sm">
+                                    <i class="far fa-heart"></i>
+                                </a>
+                                <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur text-white text-[9px] px-1.5 py-0.5 rounded flex items-center gap-1">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <span class="font-bold">{{ $card['rating'] }}</span>
+                                </div>
                             </div>
-                            <button class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 tap-effect">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur text-white text-[10px] px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span class="font-bold">{{ $card['rating'] }}</span>
-                                <span class="text-gray-300">({{ $card['reviews'] }})</span>
+                            <div class="p-2.5">
+                                <div class="flex justify-between items-start mb-1 gap-1">
+                                    <h3 class="font-bold text-xs text-gray-900 truncate">{{ $card['title'] }}</h3>
+                                    <span class="{{ $card['typeClass'] }} text-[8px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $card['type'] }}</span>
+                                </div>
+                                <p class="text-gray-500 text-[10px] mb-2 flex items-center gap-1 truncate">
+                                    <i class="fas fa-map-marker-alt text-brand text-[8px]"></i>
+                                    {{ $card['location'] }}
+                                </p>
                             </div>
                         </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-1.5">
-                                <h3 class="font-bold text-gray-900">{{ $card['title'] }}</h3>
-                                <span class="{{ $card['typeClass'] }} text-[10px] font-bold px-2 py-0.5 rounded">{{ $card['type'] }}</span>
-                            </div>
-                            <p class="text-gray-500 text-xs mb-3 flex items-center gap-1">
-                                <i class="fas fa-map-marker-alt text-brand text-[10px]"></i>
-                                {{ $card['location'] }}
-                            </p>
-                            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                                <div>
-                                    <span class="text-[10px] text-gray-500">Starts from</span>
-                                    <div class="text-base font-bold text-gray-900">{{ $card['price'] }}<span class="text-[10px] font-normal text-gray-500">/mo</span></div>
-                                </div>
-                                <button class="bg-brand text-white text-xs font-semibold px-4 py-2 rounded-lg tap-effect">View</button>
-                            </div>
+                        <div class="px-2.5 pb-2.5 pt-1 border-t border-gray-100 flex items-center justify-between">
+                            <div class="text-xs font-bold text-gray-900">{{ $card['price'] }}<span class="text-[9px] font-normal text-gray-500">/mo</span></div>
+                            <a href="{{ route('user.detail') }}" class="bg-brand text-white text-[10px] font-semibold px-2.5 py-1 rounded-md tap-effect">View</a>
                         </div>
                     </div>
                 @endforeach
@@ -475,6 +474,130 @@
                 </button>
             </div>
         </div>
+
+        <!-- PG Near Me Section (Desktop) -->
+        <section class="max-w-7xl mx-auto px-6 mb-12">
+            <div class="flex justify-between items-end mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-brand-light rounded-2xl flex items-center justify-center text-brand shadow-sm">
+                        <i class="fas fa-location-crosshairs text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-gray-900">PG Near Me</h2>
+                        <p class="text-gray-500 text-sm mt-0.5">Top-rated stays within 2 km of your current location</p>
+                    </div>
+                </div>
+                <a href="{{ route('user.search') }}" class="text-brand font-semibold text-sm hover:underline flex items-center gap-2">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach ([
+                    ['image' => 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Sunrise Premium PG', 'type' => 'BOYS', 'typeClass' => 'bg-blue-50 text-blue-600', 'location' => 'Saket, New Delhi', 'price' => '₹8,500', 'distance' => '0.3 km away', 'badge' => 'Verified', 'badgeClass' => 'bg-green-500', 'badgeIcon' => 'check-circle', 'rating' => '4.8', 'reviews' => '120'],
+                    ['image' => 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Aura Women\'s Stay', 'type' => 'GIRLS', 'typeClass' => 'bg-pink-50 text-pink-600', 'location' => 'Saket, New Delhi', 'price' => '₹9,999', 'distance' => '0.8 km away', 'badge' => 'Verified', 'badgeClass' => 'bg-green-500', 'badgeIcon' => 'check-circle', 'rating' => '4.9', 'reviews' => '98'],
+                    ['image' => 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Urban Nest Co-living', 'type' => 'CO-ED', 'typeClass' => 'bg-purple-50 text-purple-600', 'location' => 'Hauz Khas, Delhi', 'price' => '₹11,500', 'distance' => '1.2 km away', 'badge' => 'Popular', 'badgeClass' => 'bg-orange-500', 'badgeIcon' => 'fire', 'rating' => '4.7', 'reviews' => '75'],
+                    ['image' => 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Green Valley PG', 'type' => 'BOYS', 'typeClass' => 'bg-blue-50 text-blue-600', 'location' => 'Malviya Nagar, Delhi', 'price' => '₹7,200', 'distance' => '1.5 km away', 'badge' => 'Verified', 'badgeClass' => 'bg-green-500', 'badgeIcon' => 'check-circle', 'rating' => '4.6', 'reviews' => '54'],
+                ] as $card)
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm card-hover border border-gray-100 group flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="{{ $card['image'] }}" alt="PG" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                <div class="absolute top-3 left-3 {{ $card['badgeClass'] }} text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                                    <i class="fas fa-{{ $card['badgeIcon'] }}"></i> {{ $card['badge'] }}
+                                </div>
+                                <div class="absolute top-3 right-3 bg-brand text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                                    <i class="fas fa-route"></i> {{ $card['distance'] }}
+                                </div>
+                                <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur text-white text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <span class="font-bold">{{ $card['rating'] }}</span>
+                                    <span class="text-gray-300">({{ $card['reviews'] }})</span>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-base text-gray-900 truncate">{{ $card['title'] }}</h3>
+                                    <span class="{{ $card['typeClass'] }} text-[10px] font-bold px-2 py-0.5 rounded">{{ $card['type'] }}</span>
+                                </div>
+                                <p class="text-gray-500 text-xs mb-3 flex items-center gap-1 truncate">
+                                    <i class="fas fa-map-marker-alt text-brand"></i> {{ $card['location'] }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="px-4 pb-4 pt-2 border-t border-gray-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-gray-500 uppercase font-semibold">Rent / Month</span>
+                                <div class="text-lg font-bold text-gray-900">{{ $card['price'] }}<span class="text-xs font-normal text-gray-500">/mo</span></div>
+                            </div>
+                            <a href="{{ route('user.detail') }}" class="bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-xl text-xs font-semibold tap-effect transition">View Room</a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <!-- Recently Added Section (Desktop) -->
+        <section class="max-w-7xl mx-auto px-6 mb-12">
+            <div class="flex justify-between items-end mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-500 shadow-sm">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Recently Added</h2>
+                        <p class="text-gray-500 text-sm mt-0.5">Fresh listings published in the last 24 hours</p>
+                    </div>
+                </div>
+                <a href="{{ route('user.search') }}" class="text-brand font-semibold text-sm hover:underline flex items-center gap-2">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach ([
+                    ['image' => 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Metro View PG', 'type' => 'BOYS', 'typeClass' => 'bg-blue-50 text-blue-600', 'location' => 'Near Saket Metro, Delhi', 'price' => '₹6,500', 'since' => '2h ago', 'rating' => '4.5', 'reviews' => '32'],
+                    ['image' => 'https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Skyline Residency', 'type' => 'CO-ED', 'typeClass' => 'bg-purple-50 text-purple-600', 'location' => 'Vasant Kunj, Delhi', 'price' => '₹9,200', 'since' => '5h ago', 'rating' => '4.7', 'reviews' => '46'],
+                    ['image' => 'https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Royal Stay PG', 'type' => 'GIRLS', 'typeClass' => 'bg-pink-50 text-pink-600', 'location' => 'Chattarpur, Delhi', 'price' => '₹7,800', 'since' => '1d ago', 'rating' => '4.4', 'reviews' => '28'],
+                    ['image' => 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 'title' => 'Comfort Inn PG', 'type' => 'BOYS', 'typeClass' => 'bg-blue-50 text-blue-600', 'location' => 'Mehrauli, Delhi', 'price' => '₹8,100', 'since' => '1d ago', 'rating' => '4.6', 'reviews' => '39'],
+                ] as $card)
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm card-hover border border-gray-100 group flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="{{ $card['image'] }}" alt="PG" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                <div class="absolute top-3 left-3 bg-red-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                                    <i class="fas fa-bolt"></i> NEW
+                                </div>
+                                <div class="absolute top-3 right-3 bg-black/60 backdrop-blur text-white text-[11px] px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                                    <i class="fas fa-clock"></i> {{ $card['since'] }}
+                                </div>
+                                <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur text-white text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <span class="font-bold">{{ $card['rating'] }}</span>
+                                    <span class="text-gray-300">({{ $card['reviews'] }})</span>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-base text-gray-900 truncate">{{ $card['title'] }}</h3>
+                                    <span class="{{ $card['typeClass'] }} text-[10px] font-bold px-2 py-0.5 rounded">{{ $card['type'] }}</span>
+                                </div>
+                                <p class="text-gray-500 text-xs mb-3 flex items-center gap-1 truncate">
+                                    <i class="fas fa-map-marker-alt text-brand"></i> {{ $card['location'] }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="px-4 pb-4 pt-2 border-t border-gray-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-gray-500 uppercase font-semibold">Rent / Month</span>
+                                <div class="text-lg font-bold text-gray-900">{{ $card['price'] }}<span class="text-xs font-normal text-gray-500">/mo</span></div>
+                            </div>
+                            <a href="{{ route('user.detail') }}" class="bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-xl text-xs font-semibold tap-effect transition">View Room</a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
 
         <!-- Recommended Section -->
         <section class="max-w-7xl mx-auto px-6 mb-12">

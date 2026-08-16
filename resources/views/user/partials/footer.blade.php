@@ -50,6 +50,9 @@
                     <li><a href="{{ route('user.about') }}" class="hover:text-brand transition">About Us</a></li>
                     <li><a href="{{ route('user.pricing') }}" class="hover:text-brand transition">Pricing Plans</a></li>
                     <li><a href="{{ route('user.list-property') }}" class="hover:text-brand transition">List Property</a></li>
+                    <li><a href="{{ route('user.contact') }}" class="hover:text-brand transition">Contact Us</a></li>
+                    <li><a href="{{ route('user.terms') }}" class="hover:text-brand transition">Terms of Service</a></li>
+                    <li><a href="{{ route('user.privacy') }}" class="hover:text-brand transition">Privacy Policy</a></li>
                 </ul>
             </div>
             <div>
@@ -73,6 +76,12 @@
         <div class="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
             <p class="text-xs text-gray-500">&copy; {{ date('Y') }} StayNest Technologies Pvt. Ltd. All rights reserved.</p>
             <div class="flex items-center gap-4 text-xs text-gray-500">
+                <a href="{{ route('user.terms') }}" class="hover:text-brand transition">Terms</a>
+                <span>•</span>
+                <a href="{{ route('user.privacy') }}" class="hover:text-brand transition">Privacy</a>
+                <span>•</span>
+                <a href="{{ route('user.contact') }}" class="hover:text-brand transition">Contact</a>
+                <span>•</span>
                 <span>Made with <i class="fas fa-heart text-red-500"></i> in India</span>
             </div>
         </div>

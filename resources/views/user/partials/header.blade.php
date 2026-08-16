@@ -1,16 +1,5 @@
 <!-- Mobile App Header -->
 <header class="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
-    <div class="android-status-bar px-4 py-1.5 flex justify-between items-center text-xs font-semibold text-gray-900 pt-safe">
-        <span>9:41</span>
-        <div class="flex items-center gap-1.5">
-            <i class="fas fa-signal text-[10px]"></i>
-            <i class="fas fa-wifi text-[10px]"></i>
-            <div class="flex items-center gap-1">
-                <span class="text-[10px]">85%</span>
-                <i class="fas fa-battery-three-quarters text-[10px]"></i>
-            </div>
-        </div>
-    </div>
 
     <div class="px-4 py-3">
         <div class="flex items-center justify-between">
@@ -57,6 +46,7 @@
                     <a href="{{ route('user.list-property') }}" class="{{ request()->routeIs('user.list-property') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">List Property</a>
                     <a href="{{ route('user.pricing') }}" class="{{ request()->routeIs('user.pricing') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Pricing</a>
                     <a href="{{ route('user.about') }}" class="{{ request()->routeIs('user.about') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">About Us</a>
+                    <a href="{{ route('user.contact') }}" class="{{ request()->routeIs('user.contact') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Contact</a>
                 </nav>
             </div>
             <div class="flex items-center gap-3">

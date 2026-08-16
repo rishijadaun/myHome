@@ -2,25 +2,79 @@
 <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-safe shadow-lg">
     <div class="grid grid-cols-5 h-16">
         <a href="{{ route('user.home') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-home text-xl text-brand"></i>
-            <span class="text-[10px] font-semibold text-brand">Home</span>
+            <i class="fas fa-home text-xl {{ request()->routeIs('user.home') ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[10px] font-medium {{ request()->routeIs('user.home') ? 'text-brand font-semibold' : 'text-gray-500' }}">Home</span>
         </a>
-        <a href="#" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-search text-xl text-gray-400"></i>
-            <span class="text-[10px] font-medium text-gray-500">Search</span>
+        <a href="{{ route('user.search') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
+            <i class="fas fa-search text-xl {{ request()->routeIs('user.search') ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[10px] font-medium {{ request()->routeIs('user.search') ? 'text-brand font-semibold' : 'text-gray-500' }}">Search</span>
         </a>
         <a href="{{ route('user.location') }}" class="flex flex-col items-center justify-center gap-1 tap-effect -translate-y-4">
-            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center text-white shadow-lg shadow-yellow-500/40">
-                <i class="fas fa-map-marker  text-xl text-gray-400"></i>
+            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center text-white shadow-lg shadow-brand/40">
+                <i class="fas fa-map-marker-alt text-xl text-white"></i>
             </div>
+            <span class="text-[10px] font-medium text-gray-500 -mt-1">Map</span>
         </a>
-        <a href="#" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-heart text-xl text-gray-400"></i>
-            <span class="text-[10px] font-medium text-gray-500">Saved</span>
+        <a href="{{ route('user.saved') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
+            <i class="fas fa-heart text-xl {{ request()->routeIs('user.saved') ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[10px] font-medium {{ request()->routeIs('user.saved') ? 'text-brand font-semibold' : 'text-gray-500' }}">Saved</span>
         </a>
-        <a href="#" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-user text-xl text-gray-400"></i>
-            <span class="text-[10px] font-medium text-gray-500">Profile</span>
+        <a href="{{ route('user.profile') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
+            <i class="fas fa-user text-xl {{ request()->routeIs('user.profile') ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[10px] font-medium {{ request()->routeIs('user.profile') ? 'text-brand font-semibold' : 'text-gray-500' }}">Profile</span>
         </a>
     </div>
 </nav>
+
+<!-- Desktop Global Footer Component -->
+<footer class="hidden md:block bg-gray-900 text-gray-300 mt-12">
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+            <div class="lg:col-span-2">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-brand to-brand-dark rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <span class="font-bold text-2xl text-white tracking-tight">Stay<span class="text-brand">Nest</span></span>
+                </div>
+                <p class="text-sm text-gray-400 mb-4 max-w-md">Making PG and co-living simple, safe, and comfortable for students and working professionals across India with zero brokerage.</p>
+                <div class="flex gap-3">
+                    <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-facebook-f text-sm"></i></a>
+                    <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-twitter text-sm"></i></a>
+                    <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-instagram text-sm"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Company</h4>
+                <ul class="space-y-2.5 text-sm">
+                    <li><a href="{{ route('user.about') }}" class="hover:text-brand transition">About Us</a></li>
+                    <li><a href="{{ route('user.pricing') }}" class="hover:text-brand transition">Pricing Plans</a></li>
+                    <li><a href="{{ route('user.list-property') }}" class="hover:text-brand transition">List Property</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Explore Cities</h4>
+                <ul class="space-y-2.5 text-sm">
+                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Bangalore PGs</a></li>
+                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Noida PGs</a></li>
+                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Delhi PGs</a></li>
+                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Mumbai PGs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Portals</h4>
+                <ul class="space-y-2.5 text-sm">
+                    <li><a href="{{ route('user.bookings') }}" class="hover:text-brand transition">My Bookings</a></li>
+                    <li><a href="{{ route('broker.login') }}" class="hover:text-brand transition">Broker Portal</a></li>
+                    <li><a href="{{ route('admin.login') }}" class="hover:text-brand transition">Admin Console</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
+            <p class="text-xs text-gray-500">&copy; {{ date('Y') }} StayNest Technologies Pvt. Ltd. All rights reserved.</p>
+            <div class="flex items-center gap-4 text-xs text-gray-500">
+                <span>Made with <i class="fas fa-heart text-red-500"></i> in India</span>
+            </div>
+        </div>
+    </div>
+</footer>

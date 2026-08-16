@@ -14,25 +14,27 @@
 
     <div class="px-4 py-3">
         <div class="flex items-center justify-between">
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-1.5 mb-0.5">
-                    <h1 class="text-lg font-bold text-gray-900">Home</h1>
-                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+            <a href="{{ route('user.location') }}" class="flex-1 min-w-0 flex items-center gap-2">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                        <h1 class="text-lg font-bold text-gray-900">StayNest</h1>
+                        <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 truncate"><i class="fas fa-map-marker-alt text-brand text-[10px] mr-1"></i>Sector 62, Noida, Delhi NCR</p>
                 </div>
-                <p class="text-xs text-gray-500 truncate">468, Sangeet, 431, Saket, New...</p>
-            </div>
+            </a>
 
             <div class="flex items-center gap-2 ml-3">
-                <button class="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-green-400 flex items-center justify-center text-white tap-effect shadow-md">
-                    <i class="fas fa-wallet text-sm"></i>
-                </button>
-                <button class="w-11 h-11 rounded-full bg-gradient-to-br from-yellow-300 to-orange-400 flex items-center justify-center text-white tap-effect shadow-md relative">
-                    <i class="fas fa-gift text-sm"></i>
-                    <span class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 bg-white text-gray-900 text-[8px] font-bold px-1.5 py-0.5 rounded-full border border-gray-200 whitespace-nowrap">100</span>
-                </button>
-                <button class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 tap-effect">
+                <a href="{{ route('user.saved') }}" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center tap-effect shadow-xs" title="Saved">
+                    <i class="fas fa-heart text-sm"></i>
+                </a>
+                <a href="{{ route('user.bookings') }}" class="w-10 h-10 rounded-full bg-brand-light text-brand flex items-center justify-center tap-effect shadow-xs relative" title="Bookings">
+                    <i class="fas fa-calendar-check text-sm"></i>
+                    <span class="absolute -top-1 -right-1 bg-brand text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">2</span>
+                </a>
+                <a href="{{ route('user.profile') }}" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 tap-effect" title="Profile">
                     <i class="fas fa-user text-sm"></i>
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -50,28 +52,28 @@
                     <span class="font-bold text-2xl text-gray-900 tracking-tight">Stay<span class="gradient-text">Nest</span></span>
                 </a>
                 <nav class="flex space-x-8">
-                    <a href="{{ route('user.home') }}" class="text-brand font-semibold border-b-2 border-brand px-1 pt-1 text-sm">Home</a>
-                    <a href="#" class="text-gray-600 hover:text-brand font-medium transition text-sm">Find PG</a>
-                    <a href="#" class="text-gray-600 hover:text-brand font-medium transition text-sm">List Property</a>
-                    <a href="#" class="text-gray-600 hover:text-brand font-medium transition text-sm">Pricing</a>
-                    <a href="#" class="text-gray-600 hover:text-brand font-medium transition text-sm">About Us</a>
+                    <a href="{{ route('user.home') }}" class="{{ request()->routeIs('user.home') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Home</a>
+                    <a href="{{ route('user.search') }}" class="{{ request()->routeIs('user.search') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Find PG</a>
+                    <a href="{{ route('user.list-property') }}" class="{{ request()->routeIs('user.list-property') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">List Property</a>
+                    <a href="{{ route('user.pricing') }}" class="{{ request()->routeIs('user.pricing') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Pricing</a>
+                    <a href="{{ route('user.about') }}" class="{{ request()->routeIs('user.about') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">About Us</a>
                 </nav>
             </div>
             <div class="flex items-center gap-3">
-                <button class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition">
+                <a href="{{ route('user.search') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition" title="Search PGs">
                     <i class="fas fa-search"></i>
-                </button>
-                <button class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition relative">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
-                        <path d="M9 17a3 3 0 0 0 6 0"></path>
-                    </svg>
+                </a>
+                <a href="{{ route('user.saved') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition" title="Saved Properties">
+                    <i class="fas fa-heart text-red-500"></i>
+                </a>
+                <a href="{{ route('user.bookings') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition relative" title="My Bookings">
+                    <i class="fas fa-bell"></i>
                     <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
-                <a href="/login" class="px-5 py-2.5 text-gray-700 font-medium hover:text-brand transition text-sm">Log In</a>
-                <button class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-6 py-2.5 rounded-xl font-semibold transition tap-effect text-sm">
-                    Download App
-                </button>
+                </a>
+                <a href="{{ route('user.login') }}" class="px-5 py-2.5 text-gray-700 font-medium hover:text-brand transition text-sm">Log In</a>
+                <a href="{{ route('user.list-property') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-6 py-2.5 rounded-xl font-semibold transition tap-effect text-sm">
+                    List PG Free
+                </a>
             </div>
         </div>
     </div>

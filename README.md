@@ -66,3 +66,78 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 npm install leaflet leaflet-routing-machine
+
+
+
+After Installation
+Restart your terminal / IDE (close and reopen Command Prompt or your IDE terminal) so the newly added environment variables take effect.
+Verify the installation:
+cmd
+git --version
+Initialize your repository:
+cmd
+D:\gitProject> git init
+2:43 PM
+2:49 PM
+Git successfully install ho chuka hai! 👍
+
+Abhi error isliye aayi kyunki terminal ko restart nahi kiya gaya tha, isliye terminal ko naya PATH nahi mila.
+
+Step 1: Terminal ko refresh karein (Ya Restart karein)
+Apna Terminal / IDE close karke dobara open karein, ya fir current terminal me ye command run karein:
+
+Agar PowerShell me hain:
+
+powershell
+$env:Path = "C:\Program Files\Git\cmd;" + $env:Path
+Agar Command Prompt (CMD) me hain:
+
+cmd
+set "PATH=C:\Program Files\Git\cmd;%PATH%"
+Ab git --version check karenge toh version dikha dega.
+
+Step 2: Git User Info Configure karein (Sirf Pehli Baar)
+Commit karne se pehle apna Git name aur email set kar lein:
+
+cmd
+git config --global user.name "Rishi Jadaun"
+git config --global user.email "your-github-email@example.com"
+(Apna actual GitHub email daalein)
+
+Step 3: Commands Ek-Ek Karke Run Karein
+D:\gitProject directory me ye commands run karein:
+
+README file banayein:
+
+powershell
+echo "# myHome" > README.md
+Git repository initialize karein:
+
+cmd
+git init
+Files stage karein:
+
+Sirf README add karne ke liye:
+cmd
+git add README.md
+(Optional) Agar poore project ki saari files add karni hain:
+cmd
+git add .
+Commit banayein:
+
+cmd
+git commit -m "first commit"
+Branch ka naam main set karein:
+
+cmd
+git branch -M main
+GitHub repository link karein:
+
+cmd
+git remote add origin https://github.com/rishijadaun/myHome.git
+(Agar already origin added ka error aaye toh git remote set-url origin https://github.com/rishijadaun/myHome.git use karein)
+
+GitHub par push karein:
+
+cmd
+git push -u origin main

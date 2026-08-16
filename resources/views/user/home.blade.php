@@ -651,58 +651,5 @@
                 </div>
             </div>
         </section>
-
-        <!-- Desktop Footer -->
-        <footer class="bg-gray-900 text-gray-300">
-            <div class="max-w-7xl mx-auto px-6 py-12">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
-                    <div class="lg:col-span-2">
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-10 h-10 bg-gradient-to-br from-brand to-brand-dark rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"><i class="fas fa-home"></i></div>
-                            <span class="font-bold text-2xl text-white tracking-tight">Stay<span class="text-brand">Nest</span></span>
-                        </div>
-                        <p class="text-sm text-gray-400 mb-4 max-w-md">Making PG living simple, safe, and comfortable for everyone.</p>
-                        <div class="flex gap-3">
-                            <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-facebook-f text-sm"></i></a>
-                            <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-twitter text-sm"></i></a>
-                            <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-instagram text-sm"></i></a>
-                            <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-linkedin-in text-sm"></i></a>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Company</h4>
-                        <ul class="space-y-2.5 text-sm">
-                            <li><a href="#" class="hover:text-brand transition">About Us</a></li>
-                            <li><a href="#" class="hover:text-brand transition">Blog</a></li>
-                            <li><a href="#" class="hover:text-brand transition">Contact</a></li>
-                            <li><a href="#" class="hover:text-brand transition">Careers</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Legal</h4>
-                        <ul class="space-y-2.5 text-sm">
-                            <li><a href="#" class="hover:text-brand transition">Privacy Policy</a></li>
-                            <li><a href="#" class="hover:text-brand transition">Terms of Service</a></li>
-                            <li><a href="#" class="hover:text-brand transition">Refund Policy</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Popular Cities</h4>
-                        <ul class="space-y-2.5 text-sm">
-                            <li><a href="#" class="hover:text-brand transition">Bangalore PG</a></li>
-                            <li><a href="#" class="hover:text-brand transition">Delhi PG</a></li>
-                            <li><a href="#" class="hover:text-brand transition">Mumbai PG</a></li>
-                            <li><a href="#" class="hover:text-brand transition">Hyderabad PG</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
-                    <p class="text-xs text-gray-500">&copy; {{ date('Y') }} StayNest Technologies Pvt. Ltd. All rights reserved.</p>
-                    <div class="flex items-center gap-4 text-xs text-gray-500">
-                        <span>Made with <i class="fas fa-heart text-red-500"></i> in India</span>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </div>
 @endsection

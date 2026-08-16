@@ -518,8 +518,53 @@
 
     </div>
 
+    <!-- No Results Found Contact Card (Hidden by default, shown when 0 results) -->
+    <div id="noResultsCard" class="hidden bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-xl text-center max-w-2xl mx-auto my-8">
+        <div class="w-16 h-16 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-inner">
+            <i class="fas fa-headset"></i>
+        </div>
+        <h3 class="text-xl sm:text-2xl font-black text-gray-900 mb-2">No Matching PGs Found</h3>
+        <p class="text-xs sm:text-sm text-gray-500 max-w-md mx-auto mb-6">
+            We couldn't find an exact verified match with your selected filters. Don't worry! Our offline team can manually find and arrange verified PGs for you within <strong>2 hours</strong>.
+        </p>
+
+        <!-- Direct Contact Box -->
+        <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6 mb-6 text-left">
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Direct Support Desk</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <a href="tel:+919876543210" class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl hover:border-brand transition shadow-xs">
+                    <div class="w-10 h-10 rounded-lg bg-brand-light text-brand flex items-center justify-center text-sm flex-shrink-0">
+                        <i class="fas fa-phone-volume"></i>
+                    </div>
+                    <div>
+                        <p class="text-[11px] text-gray-400 font-medium">Direct Hotline</p>
+                        <p class="text-xs sm:text-sm font-bold text-gray-900">+91 98765 43210</p>
+                    </div>
+                </a>
+                <a href="https://wa.me/919876543210?text=Hi%20StayNest%20Team%2C%20I%20am%20looking%20for%20a%20PG" target="_blank" class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl hover:border-emerald-500 transition shadow-xs">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base flex-shrink-0">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div>
+                        <p class="text-[11px] text-gray-400 font-medium">WhatsApp Support</p>
+                        <p class="text-xs sm:text-sm font-bold text-emerald-600">+91 98765 43210</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+            <button onclick="resetAllFilters()" class="bg-brand hover:bg-brand-dark text-white font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm transition tap-effect shadow-md shadow-brand/30 flex items-center gap-2">
+                <i class="fas fa-undo-alt"></i> Reset All Filters
+            </button>
+            <a href="{{ route('user.contact') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-5 py-2.5 rounded-xl text-xs sm:text-sm transition tap-effect flex items-center gap-2">
+                <i class="fas fa-envelope"></i> Contact Us Form
+            </a>
+        </div>
+    </div>
+
     <!-- Load More Button -->
-    <div class="mt-10 text-center">
+    <div class="mt-10 text-center" id="loadMoreContainer">
         <button onclick="loadMoreProperties(this)" class="bg-white border-2 border-gray-200 hover:border-brand hover:text-brand text-gray-700 font-bold py-3 px-8 rounded-2xl transition tap-effect shadow-sm flex items-center gap-2 mx-auto text-xs sm:text-sm">
             <i class="fas fa-spinner"></i> Load More Properties
         </button>
@@ -835,6 +880,17 @@
 
         const countEl = document.getElementById('resultsCount');
         if (countEl) countEl.innerText = visibleCount;
+
+        // Toggle No Results Contact Box vs Load More
+        const noResults = document.getElementById('noResultsCard');
+        const loadMore = document.getElementById('loadMoreContainer');
+        if (visibleCount === 0) {
+            if (noResults) noResults.classList.remove('hidden');
+            if (loadMore) loadMore.classList.add('hidden');
+        } else {
+            if (noResults) noResults.classList.add('hidden');
+            if (loadMore) loadMore.classList.remove('hidden');
+        }
     }
 
     function sortSearchResults() {

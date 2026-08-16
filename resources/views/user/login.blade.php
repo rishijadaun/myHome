@@ -3,7 +3,7 @@
 @section('title', 'Login & Sign Up - StayNest')
 
 @section('content')
-<div class="py-8">
+<div class="min-h-screen bg-gray-50">
         <!-- Mobile Content -->
         <div class="md:hidden py-8 px-4 min-h-screen flex flex-col justify-center">
             <!-- Back to Home Bar -->

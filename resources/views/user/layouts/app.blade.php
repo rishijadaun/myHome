@@ -47,14 +47,23 @@
     
     @stack('styles')
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
-    @include('user.partials.header')
+@php
+    $isLoginPage = request()->routeIs('user.login') || request()->is('login');
+@endphp
 
-    <main class="flex-1 flex flex-col">
+<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
+    @if(!$isLoginPage)
+        @include('user.partials.header')
+    @endif
+
+    <main class="flex-1 flex flex-col {{ $isLoginPage ? '' : 'pt-[65px] md:pt-0' }}">
         @yield('content')
     </main>
 
-    @include('user.partials.footer')
+    @if(!$isLoginPage)
+        @include('user.partials.footer')
+        @include('user.partials.floating-actions')
+    @endif
     
     @stack('scripts')
 </body>

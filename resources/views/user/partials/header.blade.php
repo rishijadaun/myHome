@@ -18,7 +18,7 @@
                     <i class="fas fa-heart text-sm"></i>
                 </a>
                 <a href="{{ route('user.bookings') }}" class="w-10 h-10 rounded-full bg-brand-light text-brand flex items-center justify-center tap-effect shadow-xs relative" title="Bookings">
-                    <i class="fas fa-calendar-check text-sm"></i>
+                    <i class="fas fa-bell text-sm"></i>
                     <span class="absolute -top-1 -right-1 bg-brand text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">2</span>
                 </a>
                 <a href="{{ route('user.profile') }}" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 tap-effect" title="Profile">

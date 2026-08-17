@@ -63,6 +63,7 @@
     @if(!$isLoginPage)
         @include('user.partials.footer')
         @include('user.partials.floating-actions')
+        @include('user.partials.wishlist-helper')
     @endif
     
     @stack('scripts')

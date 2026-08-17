@@ -2,47 +2,124 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $table = 'users';
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
-        'name',
+        'id',
         'email',
-        'password',
+        'phone',
+        'password_hash',
+        'remember_token',
+        'email_verified_at',
+        'phone_verified_at',
+        'kyc_verified_at',
+        'status',
+        'is_active',
+        'version',
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
+        'password_hash',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'phone_verified_at' => 'datetime',
+            'kyc_verified_at' => 'datetime',
+            'is_active' => 'boolean',
+            'version' => 'integer',
         ];
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->{$model->getKeyName()})) {
+                $model->{$model->getKeyName()} = (string) Str::uuid();
+            }
+        });
+    }
+
+    /**
+     * Override default Laravel password column name
+     */
+    public function getAuthPassword()
+    {
+        return $this->password_hash;
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id', 'id');
+    }
+
+    public function userRoles()
+    {
+        return $this->hasMany(UserRole::class, 'user_id', 'id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
+                    ->wherePivot('is_active', 1);
+    }
+
+    public function primaryRole()
+    {
+        return $this->hasOne(UserRole::class, 'user_id', 'id')
+                    ->where('is_primary', 1)
+                    ->where('is_active', 1)
+                    ->with('role');
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class, 'user_id', 'id');
+    }
+
+    public function properties()
+    {
+        return $this->hasMany(Property::class, 'broker_id', 'id');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'user_id', 'id');
+    }
+
+    public function visits()
+    {
+        return $this->hasMany(PropertyVisit::class, 'user_id', 'id');
+    }
+
+    public function loginHistories()
+    {
+        return $this->hasMany(LoginHistory::class, 'user_id', 'id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id', 'id');
     }
 }

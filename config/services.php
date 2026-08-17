@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'moderation_model' => env('OPENAI_MODERATION_MODEL', 'omni-moderation-latest'),
+        'fail_open' => env('OPENAI_MODERATION_FAIL_OPEN', false),
+    ],
+
 ];

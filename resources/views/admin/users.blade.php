@@ -7,61 +7,95 @@
 <header class="hidden lg:flex bg-white border-b border-gray-100 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Registered Users</h1>
-        <p class="text-sm text-gray-500">1,248 registered accounts across tenants, brokers and administrators</p>
+        <p class="text-sm text-gray-500">{{ number_format($totalUsers) }} registered accounts across tenants, brokers and administrators</p>
     </div>
     <div class="flex items-center gap-3">
-        <button onclick="alert('Exporting full users list...')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-semibold tap-effect flex items-center gap-2 transition">
-            <i class="fas fa-file-export text-xs"></i> Export Users
+        <button onclick="openModal('adminAddUserModal')" class="bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-2.5 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 hover:shadow-xl transition flex items-center gap-2 cursor-pointer">
+            <i class="fas fa-user-plus text-sm"></i> Add New User
         </button>
     </div>
 </header>
 
 <div class="p-4 md:p-8 space-y-6">
-    <!-- Stats Row -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <div class="text-2xl md:text-3xl font-bold text-gray-900">1,248</div>
-            <div class="text-xs text-gray-500 mt-1 font-medium">Total Users</div>
-        </div>
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <div class="text-2xl md:text-3xl font-bold text-green-600">892</div>
-            <div class="text-xs text-gray-500 mt-1 font-medium">Active Tenants</div>
-        </div>
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <div class="text-2xl md:text-3xl font-bold text-brand">156</div>
-            <div class="text-xs text-gray-500 mt-1 font-medium">New This Month</div>
-        </div>
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <div class="text-2xl md:text-3xl font-bold text-red-600">23</div>
-            <div class="text-xs text-gray-500 mt-1 font-medium">Suspended Accounts</div>
+
+    <!-- Flash Alert / Toast Anchor -->
+    <div id="userToastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div id="userToastInner" class="flex items-center gap-3 px-5 py-3.5 bg-gray-900 text-white rounded-2xl shadow-2xl border border-gray-800 text-sm font-medium">
+            <span id="userToastIcon"><i class="fas fa-check-circle text-emerald-400"></i></span>
+            <span id="userToastMessage">Action completed</span>
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <!-- Search & Role Filter -->
-        <div class="p-4 md:p-5 border-b border-gray-100">
-            <div class="flex flex-col md:flex-row gap-3">
-                <div class="flex-1 relative">
-                    <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                    <input id="userSearch" onkeyup="filterUsers()" type="text" placeholder="Search users by name, email, phone..." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
-                </div>
-                <select id="userRoleFilter" onchange="filterUsers()" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
-                    <option value="">All Account Roles</option>
-                    <option value="TENANT">Tenants</option>
-                    <option value="BROKER">Brokers</option>
-                    <option value="ADMIN">Admins</option>
-                </select>
-                <select id="userStatusFilter" onchange="filterUsers()" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
-                    <option value="">All Status</option>
-                    <option value="ACTIVE">Active</option>
-                    <option value="BLOCKED">Blocked</option>
-                </select>
-            </div>
-        </div>
+    <!-- Mobile Add Button -->
+    <div class="lg:hidden">
+        <button onclick="openModal('adminAddUserModal')" class="w-full bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-3 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fas fa-user-plus"></i> Add New User
+        </button>
+    </div>
 
-        <!-- Desktop Table -->
-        <div class="hidden md:block overflow-x-auto">
+    <!-- Stats Row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="{{ route('admin.users') }}" class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:border-brand/40 transition">
+            <div class="text-2xl md:text-3xl font-extrabold text-gray-900">{{ number_format($totalUsers) }}</div>
+            <div class="text-xs text-gray-500 mt-1 font-medium">Total Registered Users</div>
+        </a>
+        <a href="{{ route('admin.users', ['role' => 'tenant', 'status' => 'active']) }}" class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:border-emerald-300 transition">
+            <div class="text-2xl md:text-3xl font-extrabold text-emerald-600">{{ number_format($activeTenants) }}</div>
+            <div class="text-xs text-gray-500 mt-1 font-medium">Active Tenants</div>
+        </a>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div class="text-2xl md:text-3xl font-extrabold text-brand">{{ number_format($newThisMonth) }}</div>
+            <div class="text-xs text-gray-500 mt-1 font-medium">New This Month</div>
+        </div>
+        <a href="{{ route('admin.users', ['status' => 'blocked']) }}" class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:border-red-300 transition">
+            <div class="text-2xl md:text-3xl font-extrabold text-red-600">{{ number_format($suspendedUsers) }}</div>
+            <div class="text-xs text-gray-500 mt-1 font-medium">Suspended / Blocked</div>
+        </a>
+    </div>
+
+    <!-- Search & Filter Form -->
+    <form method="GET" action="{{ route('admin.users') }}" id="adminUserFilterForm" class="bg-white rounded-2xl p-4 md:p-5 border border-gray-100 shadow-sm">
+        <div class="flex flex-col md:flex-row gap-3">
+            <div class="flex-1 relative">
+                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+                <input 
+                    type="text" 
+                    name="search" 
+                    id="userSearch" 
+                    value="{{ request('search') }}" 
+                    placeholder="Search users by name, email, phone..." 
+                    class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:bg-white transition"
+                >
+            </div>
+            
+            <!-- Role Selector -->
+            <select name="role" id="userRoleFilter" onchange="document.getElementById('adminUserFilterForm').submit()" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition">
+                <option value="">All Account Roles</option>
+                <option value="tenant" {{ request('role') == 'tenant' ? 'selected' : '' }}>Tenants</option>
+                <option value="broker" {{ request('role') == 'broker' ? 'selected' : '' }}>Brokers</option>
+                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admins</option>
+                <option value="super_admin" {{ request('role') == 'super_admin' ? 'selected' : '' }}>Super Admins</option>
+            </select>
+
+            <!-- Status Selector -->
+            <select name="status" id="userStatusFilter" onchange="document.getElementById('adminUserFilterForm').submit()" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition">
+                <option value="">All Status</option>
+                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                <option value="blocked" {{ request('status') == 'blocked' ? 'selected' : '' }}>Blocked / Suspended</option>
+                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Verification</option>
+            </select>
+
+            @if(request()->hasAny(['search', 'role', 'status']) && (request('search') || request('role') || request('status')))
+                <a href="{{ route('admin.users') }}" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5" title="Clear Filters">
+                    <i class="fas fa-times"></i> Clear
+                </a>
+            @endif
+        </div>
+    </form>
+
+    <!-- Desktop Table View -->
+    <div class="hidden md:block bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
             <table class="w-full text-left" id="userTable">
                 <thead class="bg-gray-50/80 border-b border-gray-100">
                     <tr>
@@ -75,185 +109,595 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100" id="userBody">
-                    <tr class="user-row hover:bg-gray-50/70 transition" data-role="TENANT" data-status="ACTIVE">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover shadow-xs">
-                                <div>
-                                    <div class="font-bold text-gray-900 user-name">Rahul Sharma</div>
-                                    <div class="text-xs text-gray-500 user-phone">+91 98765 43210</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600 user-email">rahul.sharma@gmail.com</td>
-                        <td class="px-6 py-4"><span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-lg">TENANT</span></td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Jan 15, 2026</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-gray-900">3 Bookings</td>
-                        <td class="px-6 py-4"><span class="status-badge bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-lg">ACTIVE</span></td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-1.5">
-                                <button onclick="viewUserDetails('Rahul Sharma', '+91 98765 43210', 'rahul.sharma@gmail.com', 'TENANT', '3 Bookings', 'Jan 15, 2026', 'ACTIVE')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect" title="View"><i class="fas fa-eye text-xs"></i></button>
-                                <button onclick="toggleUserBlock(this, 'Rahul Sharma')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center tap-effect" title="Block"><i class="fas fa-ban text-xs"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                    @forelse($users as $user)
+                        @php
+                            $fullName = $user->profile->full_name ?? ($user->name ?? $user->email);
+                            $firstName = $user->profile->first_name ?? $fullName;
+                            $lastName = $user->profile->last_name ?? '';
+                            $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
+                            if (empty(trim($initials))) $initials = 'US';
 
-                    <tr class="user-row hover:bg-gray-50/70 transition" data-role="BROKER" data-status="ACTIVE">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-brand text-white rounded-full flex items-center justify-center font-bold text-sm shadow-xs">VS</div>
-                                <div>
-                                    <div class="font-bold text-gray-900 user-name">Vikram Singh</div>
-                                    <div class="text-xs text-gray-500 user-phone">+91 98765 00000</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600 user-email">vikram@broker.com</td>
-                        <td class="px-6 py-4"><span class="bg-purple-50 text-purple-600 text-xs font-bold px-2.5 py-1 rounded-lg">BROKER</span></td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Mar 22, 2025</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-gray-900">12 Listed PGs</td>
-                        <td class="px-6 py-4"><span class="status-badge bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-lg">ACTIVE</span></td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-1.5">
-                                <button onclick="viewUserDetails('Vikram Singh', '+91 98765 00000', 'vikram@broker.com', 'BROKER', '12 Listed PGs', 'Mar 22, 2025', 'ACTIVE')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect" title="View"><i class="fas fa-eye text-xs"></i></button>
-                                <button onclick="toggleUserBlock(this, 'Vikram Singh')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center tap-effect" title="Block"><i class="fas fa-ban text-xs"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                            $role = $user->roles->first();
+                            $roleSlug = $role ? $role->slug : 'tenant';
+                            $roleName = $role ? $role->name : 'Tenant';
 
-                    <tr class="user-row hover:bg-gray-50/70 transition" data-role="TENANT" data-status="ACTIVE">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover shadow-xs">
-                                <div>
-                                    <div class="font-bold text-gray-900 user-name">Priya Patel</div>
-                                    <div class="text-xs text-gray-500 user-phone">+91 98765 11111</div>
+                            $roleBadgeClass = 'bg-blue-50 text-blue-600';
+                            if ($roleSlug === 'broker') {
+                                $roleBadgeClass = 'bg-purple-50 text-purple-600';
+                            } elseif ($roleSlug === 'admin') {
+                                $roleBadgeClass = 'bg-emerald-50 text-emerald-700';
+                            } elseif ($roleSlug === 'super_admin') {
+                                $roleBadgeClass = 'bg-gray-900 text-white';
+                            }
+
+                            $activity = '0 Bookings';
+                            if ($roleSlug === 'tenant') {
+                                $count = $user->bookings->count();
+                                $activity = "{$count} " . ($count === 1 ? 'Booking' : 'Bookings');
+                            } elseif ($roleSlug === 'broker') {
+                                $count = $user->properties->count();
+                                $activity = "{$count} Listed PGs";
+                            } elseif (in_array($roleSlug, ['admin', 'super_admin'])) {
+                                $activity = 'Platform Admin';
+                            }
+
+                            $isActive = ($user->status === 'active' && $user->is_active);
+                            $isPending = ($user->status === 'pending_verification');
+                        @endphp
+                        <tr id="user-row-{{ $user->id }}" class="user-row hover:bg-gray-50/70 transition">
+                            <!-- Details -->
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-brand to-brand-dark text-white rounded-full flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                                        {{ $initials }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="font-bold text-gray-900 truncate user-name">{{ $fullName }}</div>
+                                        <div class="text-xs text-gray-400 user-phone">{{ $user->phone ?? 'No Phone' }}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600 user-email">priya.patel@gmail.com</td>
-                        <td class="px-6 py-4"><span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-lg">TENANT</span></td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Apr 10, 2026</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-gray-900">1 Booking</td>
-                        <td class="px-6 py-4"><span class="status-badge bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-lg">ACTIVE</span></td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-1.5">
-                                <button onclick="viewUserDetails('Priya Patel', '+91 98765 11111', 'priya.patel@gmail.com', 'TENANT', '1 Booking', 'Apr 10, 2026', 'ACTIVE')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect" title="View"><i class="fas fa-eye text-xs"></i></button>
-                                <button onclick="toggleUserBlock(this, 'Priya Patel')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center tap-effect" title="Block"><i class="fas fa-ban text-xs"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+
+                            <!-- Email -->
+                            <td class="px-6 py-4 text-sm text-gray-600 user-email font-mono">
+                                {{ $user->email }}
+                            </td>
+
+                            <!-- Role -->
+                            <td class="px-6 py-4">
+                                <span class="{{ $roleBadgeClass }} text-[11px] font-bold px-2.5 py-1 rounded-lg uppercase">
+                                    {{ $roleName }}
+                                </span>
+                            </td>
+
+                            <!-- Joined Date -->
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                {{ $user->created_at ? $user->created_at->format('M d, Y') : 'Recent' }}
+                            </td>
+
+                            <!-- Activity -->
+                            <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                                {{ $activity }}
+                            </td>
+
+                            <!-- Status -->
+                            <td class="px-6 py-4">
+                                <span id="status-badge-{{ $user->id }}" class="status-badge text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase {{ $isActive ? 'bg-emerald-100 text-emerald-700' : ($isPending ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700') }}">
+                                    {{ $isActive ? 'ACTIVE' : ($isPending ? 'PENDING' : 'BLOCKED') }}
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <!-- View Profile -->
+                                    <button type="button" onclick="viewUserDetails('{{ $user->id }}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect cursor-pointer" title="View Profile">
+                                        <i class="fas fa-eye text-xs"></i>
+                                    </button>
+
+                                    <!-- Reset Password -->
+                                    <button type="button" onclick="openResetPasswordModal('{{ $user->id }}', '{{ addslashes($fullName) }}')" class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 flex items-center justify-center tap-effect cursor-pointer" title="Reset Password">
+                                        <i class="fas fa-key text-xs"></i>
+                                    </button>
+
+                                    <!-- Toggle Block / Active -->
+                                    <button type="button" onclick="toggleUserBlockDirect('{{ $user->id }}', '{{ addslashes($fullName) }}')" class="w-8 h-8 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 flex items-center justify-center tap-effect cursor-pointer" title="Toggle Block / Active">
+                                        <i class="fas fa-ban text-xs"></i>
+                                    </button>
+
+                                    <!-- Delete -->
+                                    <button type="button" onclick="deleteUserDirect('{{ $user->id }}', '{{ addslashes($fullName) }}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center tap-effect cursor-pointer" title="Delete User">
+                                        <i class="fas fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-400">
+                                <div class="w-12 h-12 rounded-full bg-gray-50 text-gray-300 flex items-center justify-center mx-auto mb-2 text-xl">
+                                    <i class="fas fa-users-slash"></i>
+                                </div>
+                                <div class="text-sm font-semibold text-gray-600">No users found</div>
+                                <p class="text-xs text-gray-400 mt-1">Try adjusting your search criteria or add a new user.</p>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
-        <!-- Mobile Cards -->
-        <div class="md:hidden divide-y divide-gray-100" id="userMobileList">
-            <div class="p-4 user-card" data-role="TENANT" data-status="ACTIVE">
-                <div class="flex items-center gap-3 mb-3">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="w-12 h-12 rounded-full object-cover">
+        <!-- Pagination -->
+        @if($users->hasPages())
+            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                <div class="text-xs text-gray-500">
+                    Showing <span class="font-bold text-gray-900">{{ $users->firstItem() }}</span> to <span class="font-bold text-gray-900">{{ $users->lastItem() }}</span> of <span class="font-bold text-gray-900">{{ $users->total() }}</span> registered users
+                </div>
+                <div>
+                    {{ $users->links() }}
+                </div>
+            </div>
+        @endif
+    </div>
+
+    <!-- Mobile Cards View -->
+    <div class="md:hidden space-y-3" id="userMobileList">
+        @forelse($users as $user)
+            @php
+                $fullName = $user->profile->full_name ?? ($user->name ?? $user->email);
+                $firstName = $user->profile->first_name ?? $fullName;
+                $lastName = $user->profile->last_name ?? '';
+                $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
+                if (empty(trim($initials))) $initials = 'US';
+
+                $role = $user->roles->first();
+                $roleSlug = $role ? $role->slug : 'tenant';
+                $roleName = $role ? $role->name : 'Tenant';
+
+                $isActive = ($user->status === 'active' && $user->is_active);
+                $isPending = ($user->status === 'pending_verification');
+            @endphp
+            <div id="user-mobile-card-{{ $user->id }}" class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm user-card space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-brand to-brand-dark text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                        {{ $initials }}
+                    </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-gray-900 user-name">Rahul Sharma</h3>
-                            <span class="status-badge bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded">ACTIVE</span>
+                        <div class="flex justify-between items-start gap-1">
+                            <h3 class="font-bold text-gray-900 user-name text-sm truncate">{{ $fullName }}</h3>
+                            <span id="mobile-status-badge-{{ $user->id }}" class="status-badge text-[9px] font-bold px-2 py-0.5 rounded uppercase shrink-0 {{ $isActive ? 'bg-emerald-100 text-emerald-700' : ($isPending ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700') }}">
+                                {{ $isActive ? 'ACTIVE' : ($isPending ? 'PENDING' : 'BLOCKED') }}
+                            </span>
                         </div>
-                        <p class="text-xs text-gray-500 user-email">rahul.sharma@gmail.com</p>
+                        <p class="text-xs text-gray-500 user-email font-mono truncate">{{ $user->email }}</p>
                         <div class="flex items-center gap-2 mt-1">
-                            <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded">TENANT</span>
-                            <span class="text-xs text-gray-500">3 bookings</span>
+                            <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">{{ $roleName }}</span>
+                            <span class="text-xs text-gray-400">{{ $user->phone ?? '' }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="flex gap-2 pt-2 border-t border-gray-100">
-                    <button onclick="viewUserDetails('Rahul Sharma', '+91 98765 43210', 'rahul.sharma@gmail.com', 'TENANT', '3 Bookings', 'Jan 15, 2026', 'ACTIVE')" class="flex-1 bg-blue-50 text-blue-600 text-xs font-semibold py-2 rounded-lg tap-effect"><i class="fas fa-eye mr-1"></i> View</button>
-                    <button onclick="toggleUserBlock(this, 'Rahul Sharma')" class="flex-1 bg-red-50 text-red-600 text-xs font-semibold py-2 rounded-lg tap-effect"><i class="fas fa-ban mr-1"></i> Block</button>
+                    <button type="button" onclick="viewUserDetails('{{ $user->id }}')" class="flex-1 bg-blue-50 text-blue-600 text-xs font-semibold py-2 rounded-lg tap-effect text-center">
+                        <i class="fas fa-eye mr-1"></i> Profile
+                    </button>
+                    <button type="button" onclick="openResetPasswordModal('{{ $user->id }}', '{{ addslashes($fullName) }}')" class="flex-1 bg-purple-50 text-purple-600 text-xs font-semibold py-2 rounded-lg tap-effect text-center">
+                        <i class="fas fa-key mr-1"></i> Pass
+                    </button>
+                    <button type="button" onclick="toggleUserBlockDirect('{{ $user->id }}', '{{ addslashes($fullName) }}')" class="flex-1 bg-yellow-50 text-yellow-700 text-xs font-semibold py-2 rounded-lg tap-effect text-center">
+                        <i class="fas fa-ban mr-1"></i> Block
+                    </button>
+                    <button type="button" onclick="deleteUserDirect('{{ $user->id }}', '{{ addslashes($fullName) }}')" class="w-9 bg-red-50 text-red-600 text-xs font-semibold py-2 rounded-lg tap-effect flex items-center justify-center">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
+        @empty
+            <div class="p-8 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
+                <i class="fas fa-users-slash text-2xl text-gray-300 mb-2"></i>
+                <div class="text-sm font-semibold text-gray-600">No users found</div>
+            </div>
+        @endforelse
+    </div>
+
+</div>
+
+<!-- 1. Add New User Modal -->
+<div id="adminAddUserModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl animate-scale-up">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+            <div>
+                <h3 class="text-xl font-bold text-gray-900">Add New User</h3>
+                <p class="text-xs text-gray-500">Create a new tenant, broker or administrator account</p>
+            </div>
+            <button onclick="closeModal('adminAddUserModal')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center tap-effect hover:bg-gray-200 cursor-pointer">
+                <i class="fas fa-times text-gray-500 text-sm"></i>
+            </button>
+        </div>
+
+        <form id="adminAddUserForm" onsubmit="handleCreateUser(event)" class="p-6 space-y-4">
+            <!-- First & Last Name -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">First Name *</label>
+                    <input type="text" name="first_name" required placeholder="e.g. Rahul" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Last Name</label>
+                    <input type="text" name="last_name" placeholder="e.g. Sharma" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
+                </div>
+            </div>
+
+            <!-- Email & Phone -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Email Address *</label>
+                    <input type="email" name="email" required placeholder="user@gmail.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Phone Number *</label>
+                    <input type="text" name="phone" required placeholder="+91 98765 43210" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
+                </div>
+            </div>
+
+            <!-- Role & Password -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Account Role *</label>
+                    <select name="role_id" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-800">
+                        @foreach($roles as $r)
+                            <option value="{{ $r->id }}">{{ $r->name }} ({{ $r->slug }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Initial Password *</label>
+                    <input type="text" name="password" value="User@123" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 font-mono">
+                </div>
+            </div>
+
+            <!-- Status Selector -->
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Initial Status</label>
+                <select name="status" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-800">
+                    <option value="active">Active (Verified)</option>
+                    <option value="suspended">Suspended / Blocked</option>
+                </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="pt-4 border-t border-gray-100 flex gap-3">
+                <button type="button" onclick="closeModal('adminAddUserModal')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl tap-effect cursor-pointer">Cancel</button>
+                <button type="submit" id="submitAddUserBtn" class="flex-1 bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3 rounded-xl tap-effect shadow-lg shadow-brand/30 cursor-pointer">Create User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 2. User Profile & Activity Modal -->
+<div id="userDetailModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden animate-scale-up">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-gray-900">User Account Profile</h3>
+            <button onclick="closeModal('userDetailModal')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center tap-effect hover:bg-gray-200 cursor-pointer">
+                <i class="fas fa-times text-gray-500 text-xs"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4 text-sm" id="userProfileModalBody">
+            <div class="flex justify-center py-8">
+                <i class="fas fa-circle-notch fa-spin text-brand text-2xl"></i>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-3xl text-right">
+            <button onclick="closeModal('userDetailModal')" class="px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-xs rounded-xl tap-effect cursor-pointer">Close</button>
         </div>
     </div>
 </div>
 
-<!-- User Details Modal -->
-<div id="userDetailModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl p-6 space-y-4">
+<!-- 3. Reset Password Modal -->
+<div id="adminResetPasswordModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl p-6 space-y-4 animate-scale-up">
         <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-            <h3 class="text-lg font-bold text-gray-900">User Account Profile</h3>
-            <button onclick="closeModal('userDetailModal')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center tap-effect"><i class="fas fa-times text-gray-500 text-xs"></i></button>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900">Set New Password</h3>
+                <p id="resetPasswordUserName" class="text-xs text-gray-500">For user account</p>
+            </div>
+            <button onclick="closeModal('adminResetPasswordModal')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center tap-effect hover:bg-gray-200 cursor-pointer">
+                <i class="fas fa-times text-gray-500 text-xs"></i>
+            </button>
         </div>
-        <div class="space-y-2.5 text-sm">
-            <div class="flex justify-between"><span class="text-gray-500">Name</span><span id="usrModalName" class="font-bold text-gray-900"></span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Phone</span><span id="usrModalPhone" class="font-medium text-gray-900"></span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Email</span><span id="usrModalEmail" class="font-medium text-gray-900"></span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Role</span><span id="usrModalRole" class="font-bold text-brand"></span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Activity</span><span id="usrModalActivity" class="font-semibold text-gray-800"></span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Member Since</span><span id="usrModalJoined" class="text-gray-600"></span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Account Status</span><span id="usrModalStatus" class="font-bold text-green-600"></span></div>
-        </div>
-        <div class="pt-3">
-            <button onclick="closeModal('userDetailModal')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl tap-effect">Close</button>
-        </div>
+
+        <form id="adminResetPasswordForm" onsubmit="handleResetPassword(event)" class="space-y-4">
+            <input type="hidden" id="resetPasswordUserId" name="user_id">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">New Password *</label>
+                <input type="text" id="resetNewPasswordInput" name="new_password" required minlength="6" value="StayNest@2026" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 font-mono">
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="closeModal('adminResetPasswordModal')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl text-xs tap-effect cursor-pointer">Cancel</button>
+                <button type="submit" id="submitResetPassBtn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs tap-effect shadow-md shadow-purple-500/20 cursor-pointer">Update Password</button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-    function viewUserDetails(name, phone, email, role, activity, joined, status) {
-        document.getElementById('usrModalName').textContent = name;
-        document.getElementById('usrModalPhone').textContent = phone;
-        document.getElementById('usrModalEmail').textContent = email;
-        document.getElementById('usrModalRole').textContent = role;
-        document.getElementById('usrModalActivity').textContent = activity;
-        document.getElementById('usrModalJoined').textContent = joined;
-        document.getElementById('usrModalStatus').textContent = status;
-        openModal('userDetailModal');
+    // Dynamic Toast Messenger
+    function showUserToast(message, type = 'success') {
+        const toast = document.getElementById('userToastNotification');
+        const text = document.getElementById('userToastMessage');
+        const icon = document.getElementById('userToastIcon');
+
+        text.textContent = message;
+        if (type === 'success') {
+            icon.innerHTML = '<i class="fas fa-check-circle text-emerald-400 text-base"></i>';
+        } else {
+            icon.innerHTML = '<i class="fas fa-exclamation-circle text-red-400 text-base"></i>';
+        }
+
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-20', 'opacity-0');
+        }, 3200);
     }
 
-    function toggleUserBlock(btn, name) {
-        const row = btn.closest('.user-row') || btn.closest('.user-card');
-        if (row) {
-            const current = row.getAttribute('data-status');
-            const badge = row.querySelector('.status-badge');
-            if (current === 'ACTIVE') {
-                if (confirm(`Block user ${name}?`)) {
-                    row.setAttribute('data-status', 'BLOCKED');
-                    badge.className = 'status-badge bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-lg';
-                    badge.textContent = 'BLOCKED';
-                    alert(`User ${name} has been blocked.`);
-                }
-            } else {
-                row.setAttribute('data-status', 'ACTIVE');
-                badge.className = 'status-badge bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-lg';
-                badge.textContent = 'ACTIVE';
-                alert(`User ${name} unblocked.`);
+    // View User Details (AJAX)
+    async function viewUserDetails(userId) {
+        openModal('userDetailModal');
+        const bodyEl = document.getElementById('userProfileModalBody');
+
+        bodyEl.innerHTML = `
+            <div class="flex justify-center py-8">
+                <i class="fas fa-circle-notch fa-spin text-brand text-2xl"></i>
+            </div>
+        `;
+
+        try {
+            const res = await fetch(`/admin/users/${userId}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success && data.user) {
+                const u = data.user;
+                bodyEl.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 bg-gray-50 p-3.5 rounded-2xl">
+                            <div class="w-12 h-12 bg-gradient-to-br from-brand to-brand-dark text-white rounded-full flex items-center justify-center font-bold text-base shadow-xs">
+                                ${u.name.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div class="min-w-0">
+                                <div class="font-bold text-gray-900 text-base truncate">${u.name}</div>
+                                <div class="text-xs text-gray-500 font-mono truncate">${u.email}</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between py-1 border-b border-gray-100">
+                                <span class="text-gray-500 font-medium">Phone</span>
+                                <span class="font-bold text-gray-900 font-mono">${u.phone}</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-gray-100">
+                                <span class="text-gray-500 font-medium">Account Role</span>
+                                <span class="font-bold text-brand">${u.role}</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-gray-100">
+                                <span class="text-gray-500 font-medium">Platform Activity</span>
+                                <span class="font-bold text-gray-900">${u.activity}</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-gray-100">
+                                <span class="text-gray-500 font-medium">Wallet Balance</span>
+                                <span class="font-bold text-gray-900 font-mono">₹${Number(u.wallet_balance).toLocaleString()}</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-gray-100">
+                                <span class="text-gray-500 font-medium">Member Since</span>
+                                <span class="font-medium text-gray-700">${u.joined_at}</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-gray-100">
+                                <span class="text-gray-500 font-medium">Account Status</span>
+                                <span class="font-bold ${u.is_active ? 'text-emerald-600' : 'text-red-600'}">${u.status}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
+        } catch (err) {
+            console.error(err);
+            bodyEl.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Failed to load user profile.</div>`;
         }
     }
 
-    function filterUsers() {
-        const search = document.getElementById('userSearch').value.toLowerCase();
-        const role = document.getElementById('userRoleFilter').value;
-        const status = document.getElementById('userStatusFilter').value;
+    // Toggle Block / Suspend
+    async function toggleUserBlockDirect(userId, userName) {
+        if (!confirm(`Switch account status for ${userName}?`)) return;
 
-        document.querySelectorAll('.user-row, .user-card').forEach(el => {
-            const name = el.querySelector('.user-name').textContent.toLowerCase();
-            const email = el.querySelector('.user-email').textContent.toLowerCase();
-            const elRole = el.getAttribute('data-role');
-            const elStatus = el.getAttribute('data-status');
+        try {
+            const res = await fetch(`/admin/users/${userId}/toggle-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            const data = await res.json();
 
-            const matchSearch = name.includes(search) || email.includes(search);
-            const matchRole = !role || elRole === role;
-            const matchStatus = !status || elStatus === status;
+            if (res.ok && data.success) {
+                showUserToast(data.message, 'success');
 
-            if (matchSearch && matchRole && matchStatus) {
-                el.style.display = '';
+                const statusBadge = document.getElementById(`status-badge-${userId}`);
+                const mobileStatus = document.getElementById(`mobile-status-badge-${userId}`);
+
+                if (data.is_active) {
+                    if (statusBadge) {
+                        statusBadge.className = 'status-badge text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase bg-emerald-100 text-emerald-700';
+                        statusBadge.textContent = 'ACTIVE';
+                    }
+                    if (mobileStatus) {
+                        mobileStatus.className = 'status-badge text-[9px] font-bold px-2 py-0.5 rounded uppercase shrink-0 bg-emerald-100 text-emerald-700';
+                        mobileStatus.textContent = 'ACTIVE';
+                    }
+                } else {
+                    if (statusBadge) {
+                        statusBadge.className = 'status-badge text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase bg-red-100 text-red-700';
+                        statusBadge.textContent = 'BLOCKED';
+                    }
+                    if (mobileStatus) {
+                        mobileStatus.className = 'status-badge text-[9px] font-bold px-2 py-0.5 rounded uppercase shrink-0 bg-red-100 text-red-700';
+                        mobileStatus.textContent = 'BLOCKED';
+                    }
+                }
             } else {
-                el.style.display = 'none';
+                showUserToast(data.message || 'Failed to update user status', 'error');
             }
-        });
+        } catch (err) {
+            console.error(err);
+            showUserToast('Network error while updating status', 'error');
+        }
+    }
+
+    // Open Reset Password Modal
+    function openResetPasswordModal(userId, userName) {
+        document.getElementById('resetPasswordUserId').value = userId;
+        document.getElementById('resetPasswordUserName').textContent = `For ${userName}`;
+        document.getElementById('resetNewPasswordInput').value = 'StayNest@2026';
+        openModal('adminResetPasswordModal');
+    }
+
+    // Handle Reset Password Submit
+    async function handleResetPassword(e) {
+        e.preventDefault();
+        const userId = document.getElementById('resetPasswordUserId').value;
+        const newPassword = document.getElementById('resetNewPasswordInput').value;
+        const submitBtn = document.getElementById('submitResetPassBtn');
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-1"></i> Saving...';
+
+        try {
+            const res = await fetch(`/admin/users/${userId}/reset-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ new_password: newPassword })
+            });
+            const data = await res.json();
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Update Password';
+
+            if (res.ok && data.success) {
+                showUserToast(data.message, 'success');
+                closeModal('adminResetPasswordModal');
+            } else {
+                showUserToast(data.message || 'Failed to reset password', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Update Password';
+            showUserToast('Connection error. Please try again.', 'error');
+        }
+    }
+
+    // Delete User
+    async function deleteUserDirect(userId, userName) {
+        if (!confirm(`Are you sure you want to permanently remove user account for "${userName}"?`)) return;
+
+        try {
+            const res = await fetch(`/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                showUserToast(data.message, 'success');
+
+                const row = document.getElementById(`user-row-${userId}`);
+                if (row) {
+                    row.style.opacity = '0';
+                    row.style.transform = 'scale(0.95)';
+                    setTimeout(() => row.remove(), 250);
+                }
+
+                const card = document.getElementById(`user-mobile-card-${userId}`);
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    setTimeout(() => card.remove(), 250);
+                }
+            } else {
+                showUserToast(data.message || 'Failed to delete user', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            showUserToast('Network error while deleting user', 'error');
+        }
+    }
+
+    // Handle Create User Form Submit (AJAX)
+    async function handleCreateUser(e) {
+        e.preventDefault();
+        const form = e.target;
+        const submitBtn = document.getElementById('submitAddUserBtn');
+        const formData = new FormData(form);
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-1"></i> Creating User...';
+
+        try {
+            const res = await fetch('{{ route('admin.users.store') }}', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: formData
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                showUserToast(data.message || 'User created successfully!', 'success');
+                closeModal('adminAddUserModal');
+                form.reset();
+
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create User';
+                let errMsg = data.message || 'Failed to create user';
+                if (data.errors) {
+                    const firstKey = Object.keys(data.errors)[0];
+                    if (firstKey && data.errors[firstKey][0]) {
+                        errMsg = data.errors[firstKey][0];
+                    }
+                }
+                showUserToast(errMsg, 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create User';
+            showUserToast('Connection error. Please try again.', 'error');
+        }
     }
 </script>
 @endpush

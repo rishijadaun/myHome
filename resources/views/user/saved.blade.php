@@ -3,86 +3,221 @@
 @section('title', 'Saved Properties - StayNest')
 
 @section('content')
-<!-- Mobile Content -->
-<div class="md:hidden pt-[80px] pb-24 px-4">
-    <h1 class="text-xl font-bold text-gray-900 mb-4">Saved Properties</h1>
-    <div class="space-y-4" id="mobileSavedList">
-        <div class="saved-item bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 tap-effect relative">
-            <button onclick="removeSaved(this)" class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 tap-effect z-10"><i class="fas fa-heart"></i></button>
-            <div class="relative h-40"><img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover"></div>
-            <div class="p-4">
-                <div class="flex justify-between items-start mb-1.5"><h3 class="font-bold text-gray-900">Sunrise Premium PG</h3><span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded">BOYS</span></div>
-                <p class="text-gray-500 text-xs mb-3 flex items-center gap-1"><i class="fas fa-map-marker-alt text-brand text-[10px]"></i> Sector 62, Noida • 1.2 km</p>
-                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div class="text-base font-bold text-gray-900">₹8,500<span class="text-[10px] font-normal text-gray-500">/mo</span></div>
-                    <a href="{{ route('user.detail') }}" class="bg-brand text-white text-xs font-semibold px-4 py-2 rounded-lg tap-effect">View</a>
+<div class="min-h-screen bg-gray-50/70 pb-24 md:pb-12 pt-6 md:pt-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Header Title Bar -->
+        <div class="flex items-center justify-between mb-6 sm:mb-8">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-black text-gray-900 flex items-center gap-2.5">
+                    <span>Saved Wishlist</span>
+                    <span id="savedCountBadge" class="text-xs bg-red-100 text-red-600 font-extrabold px-2.5 py-0.5 rounded-full">
+                        0 Stays
+                    </span>
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Properties you've bookmarked for quick booking & visits</p>
+            </div>
+            <a href="{{ route('user.search') }}" class="hidden sm:inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-xs font-bold px-4 py-2.5 rounded-xl transition tap-effect shadow-xs">
+                <i class="fas fa-search"></i> Explore More PGs
+            </a>
+        </div>
+
+        <!-- ================= 1. GUEST LOCKED STATE (IF NOT LOGGED IN) ================= -->
+        <div id="savedGuestLockedState" class="hidden">
+            <div class="bg-white rounded-3xl p-8 sm:p-12 border border-gray-100 shadow-sm text-center max-w-lg mx-auto my-8">
+                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-5 shadow-sm">
+                    <i class="fas fa-heart-circle-bolt"></i>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-gray-900 mb-2">Log in to view Saved Stays</h2>
+                <p class="text-xs sm:text-sm text-gray-500 mb-6 leading-relaxed">
+                    Your saved properties are safely stored in your account. Log in or create a free account to access your shortlist anywhere.
+                </p>
+                <div class="space-y-3">
+                    <a href="{{ route('user.login') }}" class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 px-6 rounded-2xl text-sm shadow-lg shadow-brand/30 hover:shadow-brand/40 transition tap-effect">
+                        <i class="fas fa-arrow-right-to-bracket"></i>
+                        <span>Log In / Sign Up</span>
+                    </a>
+                    <a href="{{ route('user.home') }}" class="w-full inline-flex items-center justify-center py-2.5 text-xs text-gray-500 hover:text-gray-800 font-semibold transition">
+                        Back to Home
+                    </a>
                 </div>
             </div>
         </div>
 
-        <div class="saved-item bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 tap-effect relative">
-            <button onclick="removeSaved(this)" class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 tap-effect z-10"><i class="fas fa-heart"></i></button>
-            <div class="relative h-40"><img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover"></div>
-            <div class="p-4">
-                <div class="flex justify-between items-start mb-1.5"><h3 class="font-bold text-gray-900">Aura Women's Stay</h3><span class="bg-pink-50 text-pink-600 text-[10px] font-bold px-2 py-0.5 rounded">GIRLS</span></div>
-                <p class="text-gray-500 text-xs mb-3 flex items-center gap-1"><i class="fas fa-map-marker-alt text-brand text-[10px]"></i> Indiranagar, Bangalore • 0.5 km</p>
-                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div class="text-base font-bold text-gray-900">₹9,999<span class="text-[10px] font-normal text-gray-500">/mo</span></div>
-                    <a href="{{ route('user.detail') }}" class="bg-brand text-white text-xs font-semibold px-4 py-2 rounded-lg tap-effect">View</a>
+        <!-- ================= 2. EMPTY WISHLIST STATE (LOGGED IN BUT NO ITEMS) ================= -->
+        <div id="savedEmptyState" class="hidden">
+            <div class="bg-white rounded-3xl p-8 sm:p-12 border border-gray-100 shadow-sm text-center max-w-lg mx-auto my-8">
+                <div class="w-20 h-20 bg-gray-100 text-gray-400 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-5">
+                    <i class="far fa-heart"></i>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Desktop Content -->
-<div class="hidden md:block max-w-7xl mx-auto px-6 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">Saved Properties</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="desktopSavedList">
-        <div class="saved-item bg-white rounded-2xl overflow-hidden shadow-sm card-hover border border-gray-100 group relative">
-            <div class="relative h-56 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                <button onclick="removeSaved(this)" class="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 transition tap-effect shadow-lg"><i class="fas fa-heart text-lg"></i></button>
-                <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur text-white text-xs px-3 py-2 rounded-lg flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i><span class="font-bold">4.8</span><span class="text-gray-300">(120 Reviews)</span></div>
-            </div>
-            <div class="p-5">
-                <div class="flex justify-between items-start mb-2"><h3 class="font-bold text-lg text-gray-900">Sunrise Premium PG</h3><span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-lg">BOYS</span></div>
-                <p class="text-gray-500 text-sm mb-3 flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-brand"></i> Sector 62, Noida • 1.2 km</p>
-                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div><span class="text-xs text-gray-500">Starts from</span><div class="text-xl font-bold text-gray-900">₹8,500<span class="text-sm font-normal text-gray-500">/month</span></div></div>
-                    <a href="{{ route('user.detail') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-5 py-2.5 rounded-xl font-semibold transition tap-effect">View Details</a>
-                </div>
+                <h2 class="text-xl font-black text-gray-900 mb-2">No Saved Properties Yet</h2>
+                <p class="text-xs sm:text-sm text-gray-500 mb-6 leading-relaxed">
+                    You haven't added any PGs to your wishlist. Tap the heart icon on any property card to save it here!
+                </p>
+                <a href="{{ route('user.search') }}" class="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold py-3 px-6 rounded-2xl text-xs transition tap-effect shadow-md shadow-brand/20">
+                    <i class="fas fa-compass"></i>
+                    <span>Browse Verified Stays</span>
+                </a>
             </div>
         </div>
 
-        <div class="saved-item bg-white rounded-2xl overflow-hidden shadow-sm card-hover border border-gray-100 group relative">
-            <div class="relative h-56 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                <button onclick="removeSaved(this)" class="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 transition tap-effect shadow-lg"><i class="fas fa-heart text-lg"></i></button>
-                <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur text-white text-xs px-3 py-2 rounded-lg flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i><span class="font-bold">4.9</span><span class="text-gray-300">(98 Reviews)</span></div>
-            </div>
-            <div class="p-5">
-                <div class="flex justify-between items-start mb-2"><h3 class="font-bold text-lg text-gray-900">Aura Women's Stay</h3><span class="bg-pink-50 text-pink-600 text-xs font-bold px-2.5 py-1 rounded-lg">GIRLS</span></div>
-                <p class="text-gray-500 text-sm mb-3 flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-brand"></i> Indiranagar, Bangalore • 0.5 km</p>
-                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div><span class="text-xs text-gray-500">Starts from</span><div class="text-xl font-bold text-gray-900">₹9,999<span class="text-sm font-normal text-gray-500">/month</span></div></div>
-                    <a href="{{ route('user.detail') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-5 py-2.5 rounded-xl font-semibold transition tap-effect">View Details</a>
-                </div>
-            </div>
+        <!-- ================= 3. POPULATED SAVED PROPERTIES GRID ================= -->
+        <div id="savedListContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+            <!-- Dynamically injected via JavaScript -->
         </div>
+
     </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    function removeSaved(btn) {
-        const item = btn.closest('.saved-item');
-        if (item) {
-            item.style.opacity = '0';
-            item.style.transform = 'scale(0.9)';
-            setTimeout(() => item.remove(), 200);
+    document.addEventListener('DOMContentLoaded', function() {
+        renderSavedPage();
+    });
+
+    function renderSavedPage() {
+        const lockedBox = document.getElementById('savedGuestLockedState');
+        const emptyBox = document.getElementById('savedEmptyState');
+        const listContainer = document.getElementById('savedListContainer');
+        const countBadge = document.getElementById('savedCountBadge');
+
+        // Check if user is logged in
+        if (!isUserLoggedIn()) {
+            lockedBox.classList.remove('hidden');
+            emptyBox.classList.add('hidden');
+            listContainer.classList.add('hidden');
+            countBadge.innerText = 'Locked';
+            return;
         }
+
+        lockedBox.classList.add('hidden');
+        let savedList = getSavedProperties();
+
+        // Fallback default sample wishlist if freshly logged in
+        if (!savedList || savedList.length === 0) {
+            savedList = [
+                {
+                    id: 'pg_sunrise_1',
+                    title: 'Sunrise Premium PG',
+                    type: 'BOYS',
+                    typeColor: 'bg-blue-50 text-blue-600',
+                    location: 'Sector 62, Noida',
+                    dist: '0.4 km away',
+                    price: '₹8,500',
+                    rating: '4.8',
+                    reviews: '120',
+                    badge: 'Verified',
+                    image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
+                },
+                {
+                    id: 'pg_aura_2',
+                    title: "Aura Women's Stay",
+                    type: 'GIRLS',
+                    typeColor: 'bg-pink-50 text-pink-600',
+                    location: 'Indiranagar, Bangalore',
+                    dist: '0.5 km away',
+                    price: '₹9,999',
+                    rating: '4.9',
+                    reviews: '98',
+                    badge: 'Verified',
+                    image: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
+                }
+            ];
+            savePropertiesToStorage(savedList);
+        }
+
+        countBadge.innerText = `${savedList.length} Stays`;
+
+        if (savedList.length === 0) {
+            emptyBox.classList.remove('hidden');
+            listContainer.classList.add('hidden');
+            return;
+        }
+
+        emptyBox.classList.add('hidden');
+        listContainer.classList.remove('hidden');
+        listContainer.innerHTML = '';
+
+        savedList.forEach(pg => {
+            const card = document.createElement('div');
+            card.className = 'saved-item bg-white rounded-3xl overflow-hidden shadow-xs hover:shadow-lg border border-gray-100 flex flex-col transition-all duration-300 transform group relative';
+            card.id = `savedCard_${pg.id}`;
+
+            const badgeBg = pg.type === 'GIRLS' ? 'bg-pink-50 text-pink-600' : (pg.type === 'CO-ED' ? 'bg-purple-50 text-purple-600' : 'bg-blue-50 text-blue-600');
+
+            card.innerHTML = `
+                <div class="relative h-48 overflow-hidden bg-gray-100">
+                    <img src="${pg.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'}" 
+                         alt="${pg.title}" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    
+                    <span class="absolute top-3 left-3 bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                        <i class="fas fa-check-circle text-[9px]"></i> Verified Stay
+                    </span>
+
+                    <!-- Remove from Wishlist Button -->
+                    <button type="button" 
+                            onclick="removeSavedItem('${pg.id}', this)" 
+                            class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-red-500 shadow-md hover:bg-white hover:scale-110 transition tap-effect" 
+                            title="Remove from saved">
+                        <i class="fas fa-heart text-sm"></i>
+                    </button>
+
+                    <div class="absolute bottom-2.5 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <i class="fas fa-star text-yellow-400 text-[9px]"></i> ${pg.rating || '4.8'}
+                    </div>
+                </div>
+
+                <div class="p-4 flex flex-col flex-1 justify-between">
+                    <div>
+                        <div class="flex justify-between items-start gap-1.5 mb-1.5">
+                            <h3 class="font-black text-sm sm:text-base text-gray-900 truncate leading-tight">${pg.title}</h3>
+                            <span class="${badgeBg} text-[9px] font-black uppercase px-2 py-0.5 rounded-md flex-shrink-0">${pg.type || 'BOYS'}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 flex items-center gap-1 mb-3 truncate">
+                            <i class="fas fa-map-marker-alt text-brand text-[10px]"></i> ${pg.location || 'Sector 62, Noida'}
+                        </p>
+                    </div>
+
+                    <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
+                        <div>
+                            <span class="text-[9px] text-gray-400 block font-semibold leading-none">Starting from</span>
+                            <span class="text-base font-black text-gray-900">${pg.price || '₹8,500'}<span class="text-[10px] font-normal text-gray-500">/mo</span></span>
+                        </div>
+                        <a href="{{ route('user.detail') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-md hover:shadow-brand/20 text-white text-xs font-bold px-4 py-2 rounded-xl transition tap-effect">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            `;
+            listContainer.appendChild(card);
+        });
+    }
+
+    function removeSavedItem(id, btn) {
+        let savedList = getSavedProperties();
+        const card = document.getElementById(`savedCard_${id}`) || btn.closest('.saved-item');
+        
+        savedList = savedList.filter(item => item.id !== id);
+        savePropertiesToStorage(savedList);
+
+        if (card) {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.85)';
+            setTimeout(() => {
+                card.remove();
+                const countBadge = document.getElementById('savedCountBadge');
+                countBadge.innerText = `${savedList.length} Stays`;
+
+                if (savedList.length === 0) {
+                    document.getElementById('savedEmptyState').classList.remove('hidden');
+                    document.getElementById('savedListContainer').classList.add('hidden');
+                }
+            }, 250);
+        }
+
+        showWishlistToast('Removed from Wishlist', 'Property removed from your saved stays.', false);
     }
 </script>
 @endpush

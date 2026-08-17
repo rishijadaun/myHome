@@ -1,0 +1,1 @@
+php artisan tinker --execute="App\Models\User::where('email', 'admin@staynest.com')->update(['password_hash' => Illuminate\Support\Facades\Hash::make('Rishi@123')]);"

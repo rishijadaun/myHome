@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Panel') - StayNest</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -86,33 +87,46 @@
                 <a href="{{ route('admin.pgs') }}" class="sidebar-link {{ request()->routeIs('admin.pgs') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-building w-5 text-center"></i>
                     <span class="text-sm font-medium">Manage PGs</span>
-                    <span class="ml-auto bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">124</span>
+                    <span class="ml-auto bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['properties'] ?? 0 }}</span>
                 </a>
                 <a href="{{ route('admin.brokers') }}" class="sidebar-link {{ request()->routeIs('admin.brokers') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-user-tie w-5 text-center"></i>
                     <span class="text-sm font-medium">Brokers</span>
-                    <span class="ml-auto bg-yellow-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">8</span>
+                    @if(($adminSidebarStats['pendingBrokers'] ?? 0) > 0)
+                        <span class="ml-auto bg-yellow-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['pendingBrokers'] }}</span>
+                    @endif
                 </a>
                 <a href="{{ route('admin.bookings') }}" class="sidebar-link {{ request()->routeIs('admin.bookings') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-calendar-check w-5 text-center"></i>
                     <span class="text-sm font-medium">Bookings</span>
-                    <span class="ml-auto bg-blue-50 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">389</span>
+                    <span class="ml-auto bg-blue-50 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['bookings'] ?? 0 }}</span>
                 </a>
                 <a href="{{ route('admin.users') }}" class="sidebar-link {{ request()->routeIs('admin.users') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-users w-5 text-center"></i>
                     <span class="text-sm font-medium">Users</span>
-                    <span class="ml-auto bg-purple-50 text-purple-600 text-xs font-bold px-2 py-0.5 rounded-full">1.2k</span>
+                    <span class="ml-auto bg-purple-50 text-purple-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['users'] ?? 0 }}</span>
                 </a>
             </nav>
         </div>
 
         <div class="p-4 border-t border-gray-100 space-y-1">
-            <div class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">System</div>
+            @if(Auth::check())
+            <div class="px-3 py-2.5 mb-2 bg-brand-50/60 border border-brand-100/80 rounded-xl flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand to-brand-dark text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-brand/30 shrink-0">
+                    {{ strtoupper(substr(Auth::user()->profile->first_name ?? 'A', 0, 1)) }}
+                </div>
+                <div class="overflow-hidden min-w-0">
+                    <div class="text-xs font-bold text-gray-900 truncate">{{ Auth::user()->profile->first_name ?? 'Admin' }} {{ Auth::user()->profile->last_name ?? '' }}</div>
+                    <div class="text-[10px] text-brand-dark font-medium truncate">{{ Auth::user()->email }}</div>
+                </div>
+            </div>
+            @endif
+            <div class="px-4 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">System</div>
             <a href="{{ route('admin.settings') }}" class="sidebar-link {{ request()->routeIs('admin.settings') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                 <i class="fas fa-cog w-5 text-center"></i>
                 <span class="text-sm font-medium">Settings</span>
             </a>
-            <a href="{{ route('admin.login') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition">
+            <a href="{{ route('admin.logout') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition">
                 <i class="fas fa-sign-out-alt w-5 text-center"></i>
                 <span class="text-sm font-medium">Logout</span>
             </a>

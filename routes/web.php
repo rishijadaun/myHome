@@ -6,15 +6,63 @@ Route::get('/', function () {
     return view('user.home');
 })->name('user.home');
 
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminPropertyController;
+use App\Http\Controllers\Admin\AdminBrokerController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminSettingController;
+
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::view('/login', 'admin.login')->name('login');
-    Route::view('/', 'admin.dashboard')->name('dashboard');
-    Route::view('/dashboard', 'admin.dashboard');
-    Route::view('/pgs', 'admin.pgs')->name('pgs');
-    Route::view('/brokers', 'admin.brokers')->name('brokers');
-    Route::view('/bookings', 'admin.bookings')->name('bookings');
-    Route::view('/users', 'admin.users')->name('users');
-    Route::view('/settings', 'admin.settings')->name('settings');
+    // Guest Admin Routes
+    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
+    Route::match(['get', 'post'], '/logout', [AdminAuthController::class, 'logout'])->name('logout');
+
+    // Protected Admin Routes
+    Route::middleware('admin')->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+        Route::get('/dashboard/chart-data', [AdminDashboardController::class, 'getChartData'])->name('dashboard.chart');
+        
+        // Dynamic Quick Actions from Dashboard
+        Route::post('/properties/{id}/approve', [AdminDashboardController::class, 'approveProperty'])->name('properties.approve');
+        Route::post('/properties/{id}/reject', [AdminDashboardController::class, 'rejectProperty'])->name('properties.reject');
+        Route::post('/brokers/{id}/approve', [AdminDashboardController::class, 'approveBroker'])->name('brokers.approve');
+        Route::post('/brokers/{id}/reject', [AdminDashboardController::class, 'rejectBroker'])->name('brokers.reject');
+
+        // Manage PGs Routes
+        Route::get('/pgs', [AdminPropertyController::class, 'index'])->name('pgs');
+        Route::post('/pgs', [AdminPropertyController::class, 'store'])->name('pgs.store');
+        Route::get('/pgs/{id}', [AdminPropertyController::class, 'show'])->name('pgs.show');
+        Route::post('/pgs/{id}/toggle-status', [AdminPropertyController::class, 'toggleStatus'])->name('pgs.toggle');
+        Route::post('/pgs/{id}/approve', [AdminPropertyController::class, 'approve'])->name('pgs.approve');
+        Route::delete('/pgs/{id}', [AdminPropertyController::class, 'destroy'])->name('pgs.destroy');
+
+        // Manage Brokers Routes
+        Route::get('/brokers', [AdminBrokerController::class, 'index'])->name('brokers');
+        Route::post('/brokers', [AdminBrokerController::class, 'store'])->name('brokers.store');
+        Route::get('/brokers/{id}', [AdminBrokerController::class, 'show'])->name('brokers.show');
+        Route::post('/brokers/{id}/approve', [AdminBrokerController::class, 'approve'])->name('brokers.approve');
+        Route::post('/brokers/{id}/reject', [AdminBrokerController::class, 'reject'])->name('brokers.reject');
+        Route::post('/brokers/{id}/toggle-status', [AdminBrokerController::class, 'toggleStatus'])->name('brokers.toggle');
+        Route::delete('/brokers/{id}', [AdminBrokerController::class, 'destroy'])->name('brokers.destroy');
+
+        // Manage Users Routes
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::get('/users/{id}', [AdminUserController::class, 'show'])->name('users.show');
+        Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle');
+        Route::post('/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
+        Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Settings Routes
+        Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings');
+        Route::post('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/profile', [AdminSettingController::class, 'updateProfile'])->name('settings.profile');
+
+        Route::view('/bookings', 'admin.bookings')->name('bookings');
+    });
 });
 
 Route::prefix('broker')->name('broker.')->group(function () {
@@ -40,6 +88,12 @@ Route::name('user.')->group(function () {
     Route::view('/list_property', 'user.list-property');
     Route::view('/bookings', 'user.bookings')->name('bookings');
     Route::view('/login', 'user.login')->name('login');
+    Route::match(['get', 'post'], '/logout', function () {
+        \Illuminate\Support\Facades\Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+        return redirect()->route('user.login');
+    })->name('logout');
     Route::view('/search', 'user.search')->name('search');
     Route::view('/profile', 'user.profile')->name('profile');
     Route::view('/pricing', 'user.pricing')->name('pricing');

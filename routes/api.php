@@ -29,6 +29,9 @@ Route::prefix('v1')->group(function () {
         Route::get('locations', [AppController::class, 'locations']);
     });
 
+    // ---------------- AI SEARCH ASSISTANT (REST API FOR ANDROID & CLIENTS) ----------------
+    Route::post('ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search']);
+
     // ---------------- 3. PROPERTY SUBMISSION & TYPES (DYNAMIC) ----------------
     Route::get('property-types', [PropertySubmissionController::class, 'types']);
     Route::post('properties/submit', [PropertySubmissionController::class, 'submit']);

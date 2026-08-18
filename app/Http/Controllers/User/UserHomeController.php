@@ -105,12 +105,39 @@ class UserHomeController extends Controller
 
         $property = null;
         if ($slugOrId) {
-            $property = (clone $query)->where('slug', $slugOrId)->orWhere('id', $slugOrId)->first();
+            $property = (clone $query)->where(function ($q) use ($slugOrId) {
+                $q->where('slug', $slugOrId)->orWhere('id', $slugOrId);
+            })->first();
+
+            if ($property) {
+                // Check if viewer has preview permissions (Admin or Broker Owner)
+                $canPreview = false;
+                if (Auth::check()) {
+                    $authUser = Auth::user();
+                    if ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || $property->broker_id === $authUser->id) {
+                        $canPreview = true;
+                    }
+                }
+
+                // If not authorized to preview and listing is not approved/active, block public access
+                if (!$canPreview && ($property->status !== 'active' || $property->verification_status !== 'verified' || !$property->is_active)) {
+                    abort(404, 'This property listing is currently under review by admin and is not publicly accessible.');
+                }
+            } else {
+                abort(404, 'Property not found.');
+            }
         }
 
         if (!$property) {
-            // Fallback to first approved property
-            $property = (clone $query)->where('status', 'active')->where('verification_status', 'verified')->first() ?? Property::first();
+            // Fallback to first approved & verified active property
+            $property = (clone $query)->where('status', 'active')
+                ->where('verification_status', 'verified')
+                ->where('is_active', 1)
+                ->first();
+        }
+
+        if (!$property) {
+            abort(404, 'No active property found.');
         }
 
         // Similar Stays

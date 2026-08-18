@@ -168,7 +168,10 @@ Route::name('user.')->group(function () {
     Route::get('/pg-details', [UserHomeController::class, 'show']);
     Route::post('/property/{id}/report', [UserHomeController::class, 'report'])->name('property.report');
     Route::post('/property/{id}/review', [UserHomeController::class, 'submitReview'])->name('property.review');
+    Route::post('/ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search'])->name('ai.search');
 });
+
+Route::post('/ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search'])->name('ai.search');
 
 // Fallback Route for 404 Not Found
 Route::fallback(function () {

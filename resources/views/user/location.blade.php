@@ -282,33 +282,60 @@
                     <div class="flex flex-wrap gap-1.5" id="aiParsedBadges"></div>
                 </div> -->
 
-                <!-- Quick AI Suggestions Pills -->
+                <!-- Quick AI Suggestions Pills (20+ Rich Queries) -->
                 <div>
-                    <div class="flex items-center justify-between text-[10px] font-bold text-gray-400 mb-1">
-                        <span class="flex items-center gap-1"><i class="fas fa-sparkles text-purple-500"></i> Quick AI Suggestions</span>
-                    </div>
+                    <!-- <div class="flex items-center justify-between text-[10px] font-bold text-gray-400 mb-1.5">
+                        <span class="flex items-center gap-1"><i class="fas fa-wand-magic-sparkles text-purple-600 animate-pulse"></i> Quick AI Suggestions (20+ Prompts)</span>
+                        <span class="text-[9px] text-purple-600 font-semibold">Scroll &rarr;</span>
+                    </div> -->
                     <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
-                        <button type="button" onclick="applyAIPrompt('Boys PG under 9000 in Noida')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition tap-effect">✨ Boys &lt; ₹9K Noida</button>
+                        <button type="button" onclick="applyAIPrompt('Boys PG under 8000 in Noida')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition tap-effect">✨ Boys &lt; ₹8K Noida</button>
                         <button type="button" onclick="applyAIPrompt('Girls PG with AC in Bangalore')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition tap-effect">✨ Girls AC Bangalore</button>
+                        <button type="button" onclick="applyAIPrompt('Co-ed unisex coliving stays')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 transition tap-effect">✨ Co-Ed / Unisex Stays</button>
                         <button type="button" onclick="applyAIPrompt('Luxury stay with food and wifi in Delhi')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition tap-effect">✨ Food &amp; WiFi Delhi</button>
-                        <button type="button" onclick="applyAIPrompt('Budget stays under 7000')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition tap-effect">✨ Under ₹7K</button>
+                        <button type="button" onclick="applyAIPrompt('Budget stays under 6000')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition tap-effect">✨ Under ₹6K Budget</button>
+                        <button type="button" onclick="applyAIPrompt('Single private room PG')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 transition tap-effect">✨ Single Private Room</button>
+                        <button type="button" onclick="applyAIPrompt('Stays near metro station')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition tap-effect">✨ Near Metro Station</button>
+                        <button type="button" onclick="applyAIPrompt('Luxury co-living in Gurgaon Cyber City')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200 transition tap-effect">✨ Luxury Gurgaon PG</button>
+                        <button type="button" onclick="applyAIPrompt('Boys PG in Hinjewadi Pune')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 transition tap-effect">✨ Boys Pune Hinjewadi</button>
+                        <button type="button" onclick="applyAIPrompt('Girls PG in Hitec City Hyderabad')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition tap-effect">✨ Girls Hyderabad Hitec</button>
+                        <button type="button" onclick="applyAIPrompt('Sector 62 Noida stays')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 transition tap-effect">✨ Sector 62 Noida</button>
+                        <button type="button" onclick="applyAIPrompt('Koramangala Bangalore PG with AC')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 transition tap-effect">✨ Koramangala Bangalore</button>
+                        <button type="button" onclick="applyAIPrompt('Orai city stays')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition tap-effect">✨ Orai City Stays</button>
+                        <button type="button" onclick="applyAIPrompt('Jhansi and Kanpur stays')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition tap-effect">✨ Jhansi &amp; Kanpur</button>
+                        <button type="button" onclick="applyAIPrompt('Zero deposit PG stays')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-lime-50 hover:bg-lime-100 text-lime-700 border border-lime-200 transition tap-effect">✨ Zero Deposit PGs</button>
+                        <button type="button" onclick="applyAIPrompt('Attached balcony and private washroom PG')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition tap-effect">✨ Balcony &amp; Bath</button>
+                        <button type="button" onclick="applyAIPrompt('PG with gym and fitness center')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition tap-effect">✨ Gym &amp; Fitness</button>
+                        <button type="button" onclick="applyAIPrompt('Top rated 4.5 star stays')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border border-yellow-200 transition tap-effect">✨ Top Rated 4.5+</button>
+                        <button type="button" onclick="applyAIPrompt('Knowledge Park Greater Noida student PG')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition tap-effect">✨ Gr. Noida Knowledge Park</button>
+                        <button type="button" onclick="applyAIPrompt('Working professionals co-living')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-50 hover:bg-slate-200 text-slate-700 border border-slate-200 transition tap-effect">✨ Working Professionals</button>
+                        <button type="button" onclick="applyAIPrompt('Student budget stay with food')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 transition tap-effect">✨ Student Budget &amp; Food</button>
+                        <button type="button" onclick="applyAIPrompt('Stays with 3 meals breakfast lunch dinner')" class="whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-bold bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 transition tap-effect">✨ 3-Times Food Included</button>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between pt-1">
-                    <div>
+                    <div class="flex gap-2">
                         <h2 class="text-base font-extrabold text-slate-900" id="listHeader">Nearby PGs</h2>
-                        <p class="text-xs text-slate-500 mt-0.5"><span id="pgCountBadge">0</span> properties found</p>
+                        <p class="text-xs text-slate-500 mt-0.5"><span id="pgCountBadge" class="font-bold">0</span> properties found</p>
                     </div>
                 </div>
-                
-                <!-- Filter Pills -->
+                <!-- Open & Versatile Filter Pills -->
                 <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                    <button onclick="filterPGs('all', this)" class="chip-active whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all">All</button>
-                    <button onclick="filterPGs('Boys', this)" class="whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-male mr-1"></i> Boys</button>
-                    <button onclick="filterPGs('Girls', this)" class="whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-female mr-1"></i> Girls</button>
-                    <button onclick="filterPGs('AC', this)" class="whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-snowflake mr-1"></i> AC</button>
-                    <button onclick="filterPGs('WiFi', this)" class="whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-wifi mr-1"></i> WiFi</button>
+                    <button onclick="filterPGs('all', this)" class="chip-active whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all">All Stays</button>
+                    <button onclick="filterPGs('boys', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-male mr-1 text-blue-500"></i> Boys</button>
+                    <button onclick="filterPGs('girls', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-female mr-1 text-pink-500"></i> Girls</button>
+                    <button onclick="filterPGs('co-ed', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-users mr-1 text-purple-500"></i> Co-Ed / Unisex</button>
+                    <button onclick="filterPGs('ac', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-snowflake mr-1 text-cyan-500"></i> AC</button>
+                    <button onclick="filterPGs('wifi', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-wifi mr-1 text-indigo-500"></i> WiFi</button>
+                    <button onclick="filterPGs('food', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-utensils mr-1 text-emerald-500"></i> Food</button>
+                    <button onclick="filterPGs('gym', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-dumbbell mr-1 text-orange-500"></i> Gym</button>
+                    <button onclick="filterPGs('single', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-door-closed mr-1 text-teal-500"></i> Single Room</button>
+                    <button onclick="filterPGs('bath', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-bath mr-1 text-sky-500"></i> Attached Bath</button>
+                    <button onclick="filterPGs('metro', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-train-subway mr-1 text-amber-500"></i> Near Metro</button>
+                    <button onclick="filterPGs('under8k', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-tag mr-1 text-green-500"></i> Under ₹8K</button>
+                    <button onclick="filterPGs('luxury', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-crown mr-1 text-yellow-500"></i> Luxury</button>
+                    <button onclick="filterPGs('top_rated', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-star mr-1 text-amber-400"></i> Top Rated 4.5+</button>
                 </div>
             </div>
 
@@ -808,11 +835,55 @@
 
             const filtered = currentPGList.filter(pg => {
                 if (activeFilter === 'all') return true;
-                const filterLower = activeFilter.toLowerCase();
-                const genderMatch = (pg.gender && pg.gender.toLowerCase() === filterLower) || 
-                                    (filterLower === 'unisex' && (pg.gender === 'co-ed' || pg.gender === 'unisex'));
-                const tagMatch = pg.tags && pg.tags.some(t => t.toLowerCase().includes(filterLower));
-                return genderMatch || tagMatch;
+                const f = activeFilter.toLowerCase();
+                
+                if (f === 'boys') {
+                    return (pg.gender && pg.gender.toLowerCase() === 'boys');
+                }
+                if (f === 'girls') {
+                    return (pg.gender && pg.gender.toLowerCase() === 'girls');
+                }
+                if (f === 'co-ed' || f === 'unisex' || f === 'coliving') {
+                    return (pg.gender && (pg.gender.toLowerCase() === 'co-ed' || pg.gender.toLowerCase() === 'unisex' || pg.gender.toLowerCase() === 'coliving'));
+                }
+                if (f === 'ac') {
+                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('ac')));
+                }
+                if (f === 'wifi') {
+                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('wifi')));
+                }
+                if (f === 'food') {
+                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('food') || t.toLowerCase().includes('meal') || t.toLowerCase().includes('mess')));
+                }
+                if (f === 'gym') {
+                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('gym') || t.toLowerCase().includes('fitness')));
+                }
+                if (f === 'single') {
+                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('single') || t.toLowerCase().includes('private'))) ||
+                           (pg.name && pg.name.toLowerCase().includes('single'));
+                }
+                if (f === 'bath') {
+                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('bath') || t.toLowerCase().includes('attached')));
+                }
+                if (f === 'metro') {
+                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('metro'))) ||
+                           (pg.location_text && pg.location_text.toLowerCase().includes('metro')) ||
+                           (pg.address && pg.address.toLowerCase().includes('metro'));
+                }
+                if (f === 'under8k') {
+                    return (pg.raw_price && pg.raw_price <= 8000);
+                }
+                if (f === 'luxury') {
+                    return (pg.raw_price && pg.raw_price >= 12000) || (pg.tags && pg.tags.some(t => t.toLowerCase().includes('luxury')));
+                }
+                if (f === 'top_rated') {
+                    return (parseFloat(pg.rating) >= 4.5);
+                }
+
+                // General tag/name match
+                const tagMatch = pg.tags && pg.tags.some(t => t.toLowerCase().includes(f));
+                const nameMatch = pg.name && pg.name.toLowerCase().includes(f);
+                return tagMatch || nameMatch;
             });
 
             const headerEl = document.getElementById('listHeader');

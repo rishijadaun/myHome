@@ -396,13 +396,13 @@
                             <i class="fas fa-calendar-check"></i> Book Stay Online
                         </a>
 
-                        <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I am interested in ' . $propName . ' (' . $propLocation . '). Please share room availability.') }}" target="_blank" class="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-xs">
+                        <!-- <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I am interested in ' . $propName . ' (' . $propLocation . '). Please share room availability.') }}" target="_blank" class="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-xs">
                             <i class="fab fa-whatsapp text-lg text-emerald-600"></i> WhatsApp Host
                         </a>
 
                         <a href="tel:{{ $cleanPhone }}" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-xs">
                             <i class="fas fa-phone-alt text-brand"></i> Call Host Directly
-                        </a>
+                        </a> -->
                     </div>
 
                     <!-- Assured Promises -->
@@ -436,14 +436,14 @@
                             </p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
+                    <!-- <div class="grid grid-cols-2 gap-2 text-xs">
                         <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I want to schedule a visit to ' . $propName) }}" target="_blank" class="p-2.5 bg-gray-50 hover:bg-emerald-50 rounded-xl border border-gray-200 text-center font-bold text-gray-700 hover:text-emerald-700 transition">
                             <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> Visit Schedule
                         </a>
                         <a href="tel:{{ $cleanPhone }}" class="p-2.5 bg-gray-50 hover:bg-brand-light/30 rounded-xl border border-gray-200 text-center font-bold text-gray-700 hover:text-brand transition">
                             <i class="fas fa-phone mr-1 text-brand"></i> Call Now
                         </a>
-                    </div>
+                    </div> -->
                 </div>
 
             </div>
@@ -464,28 +464,78 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+            <!-- ===== MOBILE: 2-Column Horizontal Slider ===== -->
+            <div class="md:hidden swiper similarSwiper overflow-hidden">
+                <div class="swiper-wrapper">
+                    @foreach($similarProperties as $sim)
+                        @php
+                            $simTag = $sim->display_tag_meta;
+                            $simGender = $sim->gender_type_meta;
+                            $simSlug = route('user.detail', ['slug' => $sim->slug ?: \Illuminate\Support\Str::slug($sim->name)]);
+                        @endphp
+                        <div class="swiper-slide !h-auto">
+                            <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm card-lift flex flex-col justify-between h-full group">
+                                <div>
+                                    <!-- Card Image -->
+                                    <div class="relative aspect-[4/3] overflow-hidden">
+                                        <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                        <div class="absolute top-2 left-2 {{ $simTag['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+                                            <i class="fas fa-{{ $simTag['icon'] }}"></i> {{ $simTag['label'] }}
+                                        </div>
+                                        <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur text-white text-[10px] px-2 py-0.5 rounded-lg flex items-center gap-1 font-bold">
+                                            <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $sim->rating ? number_format($sim->rating, 1) : '4.8' }}
+                                        </div>
+                                    </div>
+
+                                    <!-- Card Body -->
+                                    <div class="p-2.5">
+                                        <div class="flex justify-between items-start mb-1 gap-1">
+                                            <h3 class="font-bold text-xs text-gray-900 group-hover:text-brand transition truncate">{{ $sim->name }}</h3>
+                                            <span class="{{ $simGender['class'] }} text-[8px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $simGender['label'] }}</span>
+                                        </div>
+                                        <p class="text-gray-500 text-[10px] mb-1 flex items-center gap-1 truncate">
+                                            <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ ($sim->area ? $sim->area->name . ', ' : '') . ($sim->city ? $sim->city->name : '') }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Card Footer -->
+                                <div class="px-2.5 pb-2.5 pt-2 border-t border-gray-100 flex items-center justify-between">
+                                    <div>
+                                        <span class="text-[9px] text-gray-400 block">Rent</span>
+                                        <span class="text-xs font-extrabold text-gray-900">₹{{ number_format($sim->monthly_rent) }}<span class="text-[8px] font-normal text-gray-500">/mo</span></span>
+                                    </div>
+                                    <a href="{{ $simSlug }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-xs">View</a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- ===== DESKTOP: 4-Col Grid ===== -->
+            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 @foreach($similarProperties as $sim)
                     @php
                         $simTag = $sim->display_tag_meta;
                         $simGender = $sim->gender_type_meta;
                         $simSlug = route('user.detail', ['slug' => $sim->slug ?: \Illuminate\Support\Str::slug($sim->name)]);
                     @endphp
-                    <div class="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-100 shadow-sm card-lift flex flex-col justify-between group">
+                    <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm card-lift flex flex-col justify-between group">
                         <div>
                             <!-- Card Image -->
                             <div class="relative aspect-[4/3] overflow-hidden">
                                 <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute top-2 left-2 {{ $simTag['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+                                <div class="absolute top-2.5 left-2.5 {{ $simTag['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-sm">
                                     <i class="fas fa-{{ $simTag['icon'] }}"></i> {{ $simTag['label'] }}
                                 </div>
-                                <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur text-white text-[10px] px-2 py-0.5 rounded-lg flex items-center gap-1 font-bold">
+                                <div class="absolute bottom-2.5 left-2.5 bg-black/70 backdrop-blur text-white text-[10px] px-2.5 py-0.5 rounded-lg flex items-center gap-1 font-bold">
                                     <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $sim->rating ? number_format($sim->rating, 1) : '4.8' }}
                                 </div>
                             </div>
 
                             <!-- Card Body -->
-                            <div class="p-3 sm:p-4">
+                            <div class="p-3.5 sm:p-4">
                                 <div class="flex justify-between items-start mb-1 gap-1">
                                     <h3 class="font-bold text-xs sm:text-sm text-gray-900 group-hover:text-brand transition truncate">{{ $sim->name }}</h3>
                                     <span class="{{ $simGender['class'] }} text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $simGender['label'] }}</span>
@@ -627,17 +677,31 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        detailSwiperInstance = new Swiper('.detailSwiper', {
-            loop: true,
-            pagination: { el: '.detailSwiper .swiper-pagination', clickable: true },
-            navigation: { nextEl: '.detailSwiper .swiper-button-next', prevEl: '.detailSwiper .swiper-button-prev' },
-            autoplay: { delay: 4500, disableOnInteraction: false },
-            on: {
-                slideChange: function() {
-                    syncThumbnails(this.realIndex);
+        const slideCount = document.querySelectorAll('.detailSwiper .swiper-slide').length;
+        if (slideCount > 1) {
+            detailSwiperInstance = new Swiper('.detailSwiper', {
+                loop: true,
+                pagination: { el: '.detailSwiper .swiper-pagination', clickable: true },
+                navigation: { nextEl: '.detailSwiper .swiper-button-next', prevEl: '.detailSwiper .swiper-button-prev' },
+                autoplay: { delay: 4500, disableOnInteraction: false },
+                on: {
+                    slideChange: function() {
+                        syncThumbnails(this.realIndex);
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        if (document.querySelector('.similarSwiper')) {
+            new Swiper('.similarSwiper', {
+                slidesPerView: 2,
+                spaceBetween: 10,
+                breakpoints: {
+                    480: { slidesPerView: 2, spaceBetween: 12 },
+                    640: { slidesPerView: 2.5, spaceBetween: 14 }
+                }
+            });
+        }
     });
 
     function goToSlide(index) {

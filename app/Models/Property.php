@@ -41,12 +41,79 @@ class Property extends Model
         'verification_status',
         'status',
         'featured',
+        'tag',
         'is_active',
         'version',
         'created_by',
         'updated_by',
         'deleted_by',
     ];
+
+    public const ALLOWED_TAGS = [
+        'Popular' => [
+            'label' => 'Popular',
+            'icon' => 'fire',
+            'bg_class' => 'bg-orange-50 text-orange-700 border-orange-200',
+            'solid_badge' => 'bg-gradient-to-r from-orange-500 to-amber-500 text-white',
+            'dot_color' => 'bg-orange-500',
+        ],
+        'Verified' => [
+            'label' => 'Verified',
+            'icon' => 'check-circle',
+            'bg_class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            'solid_badge' => 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white',
+            'dot_color' => 'bg-emerald-500',
+        ],
+        'Guest Favourite' => [
+            'label' => 'Guest Favourite',
+            'icon' => 'heart',
+            'bg_class' => 'bg-rose-50 text-rose-700 border-rose-200',
+            'solid_badge' => 'bg-gradient-to-r from-rose-500 to-pink-500 text-white',
+            'dot_color' => 'bg-rose-500',
+        ],
+        'Trending' => [
+            'label' => 'Trending',
+            'icon' => 'bolt',
+            'bg_class' => 'bg-purple-50 text-purple-700 border-purple-200',
+            'solid_badge' => 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white',
+            'dot_color' => 'bg-purple-500',
+        ],
+        'Top rated' => [
+            'label' => 'Top rated',
+            'icon' => 'star',
+            'bg_class' => 'bg-amber-50 text-amber-800 border-amber-200',
+            'solid_badge' => 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900',
+            'dot_color' => 'bg-amber-500',
+        ],
+        'New' => [
+            'label' => 'New',
+            'icon' => 'sparkles',
+            'bg_class' => 'bg-blue-50 text-blue-700 border-blue-200',
+            'solid_badge' => 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white',
+            'dot_color' => 'bg-blue-500',
+        ],
+    ];
+
+    public function getTagMetaAttribute(): ?array
+    {
+        if (empty($this->tag)) {
+            return null;
+        }
+
+        foreach (self::ALLOWED_TAGS as $key => $meta) {
+            if (strcasecmp($this->tag, $key) === 0) {
+                return $meta;
+            }
+        }
+
+        return [
+            'label' => $this->tag,
+            'icon' => 'tag',
+            'bg_class' => 'bg-gray-50 text-gray-700 border-gray-200',
+            'solid_badge' => 'bg-gray-800 text-white',
+            'dot_color' => 'bg-gray-500',
+        ];
+    }
 
     protected function casts(): array
     {

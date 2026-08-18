@@ -105,12 +105,25 @@ class AdminPropertyController extends Controller
             }
         }
 
+        // Tag / Badge Filter
+        if ($request->filled('tag')) {
+            $tagFilter = trim($request->query('tag'));
+            if (strtolower($tagFilter) === 'untagged' || strtolower($tagFilter) === 'none') {
+                $query->where(function ($q) {
+                    $q->whereNull('tag')->orWhere('tag', '');
+                });
+            } else {
+                $query->where('tag', 'like', "%{$tagFilter}%");
+            }
+        }
+
         // 3. Paginated Results
         $properties = $query->latest()->paginate(15)->withQueryString();
 
         // 4. Dropdown Options
         $cities = City::where('is_active', 1)->orderBy('name')->get();
         $propertyTypes = PropertyType::where('is_active', 1)->orderBy('name')->get();
+        $allowedTags = Property::ALLOWED_TAGS;
 
         $brokerRole = Role::where('slug', 'broker')->first();
         $brokers = $brokerRole ? $brokerRole->users()->with('profile')->orderBy('email')->get() : collect();
@@ -120,6 +133,7 @@ class AdminPropertyController extends Controller
             'cities',
             'propertyTypes',
             'brokers',
+            'allowedTags',
             'totalCount',
             'approvedCount',
             'pendingCount',
@@ -137,6 +151,7 @@ class AdminPropertyController extends Controller
             'broker_id' => ['required', 'string'],
             'city_id' => ['required', 'string'],
             'property_type_id' => ['nullable', 'string'],
+            'tag' => ['nullable', 'string', 'max:50'],
             'gender_preference' => ['required', 'string', 'in:boys,girls,co-ed,male,female,any'],
             'total_beds' => ['required', 'integer', 'min:1', 'max:500'],
             'monthly_rent' => ['required', 'numeric', 'min:500'],
@@ -168,6 +183,7 @@ class AdminPropertyController extends Controller
             'city_id' => $validated['city_id'],
             'area_id' => $areaId,
             'property_type_id' => $propertyTypeId,
+            'tag' => !empty($validated['tag']) && strtolower($validated['tag']) !== 'none' ? $validated['tag'] : null,
             'gender_preference' => strtolower($validated['gender_preference']),
             'total_beds' => $validated['total_beds'],
             'available_beds' => $validated['total_beds'],
@@ -225,9 +241,55 @@ class AdminPropertyController extends Controller
         $property = Property::with(['broker.profile', 'city', 'area', 'propertyType', 'images', 'amenities'])
             ->findOrFail($id);
 
+        $propertyData = $property->toArray();
+        $propertyData['tag_meta'] = $property->tag_meta;
+
         return response()->json([
             'success' => true,
-            'property' => $property,
+            'property' => $propertyData,
+            'allowed_tags' => Property::ALLOWED_TAGS,
+        ]);
+    }
+
+    /**
+     * Update Property Tag / Badge (Popular, Verified, Guest Favourite, Trending, Top rated, New, or None).
+     */
+    public function updateTag(Request $request, $id)
+    {
+        $property = Property::findOrFail($id);
+
+        $validated = $request->validate([
+            'tag' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        $rawTag = trim($validated['tag'] ?? '');
+        $selectedTag = null;
+
+        if (!empty($rawTag) && strtolower($rawTag) !== 'none' && strtolower($rawTag) !== 'null' && strtolower($rawTag) !== 'untagged') {
+            foreach (Property::ALLOWED_TAGS as $key => $meta) {
+                if (strcasecmp($rawTag, $key) === 0) {
+                    $selectedTag = $key;
+                    break;
+                }
+            }
+            if (!$selectedTag) {
+                $selectedTag = $rawTag;
+            }
+        }
+
+        $property->tag = $selectedTag;
+        $property->save();
+
+        $tagMeta = $property->tag_meta;
+
+        return response()->json([
+            'success' => true,
+            'message' => $selectedTag 
+                ? "Tag updated to \"{$selectedTag}\" for {$property->name}!" 
+                : "Tag removed from {$property->name}.",
+            'tag' => $selectedTag,
+            'tag_meta' => $tagMeta,
+            'property_id' => $property->id,
         ]);
     }
 

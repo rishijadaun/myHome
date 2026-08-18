@@ -148,17 +148,25 @@ class PropertySubmissionController extends Controller
             // 1. Identify or Create Owner / Broker User
             $user = $request->user();
             if (!$user) {
-                $email = $validated['owner_email'] ?? ('owner_' . time() . '@staynest.com');
-                $phone = $validated['owner_phone'] ?? null;
+                $rawPhone = !empty($validated['owner_phone']) ? preg_replace('/\D/', '', $validated['owner_phone']) : null;
+                $phone = $rawPhone ? (strlen($rawPhone) >= 10 ? substr($rawPhone, -10) : $rawPhone) : null;
+                $email = !empty($validated['owner_email']) ? trim($validated['owner_email']) : null;
 
-                $user = User::where('email', $email)->orWhere(function ($q) use ($phone) {
-                    if ($phone) $q->where('phone', $phone);
+                // Find existing user by phone or email
+                $user = User::where(function ($q) use ($phone, $email) {
+                    if ($phone) {
+                        $q->where('phone', $phone)->orWhere('phone', 'like', "%{$phone}");
+                    }
+                    if ($email) {
+                        $q->orWhere('email', $email);
+                    }
                 })->first();
 
                 if (!$user) {
+                    $generatedEmail = $email ?: ('owner_' . time() . '_' . Str::random(4) . '@staynest.com');
                     $user = User::create([
                         'id' => (string) Str::uuid(),
-                        'email' => $email,
+                        'email' => $generatedEmail,
                         'phone' => $phone,
                         'password_hash' => Hash::make(Str::random(12)),
                         'status' => 'active',
@@ -175,10 +183,11 @@ class PropertySubmissionController extends Controller
 
                     $brokerRole = Role::where('slug', 'broker')->first();
                     if ($brokerRole) {
-                        UserRole::create([
-                            'id' => (string) Str::uuid(),
+                        UserRole::firstOrCreate([
                             'user_id' => $user->id,
                             'role_id' => $brokerRole->id,
+                        ], [
+                            'id' => (string) Str::uuid(),
                             'is_primary' => 1,
                             'is_active' => 1,
                         ]);
@@ -449,6 +458,8 @@ class PropertySubmissionController extends Controller
             'owner_email' => $property->broker?->email ?? '',
             'amenities' => $amenitySlugs,
             'photos' => $photos,
+            'tag' => $property->tag,
+            'tag_meta' => $property->tag_meta,
             'status' => $property->status ?? 'active',
             'is_active' => (bool) $property->is_active,
         ];
@@ -649,17 +660,87 @@ class PropertySubmissionController extends Controller
             }
 
             // Update Owner/Broker contact if provided
-            if ($property->broker) {
-                if (!empty($validated['owner_phone'])) {
-                    $property->broker->phone = $validated['owner_phone'];
-                    $property->broker->save();
-                }
-                if (!empty($validated['owner_name'])) {
-                    if ($property->broker->profile) {
-                        $nameParts = explode(' ', trim($validated['owner_name']), 2);
-                        $property->broker->profile->first_name = $nameParts[0];
-                        $property->broker->profile->last_name = $nameParts[1] ?? '';
-                        $property->broker->profile->save();
+            $rawPhone = !empty($validated['owner_phone']) ? preg_replace('/\D/', '', $validated['owner_phone']) : null;
+            $ownerPhone = $rawPhone ? (strlen($rawPhone) >= 10 ? substr($rawPhone, -10) : $rawPhone) : null;
+            $ownerEmail = !empty($validated['owner_email']) ? trim($validated['owner_email']) : null;
+            $ownerName = !empty($validated['owner_name']) ? trim($validated['owner_name']) : null;
+
+            if ($ownerPhone || $ownerEmail || $ownerName) {
+                // Check if another user already exists with this phone or email
+                $matchedUser = User::where(function ($q) use ($ownerPhone, $ownerEmail) {
+                    if ($ownerPhone) {
+                        $q->where('phone', $ownerPhone)->orWhere('phone', 'like', "%{$ownerPhone}");
+                    }
+                    if ($ownerEmail) {
+                        $q->orWhere('email', $ownerEmail);
+                    }
+                })->first();
+
+                if ($matchedUser) {
+                    // Link property to this existing user if not already linked
+                    if ($property->broker_id !== $matchedUser->id) {
+                        $property->broker_id = $matchedUser->id;
+                        $property->save();
+                    }
+                    // Update user profile name if provided
+                    if ($ownerName && $matchedUser->profile) {
+                        $nameParts = explode(' ', $ownerName, 2);
+                        $matchedUser->profile->first_name = $nameParts[0] ?? 'Property';
+                        $matchedUser->profile->last_name = $nameParts[1] ?? 'Manager';
+                        $matchedUser->profile->save();
+                    }
+                } else {
+                    // No existing user with that phone/email
+                    if ($property->broker) {
+                        // Current broker exists and phone/email is free -> safely update
+                        if ($ownerPhone) {
+                            $property->broker->phone = $ownerPhone;
+                        }
+                        if ($ownerEmail) {
+                            $property->broker->email = $ownerEmail;
+                        }
+                        $property->broker->save();
+
+                        if ($ownerName && $property->broker->profile) {
+                            $nameParts = explode(' ', $ownerName, 2);
+                            $property->broker->profile->first_name = $nameParts[0] ?? 'Property';
+                            $property->broker->profile->last_name = $nameParts[1] ?? 'Manager';
+                            $property->broker->profile->save();
+                        }
+                    } else {
+                        // Create a new broker user and attach to property
+                        $newUserEmail = $ownerEmail ?: ('owner_' . time() . '_' . Str::random(4) . '@staynest.com');
+                        $newBroker = User::create([
+                            'id' => (string) Str::uuid(),
+                            'email' => $newUserEmail,
+                            'phone' => $ownerPhone,
+                            'password_hash' => Hash::make(Str::random(12)),
+                            'status' => 'active',
+                            'is_active' => 1,
+                        ]);
+
+                        $nameParts = explode(' ', $ownerName ?: 'Property Manager', 2);
+                        UserProfile::create([
+                            'id' => (string) Str::uuid(),
+                            'user_id' => $newBroker->id,
+                            'first_name' => $nameParts[0] ?? 'Property',
+                            'last_name' => $nameParts[1] ?? 'Manager',
+                        ]);
+
+                        $brokerRole = Role::where('slug', 'broker')->first();
+                        if ($brokerRole) {
+                            UserRole::firstOrCreate([
+                                'user_id' => $newBroker->id,
+                                'role_id' => $brokerRole->id,
+                            ], [
+                                'id' => (string) Str::uuid(),
+                                'is_primary' => 1,
+                                'is_active' => 1,
+                            ]);
+                        }
+
+                        $property->broker_id = $newBroker->id;
+                        $property->save();
                     }
                 }
             }

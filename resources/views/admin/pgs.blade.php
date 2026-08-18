@@ -55,7 +55,7 @@
 
     <!-- Search & Filter Form -->
     <form method="GET" action="{{ route('admin.pgs') }}" id="adminPgFilterForm" class="bg-white rounded-2xl p-4 md:p-5 border border-gray-100 shadow-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
             <!-- Search Text -->
             <div class="lg:col-span-2 relative">
                 <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
@@ -82,6 +82,20 @@
                 </select>
             </div>
 
+            <!-- Tag / Badge Filter -->
+            <div>
+                <select name="tag" id="adminPgTag" onchange="document.getElementById('adminPgFilterForm').submit()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition font-medium">
+                    <option value="">All Tags / Badges</option>
+                    <option value="Popular" {{ request('tag') == 'Popular' ? 'selected' : '' }}>🔥 Popular</option>
+                    <option value="Verified" {{ request('tag') == 'Verified' ? 'selected' : '' }}>🛡️ Verified</option>
+                    <option value="Guest Favourite" {{ request('tag') == 'Guest Favourite' ? 'selected' : '' }}>❤️ Guest Favourite</option>
+                    <option value="Trending" {{ request('tag') == 'Trending' ? 'selected' : '' }}>⚡ Trending</option>
+                    <option value="Top rated" {{ request('tag') == 'Top rated' ? 'selected' : '' }}>⭐ Top rated</option>
+                    <option value="New" {{ request('tag') == 'New' ? 'selected' : '' }}>✨ New</option>
+                    <option value="untagged" {{ request('tag') == 'untagged' ? 'selected' : '' }}>🚫 Untagged</option>
+                </select>
+            </div>
+
             <!-- City Filter -->
             <div>
                 <select name="city" id="adminPgCity" onchange="document.getElementById('adminPgFilterForm').submit()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition">
@@ -101,7 +115,7 @@
                     <option value="SUSPENDED" {{ request('status') == 'SUSPENDED' ? 'selected' : '' }}>Suspended / Inactive</option>
                 </select>
 
-                @if(request()->hasAny(['search', 'type', 'city', 'status']) && (request('search') || request('type') || request('city') || request('status')))
+                @if(request()->hasAny(['search', 'type', 'city', 'status', 'tag']) && (request('search') || request('type') || request('city') || request('status') || request('tag')))
                     <a href="{{ route('admin.pgs') }}" class="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-bold transition flex items-center gap-1" title="Clear Filters">
                         <i class="fas fa-times"></i>
                     </a>
@@ -120,6 +134,7 @@
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Broker / Owner</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">City / Area</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tag / Badge</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Capacity</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Price / Mo</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
@@ -146,6 +161,7 @@
                             
                             $isVerified = ($property->verification_status === 'verified' && $property->status === 'active');
                             $isPending = ($property->verification_status === 'pending');
+                            $tagMeta = $property->tag_meta;
                         @endphp
                         <tr id="pg-row-{{ $property->id }}" class="admin-pg-row hover:bg-gray-50/70 transition">
                             <td class="px-6 py-4">
@@ -171,6 +187,26 @@
                                 <span class="{{ $typeClass }} text-[11px] font-bold px-2.5 py-1 rounded-lg uppercase">
                                     {{ $typeLabel }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-1.5 min-w-[145px]" id="tag-container-{{ $property->id }}">
+                                    <span id="tag-badge-{{ $property->id }}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all duration-200 w-fit {{ $tagMeta ? $tagMeta['bg_class'] : 'bg-gray-100 text-gray-500 border-gray-200' }}">
+                                        <i class="fas fa-{{ $tagMeta ? $tagMeta['icon'] : 'tag' }} text-[10px]"></i>
+                                        <span class="tag-label">{{ $tagMeta ? $tagMeta['label'] : 'No Tag' }}</span>
+                                    </span>
+                                    <select onchange="changePropertyTag('{{ $property->id }}', this.value)" 
+                                            id="tag-select-{{ $property->id }}"
+                                            class="text-[11px] font-medium bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-700 hover:bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer transition">
+                                        <option value="" {{ empty($property->tag) ? 'selected' : '' }}>Select Tag...</option>
+                                        <option value="Popular" {{ strcasecmp($property->tag, 'Popular') === 0 ? 'selected' : '' }}>🔥 Popular</option>
+                                        <option value="Verified" {{ strcasecmp($property->tag, 'Verified') === 0 ? 'selected' : '' }}>🛡️ Verified</option>
+                                        <option value="Guest Favourite" {{ strcasecmp($property->tag, 'Guest Favourite') === 0 ? 'selected' : '' }}>❤️ Guest Favourite</option>
+                                        <option value="Trending" {{ strcasecmp($property->tag, 'Trending') === 0 ? 'selected' : '' }}>⚡ Trending</option>
+                                        <option value="Top rated" {{ strcasecmp($property->tag, 'Top rated') === 0 ? 'selected' : '' }}>⭐ Top rated</option>
+                                        <option value="New" {{ strcasecmp($property->tag, 'New') === 0 ? 'selected' : '' }}>✨ New</option>
+                                        <option value="none">❌ None (Clear Tag)</option>
+                                    </select>
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">
                                 {{ $property->total_beds ?? 1 }} beds
@@ -216,7 +252,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-gray-400">
+                            <td colspan="9" class="px-6 py-12 text-center text-gray-400">
                                 <div class="w-12 h-12 rounded-full bg-gray-50 text-gray-300 flex items-center justify-center mx-auto mb-2 text-xl">
                                     <i class="fas fa-search"></i>
                                 </div>
@@ -250,6 +286,7 @@
                 $brokerName = $property->broker->profile->full_name ?? ($property->broker->name ?? ($property->broker->email ?? 'Direct / Admin'));
                 $isVerified = ($property->verification_status === 'verified' && $property->status === 'active');
                 $isPending = ($property->verification_status === 'pending');
+                $tagMeta = $property->tag_meta;
             @endphp
             <div id="pg-mobile-card-{{ $property->id }}" class="admin-pg-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm space-y-3">
                 <div class="flex gap-3">
@@ -268,6 +305,30 @@
                         <p class="text-xs font-bold text-gray-900 mt-1">₹{{ number_format($property->monthly_rent) }}/mo • {{ $property->total_beds }} beds</p>
                     </div>
                 </div>
+
+                <!-- Mobile Tag Selector Bar -->
+                <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Tag:</span>
+                        <span id="mobile-tag-badge-{{ $property->id }}" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border {{ $tagMeta ? $tagMeta['bg_class'] : 'bg-gray-100 text-gray-500 border-gray-200' }}">
+                            <i class="fas fa-{{ $tagMeta ? $tagMeta['icon'] : 'tag' }} text-[9px]"></i>
+                            <span>{{ $tagMeta ? $tagMeta['label'] : 'No Tag' }}</span>
+                        </span>
+                    </div>
+                    <select onchange="changePropertyTag('{{ $property->id }}', this.value)" 
+                            id="mobile-tag-select-{{ $property->id }}"
+                            class="text-[11px] font-medium bg-gray-50 border border-gray-200 rounded px-2 py-1 text-gray-700">
+                        <option value="" {{ empty($property->tag) ? 'selected' : '' }}>Select Tag...</option>
+                        <option value="Popular" {{ strcasecmp($property->tag, 'Popular') === 0 ? 'selected' : '' }}>🔥 Popular</option>
+                        <option value="Verified" {{ strcasecmp($property->tag, 'Verified') === 0 ? 'selected' : '' }}>🛡️ Verified</option>
+                        <option value="Guest Favourite" {{ strcasecmp($property->tag, 'Guest Favourite') === 0 ? 'selected' : '' }}>❤️ Guest Favourite</option>
+                        <option value="Trending" {{ strcasecmp($property->tag, 'Trending') === 0 ? 'selected' : '' }}>⚡ Trending</option>
+                        <option value="Top rated" {{ strcasecmp($property->tag, 'Top rated') === 0 ? 'selected' : '' }}>⭐ Top rated</option>
+                        <option value="New" {{ strcasecmp($property->tag, 'New') === 0 ? 'selected' : '' }}>✨ New</option>
+                        <option value="none">❌ Clear</option>
+                    </select>
+                </div>
+
                 <div class="flex gap-2 pt-2 border-t border-gray-100">
                     <a href="{{ url('/list-property?edit_id=' . $property->id) }}" class="flex-1 bg-blue-50 text-blue-600 text-xs font-semibold py-2 rounded-lg text-center tap-effect flex items-center justify-center gap-1">
                         <i class="fas fa-edit"></i> Edit
@@ -370,10 +431,24 @@
                 </div>
             </div>
 
-            <!-- Image URL -->
-            <div>
-                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Primary Photo URL</label>
-                <input type="url" name="image_url" value="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" placeholder="https://images.unsplash.com/..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700">
+            <!-- Tag & Image URL -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Property Tag / Badge</label>
+                    <select name="tag" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-800 font-medium">
+                        <option value="">No Tag (Default)</option>
+                        <option value="Popular">🔥 Popular</option>
+                        <option value="Verified">🛡️ Verified</option>
+                        <option value="Guest Favourite">❤️ Guest Favourite</option>
+                        <option value="Trending">⚡ Trending</option>
+                        <option value="Top rated">⭐ Top rated</option>
+                        <option value="New">✨ New</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Primary Photo URL</label>
+                    <input type="url" name="image_url" value="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" placeholder="https://images.unsplash.com/..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700">
+                </div>
             </div>
 
             <!-- Instant Publish Checkbox -->
@@ -449,6 +524,65 @@
             toast.classList.remove('translate-y-0', 'opacity-100');
             toast.classList.add('translate-y-20', 'opacity-0');
         }, 3200);
+    }
+
+    // 1-Click Update Property Tag / Badge Direct (AJAX)
+    async function changePropertyTag(propertyId, newTag) {
+        try {
+            const res = await fetch(`/admin/pgs/${propertyId}/update-tag`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ tag: newTag })
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                showPgToast(data.message, 'success');
+
+                const meta = data.tag_meta;
+                const badge = document.getElementById(`tag-badge-${propertyId}`);
+                const mBadge = document.getElementById(`mobile-tag-badge-${propertyId}`);
+                const modalBadge = document.getElementById(`modal-tag-badge-${propertyId}`);
+
+                const badgeClass = meta ? meta.bg_class : 'bg-gray-100 text-gray-500 border-gray-200';
+                const badgeIcon = meta ? meta.icon : 'tag';
+                const badgeLabel = meta ? meta.label : 'No Tag';
+
+                if (badge) {
+                    badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all duration-200 w-fit ${badgeClass} animate-pulse`;
+                    badge.innerHTML = `<i class="fas fa-${badgeIcon} text-[10px]"></i> <span class="tag-label">${badgeLabel}</span>`;
+                    setTimeout(() => badge.classList.remove('animate-pulse'), 500);
+                }
+
+                if (mBadge) {
+                    mBadge.className = `inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass}`;
+                    mBadge.innerHTML = `<i class="fas fa-${badgeIcon} text-[9px]"></i> <span>${badgeLabel}</span>`;
+                }
+
+                if (modalBadge) {
+                    modalBadge.className = `inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border ${badgeClass}`;
+                    modalBadge.innerHTML = `<i class="fas fa-${badgeIcon} text-xs"></i> <span>${badgeLabel}</span>`;
+                }
+
+                // Sync desktop & mobile dropdown selects
+                const sel = document.getElementById(`tag-select-${propertyId}`);
+                if (sel) sel.value = data.tag || '';
+                const mSel = document.getElementById(`mobile-tag-select-${propertyId}`);
+                if (mSel) mSel.value = data.tag || '';
+                const modalSel = document.getElementById(`modal-tag-select-${propertyId}`);
+                if (modalSel) modalSel.value = data.tag || '';
+
+            } else {
+                showPgToast(data.message || 'Failed to update tag', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            showPgToast('Network error while updating tag', 'error');
+        }
     }
 
     // 1-Click Approve PG
@@ -649,11 +783,40 @@
 
                 const imgUrl = p.primary_image ? p.primary_image.image_url : (p.images && p.images[0] ? p.images[0].image_url : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80');
                 const brokerName = p.broker ? (p.broker.profile ? p.broker.profile.full_name : p.broker.name || p.broker.email) : 'Direct Partner';
+                const tagMeta = p.tag_meta;
+                const tagBadgeClass = tagMeta ? tagMeta.bg_class : 'bg-gray-100 text-gray-500 border-gray-200';
+                const tagBadgeIcon = tagMeta ? tagMeta.icon : 'tag';
+                const tagBadgeLabel = tagMeta ? tagMeta.label : 'No Tag';
 
                 bodyEl.innerHTML = `
                     <div class="space-y-4">
                         <img src="${imgUrl}" alt="${p.name}" class="w-full h-48 rounded-2xl object-cover border border-gray-100 shadow-xs">
                         
+                        <!-- Tag Modifier Row -->
+                        <div class="bg-gray-50 p-3.5 rounded-2xl flex items-center justify-between gap-3 border border-gray-100">
+                            <div>
+                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Property Tag / Badge</span>
+                                <span id="modal-tag-badge-${p.id}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border ${tagBadgeClass}">
+                                    <i class="fas fa-${tagBadgeIcon} text-xs"></i> <span>${tagBadgeLabel}</span>
+                                </span>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1 text-right">Change Tag</label>
+                                <select onchange="changePropertyTag('${p.id}', this.value)" 
+                                        id="modal-tag-select-${p.id}"
+                                        class="text-xs font-semibold bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer shadow-xs">
+                                    <option value="" ${!p.tag ? 'selected' : ''}>No Tag (None)</option>
+                                    <option value="Popular" ${p.tag && p.tag.toLowerCase() === 'popular' ? 'selected' : ''}>🔥 Popular</option>
+                                    <option value="Verified" ${p.tag && p.tag.toLowerCase() === 'verified' ? 'selected' : ''}>🛡️ Verified</option>
+                                    <option value="Guest Favourite" ${p.tag && p.tag.toLowerCase() === 'guest favourite' ? 'selected' : ''}>❤️ Guest Favourite</option>
+                                    <option value="Trending" ${p.tag && p.tag.toLowerCase() === 'trending' ? 'selected' : ''}>⚡ Trending</option>
+                                    <option value="Top rated" ${p.tag && p.tag.toLowerCase() === 'top rated' ? 'selected' : ''}>⭐ Top rated</option>
+                                    <option value="New" ${p.tag && p.tag.toLowerCase() === 'new' ? 'selected' : ''}>✨ New</option>
+                                    <option value="none">❌ Clear Tag</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-3 bg-gray-50 p-4 rounded-2xl">
                             <div>
                                 <span class="text-xs text-gray-500 block font-medium">Monthly Rent</span>

@@ -429,4 +429,83 @@ class UserHomeController extends Controller
 
         return back()->with('success', 'Thank you! Your review has been submitted and is pending moderation. It will be published once approved by admin.');
     }
+
+    /**
+     * Display Dynamic Interactive Map View (/location).
+     */
+    public function location(Request $request)
+    {
+        $query = Property::where('status', 'active')
+            ->where('verification_status', 'verified')
+            ->where('is_active', 1)
+            ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
+
+        if ($request->filled('city')) {
+            $cityParam = $request->query('city');
+            $query->whereHas('city', function ($q) use ($cityParam) {
+                $q->where('slug', $cityParam)->orWhere('name', 'like', "%{$cityParam}%");
+            });
+        }
+
+        if ($request->filled('gender')) {
+            $gender = $request->query('gender');
+            if ($gender === 'boys' || $gender === 'girls' || $gender === 'co-ed' || $gender === 'unisex') {
+                $query->where('gender_preference', $gender);
+            }
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('monthly_rent', '<=', (float)$request->query('max_price'));
+        }
+
+        $properties = $query->latest()->get()->map(function ($p) {
+            $primaryImg = $p->primaryImage->image_url ?? ($p->images->first()?->image_url ?? $p->display_image_url ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');
+            $lat = $p->map_latitude;
+            $lng = $p->map_longitude;
+            $tags = [];
+            if ($p->gender_preference) {
+                $tags[] = ucfirst($p->gender_preference === 'co-ed' ? 'Unisex' : $p->gender_preference);
+            }
+            if ($p->amenities->count() > 0) {
+                foreach ($p->amenities->take(2) as $am) {
+                    $tags[] = $am->name;
+                }
+            } else {
+                $tags[] = 'WiFi';
+                $tags[] = 'AC';
+            }
+
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug ?: \Illuminate\Support\Str::slug($p->name),
+                'price' => number_format($p->monthly_rent),
+                'raw_price' => (float) $p->monthly_rent,
+                'rating' => $p->rating ? number_format($p->rating, 1) : '4.8',
+                'reviews_count' => $p->total_reviews ?: 12,
+                'lat' => (float) $lat,
+                'lng' => (float) $lng,
+                'image' => $primaryImg,
+                'gender' => $p->gender_preference ?? 'boys',
+                'gender_label' => strtoupper($p->gender_preference === 'co-ed' ? 'UNISEX' : ($p->gender_preference ?: 'BOYS')),
+                'location_text' => ($p->area ? $p->area->name . ', ' : '') . ($p->city->name ?? 'City Center'),
+                'address' => $p->address ?: (($p->area->name ?? '') . ', ' . ($p->city->name ?? 'Noida')),
+                'city' => $p->city->name ?? 'Noida',
+                'tags' => $tags,
+                'detail_url' => route('user.detail', ['slug' => $p->slug ?: \Illuminate\Support\Str::slug($p->name)]),
+            ];
+        });
+
+        $cities = City::where('is_active', 1)->orderBy('name')->get();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'count' => $properties->count(),
+                'properties' => $properties
+            ]);
+        }
+
+        return view('user.location', compact('properties', 'cities'));
+    }
 }

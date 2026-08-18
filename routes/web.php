@@ -126,9 +126,7 @@ Route::prefix('broker')->name('broker.')->group(function () {
     });
 });
 
-Route::get('/location', function () {
-    return view('user.location');
-})->name('user.location');
+Route::get('/location', [UserHomeController::class, 'location'])->name('user.location');
 
 // Public User Routes
 Route::name('user.')->group(function () {

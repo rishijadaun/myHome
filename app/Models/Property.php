@@ -299,6 +299,88 @@ class Property extends Model
         });
     }
 
+    /**
+     * Fallback and smart coordinates resolver for Map View.
+     */
+    public function getMapLatitudeAttribute()
+    {
+        if ($this->latitude && is_numeric($this->latitude) && (float) $this->latitude != 0) {
+            return (float) $this->latitude;
+        }
+        if ($this->area && $this->area->latitude && is_numeric($this->area->latitude)) {
+            return (float) $this->area->latitude;
+        }
+        if ($this->city && $this->city->latitude && is_numeric($this->city->latitude)) {
+            return (float) $this->city->latitude;
+        }
+
+        $cityName = strtolower(trim($this->city->name ?? ''));
+        $cityDefaults = [
+            'noida' => 28.6280,
+            'greater noida' => 28.4744,
+            'new delhi' => 28.6139,
+            'delhi' => 28.6139,
+            'bangalore' => 12.9716,
+            'bangalore (bengaluru)' => 12.9716,
+            'bengaluru' => 12.9716,
+            'gurgaon' => 28.4595,
+            'gurugram' => 28.4595,
+            'mumbai' => 19.0760,
+            'pune' => 18.5204,
+            'hyderabad' => 17.3850,
+            'chennai' => 13.0827,
+            'kolkata' => 22.5726,
+            'ahmedabad' => 23.0225,
+            'jaipur' => 26.9124,
+            'chandigarh' => 30.7333,
+            'lucknow' => 26.8467,
+            'indore' => 22.7196,
+        ];
+
+        // If multiple properties in same city, slightly disperse coordinates so pins don't overlap exactly
+        $hashOffset = (crc32($this->id ?? '') % 100) * 0.0003;
+        return ($cityDefaults[$cityName] ?? 28.6280) + $hashOffset;
+    }
+
+    public function getMapLongitudeAttribute()
+    {
+        if ($this->longitude && is_numeric($this->longitude) && (float) $this->longitude != 0) {
+            return (float) $this->longitude;
+        }
+        if ($this->area && $this->area->longitude && is_numeric($this->area->longitude)) {
+            return (float) $this->area->longitude;
+        }
+        if ($this->city && $this->city->longitude && is_numeric($this->city->longitude)) {
+            return (float) $this->city->longitude;
+        }
+
+        $cityName = strtolower(trim($this->city->name ?? ''));
+        $cityDefaults = [
+            'noida' => 77.3649,
+            'greater noida' => 77.5030,
+            'new delhi' => 77.2090,
+            'delhi' => 77.2090,
+            'bangalore' => 77.5946,
+            'bangalore (bengaluru)' => 77.5946,
+            'bengaluru' => 77.5946,
+            'gurgaon' => 77.0266,
+            'gurugram' => 77.0266,
+            'mumbai' => 72.8777,
+            'pune' => 73.8567,
+            'hyderabad' => 78.4867,
+            'chennai' => 80.2707,
+            'kolkata' => 88.3639,
+            'ahmedabad' => 72.5714,
+            'jaipur' => 75.7873,
+            'chandigarh' => 76.7794,
+            'lucknow' => 80.9462,
+            'indore' => 75.8577,
+        ];
+
+        $hashOffset = (crc32(($this->id ?? '') . 'lng') % 100) * 0.0003;
+        return ($cityDefaults[$cityName] ?? 77.3649) + $hashOffset;
+    }
+
     public function scopeApproved($query)
     {
         return $query->where('verification_status', 'verified')->where('status', 'active');

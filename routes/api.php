@@ -34,6 +34,7 @@ Route::prefix('v1')->group(function () {
     Route::post('properties/submit', [PropertySubmissionController::class, 'submit']);
     Route::get('properties/details/{id}', [PropertySubmissionController::class, 'details']);
     Route::post('properties/{id}/update', [PropertySubmissionController::class, 'update']);
+    Route::post('properties/{id}/report', [\App\Http\Controllers\User\UserHomeController::class, 'report']);
 
     // ---------------- 4. TENANT / USER MODULE APIS ----------------
     Route::get('user/profile/{id}', [UserController::class, 'profile']);

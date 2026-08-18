@@ -249,6 +249,11 @@ class Property extends Model
         return $this->belongsTo(User::class, 'broker_id', 'id');
     }
 
+    public function reports()
+    {
+        return $this->hasMany(PropertyReport::class, 'property_id', 'id');
+    }
+
     public function city()
     {
         return $this->belongsTo(City::class, 'city_id', 'id');

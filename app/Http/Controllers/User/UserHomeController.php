@@ -4,8 +4,12 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\City;
+use App\Models\Notification;
 use App\Models\Property;
+use App\Models\PropertyReport;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserHomeController extends Controller
 {
@@ -40,16 +44,16 @@ class UserHomeController extends Controller
             $recommendedProperties = (clone $approvedBase)->take(4)->get();
         }
 
-        // 4. Popular Boys PG Section
+        // 4. Popular Boys PG Section (max 4)
         $boysProperties = (clone $approvedBase)
             ->where(function ($q) {
                 $q->where('gender_preference', 'boys')
                   ->orWhere('gender_preference', 'male');
             })
-            ->take(6)
+            ->take(4)
             ->get();
 
-        // If boys properties are few, fallback to any approved
+        // If boys properties are few, fallback to any approved (max 4)
         if ($boysProperties->isEmpty()) {
             $boysProperties = (clone $approvedBase)->take(4)->get();
         }
@@ -252,5 +256,67 @@ class UserHomeController extends Controller
             'searchQuery',
             'sort'
         ));
+    }
+
+    /**
+     * Submit user feedback or abuse report for a listing.
+     */
+    public function report(Request $request, $id)
+    {
+        $property = Property::findOrFail($id);
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'reporter_name' => 'nullable|string|max:100',
+            'reporter_email' => 'nullable|email|max:150',
+            'reporter_phone' => ['nullable', 'string', 'regex:/^[0-9]{10}$/'],
+        ], [
+            'reporter_phone.regex' => 'The phone number must be exactly 10 digits.',
+        ]);
+
+        $userId = Auth::id() ?? null;
+        $userName = Auth::user()?->name ?? $validated['reporter_name'] ?? 'Guest User';
+        $userEmail = Auth::user()?->email ?? $validated['reporter_email'] ?? null;
+        $userPhone = Auth::user()?->phone ?? $validated['reporter_phone'] ?? null;
+
+        $report = PropertyReport::create([
+            'property_id' => $property->id,
+            'user_id' => $userId,
+            'reporter_name' => $userName,
+            'reporter_email' => $userEmail,
+            'reporter_phone' => $userPhone,
+            'reason' => $validated['reason'],
+            'description' => $validated['description'] ?? null,
+            'status' => 'pending',
+            'ip_address' => $request->ip(),
+        ]);
+
+        // Alert administrators
+        try {
+            $admins = User::whereHas('roles', fn($q) => $q->whereIn('slug', ['super_admin', 'admin']))->get();
+            foreach ($admins as $admin) {
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'user_type' => 'admin',
+                    'title' => 'Property Reported ⚠️',
+                    'message' => "Listing \"{$property->name}\" was reported for: {$validated['reason']}.",
+                    'type' => 'property_report',
+                    'data' => json_encode(['property_id' => $property->id, 'report_id' => $report->id]),
+                    'is_read' => false,
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Ignore notification failure
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Thank you for your feedback. Our Trust & Safety team has received your report and will investigate this listing promptly.'
+            ]);
+        }
+
+        return back()->with('success', 'Thank you for your feedback. Our team will review this listing shortly.');
     }
 }

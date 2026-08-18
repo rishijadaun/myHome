@@ -163,6 +163,7 @@ Route::name('user.')->group(function () {
     Route::view('/404', 'errors.404')->name('404');
     Route::get('/detail/{slug?}', [UserHomeController::class, 'show'])->name('detail');
     Route::get('/pg-details', [UserHomeController::class, 'show']);
+    Route::post('/property/{id}/report', [UserHomeController::class, 'report'])->name('property.report');
 });
 
 // Fallback Route for 404 Not Found

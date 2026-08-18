@@ -269,7 +269,7 @@
                 </div>
 
                 <!-- AI Match Status Banner -->
-                <div id="aiMatchStatusBanner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-brand-50 border border-purple-200/80 text-xs shadow-xs space-y-1.5 animate-fadeIn">
+                <!-- <div id="aiMatchStatusBanner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-brand-50 border border-purple-200/80 text-xs shadow-xs space-y-1.5 animate-fadeIn">
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 font-extrabold text-purple-900 text-xs">
                             <i class="fas fa-wand-magic-sparkles text-purple-600"></i>
@@ -280,7 +280,7 @@
                         </button>
                     </div>
                     <div class="flex flex-wrap gap-1.5" id="aiParsedBadges"></div>
-                </div>
+                </div> -->
 
                 <!-- Quick AI Suggestions Pills -->
                 <div>
@@ -527,6 +527,73 @@
         let aiSearchActive = false;
         let aiParsedResult = null;
 
+        async function highlightAreaBoundary(locationName) {
+            if (!locationName) return null;
+            try {
+                clearAllHighlights();
+
+                const cleanName = locationName.trim();
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&countrycodes=in&q=${encodeURIComponent(cleanName)}`, {
+                    headers: { 'Accept-Language': 'en' }
+                });
+                const results = await response.json();
+                
+                if (results && results.length > 0) {
+                    const best = results[0];
+                    const lat = parseFloat(best.lat);
+                    const lon = parseFloat(best.lon);
+
+                    if (best.geojson && (best.geojson.type === 'Polygon' || best.geojson.type === 'MultiPolygon')) {
+                        activeAreaHighlightLayer = L.geoJSON(best.geojson, {
+                            style: {
+                                color: '#10b981',       // Light Green / Emerald Border
+                                weight: 3,
+                                opacity: 0.95,
+                                fillColor: '#34d399',   // Light Green Fill
+                                fillOpacity: 0.25,
+                                dashArray: '6, 6'
+                            }
+                        }).addTo(map);
+
+                        map.fitBounds(activeAreaHighlightLayer.getBounds(), { padding: [30, 30], maxZoom: 14 });
+                        return { lat, lon, name: best.display_name, hasPolygon: true };
+                    } else if (best.boundingbox && best.boundingbox.length === 4) {
+                        const south = parseFloat(best.boundingbox[0]);
+                        const north = parseFloat(best.boundingbox[1]);
+                        const west = parseFloat(best.boundingbox[2]);
+                        const east = parseFloat(best.boundingbox[3]);
+                        
+                        const bounds = [[south, west], [north, east]];
+                        activeAreaHighlightLayer = L.rectangle(bounds, {
+                            color: '#10b981',
+                            weight: 3,
+                            opacity: 0.95,
+                            fillColor: '#34d399',
+                            fillOpacity: 0.22,
+                            dashArray: '6, 6'
+                        }).addTo(map);
+
+                        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+                        return { lat, lon, name: best.display_name, hasPolygon: true };
+                    } else {
+                        radiusHighlightCircle = L.circle([lat, lon], {
+                            radius: 8000,
+                            color: '#10b981',
+                            weight: 3,
+                            opacity: 0.95,
+                            fillColor: '#34d399',
+                            fillOpacity: 0.22
+                        }).addTo(map);
+                        map.fitBounds(radiusHighlightCircle.getBounds(), { padding: [30, 30], maxZoom: 14 });
+                        return { lat, lon, name: best.display_name, hasPolygon: false };
+                    }
+                }
+            } catch (err) {
+                console.warn("Boundary highlight error:", err);
+            }
+            return null;
+        }
+
         async function performAISmartSearch() {
             const input = document.getElementById('mapSearchInput');
             const query = input.value.trim();
@@ -539,14 +606,28 @@
             aiParsedResult = ai;
             aiSearchActive = true;
 
+            // Determine candidate location for boundary highlight (e.g. Orai, Jhansi, Kanpur, Noida, Bangalore, etc.)
+            let searchLocation = ai.city;
+            if (!searchLocation) {
+                searchLocation = query.replace(/\b(boys?|girls?|unisex|pg|stays?|rooms?|hostels?|under|below|\d+k?|with|ac|wifi|food|gym|near|in|me|chahiye|ke|andar|city|district|state)\b/gi, '').trim();
+                if (!searchLocation) searchLocation = query.trim();
+            }
+
+            // Highlight the searched City, State, or District boundary in Light Green
+            let boundaryGeo = null;
+            if (searchLocation) {
+                boundaryGeo = await highlightAreaBoundary(searchLocation);
+            }
+
             // Render AI status badges
             const banner = document.getElementById('aiMatchStatusBanner');
             const badgesContainer = document.getElementById('aiParsedBadges');
             banner.classList.remove('hidden');
             badgesContainer.innerHTML = '';
 
-            if (ai.city) {
-                badgesContainer.innerHTML += `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md text-[10px] flex items-center gap-1"><i class="fas fa-map-marker-alt text-purple-600"></i> ${ai.city}</span>`;
+            const displayCity = ai.city || (boundaryGeo ? searchLocation : null);
+            if (displayCity) {
+                badgesContainer.innerHTML += `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-md text-[10px] flex items-center gap-1"><i class="fas fa-map-marked-alt text-emerald-600"></i> ${displayCity} (Highlighted)</span>`;
             }
             if (ai.gender) {
                 const gLabel = ai.gender === 'boys' ? 'Boys Only' : (ai.gender === 'girls' ? 'Girls Only' : 'Co-ed / Unisex');
@@ -559,7 +640,7 @@
                 badgesContainer.innerHTML += `<span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-md text-[10px] flex items-center gap-1"><i class="fas fa-check text-blue-600"></i> ${am}</span>`;
             });
 
-            if (!ai.city && !ai.gender && !ai.maxPrice && ai.amenities.length === 0) {
+            if (!displayCity && !ai.gender && !ai.maxPrice && ai.amenities.length === 0) {
                 badgesContainer.innerHTML += `<span class="bg-gray-100 text-gray-800 font-bold px-2 py-0.5 rounded-md text-[10px]"><i class="fas fa-search text-gray-500"></i> Keyword: "${query}"</span>`;
             }
 
@@ -611,7 +692,7 @@
                 return true;
             });
 
-            // If no strict matches found, fallback gracefully to city or closest properties
+            // If no strict matches found, fallback gracefully
             if (filtered.length === 0 && ai.city) {
                 filtered = rawDatabaseProperties.filter(pg => {
                     const targetCity = ai.city.toLowerCase();
@@ -622,15 +703,20 @@
                 filtered = rawDatabaseProperties;
             }
 
-            // Move map to city center if detected
-            if (ai.cityCoords) {
-                map.flyTo(ai.cityCoords, 13, { duration: 1.2 });
-            } else if (filtered.length > 0) {
-                map.flyTo([filtered[0].lat, filtered[0].lng], 14, { duration: 1.2 });
+            // Move map to city center if boundary was not already fitted
+            if (!boundaryGeo) {
+                if (ai.cityCoords) {
+                    map.flyTo(ai.cityCoords, 13, { duration: 1.2 });
+                } else if (filtered.length > 0) {
+                    map.flyTo([filtered[0].lat, filtered[0].lng], 14, { duration: 1.2 });
+                }
             }
 
-            // Render matching markers and sidebar
-            renderCustomPGList(filtered, `AI Matches: "${query}"`);
+            // Calculate distance relative to boundary center if boundary was found
+            const refCenterLat = boundaryGeo ? boundaryGeo.lat : (userLocation ? userLocation[0] : 28.6280);
+            const refCenterLng = boundaryGeo ? boundaryGeo.lon : (userLocation ? userLocation[1] : 77.3649);
+
+            renderCustomPGList(filtered, `AI Matches: "${query}"`, refCenterLat, refCenterLng);
 
             // On mobile, auto open list
             if (window.innerWidth < 768 && !mobileSidebarOpen) {
@@ -638,13 +724,13 @@
             }
         }
 
-        function renderCustomPGList(list, regionTitle) {
+        function renderCustomPGList(list, regionTitle, customLat, customLng) {
             markersLayer.clearLayers();
             markerMap = {};
             renderUserMarker();
 
-            const refLat = userLocation ? userLocation[0] : 28.6280;
-            const refLng = userLocation ? userLocation[1] : 77.3649;
+            const refLat = customLat !== undefined ? customLat : (userLocation ? userLocation[0] : 28.6280);
+            const refLng = customLng !== undefined ? customLng : (userLocation ? userLocation[1] : 77.3649);
 
             currentPGList = list.map(p => ({
                 ...p,
@@ -825,6 +911,7 @@
         function resetAISearch() {
             aiSearchActive = false;
             aiParsedResult = null;
+            clearAllHighlights();
             const input = document.getElementById('mapSearchInput');
             if (input) input.value = '';
             document.getElementById('clearSearchBtn')?.classList.add('hidden');

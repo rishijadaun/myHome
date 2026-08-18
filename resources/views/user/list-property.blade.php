@@ -77,6 +77,16 @@
 @endpush
 
 @section('content')
+@php
+    $authUser = Auth::user();
+    $isLoggedIn = !empty($authUser);
+    $authName = $authUser?->profile?->first_name 
+        ? ($authUser->profile->first_name . ' ' . ($authUser->profile->last_name ?? '')) 
+        : ($authUser?->name ?? '');
+    $authPhone = $authUser?->phone ?? '';
+    $authEmail = $authUser?->email ?? '';
+@endphp
+
 <!-- Zepto Style Top Notification Toast -->
 <div id="zeptoToast" class="fixed top-6 right-4 md:right-8 z-50 hidden transition-all duration-300 transform translate-y-2">
     <div class="bg-gray-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/20">
@@ -711,34 +721,99 @@
                     <!-- ================= STEP 4: OWNER INFO & SUBMIT ================= -->
                     <div id="step-pane-4" class="step-pane hidden space-y-6">
                         <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
-                            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                                <i class="fas fa-user-shield text-brand"></i> Owner / Landlord Contact Info
-                            </h2>
-                            <p class="text-xs sm:text-sm text-gray-500 mb-6">Our verification team will call this number to confirm listing details.</p>
+                            <div class="flex items-center justify-between mb-2">
+                                <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <i class="fas fa-user-shield text-brand"></i> Owner / Landlord Contact Info
+                                </h2>
+                                @if($isLoggedIn)
+                                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-3 py-1 rounded-full border border-emerald-300 flex items-center gap-1 shadow-xs">
+                                        <i class="fas fa-lock text-[9px] text-emerald-600"></i> Locked to Logged-in Account
+                                    </span>
+                                @endif
+                            </div>
+                            <p class="text-xs sm:text-sm text-gray-500 mb-6">Our verification team and interested tenants will reach out to these contact details.</p>
+
+                            @if($isLoggedIn)
+                                <!-- Verified Logged-in Account Badge -->
+                                <div class="mb-5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/90 rounded-2xl p-4 flex items-center justify-between shadow-xs">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-base font-bold shadow-xs shrink-0">
+                                            <i class="fas fa-shield-check"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-[11px] font-extrabold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+                                                <span>Auto-Filled from Logged In Profile</span>
+                                                <span class="bg-emerald-200 text-emerald-950 text-[9px] px-2 py-0.5 rounded-full font-black">ACTIVE</span>
+                                            </div>
+                                            <div class="text-xs font-bold text-gray-900 mt-0.5">{{ $authName ?: 'StayNest Member' }} &bull; {{ $authPhone ?: $authEmail }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-emerald-700 font-semibold hidden sm:flex items-center gap-1">
+                                        <i class="fas fa-check-circle text-emerald-600"></i> Verified
+                                    </span>
+                                </div>
+                            @endif
 
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Your Full Name *</label>
-                                    <input type="text" id="ownerName" name="owner_name" required placeholder="e.g. Rajesh Sharma" 
-                                           oninput="clearError(this)"
-                                           class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                                        Your Full Name *
+                                        @if($isLoggedIn)
+                                            <span class="text-[10px] text-emerald-700 font-bold ml-1">(Auto-Filled & Locked)</span>
+                                        @endif
+                                    </label>
+                                    <div class="relative">
+                                        <input type="text" id="ownerName" name="owner_name" required 
+                                               value="{{ $authName }}"
+                                               {{ $isLoggedIn ? 'readonly' : '' }}
+                                               placeholder="e.g. Rajesh Sharma" 
+                                               oninput="clearError(this)"
+                                               class="w-full {{ $isLoggedIn ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
+                                        @if($isLoggedIn)
+                                            <span class="absolute right-4 top-3.5 text-gray-400 text-xs" title="Locked to logged-in profile"><i class="fas fa-lock"></i></span>
+                                        @endif
+                                    </div>
                                     <div class="error-msg hidden" id="err-ownerName">Please enter owner / contact person name.</div>
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Mobile Phone Number (10 Digits) *</label>
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                                            Mobile Phone Number (10 Digits) *
+                                            @if($isLoggedIn)
+                                                <span class="text-[10px] text-emerald-700 font-bold ml-1">(Auto-Filled & Locked)</span>
+                                            @endif
+                                        </label>
                                         <div class="relative">
                                             <span class="absolute left-4 top-3.5 text-sm font-semibold text-gray-500">+91</span>
-                                            <input type="tel" id="ownerPhone" name="owner_phone" required placeholder="98765 43210" maxlength="10"
+                                            <input type="tel" id="ownerPhone" name="owner_phone" required 
+                                                   value="{{ $authPhone }}"
+                                                   {{ $isLoggedIn ? 'readonly' : '' }}
+                                                   placeholder="98765 43210" maxlength="10"
                                                    onkeydown="preventNegative(event)" oninput="sanitizePhone(this); clearError(this);"
-                                                   class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-14 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                                   class="w-full {{ $isLoggedIn ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl pl-14 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
+                                            @if($isLoggedIn)
+                                                <span class="absolute right-4 top-3.5 text-gray-400 text-xs" title="Locked to logged-in profile"><i class="fas fa-lock"></i></span>
+                                            @endif
                                         </div>
                                         <div class="error-msg hidden" id="err-ownerPhone">Please enter a valid 10-digit Indian mobile number.</div>
                                     </div>
                                     <div>
-                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                                        <input type="email" id="ownerEmail" name="owner_email" placeholder="rajesh@example.com" 
-                                               class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                                            Email Address
+                                            @if($isLoggedIn)
+                                                <span class="text-[10px] text-emerald-700 font-bold ml-1">(Auto-Filled & Locked)</span>
+                                            @endif
+                                        </label>
+                                        <div class="relative">
+                                            <input type="email" id="ownerEmail" name="owner_email" 
+                                                   value="{{ $authEmail }}"
+                                                   {{ $isLoggedIn ? 'readonly' : '' }}
+                                                   placeholder="rajesh@example.com" 
+                                                   class="w-full {{ $isLoggedIn ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl px-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
+                                            @if($isLoggedIn)
+                                                <span class="absolute right-4 top-3.5 text-gray-400 text-xs" title="Locked to logged-in profile"><i class="fas fa-lock"></i></span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
 
@@ -840,7 +915,7 @@
         </div>
 
         <!-- FAQ Section for SEO and Landlords -->
-        <div class="mt-16 bg-white rounded-3xl p-8 shadow-sm border border-gray-100 max-w-4xl mx-auto">
+        <!-- <div class="mt-16 bg-white rounded-3xl p-8 shadow-sm border border-gray-100 max-w-4xl mx-auto">
             <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Frequently Asked Questions by Owners</h3>
             <div class="space-y-4">
                 <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
@@ -856,7 +931,7 @@
                     <p class="text-xs text-gray-600">Yes! The listing engine supports PGs, Co-living spaces, Flats, and Commercial shops with dedicated search filters.</p>
                 </div>
             </div>
-        </div>
+        </div> -->
 
     </div>
 
@@ -970,31 +1045,47 @@
     </div>
 </div>
 
-<!-- ================= SUCCESS MODAL (ADMIN APPROVAL QUEUE) ================= -->
+<!-- ================= SUCCESS MODAL (ADMIN APPROVAL QUEUE / UPDATE COMPLETE) ================= -->
 <div id="successModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300">
         <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
             <i class="fas fa-check-circle"></i>
         </div>
-        <h3 class="text-xl font-extrabold text-gray-900 mb-2">Submitted for Admin Approval!</h3>
-        <p class="text-xs sm:text-sm text-gray-600 mb-4">
+        <h3 id="successModalHeading" class="text-xl font-extrabold text-gray-900 mb-2">Submitted for Admin Approval!</h3>
+        <p id="successModalMessage" class="text-xs sm:text-sm text-gray-600 mb-4">
             Your listing has been submitted successfully and assigned to our review team.
         </p>
 
         <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 mb-6">
             <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Tracking Reference ID</div>
             <div id="successTrackingId" class="text-lg font-mono font-bold text-brand">STAY-XXXXXX</div>
-            <div class="text-xs text-amber-700 mt-2 font-medium flex items-center justify-center gap-1">
+            <div id="successStatusBadge" class="text-xs text-amber-700 mt-2 font-medium flex items-center justify-center gap-1">
                 <i class="fas fa-clock text-amber-500"></i> Verification Status: <span class="font-bold">Pending Review (24h)</span>
             </div>
         </div>
 
         <div class="space-y-3">
-            <a href="{{ route('user.home') }}" class="block w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition">
-                Explore StayNest
-            </a>
-            <button onclick="document.getElementById('successModal').classList.add('hidden'); window.location.reload();" class="w-full bg-gray-100 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-200 transition text-sm">
-                Submit Another Property
+            @auth
+                @if(Auth::user()->roles()->where('slug', 'broker')->exists())
+                    <a href="{{ route('broker.pgs') }}" class="block w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition">
+                        <i class="fas fa-arrow-left mr-1.5"></i> Return to Broker PGs
+                    </a>
+                @elseif(Auth::user()->roles()->whereIn('slug', ['super_admin', 'admin'])->exists())
+                    <a href="{{ route('admin.pgs') }}" class="block w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition">
+                        <i class="fas fa-arrow-left mr-1.5"></i> Return to Admin Console
+                    </a>
+                @else
+                    <a href="{{ route('user.home') }}" class="block w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition">
+                        Explore StayNest
+                    </a>
+                @endif
+            @else
+                <a href="{{ route('user.home') }}" class="block w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition">
+                    Explore StayNest
+                </a>
+            @endauth
+            <button onclick="document.getElementById('successModal').classList.add('hidden'); window.location.href = '{{ url('/list-property') }}';" class="w-full bg-gray-100 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-200 transition text-sm">
+                List Another Property
             </button>
         </div>
     </div>
@@ -1014,11 +1105,14 @@
 
     let uploadedPhotos = [];
     let bannerCountdownInterval = null;
+    let editPropertyId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
+        initLoggedInContact();
         initHeroBannerTimer();
         renderPhotoPreviews();
         initPropertyMap();
+        checkForEditMode();
     });
 
     // Auto-hide hero banner after 40 seconds & only show once per day
@@ -1823,81 +1917,320 @@
         renderPhotoPreviews();
     }
 
+    async function checkForEditMode() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('edit_id') || urlParams.get('id');
+        if (!editId) return;
+
+        editPropertyId = editId;
+
+        // Update hero banner and submit buttons for Edit Mode
+        const bannerTitle = document.querySelector('#listPropertyHeroBanner h1');
+        if (bannerTitle) {
+            bannerTitle.innerHTML = `Edit Your Property Listing on <span class="text-brand-light">StayNest</span>`;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.innerHTML = `
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-lg"></i>
+                    <span>Save & Update Listing</span>
+                    <i id="submitSpinner" class="fas fa-spinner fa-spin hidden"></i>
+                </span>
+            `;
+        }
+
+        // Add prominent Edit Mode alert banner above form with Quick Save Button
+        const formContainer = document.getElementById('propertyListingForm');
+        if (formContainer && formContainer.parentNode) {
+            const existingAlert = document.getElementById('editModeAlertBanner');
+            if (!existingAlert) {
+                const editBanner = document.createElement('div');
+                editBanner.id = 'editModeAlertBanner';
+                editBanner.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6';
+                editBanner.innerHTML = `
+                    <div class="bg-amber-500/15 border border-amber-500/30 text-amber-900 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-xs shrink-0">
+                                <i class="fas fa-pen-to-square"></i>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-800">Edit Mode Active</div>
+                                <div class="text-sm font-bold text-gray-900" id="editingPropTitle">Loading property details...</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="handleListingSubmit()" class="bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-brand/20 transition tap-effect flex items-center gap-1.5 cursor-pointer">
+                                <i class="fas fa-check-circle"></i> Save Changes Now
+                            </button>
+                            <a href="{{ route('broker.pgs') }}" class="px-3.5 py-2.5 rounded-xl bg-white text-xs font-bold text-gray-700 hover:bg-gray-50 border border-gray-200 transition shadow-xs">
+                                <i class="fas fa-arrow-left mr-1"></i> Back
+                            </a>
+                        </div>
+                    </div>
+                `;
+                formContainer.parentNode.insertBefore(editBanner, formContainer);
+            }
+        }
+
+        // Fetch property details from API
+        try {
+            const res = await fetch(`/api/v1/properties/details/${editPropertyId}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.success && data.data) {
+                populateFormWithProperty(data.data);
+            }
+        } catch(err) {
+            console.error('Failed to load edit property data:', err);
+        }
+    }
+
+    function populateFormWithProperty(p) {
+        const titleEl = document.getElementById('editingPropTitle');
+        if (titleEl) titleEl.innerText = p.name;
+
+        // Step 1: Basic Info & Location
+        const nameInput = document.getElementById('propName');
+        const cityInput = document.getElementById('propCity');
+        const areaInput = document.getElementById('propArea');
+        const addressInput = document.getElementById('propAddress');
+        const landmarkInput = document.getElementById('propLandmark');
+        const pincodeInput = document.getElementById('propPincode');
+        const latInput = document.getElementById('propLatitude');
+        const lngInput = document.getElementById('propLongitude');
+
+        if (nameInput) nameInput.value = p.name || '';
+        if (cityInput) cityInput.value = p.city || '';
+        if (areaInput) areaInput.value = p.area || '';
+        if (addressInput) addressInput.value = p.address || '';
+        if (landmarkInput) landmarkInput.value = p.landmark || '';
+        if (pincodeInput) pincodeInput.value = p.pincode || '';
+        if (latInput && p.latitude) latInput.value = p.latitude;
+        if (lngInput && p.longitude) lngInput.value = p.longitude;
+
+        if (p.latitude && p.longitude && propertyMap && propertyMarker) {
+            const lat = Number(p.latitude);
+            const lng = Number(p.longitude);
+            propertyMap.setView([lat, lng], 17);
+            propertyMarker.setLatLng([lat, lng]);
+            propertyMarker.bindPopup(`<strong>${p.name}</strong><br>${p.address || ''}`).openPopup();
+        }
+
+        // Step 2: Listing Type & Gender
+        if (p.listing_type) {
+            const radio = document.querySelector(`input[name="listing_type"][value="${p.listing_type}"]`);
+            if (radio) {
+                radio.checked = true;
+                handleTypeChange(p.listing_type);
+            }
+        }
+
+        if (p.gender_preference) {
+            const gRadio = document.querySelector(`input[name="gender_preference"][value="${p.gender_preference}"]`);
+            if (gRadio) gRadio.checked = true;
+        }
+
+        // Step 2 & 3: Pricing & Beds
+        const rentInput = document.getElementById('propRent');
+        const depositInput = document.getElementById('propDeposit');
+        const totalBedsInput = document.getElementById('propTotalBeds');
+        const availBedsInput = document.getElementById('propAvailableBeds');
+        const descInput = document.getElementById('propDescription');
+        const rulesInput = document.getElementById('propRules');
+
+        if (rentInput) rentInput.value = p.monthly_rent || '';
+        if (depositInput) depositInput.value = p.security_deposit || '';
+        if (totalBedsInput) totalBedsInput.value = p.total_beds || '';
+        if (availBedsInput) availBedsInput.value = p.available_beds || '';
+        if (descInput) descInput.value = p.description || '';
+        if (rulesInput) rulesInput.value = p.house_rules || '';
+
+        // Amenities
+        if (p.amenities && Array.isArray(p.amenities)) {
+            document.querySelectorAll('input[name="amenities[]"]').forEach(cb => {
+                cb.checked = p.amenities.includes(cb.value);
+            });
+        }
+
+        // Photos
+        if (p.photos && Array.isArray(p.photos) && p.photos.length > 0) {
+            uploadedPhotos = [...p.photos];
+            renderPhotoPreviews();
+        }
+
+        // Step 4: Owner Info (Retain locked profile details if authenticated)
+        const ownerNameInput = document.getElementById('ownerName');
+        const ownerPhoneInput = document.getElementById('ownerPhone');
+        const ownerEmailInput = document.getElementById('ownerEmail');
+
+        const isAuthUser = {{ $isLoggedIn ? 'true' : 'false' }};
+        if (!isAuthUser) {
+            if (ownerNameInput && p.owner_name) ownerNameInput.value = p.owner_name;
+            if (ownerPhoneInput && p.owner_phone) ownerPhoneInput.value = p.owner_phone;
+            if (ownerEmailInput && p.owner_email) ownerEmailInput.value = p.owner_email;
+        } else {
+            if (ownerNameInput && !ownerNameInput.value && p.owner_name) ownerNameInput.value = p.owner_name;
+            if (ownerPhoneInput && !ownerPhoneInput.value && p.owner_phone) ownerPhoneInput.value = p.owner_phone;
+            if (ownerEmailInput && !ownerEmailInput.value && p.owner_email) ownerEmailInput.value = p.owner_email;
+        }
+
+        updateLocationSummaryCard(p.city, p.area, p.address, p.pincode);
+        updateLivePreview();
+    }
+
+    function initLoggedInContact() {
+        const isAuthUser = {{ $isLoggedIn ? 'true' : 'false' }};
+        const ownerNameInput = document.getElementById('ownerName');
+        const ownerPhoneInput = document.getElementById('ownerPhone');
+        const ownerEmailInput = document.getElementById('ownerEmail');
+
+        if (isAuthUser) return; // Already handled server-side by Blade
+
+        try {
+            const rawUser = localStorage.getItem('staynest_user') || localStorage.getItem('broker_user');
+            if (rawUser) {
+                const user = JSON.parse(rawUser);
+                const name = user.name || user.full_name || (user.profile ? (user.profile.first_name + ' ' + (user.profile.last_name || '')) : '');
+                const phone = user.phone || '';
+                const email = user.email || '';
+
+                if (name && ownerNameInput && !ownerNameInput.value) {
+                    ownerNameInput.value = name;
+                    ownerNameInput.readOnly = true;
+                    ownerNameInput.className = 'w-full bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none transition select-none';
+                }
+                if (phone && ownerPhoneInput && !ownerPhoneInput.value) {
+                    ownerPhoneInput.value = phone;
+                    ownerPhoneInput.readOnly = true;
+                    ownerPhoneInput.className = 'w-full bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border border-gray-200 rounded-xl pl-14 pr-10 py-3 text-sm focus:outline-none transition select-none';
+                }
+                if (email && ownerEmailInput && !ownerEmailInput.value) {
+                    ownerEmailInput.value = email;
+                    ownerEmailInput.readOnly = true;
+                    ownerEmailInput.className = 'w-full bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border border-gray-200 rounded-xl px-4 pr-10 py-3 text-sm focus:outline-none transition select-none';
+                }
+            }
+        } catch(e) {}
+    }
+
     async function handleListingSubmit() {
-        // Validate all steps before submitting
-        if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
-            alert('Please check and fill required fields across the steps.');
+        // Collect DOM elements
+        const nameEl = document.getElementById('propName');
+        const cityEl = document.getElementById('propCity');
+        const areaEl = document.getElementById('propArea');
+        const addrEl = document.getElementById('propAddress');
+        const landEl = document.getElementById('propLandmark');
+        const pinEl = document.getElementById('propPincode');
+        const latEl = document.getElementById('propLatitude');
+        const lngEl = document.getElementById('propLongitude');
+        const rentEl = document.getElementById('propRent');
+        const depEl = document.getElementById('propDeposit');
+        const maintEl = document.getElementById('propMaintenance');
+        const tBedsEl = document.getElementById('propTotalBeds');
+        const aBedsEl = document.getElementById('propAvailableBeds');
+        const descEl = document.getElementById('propDescription');
+        const rulesEl = document.getElementById('propRules');
+        const ownerNameEl = document.getElementById('ownerName');
+        const ownerPhoneEl = document.getElementById('ownerPhone');
+        const ownerEmailEl = document.getElementById('ownerEmail');
+
+        // Validation Checks
+        if (!nameEl?.value.trim() || nameEl.value.trim().length < 2) {
+            goToStep(1);
+            showError('propName', 'Please enter a valid property title.');
+            nameEl?.focus();
             return;
         }
 
+        if (!cityEl?.value.trim() || cityEl.value.trim().length < 2) {
+            goToStep(1);
+            showError('propCity', 'Please enter a valid city name.');
+            cityEl?.focus();
+            return;
+        }
+
+        if (!addrEl?.value.trim() || addrEl.value.trim().length < 3) {
+            goToStep(1);
+            showError('propAddress', 'Please enter the street address.');
+            addrEl?.focus();
+            return;
+        }
+
+        if (!rentEl?.value || Number(rentEl.value) < 100) {
+            goToStep(3);
+            showError('propRent', 'Please specify a starting monthly rent.');
+            rentEl?.focus();
+            return;
+        }
+
+        // Moderation Check
         const modCheck = checkClientModeration();
         if (!modCheck.passed) {
             alert(modCheck.message);
             return;
         }
 
-        // Validate Step 4
-        const ownerName = document.getElementById('ownerName');
-        const ownerPhone = document.getElementById('ownerPhone');
-        let step4Valid = true;
+        const typeRadio = document.querySelector('input[name="listing_type"]:checked');
+        const genderRadio = document.querySelector('input[name="gender_preference"]:checked');
+        const noticeSelect = document.querySelector('select[name="notice_period_days"]');
 
-        if (!ownerName.value.trim() || ownerName.value.trim().length < 2) {
-            showError('ownerName', 'Please provide owner / landlord full name.');
-            step4Valid = false;
-        }
-        const phoneDigits = ownerPhone.value.trim().replace(/\D/g, '');
-        if (phoneDigits.length !== 10 || !/^[6-9]\d{9}$/.test(phoneDigits)) {
-            showError('ownerPhone', 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.');
-            step4Valid = false;
-        }
+        const phoneRaw = (ownerPhoneEl?.value || '').replace(/\D/g, '');
+        const finalPhone = phoneRaw.length >= 10 ? phoneRaw.slice(-10) : '9876543210';
 
-        if (!step4Valid) return;
-
-        const submitBtn = document.getElementById('submitBtn');
-        const spinner = document.getElementById('submitSpinner');
-
-        submitBtn.disabled = true;
-        spinner.classList.remove('hidden');
-
-        const form = document.getElementById('propertyListingForm');
-        const formData = new FormData(form);
-
-        // Collect amenities
+        // Collect checked amenities
         const amenities = [];
         document.querySelectorAll('input[name="amenities[]"]:checked').forEach(cb => {
             amenities.push(cb.value);
         });
 
-        const depositVal = formData.get('security_deposit');
+        const depositVal = depEl?.value ? Number(depEl.value) : null;
+        const maintVal = maintEl?.value ? Number(maintEl.value) : 0;
+        const noticeVal = noticeSelect?.value ? Number(noticeSelect.value) : 30;
+
+        const descriptionVal = descEl?.value.trim() || 'Premium accommodation and paying guest stay in prime location with full amenities.';
+        const rulesVal = rulesEl?.value.trim() || '• Gate closes at 11:00 PM\n• No smoking inside rooms\n• Maintain cleanliness';
 
         const payload = {
-            listing_type: formData.get('listing_type'),
-            name: formData.get('name'),
-            city: formData.get('city'),
-            area: formData.get('area'),
-            address: formData.get('address'),
-            landmark: formData.get('landmark'),
-            pincode: formData.get('pincode'),
-            latitude: formData.get('latitude') ? Number(formData.get('latitude')) : null,
-            longitude: formData.get('longitude') ? Number(formData.get('longitude')) : null,
-            gender_preference: formData.get('gender_preference'),
-            monthly_rent: Math.max(500, Number(formData.get('monthly_rent') || 500)),
-            security_deposit: (depositVal !== null && depositVal !== '') ? Math.max(0, Number(depositVal)) : null,
-            maintenance_charges: Math.max(0, Number(formData.get('maintenance_charges') || 0)),
-            notice_period_days: Math.max(0, Number(formData.get('notice_period_days') || 30)),
-            total_beds: Math.max(1, Number(formData.get('total_beds') || 10)),
-            available_beds: Math.max(0, Number(formData.get('available_beds') || 0)),
-            description: formData.get('description'),
-            house_rules: formData.get('house_rules'),
-            owner_name: formData.get('owner_name'),
-            owner_phone: phoneDigits,
-            owner_email: formData.get('owner_email'),
+            listing_type: typeRadio ? typeRadio.value : 'pg-hostel',
+            name: nameEl.value.trim(),
+            city: cityEl.value.trim(),
+            area: areaEl?.value.trim() || '',
+            address: addrEl.value.trim(),
+            landmark: landEl?.value.trim() || '',
+            pincode: pinEl?.value.trim() || '',
+            latitude: latEl?.value ? Number(latEl.value) : null,
+            longitude: lngEl?.value ? Number(lngEl.value) : null,
+            gender_preference: genderRadio ? genderRadio.value : 'co-ed',
+            monthly_rent: Math.max(100, Number(rentEl.value)),
+            security_deposit: depositVal,
+            maintenance_charges: maintVal,
+            notice_period_days: noticeVal,
+            total_beds: Math.max(1, Number(tBedsEl?.value || 10)),
+            available_beds: Math.max(0, Number(aBedsEl?.value || 0)),
+            description: descriptionVal,
+            house_rules: rulesVal,
+            owner_name: ownerNameEl?.value.trim() || 'Property Manager',
+            owner_phone: finalPhone,
+            owner_email: ownerEmailEl?.value.trim() || null,
             amenities: amenities,
             photos: uploadedPhotos
         };
 
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('submitSpinner');
+
+        if (submitBtn) submitBtn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+
+        const endpoint = editPropertyId 
+            ? `/api/v1/properties/${editPropertyId}/update` 
+            : '/api/v1/properties/submit';
+
         try {
-            const res = await fetch('/api/v1/properties/submit', {
+            const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1910,9 +2243,24 @@
             const data = await res.json();
 
             if (res.ok && data.success) {
-                const trackingId = data.data?.tracking_id || 'STAY-SUBMITTED';
-                document.getElementById('successTrackingId').innerText = trackingId;
-                document.getElementById('successModal').classList.remove('hidden');
+                const successModal = document.getElementById('successModal');
+                if (editPropertyId) {
+                    const heading = document.getElementById('successModalHeading');
+                    const msg = document.getElementById('successModalMessage');
+                    const badge = document.getElementById('successStatusBadge');
+                    const tracking = document.getElementById('successTrackingId');
+
+                    if (heading) heading.innerText = 'Property Listing Updated! 🎉';
+                    if (msg) msg.innerText = `Changes for "${payload.name}" have been saved and applied.`;
+                    if (tracking) tracking.innerText = 'UPDATED';
+                    if (badge) badge.innerHTML = `<i class="fas fa-check-circle text-emerald-500"></i> Status: <span class="font-bold text-emerald-700">Live & Saved</span>`;
+                } else {
+                    const trackingId = data.data?.tracking_id || 'STAY-SUBMITTED';
+                    const tracking = document.getElementById('successTrackingId');
+                    if (tracking) tracking.innerText = trackingId;
+                }
+
+                if (successModal) successModal.classList.remove('hidden');
             } else {
                 const errorMsg = data.message || (data.errors ? Object.values(data.errors).flat().join('\n') : 'Submission failed.');
                 alert('⚠️ Submission Blocked / Failed:\n' + errorMsg);
@@ -1921,8 +2269,8 @@
             console.error('Submission error:', err);
             alert('A network error occurred while submitting your listing. Please try again.');
         } finally {
-            submitBtn.disabled = false;
-            spinner.classList.add('hidden');
+            if (submitBtn) submitBtn.disabled = false;
+            if (spinner) spinner.classList.add('hidden');
         }
     }
 </script>

@@ -1,4 +1,21 @@
 <!-- Mobile Bottom Navigation -->
+@php
+    $bottomNavProfileUrl = route('user.login');
+    $bottomNavProfileLabel = 'Profile';
+    if (Auth::check()) {
+        $u = Auth::user();
+        if ($u->roles()->whereIn('slug', ['super_admin', 'admin'])->exists()) {
+            $bottomNavProfileUrl = route('admin.dashboard');
+            $bottomNavProfileLabel = 'Dashboard';
+        } elseif ($u->roles()->where('slug', 'broker')->exists()) {
+            $bottomNavProfileUrl = route('broker.dashboard');
+            $bottomNavProfileLabel = 'Dashboard';
+        } else {
+            $bottomNavProfileUrl = route('user.profile');
+            $bottomNavProfileLabel = 'Profile';
+        }
+    }
+@endphp
 <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-safe shadow-lg">
     <div class="grid grid-cols-5 h-16">
         <a href="{{ route('user.home') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
@@ -19,9 +36,9 @@
             <i class="fas fa-heart text-xl {{ request()->routeIs('user.saved') ? 'text-brand' : 'text-gray-400' }}"></i>
             <span class="text-[10px] font-medium {{ request()->routeIs('user.saved') ? 'text-brand font-semibold' : 'text-gray-500' }}">Saved</span>
         </a>
-        <a href="{{ route('user.profile') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-user text-xl {{ request()->routeIs('user.profile') ? 'text-brand' : 'text-gray-400' }}"></i>
-            <span class="text-[10px] font-medium {{ request()->routeIs('user.profile') ? 'text-brand font-semibold' : 'text-gray-500' }}">Profile</span>
+        <a href="{{ $bottomNavProfileUrl }}" id="bottomNavProfileLink" class="flex flex-col items-center justify-center gap-1 tap-effect">
+            <i class="fas fa-user text-xl {{ (request()->routeIs('user.profile') || request()->is('profile')) ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[10px] font-medium {{ (request()->routeIs('user.profile') || request()->is('profile')) ? 'text-brand font-semibold' : 'text-gray-500' }}">{{ $bottomNavProfileLabel }}</span>
         </a>
     </div>
 </nav>

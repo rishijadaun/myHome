@@ -576,6 +576,15 @@ function loadProfileState() {
     if (userStr) {
         try {
             const u = JSON.parse(userStr);
+            const role = (u.role || '').toLowerCase();
+            if (role === 'admin' || role === 'super_admin') {
+                window.location.href = "{{ route('admin.dashboard') }}";
+                return;
+            } else if (role === 'broker') {
+                window.location.href = "{{ route('broker.dashboard') }}";
+                return;
+            }
+
             if (u.first_name) currentProfileData.first_name = u.first_name;
             if (u.last_name) currentProfileData.last_name = u.last_name;
             if (u.email) currentProfileData.email = u.email;

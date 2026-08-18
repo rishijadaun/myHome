@@ -41,6 +41,31 @@ class BrokerMiddleware
             return redirect()->route('broker.login')->with('error', 'Access Denied: Your account does not have partner broker access.');
         }
 
+        // STRICT ENFORCEMENT: Only active brokers can access the portal
+        if ($user->status !== 'active' || !$user->is_active) {
+            Auth::logout();
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+
+            $errMsg = match ($user->status) {
+                'pending_verification' => 'Your partner broker account is awaiting verification.',
+                'rejected' => 'Your broker application has been rejected.',
+                'suspended' => 'Your partner broker account is currently suspended.',
+                default => 'Your account is currently inactive. Only active brokers have portal access.',
+            };
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errMsg
+                ], 403);
+            }
+
+            return redirect()->route('broker.login')->with('error', $errMsg);
+        }
+
         return $next($request);
     }
 }

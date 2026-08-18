@@ -17,7 +17,6 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserRole;
 use App\Services\ContentModerationService;
-use App\Services\ImageModerationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -141,23 +140,6 @@ class PropertySubmissionController extends Controller
                 ],
                 422
             );
-        }
-
-        // =========================================================================
-        // AUTOMATED AI IMAGE MODERATION FILTER (OPENAI OMNIMODELS MODERATION)
-        // =========================================================================
-        if (!empty($validated['photos']) && is_array($validated['photos'])) {
-            $imageModeration = app(ImageModerationService::class)->scanImages($validated['photos']);
-            if (!$imageModeration['is_safe']) {
-                return $this->error(
-                    $imageModeration['reason'],
-                    [
-                        'category' => 'Image Content Safety Violation',
-                        'flagged_index' => $imageModeration['flagged_index']
-                    ],
-                    422
-                );
-            }
         }
 
         try {
@@ -408,6 +390,291 @@ class PropertySubmissionController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error('Failed to submit listing: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get single property details for edit mode in list-property wizard.
+     */
+    public function details($id)
+    {
+        $property = Property::with([
+            'city',
+            'area',
+            'propertyType',
+            'images',
+            'amenities',
+            'rules',
+            'broker.profile',
+        ])->where('id', $id)->orWhere('slug', $id)->firstOrFail();
+
+        // Format amenities slugs
+        $amenitySlugs = $property->amenities->pluck('slug')->toArray();
+
+        // Format photos list
+        $photos = $property->images->sortBy('sort_order')->pluck('image_url')->toArray();
+        if (empty($photos) && $property->primaryImage) {
+            $photos[] = $property->primaryImage->image_url;
+        }
+
+        // Format house rules
+        $houseRules = $property->rules->pluck('rule_text')->implode("\n");
+
+        $data = [
+            'id' => $property->id,
+            'name' => $property->name,
+            'listing_type' => $property->propertyType?->slug ?? 'pg-hostel',
+            'city' => $property->city?->name ?? '',
+            'city_id' => $property->city_id,
+            'area' => $property->area?->name ?? $property->landmark ?? '',
+            'area_id' => $property->area_id,
+            'address' => $property->address ?? '',
+            'landmark' => $property->landmark ?? '',
+            'pincode' => $property->area?->pincode ?? '',
+            'latitude' => $property->latitude,
+            'longitude' => $property->longitude,
+            'gender_preference' => $property->gender_preference ?? 'co-ed',
+            'monthly_rent' => (float) $property->monthly_rent,
+            'security_deposit' => (float) ($property->security_deposit ?? $property->monthly_rent),
+            'maintenance_charges' => 0,
+            'notice_period_days' => (int) ($property->notice_period_days ?? 30),
+            'total_beds' => (int) ($property->total_beds ?? 10),
+            'available_beds' => (int) ($property->available_beds ?? 0),
+            'description' => $property->description ?? '',
+            'house_rules' => $houseRules,
+            'owner_name' => $property->broker?->profile?->first_name 
+                ? ($property->broker->profile->first_name . ' ' . ($property->broker->profile->last_name ?? ''))
+                : ($property->broker?->name ?? 'Property Manager'),
+            'owner_phone' => $property->broker?->phone ?? '',
+            'owner_email' => $property->broker?->email ?? '',
+            'amenities' => $amenitySlugs,
+            'photos' => $photos,
+            'status' => $property->status ?? 'active',
+            'is_active' => (bool) $property->is_active,
+        ];
+
+        return $this->success('Property details retrieved successfully', $data);
+    }
+
+    /**
+     * Update existing property from list-property wizard.
+     */
+    public function update(Request $request, $id)
+    {
+        $property = Property::where('id', $id)->orWhere('slug', $id)->firstOrFail();
+
+        // Convert empty string owner_email to null so email validator doesn't fail on empty string
+        if ($request->has('owner_email') && trim((string) $request->input('owner_email')) === '') {
+            $request->merge(['owner_email' => null]);
+        }
+
+        $validated = $request->validate([
+            'listing_type' => ['nullable', 'string', 'max:50'],
+            'name' => ['required', 'string', 'min:2', 'max:200'],
+            'city' => ['required', 'string', 'min:2', 'max:100'],
+            'area' => ['nullable', 'string', 'max:150'],
+            'address' => ['required', 'string', 'min:3'],
+            'landmark' => ['nullable', 'string', 'max:200'],
+            'pincode' => ['nullable', 'string'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
+            'gender_preference' => ['nullable', 'in:boys,girls,co-ed'],
+            'monthly_rent' => ['required', 'numeric', 'min:100'],
+            'security_deposit' => ['nullable', 'numeric', 'min:0'],
+            'maintenance_charges' => ['nullable', 'numeric', 'min:0'],
+            'notice_period_days' => ['nullable', 'integer', 'min:0'],
+            'total_beds' => ['nullable', 'integer', 'min:1'],
+            'available_beds' => ['nullable', 'integer', 'min:0'],
+            'description' => ['nullable', 'string'],
+            'house_rules' => ['nullable', 'string'],
+            'amenities' => ['nullable', 'array'],
+            'photos' => ['nullable', 'array'],
+            'owner_name' => ['nullable', 'string'],
+            'owner_phone' => ['nullable', 'string'],
+            'owner_email' => ['nullable', 'email'],
+            'status' => ['nullable', 'in:active,draft,inactive'],
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Resolve City
+            $cityName = !empty($validated['city']) ? trim($validated['city']) : 'City';
+            $city = City::firstOrCreate(
+                ['name' => $cityName],
+                [
+                    'id' => (string) Str::uuid(),
+                    'slug' => Str::slug($cityName),
+                    'is_active' => 1,
+                    'is_metro' => 0,
+                    'is_tier1' => 0,
+                    'version' => 1
+                ]
+            );
+
+            // Resolve Area
+            $areaId = $property->area_id;
+            if (!empty($validated['area'])) {
+                $area = Area::firstOrCreate(
+                    ['city_id' => $city->id, 'name' => trim($validated['area'])],
+                    [
+                        'id' => (string) Str::uuid(),
+                        'slug' => Str::slug(trim($validated['area'])) . '-' . Str::random(4),
+                        'pincode' => $validated['pincode'] ?? null,
+                        'is_active' => 1,
+                        'version' => 1
+                    ]
+                );
+                if (!empty($validated['pincode']) && empty($area->pincode)) {
+                    $area->pincode = $validated['pincode'];
+                    $area->save();
+                }
+                $areaId = $area->id;
+            }
+
+            // Resolve Type
+            $typeSlug = $validated['listing_type'] ?? 'pg-hostel';
+            $propertyType = PropertyType::where('slug', $typeSlug)->first() ?? PropertyType::first();
+
+            $property->name = $validated['name'];
+            $property->city_id = $city->id;
+            $property->area_id = $areaId;
+            if ($propertyType) {
+                $property->property_type_id = $propertyType->id;
+            }
+            $property->address = $validated['address'];
+            $property->landmark = $validated['landmark'] ?? $property->landmark;
+            $property->gender_preference = $validated['gender_preference'] ?? $property->gender_preference;
+            $property->monthly_rent = $validated['monthly_rent'];
+            $property->security_deposit = $validated['security_deposit'] ?? $property->security_deposit;
+            $property->notice_period_days = $validated['notice_period_days'] ?? $property->notice_period_days;
+            $property->total_beds = $validated['total_beds'] ?? $property->total_beds;
+            $property->available_beds = $validated['available_beds'] ?? $property->available_beds;
+            
+            $descriptionText = !empty($validated['description']) ? trim($validated['description']) : ($property->description ?: "Premium PG and accommodation in {$city->name} with modern amenities.");
+            $property->description = $descriptionText;
+
+            if (!empty($validated['latitude'])) $property->latitude = $validated['latitude'];
+            if (!empty($validated['longitude'])) $property->longitude = $validated['longitude'];
+
+            if (!empty($validated['status'])) {
+                $property->status = $validated['status'];
+                $property->is_active = ($validated['status'] === 'active' ? 1 : 0);
+            }
+
+            $property->save();
+
+            // Sync Amenities
+            if (isset($validated['amenities']) && is_array($validated['amenities'])) {
+                $amenityIds = [];
+                foreach ($validated['amenities'] as $item) {
+                    $amenity = Amenity::where('slug', $item)->orWhere('id', $item)->orWhere('name', $item)->first();
+                    if ($amenity) {
+                        $amenityIds[] = $amenity->id;
+                    }
+                }
+                DB::table('property_amenities')->where('property_id', $property->id)->delete();
+                $pivotRows = [];
+                foreach ($amenityIds as $aId) {
+                    $pivotRows[] = [
+                        'id' => (string) Str::uuid(),
+                        'property_id' => $property->id,
+                        'amenity_id' => $aId,
+                        'created_at' => now(),
+                    ];
+                }
+                if (!empty($pivotRows)) {
+                    DB::table('property_amenities')->insert($pivotRows);
+                }
+            }
+
+            // Sync Photos with Base64 handler
+            $uploadDir = public_path('uploads/properties');
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            if (!empty($validated['photos']) && is_array($validated['photos'])) {
+                PropertyImage::where('property_id', $property->id)->delete();
+                foreach ($validated['photos'] as $idx => $photoData) {
+                    if (empty($photoData) || !is_string($photoData)) continue;
+
+                    $photoUrl = trim($photoData);
+
+                    // Check if photo is Base64 data URL
+                    if (preg_match('/^data:image\/(\w+);base64,/', $photoUrl, $typeMatches)) {
+                        $extension = strtolower($typeMatches[1]);
+                        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                            $extension = 'jpg';
+                        }
+                        $base64Clean = substr($photoUrl, strpos($photoUrl, ',') + 1);
+                        $decodedData = base64_decode($base64Clean);
+
+                        if ($decodedData !== false) {
+                            $fileName = 'prop_' . substr(str_replace('-', '', $property->id), 0, 8) . '_' . time() . '_' . $idx . '.' . $extension;
+                            $filePath = $uploadDir . '/' . $fileName;
+                            file_put_contents($filePath, $decodedData);
+                            $photoUrl = '/uploads/properties/' . $fileName;
+                        }
+                    }
+
+                    PropertyImage::create([
+                        'id' => (string) Str::uuid(),
+                        'property_id' => $property->id,
+                        'image_url' => $photoUrl,
+                        'image_type' => $idx === 0 ? 'main' : 'gallery',
+                        'sort_order' => $idx,
+                        'is_primary' => $idx === 0 ? 1 : 0,
+                        'is_active' => 1,
+                    ]);
+                }
+            }
+
+            // Sync Rules if provided
+            if (isset($validated['house_rules'])) {
+                PropertyRule::where('property_id', $property->id)->delete();
+                $ruleLines = preg_split('/[\r\n]+/', $validated['house_rules']);
+                foreach ($ruleLines as $rLine) {
+                    $rLine = trim($rLine);
+                    if (!empty($rLine)) {
+                        PropertyRule::create([
+                            'id' => (string) Str::uuid(),
+                            'property_id' => $property->id,
+                            'rule_text' => $rLine,
+                            'rule_type' => 'mandatory',
+                            'is_active' => 1,
+                            'version' => 1
+                        ]);
+                    }
+                }
+            }
+
+            // Update Owner/Broker contact if provided
+            if ($property->broker) {
+                if (!empty($validated['owner_phone'])) {
+                    $property->broker->phone = $validated['owner_phone'];
+                    $property->broker->save();
+                }
+                if (!empty($validated['owner_name'])) {
+                    if ($property->broker->profile) {
+                        $nameParts = explode(' ', trim($validated['owner_name']), 2);
+                        $property->broker->profile->first_name = $nameParts[0];
+                        $property->broker->profile->last_name = $nameParts[1] ?? '';
+                        $property->broker->profile->save();
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return $this->success("Property \"{$property->name}\" updated successfully!", [
+                'property_id' => $property->id,
+                'name' => $property->name,
+                'status' => $property->status,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error('Failed to update property: ' . $e->getMessage(), 500);
         }
     }
 }

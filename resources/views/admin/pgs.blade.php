@@ -10,9 +10,9 @@
         <p class="text-sm text-gray-500">{{ $totalCount }} properties listed across {{ $cities->count() }} major cities</p>
     </div>
     <div class="flex items-center gap-3">
-        <button onclick="openModal('adminAddPgModal')" class="bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-2.5 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 hover:shadow-xl transition flex items-center gap-2 cursor-pointer">
+        <a href="{{ route('user.list-property') }}" class="bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-2.5 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 hover:shadow-xl transition flex items-center gap-2 cursor-pointer">
             <i class="fas fa-plus text-sm"></i> Add PG Listing
-        </button>
+        </a>
     </div>
 </header>
 
@@ -28,9 +28,9 @@
 
     <!-- Mobile Add Button -->
     <div class="lg:hidden">
-        <button onclick="openModal('adminAddPgModal')" class="w-full bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-3 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 flex items-center justify-center gap-2 cursor-pointer">
+        <a href="{{ route('user.list-property') }}" class="w-full bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-3 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 flex items-center justify-center gap-2 cursor-pointer">
             <i class="fas fa-plus"></i> Add New PG Property
-        </button>
+        </a>
     </div>
 
     <!-- Stats Row -->
@@ -152,7 +152,7 @@
                                 <div class="flex items-center gap-3">
                                     <img src="{{ $imgUrl }}" alt="{{ $property->name }}" class="w-12 h-12 rounded-xl object-cover shadow-xs border border-gray-100 shrink-0">
                                     <div class="min-w-0">
-                                        <div class="font-bold text-gray-900 truncate max-w-xs pg-name">{{ $property->name }}</div>
+                                        <a href="{{ url('/list-property?edit_id=' . $property->id) }}" class="font-bold text-gray-900 truncate max-w-xs pg-name hover:text-brand transition block">{{ $property->name }}</a>
                                         <div class="text-xs text-gray-500 truncate max-w-xs">{{ $property->landmark ?? ($property->address ?? 'Verified Stay') }}</div>
                                     </div>
                                 </div>
@@ -185,6 +185,11 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
+                                    <!-- Edit in List Property Wizard -->
+                                    <a href="{{ url('/list-property?edit_id=' . $property->id) }}" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect cursor-pointer" title="Edit in List Property Wizard">
+                                        <i class="fas fa-edit text-xs"></i>
+                                    </a>
+
                                     <!-- View Modal Action -->
                                     <button type="button" onclick="viewPropertyDetails('{{ $property->id }}')" class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 hover:bg-teal-100 flex items-center justify-center tap-effect cursor-pointer" title="View Property Details">
                                         <i class="fas fa-eye text-xs"></i>
@@ -251,7 +256,7 @@
                     <img src="{{ $imgUrl }}" alt="{{ $property->name }}" class="w-20 h-20 rounded-xl object-cover shrink-0">
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-start gap-1">
-                            <h3 class="font-bold text-gray-900 text-sm truncate pg-name">{{ $property->name }}</h3>
+                            <a href="{{ url('/list-property?edit_id=' . $property->id) }}" class="font-bold text-gray-900 text-sm truncate pg-name hover:text-brand transition block">{{ $property->name }}</a>
                             <span id="mobile-status-badge-{{ $property->id }}" class="status-badge text-[9px] font-bold px-2 py-0.5 rounded uppercase shrink-0 {{ $isVerified ? 'bg-emerald-100 text-emerald-700' : ($isPending ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700') }}">
                                 {{ $isVerified ? 'APPROVED' : ($isPending ? 'PENDING' : strtoupper($property->status)) }}
                             </span>
@@ -264,6 +269,9 @@
                     </div>
                 </div>
                 <div class="flex gap-2 pt-2 border-t border-gray-100">
+                    <a href="{{ url('/list-property?edit_id=' . $property->id) }}" class="flex-1 bg-blue-50 text-blue-600 text-xs font-semibold py-2 rounded-lg text-center tap-effect flex items-center justify-center gap-1">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
                     <button type="button" onclick="viewPropertyDetails('{{ $property->id }}')" class="flex-1 bg-teal-50 text-teal-600 text-xs font-semibold py-2 rounded-lg text-center tap-effect">
                         <i class="fas fa-eye mr-1"></i> Details
                     </button>

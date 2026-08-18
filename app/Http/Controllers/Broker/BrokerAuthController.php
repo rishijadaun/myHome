@@ -101,11 +101,34 @@ class BrokerAuthController extends Controller
             ], 403);
         }
 
-        // Validate Active Status
+        // Validate Active Status (ONLY active brokers are permitted to log in)
         if ($user->status !== 'active' || !$user->is_active) {
+            RateLimiter::hit($throttleKey, 60);
+
+            LoginHistory::create([
+                'id' => (string) Str::uuid(),
+                'user_id' => $user->id,
+                'login_at' => now(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'login_method' => 'password',
+                'status' => 'failed',
+                'failure_reason' => 'Inactive or non-active broker account (' . $user->status . ')',
+            ]);
+
+            $statusMsg = match ($user->status) {
+                'pending_verification' => 'Your partner broker account is pending verification and approval by StayNest Admin.',
+                'rejected' => 'Your partner broker registration was rejected. Please contact StayNest partner desk.',
+                'suspended' => 'Your partner broker account has been suspended by administrator. Please contact StayNest support.',
+                default => 'Your broker account is currently inactive. Only active partner accounts are permitted to log in.',
+            };
+
             return response()->json([
                 'success' => false,
-                'message' => 'Your broker account is suspended or awaiting verification. Please contact StayNest admin.',
+                'message' => $statusMsg,
+                'errors' => [
+                    'login' => [$statusMsg]
+                ]
             ], 403);
         }
 

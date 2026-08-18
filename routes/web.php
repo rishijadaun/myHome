@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\AdminPropertyController;
 use App\Http\Controllers\Admin\AdminBrokerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\AdminRelationshipManagerController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Guest Admin Routes
@@ -39,7 +40,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/pgs/{id}/approve', [AdminPropertyController::class, 'approve'])->name('pgs.approve');
         Route::delete('/pgs/{id}', [AdminPropertyController::class, 'destroy'])->name('pgs.destroy');
 
-        // Manage Brokers Routes
+        // Manage Brokers & Relationship Manager Assignment Routes
         Route::get('/brokers', [AdminBrokerController::class, 'index'])->name('brokers');
         Route::post('/brokers', [AdminBrokerController::class, 'store'])->name('brokers.store');
         Route::get('/brokers/{id}', [AdminBrokerController::class, 'show'])->name('brokers.show');
@@ -47,6 +48,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/brokers/{id}/reject', [AdminBrokerController::class, 'reject'])->name('brokers.reject');
         Route::post('/brokers/{id}/toggle-status', [AdminBrokerController::class, 'toggleStatus'])->name('brokers.toggle');
         Route::delete('/brokers/{id}', [AdminBrokerController::class, 'destroy'])->name('brokers.destroy');
+        Route::post('/brokers/{id}/assign-rm', [AdminRelationshipManagerController::class, 'assignBroker'])->name('brokers.assign-rm');
+        Route::post('/brokers/bulk-assign-rm', [AdminRelationshipManagerController::class, 'bulkAssign'])->name('brokers.bulk-assign-rm');
+        Route::post('/brokers/auto-assign-rm', [AdminRelationshipManagerController::class, 'autoAssignByZone'])->name('brokers.auto-assign-rm');
+
+        // Relationship Managers Team Management
+        Route::get('/relationship-managers', [AdminRelationshipManagerController::class, 'index'])->name('relationship-managers.index');
+        Route::post('/relationship-managers', [AdminRelationshipManagerController::class, 'store'])->name('relationship-managers.store');
+        Route::get('/relationship-managers/{id}', [AdminRelationshipManagerController::class, 'show'])->name('relationship-managers.show');
+        Route::match(['put', 'post'], '/relationship-managers/{id}', [AdminRelationshipManagerController::class, 'update'])->name('relationship-managers.update');
+        Route::delete('/relationship-managers/{id}', [AdminRelationshipManagerController::class, 'destroy'])->name('relationship-managers.destroy');
 
         // Manage Users Routes
         Route::get('/users', [AdminUserController::class, 'index'])->name('users');
@@ -68,6 +79,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 use App\Http\Controllers\Broker\BrokerAuthController;
 use App\Http\Controllers\Broker\BrokerDashboardController;
 use App\Http\Controllers\Broker\BrokerProfileController;
+use App\Http\Controllers\Broker\BrokerPropertyController;
 
 Route::prefix('broker')->name('broker.')->group(function () {
     // Guest Broker Routes
@@ -85,7 +97,14 @@ Route::prefix('broker')->name('broker.')->group(function () {
         Route::post('/bookings/{id}/approve', [BrokerDashboardController::class, 'approveBooking'])->name('bookings.approve');
         Route::post('/bookings/{id}/reject', [BrokerDashboardController::class, 'rejectBooking'])->name('bookings.reject');
 
-        Route::view('/pgs', 'broker.pgs')->name('pgs');
+        // Dynamic PG Property Management
+        Route::get('/pgs', [BrokerPropertyController::class, 'index'])->name('pgs');
+        Route::post('/pgs', [BrokerPropertyController::class, 'store'])->name('pgs.store');
+        Route::get('/pgs/{id}', [BrokerPropertyController::class, 'show'])->name('pgs.show');
+        Route::post('/pgs/{id}/update', [BrokerPropertyController::class, 'update'])->name('pgs.update');
+        Route::post('/pgs/{id}/toggle-status', [BrokerPropertyController::class, 'toggleStatus'])->name('pgs.toggle-status');
+        Route::delete('/pgs/{id}', [BrokerPropertyController::class, 'destroy'])->name('pgs.destroy');
+
         Route::view('/bookings', 'broker.bookings')->name('bookings');
         Route::view('/tenants', 'broker.tenants')->name('tenants');
         Route::view('/earnings', 'broker.earnings')->name('earnings');
@@ -121,7 +140,18 @@ Route::name('user.')->group(function () {
         return redirect()->route('user.login');
     })->name('logout');
     Route::view('/search', 'user.search')->name('search');
-    Route::view('/profile', 'user.profile')->name('profile');
+    Route::get('/profile', function () {
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $authUser = \Illuminate\Support\Facades\Auth::user();
+            if ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists()) {
+                return redirect()->route('admin.dashboard');
+            }
+            if ($authUser->roles()->where('slug', 'broker')->exists()) {
+                return redirect()->route('broker.dashboard');
+            }
+        }
+        return view('user.profile');
+    })->name('profile');
     Route::view('/pricing', 'user.pricing')->name('pricing');
     Route::view('/about', 'user.about')->name('about');
     Route::view('/contact', 'user.contact')->name('contact');

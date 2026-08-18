@@ -1,3 +1,30 @@
+@php
+    $headerProfileUrl = route('user.login');
+    $headerProfileLabel = 'Login';
+    $headerProfileIcon = 'fa-user';
+    $headerRoleBadge = null;
+
+    if (Auth::check()) {
+        $authUser = Auth::user();
+        if ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists()) {
+            $headerProfileUrl = route('admin.dashboard');
+            $headerProfileLabel = 'Admin Dashboard';
+            $headerProfileIcon = 'fa-shield-halved';
+            $headerRoleBadge = 'ADMIN';
+        } elseif ($authUser->roles()->where('slug', 'broker')->exists()) {
+            $headerProfileUrl = route('broker.dashboard');
+            $headerProfileLabel = 'Broker Dashboard';
+            $headerProfileIcon = 'fa-gauge-high';
+            $headerRoleBadge = 'BROKER';
+        } else {
+            $headerProfileUrl = route('user.profile');
+            $headerProfileLabel = $authUser->profile?->first_name ?? 'My Profile';
+            $headerProfileIcon = 'fa-user-check';
+            $headerRoleBadge = 'TENANT';
+        }
+    }
+@endphp
+
 <!-- Mobile App Header -->
 <header class="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
 
@@ -25,11 +52,11 @@
                 <!-- Dynamic Auth Header Item for Mobile -->
                 <div id="mobHeaderAuth">
                     @auth
-                        <a href="{{ route('user.profile') }}" class="w-10 h-10 rounded-full bg-brand/10 border border-brand/30 flex items-center justify-center text-brand font-bold text-xs tap-effect" title="My Profile">
-                            <i class="fas fa-user-check text-sm"></i>
+                        <a href="{{ $headerProfileUrl }}" id="mobProfileLink" class="w-10 h-10 rounded-full bg-brand/10 border border-brand/30 flex items-center justify-center text-brand font-bold text-xs tap-effect" title="{{ $headerProfileLabel }}">
+                            <i class="fas {{ $headerProfileIcon }} text-sm"></i>
                         </a>
                     @else
-                        <a href="{{ route('user.login') }}" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 tap-effect" title="Login">
+                        <a href="{{ route('user.login') }}" id="mobProfileLink" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 tap-effect" title="Login">
                             <i class="fas fa-user text-sm"></i>
                         </a>
                     @endauth
@@ -54,7 +81,7 @@
                     <a href="{{ route('user.home') }}" class="{{ request()->routeIs('user.home') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Home</a>
                     <a href="{{ route('user.search') }}" class="{{ request()->routeIs('user.search') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Find PG</a>
                     <a href="{{ route('user.list-property') }}" class="{{ request()->routeIs('user.list-property') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">List Property</a>
-                    <a href="{{ route('user.pricing') }}" class="{{ request()->routeIs('user.pricing') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Pricing</a>
+                    <!-- <a href="{{ route('user.pricing') }}" class="{{ request()->routeIs('user.pricing') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Pricing</a> -->
                     <a href="{{ route('user.about') }}" class="{{ request()->routeIs('user.about') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">About Us</a>
                     <a href="{{ route('user.contact') }}" class="{{ request()->routeIs('user.contact') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Contact</a>
                 </nav>
@@ -74,13 +101,18 @@
                 <!-- Dynamic Auth Buttons in Desktop Header -->
                 <div id="deskHeaderAuth" class="flex items-center gap-2">
                     @auth
-                        <a href="{{ route('user.profile') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 hover:bg-brand-light text-gray-800 hover:text-brand transition text-sm font-semibold">
-                            <div class="w-7 h-7 rounded-full bg-brand text-white flex items-center justify-center text-xs">
-                                <i class="fas fa-user"></i>
+                        <a href="{{ $headerProfileUrl }}" id="deskProfileLink" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-brand-light text-gray-800 hover:text-brand transition text-sm font-semibold border border-transparent hover:border-brand/20">
+                            <div class="w-7 h-7 rounded-full bg-brand text-white flex items-center justify-center text-xs shadow-xs">
+                                <i class="fas {{ $headerProfileIcon }}"></i>
                             </div>
-                            <span>Profile</span>
+                            <div class="flex flex-col text-left">
+                                <span class="leading-tight">{{ $headerProfileLabel }}</span>
+                                @if($headerRoleBadge)
+                                    <span class="text-[9px] font-extrabold text-brand-dark tracking-wider">{{ $headerRoleBadge }}</span>
+                                @endif
+                            </div>
                         </a>
-                        <button type="button" onclick="performLogout()" class="px-4 py-2 text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 rounded-xl font-bold transition text-sm flex items-center gap-1.5">
+                        <button type="button" onclick="performLogout()" class="px-3.5 py-2 text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 rounded-xl font-bold transition text-xs flex items-center gap-1.5">
                             <i class="fas fa-right-from-bracket text-xs"></i>
                             <span>Logout</span>
                         </button>
@@ -89,13 +121,16 @@
                             <a href="{{ route('user.login') }}" class="px-5 py-2.5 text-gray-700 font-medium hover:text-brand transition text-sm">Log In</a>
                         </div>
                         <div id="clientAuthState" class="hidden flex items-center gap-2">
-                            <a href="{{ route('user.profile') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 hover:bg-brand-light text-gray-800 hover:text-brand transition text-sm font-semibold">
-                                <div class="w-7 h-7 rounded-full bg-brand text-white flex items-center justify-center text-xs">
-                                    <i class="fas fa-user"></i>
+                            <a href="{{ route('user.profile') }}" id="clientProfileLink" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-brand-light text-gray-800 hover:text-brand transition text-sm font-semibold border border-transparent hover:border-brand/20">
+                                <div class="w-7 h-7 rounded-full bg-brand text-white flex items-center justify-center text-xs shadow-xs">
+                                    <i class="fas fa-user" id="clientProfileIcon"></i>
                                 </div>
-                                <span id="clientUserName">Profile</span>
+                                <div class="flex flex-col text-left">
+                                    <span id="clientUserName" class="leading-tight">Profile</span>
+                                    <span id="clientRoleBadge" class="text-[9px] font-extrabold text-brand-dark tracking-wider">TENANT</span>
+                                </div>
                             </a>
-                            <button type="button" onclick="performLogout()" class="px-4 py-2 text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 rounded-xl font-bold transition text-sm flex items-center gap-1.5">
+                            <button type="button" onclick="performLogout()" class="px-3.5 py-2 text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 rounded-xl font-bold transition text-xs flex items-center gap-1.5">
                                 <i class="fas fa-right-from-bracket text-xs"></i>
                                 <span>Logout</span>
                             </button>
@@ -123,13 +158,40 @@
                 const guestBox = document.getElementById('clientGuestState');
                 const authBox = document.getElementById('clientAuthState');
                 const nameLabel = document.getElementById('clientUserName');
+                const roleBadge = document.getElementById('clientRoleBadge');
+                const profileIcon = document.getElementById('clientProfileIcon');
+                const clientProfileLink = document.getElementById('clientProfileLink');
+                const mobProfileLink = document.getElementById('mobProfileLink');
+                const bottomNavProfileLink = document.getElementById('bottomNavProfileLink');
                 
+                let targetUrl = "{{ route('user.profile') }}";
+                let displayTitle = user.first_name || "My Profile";
+                let badgeText = "TENANT";
+                let iconClass = "fa-user-check";
+
+                const role = (user.role || '').toLowerCase();
+                if (role === 'admin' || role === 'super_admin') {
+                    targetUrl = "{{ route('admin.dashboard') }}";
+                    displayTitle = "Dashboard";
+                    badgeText = "ADMIN";
+                    iconClass = "fa-shield-halved";
+                } else if (role === 'broker') {
+                    targetUrl = "{{ route('broker.dashboard') }}";
+                    displayTitle = "Dashboard";
+                    badgeText = "BROKER";
+                    iconClass = "fa-gauge-high";
+                }
+
+                if (clientProfileLink) clientProfileLink.href = targetUrl;
+                if (mobProfileLink) mobProfileLink.href = targetUrl;
+                if (bottomNavProfileLink) bottomNavProfileLink.href = targetUrl;
+
                 if (guestBox && authBox) {
                     guestBox.classList.add('hidden');
                     authBox.classList.remove('hidden');
-                    if (nameLabel && user.first_name) {
-                        nameLabel.innerText = user.first_name;
-                    }
+                    if (nameLabel) nameLabel.innerText = displayTitle;
+                    if (roleBadge) roleBadge.innerText = badgeText;
+                    if (profileIcon) profileIcon.className = 'fas ' + iconClass;
                 }
             } catch(e) {}
         }

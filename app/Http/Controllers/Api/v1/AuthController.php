@@ -197,8 +197,29 @@ class AuthController extends Controller
             ], 401);
         }
 
-        if ($user->status !== 'active' || ! $user->is_active) {
-            return $this->error('Your account is currently inactive or suspended. Please contact support.', [], 403);
+        // Validate Active Status (ONLY active accounts are allowed to log in)
+        if ($user->status !== 'active' || !$user->is_active) {
+            LoginHistory::create([
+                'id' => (string) Str::uuid(),
+                'user_id' => $user->id,
+                'login_at' => now(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'login_method' => 'password',
+                'status' => 'failed',
+                'failure_reason' => 'Inactive or non-active account (' . $user->status . ')',
+            ]);
+
+            $statusMsg = match ($user->status) {
+                'pending_verification' => 'Your account is pending verification and approval by StayNest Admin.',
+                'rejected' => 'Your account registration was rejected. Please contact StayNest support.',
+                'suspended' => 'Your account has been suspended by administrator. Please contact StayNest support.',
+                default => 'Your account is currently inactive. Only active accounts are permitted to log in.',
+            };
+
+            return $this->error($statusMsg, [
+                'login' => [$statusMsg]
+            ], 403);
         }
 
         // Record successful login in `login_history`

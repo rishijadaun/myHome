@@ -43,6 +43,26 @@ class AdminMiddleware
             return redirect()->route('admin.login')->with('error', 'Access Denied: Your account does not have administrator privileges.');
         }
 
+        // STRICT ENFORCEMENT: Only active admins can access the console
+        if ($user->status !== 'active' || !$user->is_active) {
+            Auth::logout();
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+
+            $errMsg = 'Access Denied: This administrator account is currently suspended or inactive.';
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errMsg
+                ], 403);
+            }
+
+            return redirect()->route('admin.login')->with('error', $errMsg);
+        }
+
         return $next($request);
     }
 }

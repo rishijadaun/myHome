@@ -668,29 +668,60 @@
             </div>
 
             <!-- Dedicated Support & Relationship Manager Card -->
+            @php
+                $rmName = $assignedRm?->name ?? 'Ananya Sengupta';
+                $rmDesignation = $assignedRm?->designation ?? 'Senior Key Account Lead';
+                $rmZone = $assignedRm?->zone ?? 'North Zone (Noida & Delhi NCR)';
+                $rmPhone = $assignedRm?->phone ?? '+91 98765 43210';
+                $rmWhatsapp = $assignedRm?->whatsapp_number ?? '919876543210';
+                $rmEmail = $assignedRm?->email ?? 'partners@staynest.com';
+                $rmWorkingHours = $assignedRm?->working_hours ?? 'Mon - Sat: 9:00 AM - 7:30 PM';
+                $rmAvatar = $assignedRm?->avatar_url ?? null;
+            @endphp
             <div class="bg-gradient-to-br from-brand-50 to-teal-50 rounded-3xl p-6 border border-brand-100 text-center space-y-3.5 shadow-xs">
-                <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-brand text-2xl mx-auto shadow-sm">
-                    <i class="fas fa-headset"></i>
+                <div class="relative w-16 h-16 mx-auto">
+                    @if($rmAvatar)
+                        <img src="{{ $rmAvatar }}" alt="{{ $rmName }}" class="w-16 h-16 rounded-2xl object-cover shadow-sm border-2 border-white">
+                    @else
+                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-brand text-2xl shadow-sm border-2 border-brand-100">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                    @endif
+                    <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white" title="Active & Available"></span>
                 </div>
                 <div>
                     <h4 class="font-bold text-gray-900 text-base">Partner Support Desk</h4>
-                    <p class="text-xs text-gray-600 mt-1">Direct access to your dedicated StayNest Relationship Manager for priority assistance.</p>
+                    <p class="text-xs text-gray-600 mt-0.5">Direct access to your dedicated Relationship Manager.</p>
                 </div>
 
-                <div class="bg-white/80 backdrop-blur-xs p-3 rounded-2xl border border-brand-100 text-xs text-left space-y-1.5">
-                    <div class="text-gray-500 font-medium">Relationship Manager:</div>
-                    <div class="font-bold text-gray-900 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Ananya Sengupta (North Zone)
+                <div class="bg-white/90 backdrop-blur-xs p-3.5 rounded-2xl border border-brand-100 text-xs text-left space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400 font-semibold text-[11px] uppercase tracking-wider">Your Assigned Manager</span>
+                        <span class="text-emerald-700 bg-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded-full">ASSIGNED</span>
+                    </div>
+                    <div>
+                        <div class="font-extrabold text-gray-900 text-sm flex items-center gap-1.5">
+                            {{ $rmName }}
+                        </div>
+                        <div class="text-[11px] text-gray-500 font-medium">{{ $rmDesignation }} • <span class="text-brand-dark font-semibold">{{ $rmZone }}</span></div>
+                    </div>
+                    <div class="text-[10px] text-gray-400 border-t border-gray-100 pt-1.5 flex items-center gap-1">
+                        <i class="fas fa-clock text-brand text-[9px]"></i> {{ $rmWorkingHours }}
                     </div>
                 </div>
 
                 <div class="space-y-2 pt-1">
-                    <a href="https://wa.me/919876543210?text={{ urlencode('Hi Ananya, I am partner broker: ' . $brokerName . ' (ID: ' . substr($broker->id, 0, 8) . '). I need assistance with my StayNest properties.') }}" target="_blank" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-xl text-xs tap-effect shadow-md shadow-brand/20 transition flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fab fa-whatsapp text-sm"></i> Chat with Relationship Manager
+                    <a href="https://wa.me/{{ $rmWhatsapp }}?text={{ urlencode('Hi ' . $rmName . ', I am partner broker: ' . $brokerName . ' (Broker ID: ' . substr($broker->id, 0, 8) . ', Email: ' . $broker->email . '). I need assistance with my StayNest properties.') }}" target="_blank" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-xl text-xs tap-effect shadow-md shadow-brand/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fab fa-whatsapp text-sm"></i> Chat on WhatsApp
                     </a>
-                    <a href="mailto:partners@staynest.com?subject={{ urlencode('Partner Broker Inquiry - ' . $brokerName) }}" class="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2.5 rounded-xl text-xs border border-gray-200 tap-effect transition flex items-center justify-center gap-2">
-                        <i class="fas fa-envelope text-gray-400"></i> Email Partner Desk
-                    </a>
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="tel:{{ $rmPhone }}" class="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 rounded-xl text-xs border border-gray-200 tap-effect transition flex items-center justify-center gap-1.5">
+                            <i class="fas fa-phone-alt text-brand text-xs"></i> Call RM
+                        </a>
+                        <a href="mailto:{{ $rmEmail }}?subject={{ urlencode('Partner Broker Support - ' . $brokerName) }}" class="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 rounded-xl text-xs border border-gray-200 tap-effect transition flex items-center justify-center gap-1.5">
+                            <i class="fas fa-envelope text-gray-400 text-xs"></i> Email
+                        </a>
+                    </div>
                 </div>
             </div>
 

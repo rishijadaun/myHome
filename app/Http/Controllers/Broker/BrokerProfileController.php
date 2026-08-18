@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Broker;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Property;
+use App\Models\RelationshipManager;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -86,7 +87,7 @@ class BrokerProfileController extends Controller
             ]
         );
 
-        $broker->load(['roles', 'profile']);
+        $broker->load(['roles', 'profile', 'relationshipManager']);
 
         // 1. Calculate live performance stats for the profile summary
         $brokerId = $broker->id;
@@ -114,6 +115,19 @@ class BrokerProfileController extends Controller
         $preferences = $profile->preferences ?? [];
         if (!is_array($preferences)) {
             $preferences = json_decode($preferences, true) ?? [];
+        }
+
+        // 3. Resolve Assigned Relationship Manager
+        $assignedRm = $broker->relationshipManager;
+        if (!$assignedRm && !empty($preferences['relationship_manager_id'])) {
+            $assignedRm = RelationshipManager::find($preferences['relationship_manager_id']);
+        }
+        if (!$assignedRm) {
+            $assignedRm = RelationshipManager::where('is_default', 1)->first() ?? RelationshipManager::first();
+            if ($assignedRm && empty($broker->relationship_manager_id)) {
+                $broker->relationship_manager_id = $assignedRm->id;
+                $broker->save();
+            }
         }
 
         $bankDetails = $preferences['bank_details'] ?? [
@@ -157,6 +171,7 @@ class BrokerProfileController extends Controller
             'bankDetails',
             'documents',
             'notifications',
+            'assignedRm',
             'stats'
         ));
     }

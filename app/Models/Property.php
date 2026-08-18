@@ -125,6 +125,11 @@ class Property extends Model
         return $this->hasMany(PropertyVisit::class, 'property_id', 'id');
     }
 
+    public function rules()
+    {
+        return $this->hasMany(PropertyRule::class, 'property_id', 'id');
+    }
+
     /**
      * Scopes for dynamic filtering
      */

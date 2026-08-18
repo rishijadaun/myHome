@@ -27,6 +27,7 @@ class User extends Authenticatable
         'email_verified_at',
         'phone_verified_at',
         'kyc_verified_at',
+        'relationship_manager_id',
         'status',
         'is_active',
         'version',
@@ -72,6 +73,11 @@ class User extends Authenticatable
     public function profile()
     {
         return $this->hasOne(UserProfile::class, 'user_id', 'id');
+    }
+
+    public function relationshipManager()
+    {
+        return $this->belongsTo(RelationshipManager::class, 'relationship_manager_id', 'id');
     }
 
     public function userRoles()

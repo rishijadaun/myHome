@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Notification;
+use App\Models\RelationshipManager;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -49,7 +50,7 @@ class AdminBrokerController extends Controller
         }
 
         // 2. Query Builder
-        $query = $brokerRole ? $brokerRole->users()->with(['profile', 'properties.city', 'wallet']) : User::query()->whereRaw('0 = 1');
+        $query = $brokerRole ? $brokerRole->users()->with(['profile', 'properties.city', 'wallet', 'relationshipManager']) : User::query()->whereRaw('0 = 1');
 
         // Status Tab Filter
         $currentTab = strtoupper($request->query('tab', 'ALL'));
@@ -66,6 +67,16 @@ class AdminBrokerController extends Controller
                 $q->where('users.status', 'suspended')
                   ->orWhere('users.status', 'inactive');
             });
+        }
+
+        // Relationship Manager Filter
+        $selectedRm = $request->query('rm_id');
+        if ($request->filled('rm_id')) {
+            if ($selectedRm === 'unassigned') {
+                $query->whereNull('users.relationship_manager_id');
+            } else {
+                $query->where('users.relationship_manager_id', $selectedRm);
+            }
         }
 
         // Search Filter
@@ -88,10 +99,13 @@ class AdminBrokerController extends Controller
 
         $brokers = $query->latest('users.created_at')->paginate(15)->withQueryString();
         $cities = City::where('is_active', 1)->orderBy('name')->get();
+        $relationshipManagers = RelationshipManager::where('is_active', 1)->orderByDesc('is_default')->orderBy('name')->get();
 
         return view('admin.brokers', compact(
             'brokers',
             'cities',
+            'relationshipManagers',
+            'selectedRm',
             'totalCount',
             'pendingCount',
             'approvedCount',
@@ -114,6 +128,7 @@ class AdminBrokerController extends Controller
             'password' => ['required', 'string', 'min:6', 'max:100'],
             'company_name' => ['nullable', 'string', 'max:150'],
             'city_name' => ['nullable', 'string', 'max:100'],
+            'relationship_manager_id' => ['nullable', 'uuid', 'exists:relationship_managers,id'],
             'auto_verify_kyc' => ['nullable', 'boolean'],
         ], [
             'email.unique' => 'A user or broker with this email already exists.',
@@ -121,6 +136,11 @@ class AdminBrokerController extends Controller
         ]);
 
         $isAutoVerify = $request->boolean('auto_verify_kyc', true);
+        $rmId = $validated['relationship_manager_id'] ?? null;
+        if (!$rmId) {
+            $defaultRm = RelationshipManager::where('is_default', 1)->first() ?? RelationshipManager::first();
+            $rmId = $defaultRm?->id;
+        }
 
         // 1. Create User
         $user = User::create([
@@ -128,6 +148,7 @@ class AdminBrokerController extends Controller
             'email' => strtolower(trim($validated['email'])),
             'phone' => trim($validated['phone']),
             'password_hash' => Hash::make($validated['password']),
+            'relationship_manager_id' => $rmId,
             'status' => 'active',
             'is_active' => true,
             'email_verified_at' => now(),
@@ -144,6 +165,9 @@ class AdminBrokerController extends Controller
             'full_name' => $fullName,
             'company_name' => $validated['company_name'] ?? ($fullName . ' Real Estate'),
             'bio' => 'Partner property broker operating across ' . ($validated['city_name'] ?? 'major cities') . '.',
+            'preferences' => [
+                'relationship_manager_id' => $rmId,
+            ],
             'is_active' => true,
             'version' => 1,
         ]);
@@ -191,7 +215,7 @@ class AdminBrokerController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => "Broker \"{$fullName}\" created and added successfully!",
-                'broker' => $user->load('profile'),
+                'broker' => $user->load('profile', 'relationshipManager'),
             ]);
         }
 
@@ -203,7 +227,7 @@ class AdminBrokerController extends Controller
      */
     public function show($id)
     {
-        $broker = User::with(['profile', 'properties.city', 'properties.primaryImage', 'wallet'])
+        $broker = User::with(['profile', 'properties.city', 'properties.primaryImage', 'wallet', 'relationshipManager'])
             ->findOrFail($id);
 
         $operatingCities = $broker->properties->pluck('city.name')->filter()->unique()->values()->implode(', ');
@@ -223,6 +247,15 @@ class AdminBrokerController extends Controller
                 'phone' => $broker->phone ?? 'Not specified',
                 'company_name' => $broker->profile ? ($broker->profile->company_name ?? 'Individual Partner') : 'Individual Partner',
                 'cities' => $operatingCities,
+                'relationship_manager' => $broker->relationshipManager ? [
+                    'id' => $broker->relationshipManager->id,
+                    'name' => $broker->relationshipManager->name,
+                    'zone' => $broker->relationshipManager->zone,
+                    'designation' => $broker->relationshipManager->designation,
+                    'phone' => $broker->relationshipManager->phone,
+                    'whatsapp' => $broker->relationshipManager->whatsapp_number,
+                    'email' => $broker->relationshipManager->email,
+                ] : null,
                 'properties_count' => $broker->properties->count(),
                 'properties' => $broker->properties->map(fn($p) => [
                     'id' => $p->id,

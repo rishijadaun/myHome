@@ -114,12 +114,26 @@
         </div>
 
         <div class="p-4 border-t border-gray-100 space-y-1">
+            @if(Auth::check())
+            <div class="px-3 py-2.5 mb-2 bg-brand-50/60 border border-brand-100/80 rounded-xl flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand to-brand-dark text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-brand/30 shrink-0">
+                    {{ strtoupper(substr(Auth::user()->profile->first_name ?? Auth::user()->name ?? 'B', 0, 1)) }}
+                </div>
+                <div class="overflow-hidden min-w-0">
+                    <div class="text-xs font-bold text-gray-900 truncate">{{ Auth::user()->profile->first_name ?? 'Partner' }} {{ Auth::user()->profile->last_name ?? 'Broker' }}</div>
+                    <div class="text-[10px] text-brand-dark font-medium truncate">{{ Auth::user()->email }}</div>
+                </div>
+            </div>
+            @endif
             <div class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Account</div>
             <a href="{{ route('broker.profile') }}" class="sidebar-link {{ request()->routeIs('broker.profile') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                 <i class="fas fa-user-circle w-5 text-center"></i>
                 <span class="text-sm font-medium">Profile & Settings</span>
             </a>
-            <a href="{{ route('broker.login') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition">
+            <form id="brokerLogoutForm" action="{{ route('broker.logout') }}" method="POST" class="hidden">
+                @csrf
+            </form>
+            <a href="{{ route('broker.logout') }}" onclick="performBrokerLogout(event)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition cursor-pointer">
                 <i class="fas fa-sign-out-alt w-5 text-center"></i>
                 <span class="text-sm font-medium">Logout</span>
             </a>
@@ -151,6 +165,18 @@
             const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('open');
             overlay.classList.toggle('hidden');
+        }
+
+        async function performBrokerLogout(e) {
+            if (e) e.preventDefault();
+
+            // Clear client-side stored tokens & profile
+            localStorage.removeItem('staynest_token');
+            localStorage.removeItem('staynest_user');
+            localStorage.removeItem('broker_token');
+            localStorage.removeItem('broker_user');
+
+            window.location.href = "{{ route('broker.logout') }}";
         }
     </script>
     @stack('scripts')

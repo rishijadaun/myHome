@@ -32,6 +32,8 @@ Route::prefix('v1')->group(function () {
     // ---------------- 3. PROPERTY SUBMISSION & TYPES (DYNAMIC) ----------------
     Route::get('property-types', [PropertySubmissionController::class, 'types']);
     Route::post('properties/submit', [PropertySubmissionController::class, 'submit']);
+    Route::get('properties/details/{id}', [PropertySubmissionController::class, 'details']);
+    Route::post('properties/{id}/update', [PropertySubmissionController::class, 'update']);
 
     // ---------------- 4. TENANT / USER MODULE APIS ----------------
     Route::get('user/profile/{id}', [UserController::class, 'profile']);

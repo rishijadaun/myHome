@@ -70,6 +70,31 @@ class User extends Authenticatable
         return $this->password_hash;
     }
 
+    /**
+     * Dynamic user full name accessor from profile or email.
+     */
+    public function getNameAttribute()
+    {
+        if ($this->relationLoaded('profile') && $this->profile) {
+            $fullName = trim(($this->profile->first_name ?? '') . ' ' . ($this->profile->last_name ?? ''));
+            if (!empty($fullName)) return $fullName;
+        } elseif ($this->profile) {
+            $fullName = trim(($this->profile->first_name ?? '') . ' ' . ($this->profile->last_name ?? ''));
+            if (!empty($fullName)) return $fullName;
+        }
+
+        if (!empty($this->email)) {
+            $parts = explode('@', $this->email);
+            return ucfirst($parts[0]);
+        }
+
+        if (!empty($this->phone)) {
+            return substr($this->phone, 0, 4) . '****' . substr($this->phone, -2);
+        }
+
+        return 'Resident User';
+    }
+
     public function profile()
     {
         return $this->hasOne(UserProfile::class, 'user_id', 'id');

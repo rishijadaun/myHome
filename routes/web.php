@@ -37,7 +37,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/pgs/{id}/toggle-status', [AdminPropertyController::class, 'toggleStatus'])->name('pgs.toggle');
         Route::post('/pgs/{id}/approve', [AdminPropertyController::class, 'approve'])->name('pgs.approve');
         Route::post('/pgs/{id}/update-tag', [AdminPropertyController::class, 'updateTag'])->name('pgs.update-tag');
-        Route::delete('/pgs/{id}', [AdminPropertyController::class, 'destroy'])->name('pgs.destroy');
+        // Manage Reviews & Moderation
+        Route::get('/reviews', [AdminPropertyController::class, 'indexReviews'])->name('reviews');
+        Route::post('/reviews/{id}/approve', [AdminPropertyController::class, 'approveReview'])->name('reviews.approve');
+        Route::post('/reviews/{id}/reject', [AdminPropertyController::class, 'rejectReview'])->name('reviews.reject');
+        Route::post('/reviews/{id}/reply', [AdminPropertyController::class, 'replyReview'])->name('reviews.reply');
+        Route::delete('/reviews/{id}', [AdminPropertyController::class, 'destroyReview'])->name('reviews.destroy');
 
         // Manage Brokers & Relationship Manager Assignment Routes
         Route::get('/brokers', [AdminBrokerController::class, 'index'])->name('brokers');
@@ -164,6 +169,7 @@ Route::name('user.')->group(function () {
     Route::get('/detail/{slug?}', [UserHomeController::class, 'show'])->name('detail');
     Route::get('/pg-details', [UserHomeController::class, 'show']);
     Route::post('/property/{id}/report', [UserHomeController::class, 'report'])->name('property.report');
+    Route::post('/property/{id}/review', [UserHomeController::class, 'submitReview'])->name('property.review');
 });
 
 // Fallback Route for 404 Not Found

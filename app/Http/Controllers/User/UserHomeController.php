@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\Notification;
 use App\Models\Property;
 use App\Models\PropertyReport;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -114,6 +115,9 @@ class UserHomeController extends Controller
 
         // Similar Stays
         $similarProperties = collect();
+        $approvedReviews = collect();
+        $userPendingReview = null;
+
         if ($property) {
             $similarProperties = Property::where('status', 'active')
                 ->where('verification_status', 'verified')
@@ -126,9 +130,31 @@ class UserHomeController extends Controller
                 ->with(['primaryImage', 'images', 'city', 'area', 'amenities'])
                 ->take(4)
                 ->get();
+
+            // Approved Reviews for this property
+            $approvedReviews = Review::where('property_id', $property->id)
+                ->where('status', 'approved')
+                ->where('is_active', 1)
+                ->with('user.profile')
+                ->latest()
+                ->get();
+
+            // Check if authenticated user has a pending review
+            if (Auth::check()) {
+                $userPendingReview = Review::where('property_id', $property->id)
+                    ->where('user_id', Auth::id())
+                    ->where('status', 'pending')
+                    ->latest()
+                    ->first();
+            }
         }
 
-        return view('user.detail', compact('property', 'similarProperties'));
+        $totalReviewsCount = $approvedReviews->count();
+        $avgRating = $totalReviewsCount > 0
+            ? round($approvedReviews->avg('rating'), 1)
+            : ($property && $property->rating ? number_format($property->rating, 1) : '4.8');
+
+        return view('user.detail', compact('property', 'similarProperties', 'approvedReviews', 'userPendingReview', 'avgRating', 'totalReviewsCount'));
     }
 
     /**
@@ -318,5 +344,89 @@ class UserHomeController extends Controller
         }
 
         return back()->with('success', 'Thank you for your feedback. Our team will review this listing shortly.');
+    }
+
+    /**
+     * Submit user review for a property (Pending admin approval).
+     */
+    public function submitReview(Request $request, $id)
+    {
+        $user = Auth::user();
+
+        // If not logged in via web session, check Bearer token from request or Sanctum
+        if (!$user && $request->bearerToken()) {
+            $tokenModel = \Laravel\Sanctum\PersonalAccessToken::findToken($request->bearerToken());
+            if ($tokenModel) {
+                $user = $tokenModel->tokenable;
+            }
+        }
+
+        // Also check if auth_user_id was passed in form / payload
+        if (!$user && $request->filled('auth_user_id')) {
+            $user = User::find($request->input('auth_user_id'));
+        }
+
+        if ($user) {
+            // Keep web session active
+            Auth::login($user);
+        } else {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please login to submit a review.',
+                    'redirect' => route('user.login')
+                ], 401);
+            }
+            return redirect()->route('user.login')->with('error', 'Please login to submit a review.');
+        }
+
+        $property = Property::findOrFail($id);
+
+        $validated = $request->validate([
+            'rating' => 'required|numeric|min:1|max:5',
+            'title' => 'nullable|string|max:150',
+            'comment' => 'required|string|min:5|max:2000',
+        ]);
+
+        $review = Review::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'property_id' => $property->id,
+            'user_id' => $user->id,
+            'rating' => $validated['rating'],
+            'title' => $validated['title'] ?: 'Verified Resident Review',
+            'comment' => $validated['comment'],
+            'status' => 'pending',
+            'is_verified' => 1,
+            'is_active' => 1,
+        ]);
+
+        // Notify Admins
+        try {
+            $admins = User::whereHas('roles', fn($q) => $q->whereIn('slug', ['super_admin', 'admin']))->get();
+            foreach ($admins as $admin) {
+                Notification::create([
+                    'id' => (string) \Illuminate\Support\Str::uuid(),
+                    'user_id' => $admin->id,
+                    'user_type' => 'admin',
+                    'title' => 'New Review Pending Approval ⭐',
+                    'message' => 'User "' . (Auth::user()->name ?? 'User') . "\" submitted a {$validated['rating']}★ review for \"{$property->name}\".",
+                    'type' => 'property_review_pending',
+                    'data' => json_encode(['property_id' => $property->id, 'review_id' => $review->id]),
+                    'is_read' => false,
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Ignore notification failure
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Thank you! Your review has been submitted and is pending moderation. It will be published once approved by admin.',
+                'review' => $review
+            ]);
+        }
+
+        return back()->with('success', 'Thank you! Your review has been submitted and is pending moderation. It will be published once approved by admin.');
     }
 }

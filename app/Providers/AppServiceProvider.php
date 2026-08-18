@@ -26,11 +26,17 @@ class AppServiceProvider extends ServiceProvider
                     $q->where('users.status', 'pending_verification')->orWhereNull('users.kyc_verified_at');
                 })->count() : 0;
 
+                $pendingReviewsCount = \Illuminate\Support\Facades\Schema::hasTable('reviews')
+                    ? \App\Models\Review::where('status', 'pending')->count()
+                    : 0;
+
                 $view->with('adminSidebarStats', [
                     'properties' => \App\Models\Property::count(),
                     'pendingBrokers' => $pendingBrokersCount,
                     'bookings' => \App\Models\Booking::count(),
                     'users' => \App\Models\User::count(),
+                    'pendingReviews' => $pendingReviewsCount,
+                    'totalReviews' => \Illuminate\Support\Facades\Schema::hasTable('reviews') ? \App\Models\Review::count() : 0,
                 ]);
             }
         });

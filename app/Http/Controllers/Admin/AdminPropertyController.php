@@ -9,6 +9,7 @@ use App\Models\Notification;
 use App\Models\Property;
 use App\Models\PropertyImage;
 use App\Models\PropertyType;
+use App\Models\Review;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -361,6 +362,172 @@ class AdminPropertyController extends Controller
         return response()->json([
             'success' => true,
             'message' => "Property \"{$name}\" was removed successfully.",
+        ]);
+    }
+
+    /**
+     * Approve a pending user review and recalculate property ratings.
+     */
+    public function approveReview(Request $request, $id)
+    {
+        $review = \App\Models\Review::findOrFail($id);
+        $review->status = 'approved';
+        $review->is_active = true;
+        $review->save();
+
+        // Recalculate Property Rating
+        $property = Property::find($review->property_id);
+        if ($property) {
+            $avg = \App\Models\Review::where('property_id', $property->id)->where('status', 'approved')->avg('rating');
+            $count = \App\Models\Review::where('property_id', $property->id)->where('status', 'approved')->count();
+            $property->rating = round($avg, 2);
+            $property->total_reviews = $count;
+            $property->save();
+        }
+
+        // Notify Reviewer
+        if ($review->user_id) {
+            Notification::create([
+                'id' => (string) Str::uuid(),
+                'user_id' => $review->user_id,
+                'user_type' => 'user',
+                'title' => 'Review Published! ⭐',
+                'message' => "Your review for \"{$property?->name}\" was approved and is now public.",
+                'type' => 'review_approved',
+                'is_read' => 0,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Review approved successfully and is now published!',
+            'review' => $review,
+        ]);
+    }
+
+    /**
+     * Reject a user review.
+     */
+    public function rejectReview(Request $request, $id)
+    {
+        $review = \App\Models\Review::findOrFail($id);
+        $review->status = 'rejected';
+        $review->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Review rejected.',
+            'review' => $review,
+        ]);
+    }
+
+    /**
+     * Delete a review.
+     */
+    public function destroyReview(Request $request, $id)
+    {
+        $review = \App\Models\Review::findOrFail($id);
+        $propertyId = $review->property_id;
+        $review->delete();
+
+        // Recalculate Property Rating
+        $property = Property::find($propertyId);
+        if ($property) {
+            $avg = \App\Models\Review::where('property_id', $property->id)->where('status', 'approved')->avg('rating');
+            $count = \App\Models\Review::where('property_id', $property->id)->where('status', 'approved')->count();
+            $property->rating = $count > 0 ? round($avg, 2) : 0;
+            $property->total_reviews = $count;
+            $property->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Review deleted successfully.',
+        ]);
+    }
+
+    /**
+     * List all reviews for moderation in Admin Panel.
+     */
+    public function indexReviews(Request $request)
+    {
+        // 1. Live Statistics
+        $totalReviews = Review::count();
+        $pendingReviews = Review::where('status', 'pending')->count();
+        $approvedReviews = Review::where('status', 'approved')->count();
+        $rejectedReviews = Review::where('status', 'rejected')->count();
+        $avgRating = round(Review::where('status', 'approved')->avg('rating') ?: 4.8, 1);
+
+        // 2. Query with Filters
+        $query = Review::with(['user.profile', 'property.city', 'property.area'])->latest();
+
+        $statusFilter = $request->query('status', 'all');
+        if ($statusFilter && $statusFilter !== 'all') {
+            $query->where('status', $statusFilter);
+        }
+
+        $ratingFilter = $request->query('rating');
+        if ($ratingFilter) {
+            $query->where('rating', '>=', (float) $ratingFilter);
+        }
+
+        $propertyFilter = $request->query('property_id');
+        if ($propertyFilter) {
+            $query->where('property_id', $propertyFilter);
+        }
+
+        $searchQuery = trim($request->query('search', ''));
+        if (!empty($searchQuery)) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('title', 'like', "%{$searchQuery}%")
+                  ->orWhere('comment', 'like', "%{$searchQuery}%")
+                  ->orWhereHas('user', function ($uq) use ($searchQuery) {
+                      $uq->where('name', 'like', "%{$searchQuery}%")
+                         ->orWhere('email', 'like', "%{$searchQuery}%")
+                         ->orWhere('phone', 'like', "%{$searchQuery}%");
+                  })
+                  ->orWhereHas('property', function ($pq) use ($searchQuery) {
+                      $pq->where('name', 'like', "%{$searchQuery}%");
+                  });
+            });
+        }
+
+        $reviews = $query->paginate(15)->withQueryString();
+        $properties = Property::select('id', 'name')->orderBy('name')->get();
+
+        return view('admin.reviews', compact(
+            'reviews',
+            'properties',
+            'totalReviews',
+            'pendingReviews',
+            'approvedReviews',
+            'rejectedReviews',
+            'avgRating',
+            'statusFilter',
+            'ratingFilter',
+            'searchQuery',
+            'propertyFilter'
+        ));
+    }
+
+    /**
+     * Add or update host reply to a review.
+     */
+    public function replyReview(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'reply' => 'required|string|max:1000',
+        ]);
+
+        $review = Review::findOrFail($id);
+        $review->broker_reply = $validated['reply'];
+        $review->broker_reply_at = now();
+        $review->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Official response saved successfully!',
+            'reply' => $review->broker_reply,
         ]);
     }
 }

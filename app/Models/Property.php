@@ -279,6 +279,16 @@ class Property extends Model
         return $this->hasMany(PropertyRule::class, 'property_id', 'id');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'property_id', 'id');
+    }
+
+    public function approvedReviews()
+    {
+        return $this->hasMany(Review::class, 'property_id', 'id')->where('status', 'approved');
+    }
+
     /**
      * Scopes for dynamic filtering
      */

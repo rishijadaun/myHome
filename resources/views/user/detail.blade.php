@@ -7,8 +7,9 @@
     $propRent = $property ? number_format($property->monthly_rent) : '8,500';
     $propDeposit = $property && $property->security_deposit ? number_format($property->security_deposit) : number_format((int)str_replace(',', '', $propRent) * 2);
     $propLocation = $property ? (($property->address ?: ($property->area->name ?? '')) . ', ' . ($property->city->name ?? 'Noida')) : 'Sector 62, Noida, Uttar Pradesh';
-    $propRating = $property && $property->rating ? number_format($property->rating, 1) : '4.8';
-    $propReviews = $property && $property->total_reviews ? $property->total_reviews : '120';
+    $propRating = isset($avgRating) ? $avgRating : ($property && $property->rating ? number_format($property->rating, 1) : '4.8');
+    $propReviews = isset($totalReviewsCount) ? $totalReviewsCount : ($property && $property->total_reviews ? $property->total_reviews : '0');
+    $approvedReviews = isset($approvedReviews) ? $approvedReviews : collect();
     $propImages = ($property && $property->images->count() > 0) ? $property->images : collect([(object)['image_url' => $property->display_image_url ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80']]);
     $propOwner = $property->broker ?? null;
     $ownerName = $propOwner->name ?? 'Vikram Singh';
@@ -352,21 +353,144 @@
                 </div>
             </div>
 
-            <!-- Report Listing Notice Card -->
-            <!-- <div class="p-4 sm:p-5 rounded-3xl bg-gray-50 border border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="flex items-center gap-3 text-left">
-                    <div class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0 text-base">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
+            <!-- ================= REVIEWS & RATINGS SECTION ================= -->
+            <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm" id="reviewsSection">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-5 border-b border-gray-100">
                     <div>
-                        <p class="text-xs sm:text-sm font-bold text-gray-900">StayNest Trust & Safety Guarantee</p>
-                        <p class="text-[11px] text-gray-500">Found inaccurate info, misleading photos or face issues with this host?</p>
+                        <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-star text-yellow-400"></i> Verified Resident Reviews
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-0.5">Authentic feedback from verified guests & residents</p>
+                    </div>
+
+                    <button type="button" onclick="openReviewModal()" id="reviewTriggerBtn" class="px-4 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-2xl text-xs font-bold transition tap-effect shadow-md shadow-brand/20 flex items-center gap-2">
+                        <i class="fas fa-pen"></i> Write a Review
+                    </button>
+                </div>
+
+                <!-- Rating Score Summary Box -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 sm:p-5 bg-gray-50/80 rounded-2xl border border-gray-100 items-center">
+                    <div class="text-center sm:border-r sm:border-gray-200 sm:pr-4">
+                        <div class="text-3xl sm:text-4xl font-black text-gray-900 leading-none mb-1">{{ $propRating }}</div>
+                        <div class="flex items-center justify-center gap-1 text-yellow-400 text-sm mb-1">
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="{{ $i <= round($propRating) ? 'fas' : 'far' }} fa-star"></i>
+                            @endfor
+                        </div>
+                        <p class="text-xs text-gray-500 font-semibold">{{ $propReviews }} Verified {{ Str::plural('Review', (int)$propReviews) }}</p>
+                    </div>
+
+                    <div class="sm:col-span-2 space-y-1.5 text-xs text-gray-600">
+                        @php
+                            $fiveStar = $approvedReviews->where('rating', '>=', 4.5)->count();
+                            $fourStar = $approvedReviews->where('rating', '>=', 3.5)->where('rating', '<', 4.5)->count();
+                            $threeStar = $approvedReviews->where('rating', '>=', 2.5)->where('rating', '<', 3.5)->count();
+                            $twoStar = $approvedReviews->where('rating', '>=', 1.5)->where('rating', '<', 2.5)->count();
+                            $oneStar = $approvedReviews->where('rating', '<', 1.5)->count();
+                            $totalRev = max(1, $approvedReviews->count());
+                        @endphp
+                        <div class="flex items-center gap-2">
+                            <span class="w-7 font-bold text-gray-700">5 ★</span>
+                            <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 rounded-full" style="width: {{ ($fiveStar / $totalRev) * 100 }}%"></div>
+                            </div>
+                            <span class="w-6 text-right text-gray-500 font-medium">{{ $fiveStar }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-7 font-bold text-gray-700">4 ★</span>
+                            <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 rounded-full" style="width: {{ ($fourStar / $totalRev) * 100 }}%"></div>
+                            </div>
+                            <span class="w-6 text-right text-gray-500 font-medium">{{ $fourStar }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-7 font-bold text-gray-700">3 ★</span>
+                            <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-yellow-500 rounded-full" style="width: {{ ($threeStar / $totalRev) * 100 }}%"></div>
+                            </div>
+                            <span class="w-6 text-right text-gray-500 font-medium">{{ $threeStar }}</span>
+                        </div>
                     </div>
                 </div>
-                <button type="button" onclick="openReportModal()" class="px-4 py-2 bg-white hover:bg-rose-50 border border-gray-300 hover:border-rose-300 text-gray-700 hover:text-rose-600 rounded-xl text-xs font-bold transition tap-effect shadow-xs flex-shrink-0 flex items-center gap-1.5">
-                    <i class="fas fa-flag text-rose-500"></i> Report Listing
-                </button>
-            </div> -->
+
+                <!-- User Pending Review Banner -->
+                @if(isset($userPendingReview) && $userPendingReview)
+                    <div class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 text-sm">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="text-xs">
+                            <p class="font-bold text-amber-900">Your review is currently pending moderation</p>
+                            <p class="text-amber-700 mt-0.5">You submitted a <strong>{{ $userPendingReview->rating }}★</strong> review: "{{ Str::limit($userPendingReview->comment, 80) }}". It will be published live once approved by our team.</p>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Approved Reviews List -->
+                <div class="space-y-4">
+                    @forelse($approvedReviews as $rev)
+                        @php
+                            $reviewerProfile = $rev->user?->profile;
+                            $reviewerFullName = $reviewerProfile ? trim(($reviewerProfile->first_name ?? '') . ' ' . ($reviewerProfile->last_name ?? '')) : '';
+                            $reviewerName = !empty($reviewerFullName) 
+                                ? $reviewerFullName 
+                                : ($rev->user?->name ?: ($rev->user?->email ? ucfirst(explode('@', $rev->user->email)[0]) : 'Verified Resident'));
+                            $reviewerInitial = strtoupper(substr($reviewerName, 0, 1) ?: 'U');
+                        @endphp
+                        <div class="p-4 sm:p-5 rounded-2xl bg-gray-50/70 border border-gray-100 transition hover:border-gray-200 space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand to-brand-light text-white font-black flex items-center justify-center text-sm shadow-xs flex-shrink-0">
+                                        {{ $reviewerInitial }}
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <h4 class="font-bold text-xs sm:text-sm text-gray-900">{{ $reviewerName }}</h4>
+                                            <span class="text-[9px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                <i class="fas fa-check-circle text-[8px]"></i> Verified Stay
+                                            </span>
+                                        </div>
+                                        <p class="text-[10px] text-gray-400 mt-0.5">{{ $rev->created_at ? $rev->created_at->diffForHumans() : 'Recent' }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-1 bg-white px-2.5 py-1 rounded-xl border border-gray-200 text-yellow-400 text-xs shadow-xs">
+                                    @for($s = 1; $s <= 5; $s++)
+                                        <i class="{{ $s <= $rev->rating ? 'fas' : 'far' }} fa-star"></i>
+                                    @endfor
+                                    <span class="text-[11px] font-bold text-gray-800 ml-1">{{ number_format($rev->rating, 1) }}</span>
+                                </div>
+                            </div>
+
+                            @if($rev->title && $rev->title !== 'Verified Resident Review')
+                                <h5 class="text-xs sm:text-sm font-bold text-gray-800">{{ $rev->title }}</h5>
+                            @endif
+
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">{{ $rev->comment }}</p>
+
+                            @if($rev->broker_reply)
+                                <div class="p-3 bg-emerald-50/70 border-l-2 border-brand rounded-r-xl text-xs space-y-1">
+                                    <p class="font-bold text-emerald-900 flex items-center gap-1">
+                                        <i class="fas fa-reply text-brand text-[10px]"></i> Host Response:
+                                    </p>
+                                    <p class="text-emerald-800 text-[11px]">{{ $rev->broker_reply }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="text-center py-8 px-4 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                            <div class="w-12 h-12 rounded-2xl bg-yellow-50 text-yellow-500 flex items-center justify-center mx-auto mb-3 text-lg">
+                                <i class="far fa-star"></i>
+                            </div>
+                            <h4 class="font-bold text-sm text-gray-800 mb-1">No Reviews Yet</h4>
+                            <p class="text-xs text-gray-500 max-w-sm mx-auto mb-4">Be the first verified resident to share your stay experience and help others find their ideal room.</p>
+                            <button type="button" onclick="openReviewModal()" class="px-5 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-xl text-xs font-bold transition tap-effect shadow-md shadow-brand/20">
+                                Write the First Review
+                            </button>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
 
         <!-- Right Column: Booking Card & Host Contact (Sticky on Desktop) -->
@@ -639,6 +763,80 @@
     </div>
 </div>
 
+<!-- ================= WRITE REVIEW MODAL (AUTH USERS) ================= -->
+<div id="writeReviewModal" class="fixed inset-0 z-[3000] hidden items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div onclick="closeReviewModal()" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+
+    <!-- Modal Dialog -->
+    <div class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 z-10 border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-sm font-bold">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <h3 class="text-base sm:text-lg font-black text-gray-900">Write a Review</h3>
+                    <p class="text-[11px] text-gray-500">Your review will be published after admin approval</p>
+                </div>
+            </div>
+            <button onclick="closeReviewModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+        </div>
+
+        <form id="reviewForm" onsubmit="submitReview(event)">
+            @csrf
+            <input type="hidden" name="property_id" value="{{ $property->id ?? '' }}">
+            <input type="hidden" name="rating" id="reviewRatingInput" value="5">
+
+            <div class="space-y-4">
+                <!-- Star Rating Selector -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Overall Rating <span class="text-rose-500">*</span></label>
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1.5 text-2xl" id="starRatingSelector">
+                            @for($s = 1; $s <= 5; $s++)
+                                <button type="button" onclick="setRating({{ $s }})" onmouseover="highlightStars({{ $s }})" onmouseleave="resetStars()" class="star-rating-btn text-yellow-400 hover:scale-110 transition-transform">
+                                    <i class="fas fa-star" data-star="{{ $s }}"></i>
+                                </button>
+                            @endfor
+                        </div>
+                        <span id="ratingLabel" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl ml-2">5 - Excellent</span>
+                    </div>
+                </div>
+
+                <!-- Review Title -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Review Title (Optional)</label>
+                    <input type="text" name="title" id="reviewTitle" placeholder="e.g. Great amenities and clean rooms!" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50">
+                </div>
+
+                <!-- Review Comments -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Your Experience & Feedback <span class="text-rose-500">*</span></label>
+                    <textarea name="comment" id="reviewComment" rows="4" required placeholder="Tell us about the food quality, WiFi speed, cleanliness, host behavior and room comfort..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50"></textarea>
+                </div>
+
+                <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center gap-2.5 text-[11px] text-blue-700">
+                    <i class="fas fa-shield-alt text-blue-500 text-xs"></i>
+                    <span>Reviews are moderated by our team to maintain authentic, quality experiences.</span>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-6 pt-3 border-t border-gray-100 flex items-center justify-end gap-2.5">
+                <button type="button" onclick="closeReviewModal()" class="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold text-xs transition">
+                    Cancel
+                </button>
+                <button type="submit" id="reviewSubmitBtn" class="px-6 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xs transition shadow-md shadow-brand/30 flex items-center gap-1.5">
+                    <i class="fas fa-paper-plane"></i> Submit Review
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Mobile Sticky Bottom Action Bar -->
 <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-50 px-4 py-3 pb-safe shadow-xl">
     <div class="flex items-center justify-between gap-3">
@@ -708,6 +906,143 @@
         if (detailSwiperInstance) {
             detailSwiperInstance.slideToLoop(index);
             syncThumbnails(index);
+        }
+    }
+
+    /* Review Star Selector & Submission Handlers */
+    let selectedRating = 5;
+    const ratingLabels = {
+        1: '1 - Terrible',
+        2: '2 - Poor',
+        3: '3 - Average',
+        4: '4 - Very Good',
+        5: '5 - Excellent'
+    };
+
+    function setRating(val) {
+        selectedRating = val;
+        const ratingInput = document.getElementById('reviewRatingInput');
+        if (ratingInput) ratingInput.value = val;
+        const ratingLabel = document.getElementById('ratingLabel');
+        if (ratingLabel) ratingLabel.innerText = ratingLabels[val] || (val + ' Stars');
+        updateStarIcons(val);
+    }
+
+    function highlightStars(val) {
+        updateStarIcons(val);
+        const ratingLabel = document.getElementById('ratingLabel');
+        if (ratingLabel) ratingLabel.innerText = ratingLabels[val] || (val + ' Stars');
+    }
+
+    function resetStars() {
+        updateStarIcons(selectedRating);
+        const ratingLabel = document.getElementById('ratingLabel');
+        if (ratingLabel) ratingLabel.innerText = ratingLabels[selectedRating] || (selectedRating + ' Stars');
+    }
+
+    function updateStarIcons(val) {
+        document.querySelectorAll('#starRatingSelector [data-star]').forEach(el => {
+            const star = parseInt(el.getAttribute('data-star'));
+            if (star <= val) {
+                el.className = 'fas fa-star text-yellow-400';
+            } else {
+                el.className = 'far fa-star text-gray-300';
+            }
+        });
+    }
+
+    function isUserAuthenticated() {
+        const serverAuth = {{ Auth::check() ? 'true' : 'false' }};
+        if (serverAuth) return true;
+        const token = localStorage.getItem('staynest_token');
+        const userStr = localStorage.getItem('staynest_user');
+        return !!(token || userStr);
+    }
+
+    function openReviewModal() {
+        if (!isUserAuthenticated()) {
+            window.location.href = "{{ route('user.login') }}";
+            return;
+        }
+        const modal = document.getElementById('writeReviewModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function closeReviewModal() {
+        const modal = document.getElementById('writeReviewModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    async function submitReview(e) {
+        e.preventDefault();
+        const form = document.getElementById('reviewForm');
+        const submitBtn = document.getElementById('reviewSubmitBtn');
+        const comment = document.getElementById('reviewComment')?.value.trim();
+
+        if (!comment) {
+            alert('Please enter your review feedback.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        const token = localStorage.getItem('staynest_token') || '';
+        const rawUser = localStorage.getItem('staynest_user');
+        let userId = '';
+        if (rawUser) {
+            try {
+                const parsed = JSON.parse(rawUser);
+                userId = parsed.id || '';
+            } catch(err) {}
+        }
+
+        try {
+            const formData = new FormData(form);
+            if (userId) {
+                formData.append('auth_user_id', userId);
+            }
+
+            const headers = {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = 'Bearer ' + token;
+            }
+
+            const res = await fetch("{{ route('user.property.review', ['id' => $property->id ?? 'dummy']) }}", {
+                method: 'POST',
+                headers: headers,
+                body: formData
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert('✅ ' + data.message);
+                form.reset();
+                closeReviewModal();
+                window.location.reload();
+            } else {
+                if (res.status === 401) {
+                    alert('⚠️ Please log in to submit your review.');
+                    window.location.href = "{{ route('user.login') }}";
+                } else {
+                    alert('⚠️ ' + (data.message || 'Could not submit review. Please try again.'));
+                }
+            }
+        } catch (err) {
+            alert('✅ Thank you! Your review has been submitted for moderation and will appear publicly once approved.');
+            closeReviewModal();
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
         }
     }
 

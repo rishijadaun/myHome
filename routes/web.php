@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\User\UserHomeController;
 
-Route::get('/', function () {
-    return view('user.home');
-})->name('user.home');
+Route::get('/', [UserHomeController::class, 'index'])->name('user.home');
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -140,7 +138,8 @@ Route::name('user.')->group(function () {
         request()->session()->regenerateToken();
         return redirect()->route('user.login');
     })->name('logout');
-    Route::view('/search', 'user.search')->name('search');
+    Route::get('/search', [UserHomeController::class, 'search'])->name('search');
+    Route::get('/properties', [UserHomeController::class, 'search']);
     Route::get('/profile', function () {
         if (\Illuminate\Support\Facades\Auth::check()) {
             $authUser = \Illuminate\Support\Facades\Auth::user();
@@ -162,8 +161,8 @@ Route::name('user.')->group(function () {
     Route::view('/privacy', 'user.privacy')->name('privacy');
     Route::view('/privacy-policy', 'user.privacy');
     Route::view('/404', 'errors.404')->name('404');
-    Route::view('/detail', 'user.detail')->name('detail');
-    Route::view('/pg-details', 'user.detail');
+    Route::get('/detail/{slug?}', [UserHomeController::class, 'show'])->name('detail');
+    Route::get('/pg-details', [UserHomeController::class, 'show']);
 });
 
 // Fallback Route for 404 Not Found

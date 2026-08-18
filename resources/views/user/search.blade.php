@@ -32,7 +32,7 @@
         <div class="flex items-center gap-2 sm:gap-3">
             <div class="relative flex-1">
                 <i class="fas fa-search absolute left-3.5 sm:left-4 top-3.5 text-gray-400 text-sm"></i>
-                <input type="text" id="searchInput" onkeyup="filterSearchResults()" placeholder="Search city, locality, PG name..." 
+                <input type="text" id="searchInput" value="{{ $searchQuery ?? '' }}" onkeyup="filterSearchResults()" placeholder="Search city, locality, PG name..." 
                     class="w-full bg-white border border-gray-200 rounded-2xl py-3 pl-10 sm:pl-11 pr-3 sm:pr-4 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50 shadow-sm transition">
             </div>
 
@@ -56,39 +56,39 @@
                     <label class="block text-xs font-semibold text-gray-700 mb-2">City / Location</label>
                     <select id="desktopCitySelect" onchange="setCityFromSelect(this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all appearance-none cursor-pointer">
                         <option value="">All Cities</option>
-                        <option value="Noida">Noida</option>
-                        <option value="Bangalore">Bangalore</option>
-                        <option value="Delhi">Delhi</option>
-                        <option value="Mumbai">Mumbai</option>
-                        <option value="Gurugram">Gurugram</option>
+                        @foreach($cities as $c)
+                            <option value="{{ $c->name }}" {{ strcasecmp($selectedCity ?? '', $c->name) === 0 ? 'selected' : '' }}>{{ $c->name }} ({{ $c->properties_count }})</option>
+                        @endforeach
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-2">Property Type</label>
                     <select id="desktopTypeFilter" onchange="filterSearchResults()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all appearance-none cursor-pointer">
                         <option value="">All Types</option>
-                        <option value="BOYS">Boys PG</option>
-                        <option value="GIRLS">Girls PG</option>
-                        <option value="CO-ED">Co-living</option>
+                        <option value="BOYS" {{ ($selectedGender ?? '') === 'BOYS' ? 'selected' : '' }}>Boys PG</option>
+                        <option value="GIRLS" {{ ($selectedGender ?? '') === 'GIRLS' ? 'selected' : '' }}>Girls PG</option>
+                        <option value="CO-ED" {{ ($selectedGender ?? '') === 'CO-ED' ? 'selected' : '' }}>Co-living</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-2">Budget Range</label>
                     <select id="desktopBudgetFilter" onchange="filterSearchResults()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all appearance-none cursor-pointer">
                         <option value="">Any Budget</option>
-                        <option value="8000">Under ₹8,000</option>
-                        <option value="10000">Under ₹10,000</option>
-                        <option value="12000">Under ₹12,000</option>
-                        <option value="15000">Under ₹15,000</option>
+                        <option value="6000" {{ in_array(($budget ?? ''), ['0-6000', '6000', 'under-6k']) || (($maxPrice ?? '') == 6000 && ($minPrice ?? 0) == 0) ? 'selected' : '' }}>Under ₹6,000</option>
+                        <option value="8000" {{ ($budget ?? '') === '8000' || ($maxPrice ?? '') == 8000 ? 'selected' : '' }}>Under ₹8,000</option>
+                        <option value="10000" {{ in_array(($budget ?? ''), ['6000-10000', '10000']) || (($maxPrice ?? '') == 10000 && ($minPrice ?? '') == 6000) ? 'selected' : '' }}>₹6K – ₹10K</option>
+                        <option value="12000" {{ ($budget ?? '') === '12000' || ($maxPrice ?? '') == 12000 ? 'selected' : '' }}>Under ₹12,000</option>
+                        <option value="15000" {{ in_array(($budget ?? ''), ['10000-15000', '15000']) || (($maxPrice ?? '') == 15000 && ($minPrice ?? '') == 10000) ? 'selected' : '' }}>₹10K – ₹15K</option>
+                        <option value="15000+" {{ in_array(($budget ?? ''), ['15000-plus', '20000', '15000+']) || (($minPrice ?? '') == 15000 && empty($maxPrice)) ? 'selected' : '' }}>₹15K+ Luxury</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-2">Gender</label>
                     <select id="desktopGenderFilter" onchange="filterSearchResults()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all appearance-none cursor-pointer">
                         <option value="">Any</option>
-                        <option value="BOYS">Boys</option>
-                        <option value="GIRLS">Girls</option>
-                        <option value="CO-ED">Co-ed</option>
+                        <option value="BOYS" {{ ($selectedGender ?? '') === 'BOYS' ? 'selected' : '' }}>Boys</option>
+                        <option value="GIRLS" {{ ($selectedGender ?? '') === 'GIRLS' ? 'selected' : '' }}>Girls</option>
+                        <option value="CO-ED" {{ ($selectedGender ?? '') === 'CO-ED' ? 'selected' : '' }}>Co-ed</option>
                     </select>
                 </div>
             </div>
@@ -96,15 +96,15 @@
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                 <div class="flex items-center gap-6">
                     <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:text-brand transition">
-                        <input type="checkbox" id="filterAC" onchange="filterSearchResults()" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand">
+                        <input type="checkbox" id="filterAC" {{ request()->boolean('ac') ? 'checked' : '' }} onchange="filterSearchResults()" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand">
                         <span>AC Required</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:text-brand transition">
-                        <input type="checkbox" id="filterFood" onchange="filterSearchResults()" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand">
+                        <input type="checkbox" id="filterFood" {{ request()->boolean('food') ? 'checked' : '' }} onchange="filterSearchResults()" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand">
                         <span>Food Included</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:text-brand transition">
-                        <input type="checkbox" id="filterWifi" onchange="filterSearchResults()" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand">
+                        <input type="checkbox" id="filterWifi" {{ request()->boolean('wifi') ? 'checked' : '' }} onchange="filterSearchResults()" class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand">
                         <span>WiFi</span>
                     </label>
                 </div>
@@ -123,7 +123,7 @@
         <div class="flex items-center justify-between mt-2.5 px-1">
             <div class="flex items-center gap-2">
                 <p class="text-xs sm:text-sm text-gray-600">
-                    Showing <span class="font-bold text-gray-900" id="resultsCount">6</span> properties
+                    Showing <span class="font-bold text-gray-900" id="resultsCount">{{ $properties->count() }}</span> properties
                 </p>
                 <button onclick="resetAllFilters()" id="clearFiltersBtn" class="hidden text-[11px] sm:text-xs font-semibold text-red-500 hover:underline tap-effect flex items-center gap-1">
                     <i class="fas fa-undo-alt text-[9px]"></i> Clear Filters
@@ -132,10 +132,10 @@
             <div class="flex items-center gap-1.5">
                 <span class="text-xs sm:text-sm text-gray-500 font-medium"><i class="fas fa-sort-amount-down text-brand mr-1"></i> Sort:</span>
                 <select id="sortBySelect" onchange="sortSearchResults()" class="bg-white border border-gray-200 rounded-xl py-1.5 px-2 text-xs sm:text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand/50 cursor-pointer shadow-sm">
-                    <option value="recommended">Recommended</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="rating">Top Rated</option>
+                    <option value="recommended" {{ ($sort ?? '') === 'recommended' ? 'selected' : '' }}>Recommended</option>
+                    <option value="price-asc" {{ ($sort ?? '') === 'price-asc' ? 'selected' : '' }}>Price: Low to High</option>
+                    <option value="price-desc" {{ ($sort ?? '') === 'price-desc' ? 'selected' : '' }}>Price: High to Low</option>
+                    <option value="rating" {{ ($sort ?? '') === 'rating' ? 'selected' : '' }}>Top Rated</option>
                 </select>
             </div>
         </div>
@@ -176,11 +176,9 @@
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Popular Cities</label>
                     <div class="flex flex-wrap gap-2" id="drawerCityGroup">
                         <button type="button" onclick="setDrawerCity('', this)" class="drawer-btn drawer-city-btn py-2 px-3.5 rounded-full text-xs font-semibold border border-brand bg-brand text-white tap-effect active">All Cities</button>
-                        <button type="button" onclick="setDrawerCity('Noida', this)" class="drawer-btn drawer-city-btn py-2 px-3.5 rounded-full text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect">Noida</button>
-                        <button type="button" onclick="setDrawerCity('Bangalore', this)" class="drawer-btn drawer-city-btn py-2 px-3.5 rounded-full text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect">Bangalore</button>
-                        <button type="button" onclick="setDrawerCity('Delhi', this)" class="drawer-btn drawer-city-btn py-2 px-3.5 rounded-full text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect">Delhi</button>
-                        <button type="button" onclick="setDrawerCity('Mumbai', this)" class="drawer-btn drawer-city-btn py-2 px-3.5 rounded-full text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect">Mumbai</button>
-                        <button type="button" onclick="setDrawerCity('Gurugram', this)" class="drawer-btn drawer-city-btn py-2 px-3.5 rounded-full text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect">Gurugram</button>
+                        @foreach($cities->take(6) as $c)
+                            <button type="button" onclick="setDrawerCity('{{ $c->name }}', this)" class="drawer-btn drawer-city-btn py-2 px-3.5 rounded-full text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect">{{ $c->name }}</button>
+                        @endforeach
                     </div>
                 </div>
 
@@ -200,10 +198,12 @@
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Monthly Budget Limit</label>
                     <div class="grid grid-cols-2 gap-2" id="drawerBudgetGroup">
                         <button type="button" onclick="setDrawerBudget('', this)" class="drawer-btn drawer-budget-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-brand bg-brand text-white tap-effect text-left active">Any Budget</button>
+                        <button type="button" onclick="setDrawerBudget('6000', this)" class="drawer-btn drawer-budget-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect text-left">Under ₹6,000</button>
                         <button type="button" onclick="setDrawerBudget('8000', this)" class="drawer-btn drawer-budget-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect text-left">Under ₹8,000</button>
                         <button type="button" onclick="setDrawerBudget('10000', this)" class="drawer-btn drawer-budget-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect text-left">Under ₹10,000</button>
                         <button type="button" onclick="setDrawerBudget('12000', this)" class="drawer-btn drawer-budget-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect text-left">Under ₹12,000</button>
-                        <button type="button" onclick="setDrawerBudget('15000', this)" class="drawer-btn drawer-budget-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect text-left col-span-2">Under ₹15,000</button>
+                        <button type="button" onclick="setDrawerBudget('15000', this)" class="drawer-btn drawer-budget-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect text-left">Under ₹15,000</button>
+                        <button type="button" onclick="setDrawerBudget('15000+', this)" class="drawer-btn drawer-budget-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-700 tap-effect text-left col-span-2">₹15,000+ Luxury</button>
                     </div>
                 </div>
 
@@ -212,15 +212,15 @@
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Must Have Amenities</label>
                     <div class="grid grid-cols-2 gap-2.5">
                         <label class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:border-brand transition">
-                            <input type="checkbox" id="drawerAC" class="w-4 h-4 rounded text-brand focus:ring-brand">
+                            <input type="checkbox" id="drawerAC" {{ request()->boolean('ac') ? 'checked' : '' }} class="w-4 h-4 rounded text-brand focus:ring-brand">
                             <span class="text-xs font-semibold text-gray-800 flex items-center gap-1.5"><i class="fas fa-snowflake text-brand"></i> AC Room</span>
                         </label>
                         <label class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:border-brand transition">
-                            <input type="checkbox" id="drawerFood" class="w-4 h-4 rounded text-brand focus:ring-brand">
+                            <input type="checkbox" id="drawerFood" {{ request()->boolean('food') ? 'checked' : '' }} class="w-4 h-4 rounded text-brand focus:ring-brand">
                             <span class="text-xs font-semibold text-gray-800 flex items-center gap-1.5"><i class="fas fa-utensils text-brand"></i> Food Included</span>
                         </label>
                         <label class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:border-brand transition">
-                            <input type="checkbox" id="drawerWifi" class="w-4 h-4 rounded text-brand focus:ring-brand">
+                            <input type="checkbox" id="drawerWifi" {{ request()->boolean('wifi') ? 'checked' : '' }} class="w-4 h-4 rounded text-brand focus:ring-brand">
                             <span class="text-xs font-semibold text-gray-800 flex items-center gap-1.5"><i class="fas fa-wifi text-brand"></i> Free WiFi</span>
                         </label>
                         <label class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:border-brand transition">
@@ -243,283 +243,86 @@
     <!-- ================= FULL WIDTH PROPERTY GRID (2-COLUMNS IN MOBILE, 3-4 COLUMNS IN DESKTOP) ================= -->
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 md:gap-6 w-full" id="searchGrid">
         
-        <!-- Property Card 1 -->
-        <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
-            data-gender="BOYS" data-price="8500" data-rating="4.8" data-city="Noida" data-ac="true" data-food="true" data-wifi="true" data-security="true">
-            <div>
-                <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full">
-                    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-green-500 text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
-                        <i class="fas fa-check-circle"></i> <span class="hidden sm:inline">Verified</span>
-                    </div>
-                    <button onclick="toggleSave(this)" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
-                        <i class="far fa-heart text-xs sm:text-sm"></i>
-                    </button>
-                    <div class="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-gray-900/80 backdrop-blur text-white text-[9px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <span class="font-bold">4.8</span>
-                        <span class="text-gray-300 hidden sm:inline">(120)</span>
-                    </div>
-                </div>
-                <div class="p-2.5 sm:p-4">
-                    <div class="flex justify-between items-start mb-1 gap-1">
-                        <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">Sunrise Premium</h3>
-                        <span class="bg-blue-50 text-blue-600 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">BOYS</span>
-                    </div>
-                    <p class="text-gray-500 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 prop-loc truncate">
-                        <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> Sector 62, Noida
-                    </p>
-                    <div class="hidden sm:flex flex-wrap gap-1.5 mb-3">
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-wifi text-brand"></i> WiFi
-                        </span>
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-snowflake text-brand"></i> AC
-                        </span>
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-utensils text-brand"></i> Food
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center justify-between">
+        @forelse($properties as $pg)
+            @php
+                $genderUpper = strtoupper($pg->gender_preference ?? 'CO-ED');
+                $tagMeta = $pg->display_tag_meta;
+                $genderMeta = $pg->gender_type_meta;
+                $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                $displayImg = $pg->display_image_url;
+                $cityName = $pg->city ? $pg->city->name : '';
+                $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($cityName ?: 'City Center');
+                $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
+                $reviewCount = $pg->total_reviews ?: (75 + (abs(crc32($pg->id)) % 80));
+                
+                $hasAC = $pg->amenities->contains(fn($a) => stripos($a->name, 'ac') !== false || stripos($a->slug, 'ac') !== false);
+                $hasFood = $pg->amenities->contains(fn($a) => stripos($a->name, 'food') !== false || stripos($a->name, 'meal') !== false || stripos($a->slug, 'food') !== false);
+                $hasWifi = $pg->amenities->contains(fn($a) => stripos($a->name, 'wifi') !== false || stripos($a->slug, 'wifi') !== false);
+                $hasSecurity = $pg->amenities->contains(fn($a) => stripos($a->name, 'security') !== false || stripos($a->name, 'cctv') !== false || stripos($a->slug, 'security') !== false);
+            @endphp
+            <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
+                data-gender="{{ $genderUpper }}" 
+                data-price="{{ (int)$pg->monthly_rent }}" 
+                data-rating="{{ $ratingVal }}" 
+                data-city="{{ $cityName }}" 
+                data-ac="{{ $hasAC ? 'true' : 'false' }}" 
+                data-food="{{ $hasFood ? 'true' : 'false' }}" 
+                data-wifi="{{ $hasWifi ? 'true' : 'false' }}" 
+                data-security="{{ $hasSecurity ? 'true' : 'false' }}">
                 <div>
-                    <span class="text-[9px] sm:text-xs text-gray-500 block">Rent</span>
-                    <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹8,500<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
-                </div>
-                <a href="{{ route('user.detail') }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition tap-effect shadow-sm">View</a>
-            </div>
-        </div>
-
-        <!-- Property Card 2 -->
-        <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
-            data-gender="GIRLS" data-price="9999" data-rating="4.9" data-city="Bangalore" data-ac="false" data-food="true" data-wifi="true" data-security="true">
-            <div>
-                <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full">
-                    <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-green-500 text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
-                        <i class="fas fa-check-circle"></i> <span class="hidden sm:inline">Verified</span>
+                    <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full">
+                        <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-2 left-2 sm:top-3 sm:left-3 {{ $tagMeta['solid_badge'] }} text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
+                            <i class="fas fa-{{ $tagMeta['icon'] }}"></i> <span class="hidden sm:inline">{{ $tagMeta['label'] }}</span>
+                        </div>
+                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
+                            <i class="far fa-heart text-xs sm:text-sm"></i>
+                        </button>
+                        <div class="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-gray-900/80 backdrop-blur text-white text-[9px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <span class="font-bold">{{ $ratingVal }}</span>
+                            <span class="text-gray-300 hidden sm:inline">({{ $reviewCount }})</span>
+                        </div>
                     </div>
-                    <button onclick="toggleSave(this)" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
-                        <i class="far fa-heart text-xs sm:text-sm"></i>
-                    </button>
-                    <div class="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-gray-900/80 backdrop-blur text-white text-[9px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <span class="font-bold">4.9</span>
-                        <span class="text-gray-300 hidden sm:inline">(98)</span>
-                    </div>
-                </div>
-                <div class="p-2.5 sm:p-4">
-                    <div class="flex justify-between items-start mb-1 gap-1">
-                        <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">Aura Women's</h3>
-                        <span class="bg-pink-50 text-pink-600 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">GIRLS</span>
-                    </div>
-                    <p class="text-gray-500 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 prop-loc truncate">
-                        <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> Indiranagar, BLR
-                    </p>
-                    <div class="hidden sm:flex flex-wrap gap-1.5 mb-3">
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-wifi text-brand"></i> WiFi
-                        </span>
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-shield-alt text-brand"></i> Security
-                        </span>
+                    <div class="p-2.5 sm:p-4">
+                        <div class="flex justify-between items-start mb-1 gap-1">
+                            <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">{{ $pg->name }}</h3>
+                            <span class="{{ $genderMeta['class'] }} text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $genderMeta['label'] }}</span>
+                        </div>
+                        <p class="text-gray-500 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 prop-loc truncate">
+                            <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ $locationText }}
+                        </p>
+                        <div class="hidden sm:flex flex-wrap gap-1.5 mb-3">
+                            @forelse($pg->amenities->take(3) as $am)
+                                <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
+                                    <i class="fas fa-{{ $am->icon ?? 'wifi' }} text-brand"></i> {{ $am->name }}
+                                </span>
+                            @empty
+                                <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
+                                    <i class="fas fa-wifi text-brand"></i> WiFi
+                                </span>
+                                <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
+                                    <i class="fas fa-snowflake text-brand"></i> AC
+                                </span>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center justify-between">
-                <div>
-                    <span class="text-[9px] sm:text-xs text-gray-500 block">Rent</span>
-                    <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹9,999<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
-                </div>
-                <a href="{{ route('user.detail') }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition tap-effect shadow-sm">View</a>
-            </div>
-        </div>
-
-        <!-- Property Card 3 -->
-        <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
-            data-gender="CO-ED" data-price="11500" data-rating="4.7" data-city="Bangalore" data-ac="true" data-food="false" data-wifi="true" data-security="true">
-            <div>
-                <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full">
-                    <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-orange-500 text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
-                        <i class="fas fa-fire"></i> <span class="hidden sm:inline">Popular</span>
+                <div class="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] sm:text-xs text-gray-500 block">Rent</span>
+                        <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
                     </div>
-                    <button onclick="toggleSave(this)" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
-                        <i class="far fa-heart text-xs sm:text-sm"></i>
-                    </button>
-                    <div class="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-gray-900/80 backdrop-blur text-white text-[9px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <span class="font-bold">4.7</span>
-                        <span class="text-gray-300 hidden sm:inline">(75)</span>
-                    </div>
-                </div>
-                <div class="p-2.5 sm:p-4">
-                    <div class="flex justify-between items-start mb-1 gap-1">
-                        <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">Urban Nest Co</h3>
-                        <span class="bg-purple-50 text-purple-600 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">CO-ED</span>
-                    </div>
-                    <p class="text-gray-500 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 prop-loc truncate">
-                        <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> HSR Layout, BLR
-                    </p>
-                    <div class="hidden sm:flex flex-wrap gap-1.5 mb-3">
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-dumbbell text-brand"></i> Gym
-                        </span>
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-wifi text-brand"></i> WiFi
-                        </span>
-                    </div>
+                    <a href="{{ $slugUrl }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition tap-effect shadow-sm">View</a>
                 </div>
             </div>
-            <div class="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center justify-between">
-                <div>
-                    <span class="text-[9px] sm:text-xs text-gray-500 block">Rent</span>
-                    <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹11,500<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
-                </div>
-                <a href="{{ route('user.detail') }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition tap-effect shadow-sm">View</a>
-            </div>
-        </div>
-
-        <!-- Property Card 4 -->
-        <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
-            data-gender="BOYS" data-price="10000" data-rating="4.6" data-city="Delhi" data-ac="true" data-food="false" data-wifi="true" data-security="true">
-            <div>
-                <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full">
-                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-green-500 text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
-                        <i class="fas fa-check-circle"></i> <span class="hidden sm:inline">Verified</span>
-                    </div>
-                    <button onclick="toggleSave(this)" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
-                        <i class="far fa-heart text-xs sm:text-sm"></i>
-                    </button>
-                    <div class="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-gray-900/80 backdrop-blur text-white text-[9px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <span class="font-bold">4.6</span>
-                        <span class="text-gray-300 hidden sm:inline">(85)</span>
-                    </div>
-                </div>
-                <div class="p-2.5 sm:p-4">
-                    <div class="flex justify-between items-start mb-1 gap-1">
-                        <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">Metro Stay Prem</h3>
-                        <span class="bg-blue-50 text-blue-600 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">BOYS</span>
-                    </div>
-                    <p class="text-gray-500 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 prop-loc truncate">
-                        <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> Saket, Delhi
-                    </p>
-                    <div class="hidden sm:flex flex-wrap gap-1.5 mb-3">
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-snowflake text-brand"></i> AC
-                        </span>
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-wifi text-brand"></i> WiFi
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center justify-between">
-                <div>
-                    <span class="text-[9px] sm:text-xs text-gray-500 block">Rent</span>
-                    <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹10,000<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
-                </div>
-                <a href="{{ route('user.detail') }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition tap-effect shadow-sm">View</a>
-            </div>
-        </div>
-
-        <!-- Property Card 5 -->
-        <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
-            data-gender="GIRLS" data-price="11500" data-rating="4.8" data-city="Bangalore" data-ac="false" data-food="true" data-wifi="true" data-security="true">
-            <div>
-                <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full">
-                    <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-green-500 text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
-                        <i class="fas fa-check-circle"></i> <span class="hidden sm:inline">Verified</span>
-                    </div>
-                    <button onclick="toggleSave(this)" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
-                        <i class="far fa-heart text-xs sm:text-sm"></i>
-                    </button>
-                    <div class="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-gray-900/80 backdrop-blur text-white text-[9px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <span class="font-bold">4.8</span>
-                        <span class="text-gray-300 hidden sm:inline">(110)</span>
-                    </div>
-                </div>
-                <div class="p-2.5 sm:p-4">
-                    <div class="flex justify-between items-start mb-1 gap-1">
-                        <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">Koramangala Stay</h3>
-                        <span class="bg-pink-50 text-pink-600 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">GIRLS</span>
-                    </div>
-                    <p class="text-gray-500 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 prop-loc truncate">
-                        <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> Koramangala, BLR
-                    </p>
-                    <div class="hidden sm:flex flex-wrap gap-1.5 mb-3">
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-utensils text-brand"></i> Food
-                        </span>
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-broom text-brand"></i> Cleaning
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center justify-between">
-                <div>
-                    <span class="text-[9px] sm:text-xs text-gray-500 block">Rent</span>
-                    <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹11,500<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
-                </div>
-                <a href="{{ route('user.detail') }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition tap-effect shadow-sm">View</a>
-            </div>
-        </div>
-
-        <!-- Property Card 6 -->
-        <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
-            data-gender="CO-ED" data-price="13000" data-rating="4.9" data-city="Bangalore" data-ac="true" data-food="false" data-wifi="true" data-security="true">
-            <div>
-                <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full">
-                    <img src="https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-orange-500 text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
-                        <i class="fas fa-fire"></i> <span class="hidden sm:inline">Popular</span>
-                    </div>
-                    <button onclick="toggleSave(this)" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
-                        <i class="far fa-heart text-xs sm:text-sm"></i>
-                    </button>
-                    <div class="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-gray-900/80 backdrop-blur text-white text-[9px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <span class="font-bold">4.9</span>
-                        <span class="text-gray-300 hidden sm:inline">(95)</span>
-                    </div>
-                </div>
-                <div class="p-2.5 sm:p-4">
-                    <div class="flex justify-between items-start mb-1 gap-1">
-                        <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">Indiranagar PG</h3>
-                        <span class="bg-purple-50 text-purple-600 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">CO-ED</span>
-                    </div>
-                    <p class="text-gray-500 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 prop-loc truncate">
-                        <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> Indiranagar, BLR
-                    </p>
-                    <div class="hidden sm:flex flex-wrap gap-1.5 mb-3">
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-parking text-brand"></i> Parking
-                        </span>
-                        <span class="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <i class="fas fa-dumbbell text-brand"></i> Gym
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center justify-between">
-                <div>
-                    <span class="text-[9px] sm:text-xs text-gray-500 block">Rent</span>
-                    <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹13,000<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
-                </div>
-                <a href="{{ route('user.detail') }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition tap-effect shadow-sm">View</a>
-            </div>
-        </div>
+        @empty
+        @endforelse
 
     </div>
 
     <!-- No Results Found Contact Card (Hidden by default, shown when 0 results) -->
-    <div id="noResultsCard" class="hidden bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-xl text-center max-w-2xl mx-auto my-8">
+    <div id="noResultsCard" class="{{ $properties->isEmpty() ? '' : 'hidden' }} bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-xl text-center max-w-2xl mx-auto my-8">
         <div class="w-16 h-16 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-inner">
             <i class="fas fa-headset"></i>
         </div>
@@ -564,7 +367,7 @@
     </div>
 
     <!-- Load More Button -->
-    <div class="mt-10 text-center" id="loadMoreContainer">
+    <div class="mt-10 text-center {{ $properties->isEmpty() ? 'hidden' : '' }}" id="loadMoreContainer">
         <button onclick="loadMoreProperties(this)" class="bg-white border-2 border-gray-200 hover:border-brand hover:text-brand text-gray-700 font-bold py-3 px-8 rounded-2xl transition tap-effect shadow-sm flex items-center gap-2 mx-auto text-xs sm:text-sm">
             <i class="fas fa-spinner"></i> Load More Properties
         </button>
@@ -574,9 +377,9 @@
 
 @push('scripts')
 <script>
-    let drawerCity = '';
-    let drawerGender = 'ALL';
-    let drawerBudget = '';
+    let drawerCity = '{{ addslashes($selectedCity ?? '') }}';
+    let drawerGender = '{{ strtoupper($selectedGender ?? 'ALL') }}';
+    let drawerBudget = '{{ addslashes($budget ?? ($maxPrice ?? '')) }}';
 
     // ================= TOGGLE FILTER BAR / DRAWER =================
     function toggleFilterBar() {
@@ -677,6 +480,9 @@
         // Sync drawer values with main desktop filters
         const deskGen = document.getElementById('desktopGenderFilter');
         if (deskGen) deskGen.value = (drawerGender === 'ALL') ? '' : drawerGender;
+
+        const deskType = document.getElementById('desktopTypeFilter');
+        if (deskType) deskType.value = (drawerGender === 'ALL') ? '' : drawerGender;
 
         const deskBud = document.getElementById('desktopBudgetFilter');
         if (deskBud) deskBud.value = drawerBudget;
@@ -808,7 +614,7 @@
         if (drawerCity) activeCount++;
         if (deskType) activeCount++;
         if (deskGender || drawerGender !== 'ALL') activeCount++;
-        if (budget || drawerBudget) activeCount++;
+        if (budget) activeCount++;
         if (ac) activeCount++;
         if (food) activeCount++;
         if (wifi) activeCount++;
@@ -862,7 +668,26 @@
 
             const matchDeskType = !deskType || elGender === deskType;
             const matchDeskGender = !deskGender || elGender === deskGender;
-            const matchBudget = !budget || elPrice <= parseInt(budget);
+
+            // Budget filter logic matching specific buckets or numeric caps
+            let matchBudget = true;
+            if (budget) {
+                if (budget === '6000' || budget === '0-6000' || budget === 'under-6k') {
+                    matchBudget = elPrice <= 6000;
+                } else if (budget === '8000') {
+                    matchBudget = elPrice <= 8000;
+                } else if (budget === '10000' || budget === '6000-10000') {
+                    matchBudget = (elPrice >= 6000 && elPrice <= 10000) || elPrice <= 10000;
+                } else if (budget === '12000') {
+                    matchBudget = elPrice <= 12000;
+                } else if (budget === '15000' || budget === '10000-15000') {
+                    matchBudget = (elPrice >= 10000 && elPrice <= 15000) || elPrice <= 15000;
+                } else if (budget === '15000+' || budget === '15000-plus' || budget === '20000') {
+                    matchBudget = elPrice >= 15000;
+                } else if (!isNaN(parseInt(budget))) {
+                    matchBudget = elPrice <= parseInt(budget);
+                }
+            }
 
             // Amenities
             const matchAC = !ac || elAC;
@@ -922,5 +747,69 @@
             btn.classList.add('opacity-50', 'cursor-not-allowed');
         }, 800);
     }
+
+    // Initialize UI on page load based on URL parameters
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const cityParam = urlParams.get('city');
+        const genderParam = urlParams.get('gender') || urlParams.get('type');
+        const budgetParam = urlParams.get('budget');
+        const minPriceParam = urlParams.get('min_price');
+        const maxPriceParam = urlParams.get('max_price');
+
+        if (cityParam) {
+            drawerCity = cityParam;
+            document.querySelectorAll('.drawer-city-btn').forEach(b => {
+                if (b.textContent.trim().toLowerCase() === cityParam.toLowerCase()) {
+                    b.classList.add('border-brand', 'bg-brand', 'text-white', 'active');
+                    b.classList.remove('border-gray-200', 'bg-gray-50', 'text-gray-700');
+                } else if (b.textContent.trim() === 'All Cities') {
+                    b.classList.remove('border-brand', 'bg-brand', 'text-white', 'active');
+                    b.classList.add('border-gray-200', 'bg-gray-50', 'text-gray-700');
+                }
+            });
+        }
+
+        if (genderParam) {
+            const gUpper = genderParam.toUpperCase();
+            drawerGender = gUpper;
+            document.querySelectorAll('.drawer-gender-btn').forEach(b => {
+                if (b.textContent.trim().toUpperCase() === gUpper || (gUpper === 'MALE' && b.textContent.trim() === 'Boys') || (gUpper === 'FEMALE' && b.textContent.trim() === 'Girls')) {
+                    b.classList.add('border-brand', 'bg-brand', 'text-white', 'active');
+                    b.classList.remove('border-gray-200', 'bg-gray-50', 'text-gray-700');
+                } else {
+                    b.classList.remove('border-brand', 'bg-brand', 'text-white', 'active');
+                    b.classList.add('border-gray-200', 'bg-gray-50', 'text-gray-700');
+                }
+            });
+        }
+
+        if (budgetParam || maxPriceParam || minPriceParam) {
+            const effectiveBudget = budgetParam || maxPriceParam || (minPriceParam ? '15000+' : '');
+            drawerBudget = effectiveBudget;
+            
+            document.querySelectorAll('.drawer-budget-btn').forEach(b => {
+                const btnText = b.textContent;
+                let isMatch = false;
+                if ((effectiveBudget === '6000' || effectiveBudget === '0-6000') && btnText.includes('6,000')) isMatch = true;
+                else if ((effectiveBudget === '8000') && btnText.includes('8,000')) isMatch = true;
+                else if ((effectiveBudget === '10000' || effectiveBudget === '6000-10000') && btnText.includes('10,000')) isMatch = true;
+                else if ((effectiveBudget === '12000') && btnText.includes('12,000')) isMatch = true;
+                else if ((effectiveBudget === '15000' || effectiveBudget === '10000-15000') && btnText.includes('15,000') && !btnText.includes('+')) isMatch = true;
+                else if ((effectiveBudget === '15000+' || effectiveBudget === '15000-plus' || (minPriceParam && parseInt(minPriceParam) >= 15000)) && btnText.includes('15,000+')) isMatch = true;
+
+                if (isMatch) {
+                    b.classList.add('border-brand', 'bg-brand', 'text-white', 'active');
+                    b.classList.remove('border-gray-200', 'bg-gray-50', 'text-gray-700');
+                } else {
+                    b.classList.remove('border-brand', 'bg-brand', 'text-white', 'active');
+                    b.classList.add('border-gray-200', 'bg-gray-50', 'text-gray-700');
+                }
+            });
+        }
+
+        // Run filter check on load
+        filterSearchResults();
+    });
 </script>
 @endpush

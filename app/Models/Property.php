@@ -54,42 +54,42 @@ class Property extends Model
             'label' => 'Popular',
             'icon' => 'fire',
             'bg_class' => 'bg-orange-50 text-orange-700 border-orange-200',
-            'solid_badge' => 'bg-gradient-to-r from-orange-500 to-amber-500 text-white',
+            'solid_badge' => 'bg-orange-500 text-white',
             'dot_color' => 'bg-orange-500',
         ],
         'Verified' => [
             'label' => 'Verified',
             'icon' => 'check-circle',
             'bg_class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-            'solid_badge' => 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white',
+            'solid_badge' => 'bg-emerald-500 text-white',
             'dot_color' => 'bg-emerald-500',
         ],
         'Guest Favourite' => [
             'label' => 'Guest Favourite',
-            'icon' => 'heart',
+            'icon' => 'crown',
             'bg_class' => 'bg-rose-50 text-rose-700 border-rose-200',
-            'solid_badge' => 'bg-gradient-to-r from-rose-500 to-pink-500 text-white',
+            'solid_badge' => 'bg-amber-500 text-white',
             'dot_color' => 'bg-rose-500',
         ],
         'Trending' => [
             'label' => 'Trending',
-            'icon' => 'bolt',
+            'icon' => 'fire',
             'bg_class' => 'bg-purple-50 text-purple-700 border-purple-200',
-            'solid_badge' => 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white',
+            'solid_badge' => 'bg-blue-600 text-white',
             'dot_color' => 'bg-purple-500',
         ],
         'Top rated' => [
-            'label' => 'Top rated',
+            'label' => 'Top Rated',
             'icon' => 'star',
             'bg_class' => 'bg-amber-50 text-amber-800 border-amber-200',
-            'solid_badge' => 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900',
+            'solid_badge' => 'bg-amber-500 text-white',
             'dot_color' => 'bg-amber-500',
         ],
         'New' => [
-            'label' => 'New',
-            'icon' => 'sparkles',
+            'label' => 'NEW',
+            'icon' => 'bolt',
             'bg_class' => 'bg-blue-50 text-blue-700 border-blue-200',
-            'solid_badge' => 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white',
+            'solid_badge' => 'bg-red-500 text-white',
             'dot_color' => 'bg-blue-500',
         ],
     ];
@@ -110,8 +110,64 @@ class Property extends Model
             'label' => $this->tag,
             'icon' => 'tag',
             'bg_class' => 'bg-gray-50 text-gray-700 border-gray-200',
-            'solid_badge' => 'bg-gray-800 text-white',
+            'solid_badge' => 'bg-emerald-500 text-white',
             'dot_color' => 'bg-gray-500',
+        ];
+    }
+
+    public function getDisplayTagMetaAttribute(): array
+    {
+        if ($this->tag_meta) {
+            return $this->tag_meta;
+        }
+        return [
+            'label' => 'Verified',
+            'icon' => 'check-circle',
+            'bg_class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            'solid_badge' => 'bg-emerald-500 text-white',
+            'dot_color' => 'bg-emerald-500',
+        ];
+    }
+
+    public function getDisplayImageUrlAttribute(): string
+    {
+        if ($this->primaryImage && !empty($this->primaryImage->image_url)) {
+            return $this->primaryImage->image_url;
+        }
+        $first = $this->images->first();
+        if ($first && !empty($first->image_url)) {
+            return $first->image_url;
+        }
+        return 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
+    }
+
+    public function getGenderTypeMetaAttribute(): array
+    {
+        $gender = strtolower($this->gender_preference ?? 'co-ed');
+        if ($gender === 'boys' || $gender === 'male') {
+            return [
+                'label' => 'BOYS',
+                'class' => 'bg-blue-50 text-blue-600',
+                'btn_class' => 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30',
+                'text_color' => 'text-blue-600',
+                'bg_color' => 'bg-blue-50',
+            ];
+        }
+        if ($gender === 'girls' || $gender === 'female') {
+            return [
+                'label' => 'GIRLS',
+                'class' => 'bg-pink-50 text-pink-600',
+                'btn_class' => 'bg-brand hover:bg-brand-dark text-white shadow-brand/30',
+                'text_color' => 'text-pink-600',
+                'bg_color' => 'bg-pink-50',
+            ];
+        }
+        return [
+            'label' => 'CO-ED',
+            'class' => 'bg-purple-50 text-purple-600',
+            'btn_class' => 'bg-brand hover:bg-brand-dark text-white shadow-brand/30',
+            'text_color' => 'text-purple-600',
+            'bg_color' => 'bg-purple-50',
         ];
     }
 
@@ -137,9 +193,30 @@ class Property extends Model
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
             if (empty($model->slug)) {
-                $model->slug = Str::slug($model->name) . '-' . substr((string) Str::uuid(), 0, 8);
+                $model->slug = static::generateSlug($model->name, $model->id);
             }
         });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('name') && (empty($model->slug) || $model->getOriginal('name') !== $model->name)) {
+                $model->slug = static::generateSlug($model->name, $model->id);
+            }
+        });
+    }
+
+    public static function generateSlug(string $name, ?string $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($name);
+        if (empty($baseSlug)) {
+            $baseSlug = 'property';
+        }
+        $slug = $baseSlug;
+        $count = 1;
+        while (static::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $count++;
+            $slug = "{$baseSlug}-{$count}";
+        }
+        return $slug;
     }
 
     public function propertyType()

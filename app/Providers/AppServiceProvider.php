@@ -34,5 +34,22 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
         });
+
+        \Illuminate\Support\Facades\View::composer('broker.*', function ($view) {
+            $brokerId = \Illuminate\Support\Facades\Auth::id();
+            if ($brokerId && \Illuminate\Support\Facades\Schema::hasTable('properties')) {
+                $propCount = \App\Models\Property::where('broker_id', $brokerId)->count();
+                $pendingCount = \App\Models\Booking::where('broker_id', $brokerId)->where('booking_status', 'pending')->count();
+                $tenantCount = \App\Models\Booking::where('broker_id', $brokerId)->where('booking_status', 'confirmed')->distinct('user_id')->count('user_id');
+                $rating = \App\Models\Review::whereHas('property', fn($q)=>$q->where('broker_id', $brokerId))->avg('rating');
+
+                $view->with('brokerSidebarStats', [
+                    'properties' => $propCount,
+                    'pendingBookings' => $pendingCount,
+                    'tenants' => $tenantCount,
+                    'rating' => $rating ? number_format($rating, 1) . ' ★' : '4.8 ★',
+                ]);
+            }
+        });
     }
 }

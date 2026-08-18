@@ -65,16 +65,42 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
+use App\Http\Controllers\Broker\BrokerAuthController;
+use App\Http\Controllers\Broker\BrokerDashboardController;
+use App\Http\Controllers\Broker\BrokerProfileController;
+
 Route::prefix('broker')->name('broker.')->group(function () {
-    Route::view('/login', 'broker.login')->name('login');
-    Route::view('/', 'broker.dashboard')->name('dashboard');
-    Route::view('/dashboard', 'broker.dashboard');
-    Route::view('/pgs', 'broker.pgs')->name('pgs');
-    Route::view('/bookings', 'broker.bookings')->name('bookings');
-    Route::view('/tenants', 'broker.tenants')->name('tenants');
-    Route::view('/earnings', 'broker.earnings')->name('earnings');
-    Route::view('/reviews', 'broker.reviews')->name('reviews');
-    Route::view('/profile', 'broker.profile')->name('profile');
+    // Guest Broker Routes
+    Route::get('/login', [BrokerAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [BrokerAuthController::class, 'login'])->name('login.submit');
+    Route::match(['get', 'post'], '/logout', [BrokerAuthController::class, 'logout'])->name('logout');
+
+    // Protected Broker Portal Routes
+    Route::middleware('broker')->group(function () {
+        Route::get('/', [BrokerDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [BrokerDashboardController::class, 'index']);
+        Route::get('/dashboard/chart-data', [BrokerDashboardController::class, 'getChartData'])->name('dashboard.chart');
+        
+        // 1-Click Quick Actions
+        Route::post('/bookings/{id}/approve', [BrokerDashboardController::class, 'approveBooking'])->name('bookings.approve');
+        Route::post('/bookings/{id}/reject', [BrokerDashboardController::class, 'rejectBooking'])->name('bookings.reject');
+
+        Route::view('/pgs', 'broker.pgs')->name('pgs');
+        Route::view('/bookings', 'broker.bookings')->name('bookings');
+        Route::view('/tenants', 'broker.tenants')->name('tenants');
+        Route::view('/earnings', 'broker.earnings')->name('earnings');
+        Route::view('/reviews', 'broker.reviews')->name('reviews');
+        
+        // Dynamic Broker Profile & Settings
+        Route::get('/profile', [BrokerProfileController::class, 'index'])->name('profile');
+        Route::post('/profile/update', [BrokerProfileController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/profile/avatar', [BrokerProfileController::class, 'updateAvatar'])->name('profile.avatar');
+        Route::post('/profile/avatar/remove', [BrokerProfileController::class, 'removeAvatar'])->name('profile.avatar.remove');
+        Route::post('/profile/bank', [BrokerProfileController::class, 'updateBankDetails'])->name('profile.bank');
+        Route::post('/profile/documents', [BrokerProfileController::class, 'uploadDocument'])->name('profile.documents');
+        Route::post('/profile/notifications', [BrokerProfileController::class, 'updateNotifications'])->name('profile.notifications');
+        Route::post('/profile/password', [BrokerProfileController::class, 'updatePassword'])->name('profile.password');
+    });
 });
 
 Route::get('/location', function () {

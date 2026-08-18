@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Broker Panel') - StayNest</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -86,17 +87,19 @@
                 <a href="{{ route('broker.pgs') }}" class="sidebar-link {{ request()->routeIs('broker.pgs') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-building w-5 text-center"></i>
                     <span class="text-sm font-medium">My PGs</span>
-                    <span class="ml-auto bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">12</span>
+                    <span class="ml-auto bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $brokerSidebarStats['properties'] ?? 0 }}</span>
                 </a>
                 <a href="{{ route('broker.bookings') }}" class="sidebar-link {{ request()->routeIs('broker.bookings') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-calendar-check w-5 text-center"></i>
                     <span class="text-sm font-medium">Bookings</span>
-                    <span class="ml-auto bg-yellow-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">5</span>
+                    @if(($brokerSidebarStats['pendingBookings'] ?? 0) > 0)
+                        <span class="ml-auto bg-yellow-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $brokerSidebarStats['pendingBookings'] }}</span>
+                    @endif
                 </a>
                 <a href="{{ route('broker.tenants') }}" class="sidebar-link {{ request()->routeIs('broker.tenants') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-users w-5 text-center"></i>
                     <span class="text-sm font-medium">Tenants</span>
-                    <span class="ml-auto bg-blue-50 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">36</span>
+                    <span class="ml-auto bg-blue-50 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ $brokerSidebarStats['tenants'] ?? 0 }}</span>
                 </a>
                 <a href="{{ route('broker.earnings') }}" class="sidebar-link {{ request()->routeIs('broker.earnings') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-rupee-sign w-5 text-center"></i>
@@ -105,7 +108,7 @@
                 <a href="{{ route('broker.reviews') }}" class="sidebar-link {{ request()->routeIs('broker.reviews') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-star w-5 text-center"></i>
                     <span class="text-sm font-medium">Reviews</span>
-                    <span class="ml-auto bg-yellow-50 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">4.8 ★</span>
+                    <span class="ml-auto bg-yellow-50 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ $brokerSidebarStats['rating'] ?? '4.8 ★' }}</span>
                 </a>
             </nav>
         </div>

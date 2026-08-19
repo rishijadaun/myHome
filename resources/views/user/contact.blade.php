@@ -94,69 +94,90 @@
             </div>
 
             <!-- Success Alert (Hidden initially) -->
-            <div id="formSuccessMessage" class="hidden mb-6 p-4 bg-brand-50 border border-brand-100 text-brand-dark rounded-2xl flex items-start gap-3">
-                <i class="fas fa-check-circle text-brand text-lg mt-0.5"></i>
-                <div>
-                    <p class="font-bold text-sm text-slate-900">Thank you for reaching out!</p>
-                    <p class="text-xs text-slate-600 mt-0.5">Your message has been received. Our team will contact you shortly.</p>
+            <div id="formSuccessMessage" class="hidden mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl flex items-start gap-3 transition-all duration-300">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-bold text-sm text-emerald-950" id="formSuccessTitle">Thank you for reaching out!</p>
+                    <p class="text-xs text-emerald-800 mt-0.5" id="formSuccessDetail">Your inquiry has been received. Our team will contact you shortly.</p>
                 </div>
             </div>
 
-            <form id="contactForm" onsubmit="handleContactSubmit(event)" class="space-y-4">
+            <!-- Error Alert (Hidden initially) -->
+            <div id="formErrorMessage" class="hidden mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-900 rounded-2xl flex items-start gap-3 transition-all duration-300">
+                <div class="w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-bold text-sm text-rose-950">Submission Failed</p>
+                    <p class="text-xs text-rose-800 mt-0.5" id="formErrorDetail">Please check the highlighted fields below and try again.</p>
+                </div>
+            </div>
+
+            <form id="contactForm" onsubmit="handleContactSubmit(event)" class="space-y-4" novalidate>
+                @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Your Name <span class="text-red-500">*</span></label>
+                        <label for="contact_name" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Your Name <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute left-3.5 top-3.5 text-gray-400 text-sm"><i class="fas fa-user"></i></span>
-                            <input type="text" required placeholder="e.g. Rahul Sharma" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition">
+                            <input type="text" id="contact_name" name="name" required placeholder="e.g. Rahul Sharma" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition">
                         </div>
+                        <p id="err_name" class="text-[11px] text-rose-500 mt-1 hidden font-medium flex items-center gap-1"><i class="fas fa-circle-exclamation text-[10px]"></i> <span></span></p>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Phone Number <span class="text-red-500">*</span></label>
+                        <label for="contact_phone" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Phone Number <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute left-3.5 top-3.5 text-gray-400 text-sm"><i class="fas fa-phone"></i></span>
-                            <input type="tel" required placeholder="+91 98765 43210" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition">
+                            <input type="tel" id="contact_phone" name="phone" required placeholder="+91 98765 43210" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition">
                         </div>
+                        <p id="err_phone" class="text-[11px] text-rose-500 mt-1 hidden font-medium flex items-center gap-1"><i class="fas fa-circle-exclamation text-[10px]"></i> <span></span></p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Email Address <span class="text-red-500">*</span></label>
+                        <label for="contact_email" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Email Address <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute left-3.5 top-3.5 text-gray-400 text-sm"><i class="fas fa-envelope"></i></span>
-                            <input type="email" required placeholder="name@example.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition">
+                            <input type="email" id="contact_email" name="email" required placeholder="name@example.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition">
                         </div>
+                        <p id="err_email" class="text-[11px] text-rose-500 mt-1 hidden font-medium flex items-center gap-1"><i class="fas fa-circle-exclamation text-[10px]"></i> <span></span></p>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">I am a</label>
+                        <label for="contact_user_type" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">I am a</label>
                         <div class="relative">
-                            <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition appearance-none">
+                            <select id="contact_user_type" name="user_type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition appearance-none">
                                 <option value="tenant">Student / Working Professional (Looking for PG)</option>
                                 <option value="owner">PG Owner / Host (Want to List Property)</option>
                                 <option value="partner">Corporate / Broker Partner</option>
                                 <option value="support">Existing Resident Needing Support</option>
+                                <option value="other">General Query / Other</option>
                             </select>
                             <span class="absolute right-3.5 top-3.5 text-gray-400 pointer-events-none text-xs"><i class="fas fa-chevron-down"></i></span>
                         </div>
+                        <p id="err_user_type" class="text-[11px] text-rose-500 mt-1 hidden font-medium flex items-center gap-1"><i class="fas fa-circle-exclamation text-[10px]"></i> <span></span></p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">City / Location of Interest</label>
+                    <label for="contact_city" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">City / Location of Interest</label>
                     <div class="relative">
                         <span class="absolute left-3.5 top-3.5 text-gray-400 text-sm"><i class="fas fa-map-marker-alt"></i></span>
-                        <input type="text" placeholder="e.g. Koramangala (Bangalore), Sector 62 (Noida), Hinjewadi (Pune)" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition">
+                        <input type="text" id="contact_city" name="city" placeholder="e.g. Koramangala (Bangalore), Sector 62 (Noida), Hinjewadi (Pune)" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition">
                     </div>
+                    <p id="err_city" class="text-[11px] text-rose-500 mt-1 hidden font-medium flex items-center gap-1"><i class="fas fa-circle-exclamation text-[10px]"></i> <span></span></p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">How can we help you? <span class="text-red-500">*</span></label>
-                    <textarea required rows="4" placeholder="Tell us what you're looking for or how we can assist you..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition resize-none"></textarea>
+                    <label for="contact_message" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">How can we help you? <span class="text-red-500">*</span></label>
+                    <textarea id="contact_message" name="message" required rows="4" placeholder="Tell us what you're looking for or how we can assist you..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition resize-none"></textarea>
+                    <p id="err_message" class="text-[11px] text-rose-500 mt-1 hidden font-medium flex items-center gap-1"><i class="fas fa-circle-exclamation text-[10px]"></i> <span></span></p>
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 px-6 rounded-xl transition tap-effect shadow-lg shadow-brand/30 hover:opacity-95 text-sm flex items-center justify-center gap-2">
-                    <i class="fas fa-paper-plane"></i> Send Message
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 px-6 rounded-xl transition tap-effect shadow-lg shadow-brand/30 hover:opacity-95 text-sm flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fas fa-paper-plane"></i> <span>Send Message</span>
                 </button>
             </form>
         </div>
@@ -272,27 +293,152 @@
 
 @push('scripts')
 <script>
-    function handleContactSubmit(e) {
+    async function handleContactSubmit(e) {
         e.preventDefault();
+        const form = document.getElementById('contactForm');
         const btn = document.getElementById('submitBtn');
         const successMsg = document.getElementById('formSuccessMessage');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+        const errorMsg = document.getElementById('formErrorMessage');
+        const errorDetail = document.getElementById('formErrorDetail');
+
+        // Clear previous error messages & styles
+        document.querySelectorAll('[id^="err_"]').forEach(el => {
+            el.classList.add('hidden');
+            const span = el.querySelector('span');
+            if (span) span.innerText = '';
+        });
+        document.querySelectorAll('#contactForm input, #contactForm select, #contactForm textarea').forEach(el => {
+            el.classList.remove('border-rose-400', 'bg-rose-50/30', 'ring-2', 'ring-rose-200');
+        });
+        successMsg.classList.add('hidden');
+        errorMsg.classList.add('hidden');
+
+        // Prepare Payload
+        const payload = {
+            name: document.getElementById('contact_name').value.trim(),
+            phone: document.getElementById('contact_phone').value.trim(),
+            email: document.getElementById('contact_email').value.trim(),
+            user_type: document.getElementById('contact_user_type').value,
+            city: document.getElementById('contact_city').value.trim(),
+            message: document.getElementById('contact_message').value.trim(),
+        };
+
+        // Client-side fast check
+        let clientValid = true;
+        if (!payload.name) {
+            showFieldError('name', 'Please enter your full name.');
+            clientValid = false;
+        }
+        if (!payload.phone) {
+            showFieldError('phone', 'Please enter your phone number.');
+            clientValid = false;
+        }
+        if (!payload.email) {
+            showFieldError('email', 'Please enter your email address.');
+            clientValid = false;
+        }
+        if (!payload.message) {
+            showFieldError('message', 'Please write your message or query.');
+            clientValid = false;
+        }
+
+        if (!clientValid) {
+            errorDetail.innerText = 'Please fill in all required fields marked with (*).';
+            errorMsg.classList.remove('hidden');
+            return;
+        }
+
+        // Set Loading state
+        const originalBtnHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin text-sm"></i> <span>Sending Message...</span>';
         btn.disabled = true;
+        btn.classList.add('opacity-80', 'cursor-not-allowed');
 
-        setTimeout(() => {
-            btn.innerHTML = '<i class="fas fa-check mr-2"></i> Message Sent!';
-            btn.classList.remove('from-brand', 'to-brand-dark');
-            btn.classList.add('bg-emerald-600');
-            successMsg.classList.remove('hidden');
-            document.getElementById('contactForm').reset();
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+            const response = await fetch('{{ url("/api/v1/contact") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(payload)
+            });
 
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Send Another Message';
-                btn.classList.add('from-brand', 'to-brand-dark');
-                btn.classList.remove('bg-emerald-600');
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                // Success feedback
+                document.getElementById('formSuccessTitle').innerText = 'Thank you, ' + (payload.name.split(' ')[0] || 'Friend') + '!';
+                document.getElementById('formSuccessDetail').innerText = data.message || 'Your inquiry has been received. Our team will contact you shortly.';
+                successMsg.classList.remove('hidden');
+                
+                // Reset form
+                form.reset();
+
+                // Button success state
+                btn.innerHTML = '<i class="fas fa-check-circle text-sm"></i> <span>Message Sent Successfully!</span>';
+                btn.classList.remove('from-brand', 'to-brand-dark');
+                btn.classList.add('bg-emerald-600');
+
+                // Smooth scroll to success message
+                successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    btn.innerHTML = originalBtnHtml;
+                    btn.classList.add('from-brand', 'to-brand-dark');
+                    btn.classList.remove('bg-emerald-600', 'opacity-80', 'cursor-not-allowed');
+                    btn.disabled = false;
+                }, 4000);
+
+            } else if (response.status === 422) {
+                // Validation error from server
+                if (data.errors) {
+                    for (const [field, messages] of Object.entries(data.errors)) {
+                        showFieldError(field, messages[0]);
+                    }
+                }
+                errorDetail.innerText = data.message || 'Please check the highlighted errors in the form.';
+                errorMsg.classList.remove('hidden');
+                errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                btn.innerHTML = originalBtnHtml;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
                 btn.disabled = false;
-            }, 3000);
-        }, 800);
+
+            } else {
+                // Server or other error
+                errorDetail.innerText = data.message || 'Something went wrong while submitting. Please try again or reach us by phone/WhatsApp.';
+                errorMsg.classList.remove('hidden');
+
+                btn.innerHTML = originalBtnHtml;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                btn.disabled = false;
+            }
+
+        } catch (err) {
+            console.error('Contact submission error:', err);
+            errorDetail.innerText = 'Unable to connect to the server. Please check your internet connection and try again.';
+            errorMsg.classList.remove('hidden');
+
+            btn.innerHTML = originalBtnHtml;
+            btn.classList.remove('opacity-80', 'cursor-not-allowed');
+            btn.disabled = false;
+        }
+    }
+
+    function showFieldError(fieldName, message) {
+        const inputEl = document.getElementById('contact_' + fieldName);
+        if (inputEl) {
+            inputEl.classList.add('border-rose-400', 'bg-rose-50/30', 'ring-2', 'ring-rose-200');
+        }
+        const errEl = document.getElementById('err_' + fieldName);
+        if (errEl) {
+            const span = errEl.querySelector('span');
+            if (span) span.innerText = message;
+            errEl.classList.remove('hidden');
+        }
     }
 
     function toggleFaq(headerEl) {

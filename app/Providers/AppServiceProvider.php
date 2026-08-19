@@ -30,6 +30,14 @@ class AppServiceProvider extends ServiceProvider
                     ? \App\Models\Review::where('status', 'pending')->count()
                     : 0;
 
+                $pendingContactsCount = \Illuminate\Support\Facades\Schema::hasTable('contact_inquiries')
+                    ? \App\Models\ContactInquiry::where('status', 'new')->count()
+                    : 0;
+
+                $totalContactsCount = \Illuminate\Support\Facades\Schema::hasTable('contact_inquiries')
+                    ? \App\Models\ContactInquiry::count()
+                    : 0;
+
                 $view->with('adminSidebarStats', [
                     'properties' => \App\Models\Property::count(),
                     'pendingBrokers' => $pendingBrokersCount,
@@ -37,6 +45,8 @@ class AppServiceProvider extends ServiceProvider
                     'users' => \App\Models\User::count(),
                     'pendingReviews' => $pendingReviewsCount,
                     'totalReviews' => \Illuminate\Support\Facades\Schema::hasTable('reviews') ? \App\Models\Review::count() : 0,
+                    'pendingContacts' => $pendingContactsCount,
+                    'totalContacts' => $totalContactsCount,
                 ]);
             }
         });

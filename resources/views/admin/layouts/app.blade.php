@@ -115,6 +115,15 @@
                         <span class="ml-auto bg-amber-50 text-amber-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['totalReviews'] ?? 0 }}</span>
                     @endif
                 </a>
+                <a href="{{ route('admin.contacts') }}" class="sidebar-link {{ request()->routeIs('admin.contacts*') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+                    <i class="fas fa-envelope-open-text w-5 text-center text-teal-600"></i>
+                    <span class="text-sm font-medium">Contact Inquiries</span>
+                    @if(($adminSidebarStats['pendingContacts'] ?? 0) > 0)
+                        <span class="ml-auto bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">{{ $adminSidebarStats['pendingContacts'] }}</span>
+                    @else
+                        <span class="ml-auto bg-teal-50 text-teal-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['totalContacts'] ?? 0 }}</span>
+                    @endif
+                </a>
             </nav>
         </div>
 

@@ -8,8 +8,13 @@ use App\Http\Controllers\Api\v1\BrokerController;
 
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\v1\PropertySubmissionController;
+use App\Http\Controllers\Api\v1\ContactInquiryController;
 
 Route::prefix('v1')->group(function () {
+
+    // ---------------- CONTACT & INQUIRIES ----------------
+    Route::post('contact', [ContactInquiryController::class, 'submit']);
+    Route::post('contact/submit', [ContactInquiryController::class, 'submit']);
 
     // ---------------- 1. AUTHENTICATION (USER & BROKER) ----------------
     Route::prefix('auth')->group(function () {

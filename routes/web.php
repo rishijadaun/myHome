@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AdminBrokerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminRelationshipManagerController;
+use App\Http\Controllers\Admin\AdminContactController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Guest Admin Routes
@@ -70,6 +71,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle');
         Route::post('/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Manage Contact Inquiries Routes
+        Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts');
+        Route::get('/contacts/export', [AdminContactController::class, 'export'])->name('contacts.export');
+        Route::get('/contacts/{id}', [AdminContactController::class, 'show'])->name('contacts.show');
+        Route::post('/contacts/{id}/status', [AdminContactController::class, 'updateStatus'])->name('contacts.status');
+        Route::delete('/contacts/{id}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
 
         // Settings Routes
         Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings');
@@ -159,6 +167,7 @@ Route::name('user.')->group(function () {
     Route::view('/about', 'user.about')->name('about');
     Route::view('/contact', 'user.contact')->name('contact');
     Route::view('/contact-us', 'user.contact');
+    Route::post('/contact', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit'])->name('contact.submit');
     Route::view('/terms', 'user.terms')->name('terms');
     Route::view('/terms-and-conditions', 'user.terms');
     Route::view('/privacy', 'user.privacy')->name('privacy');

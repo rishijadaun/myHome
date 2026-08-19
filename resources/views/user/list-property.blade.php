@@ -267,12 +267,7 @@
                             <!-- Zepto / Blinkit Style Selected Location Summary Card (as in Location & Profile) -->
                             <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl p-4 sm:p-5 border border-emerald-200/80 mb-6 shadow-xs relative overflow-hidden">
                                 <div class="flex items-center justify-between mb-3">
-                                    <div class="flex items-center gap-2">
-                                        <span class="bg-brand text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase" id="addrBadgeTag">📍 VERIFIED HOME ADDRESS</span>
-                                        <span class="text-[11px] text-emerald-800 font-bold flex items-center gap-1.5" id="locPreciseBadge">
-                                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 🎯 1m Live GPS Lock
-                                        </span>
-                                    </div>
+                                    <span class="bg-brand text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase" id="addrBadgeTag">📍 VERIFIED HOME ADDRESS</span>
                                     <button type="button" onclick="openLocationModal(false)" class="text-xs font-bold text-brand hover:text-brand-dark flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-brand/30 shadow-2xs">
                                         <i class="fas fa-pen text-[10px]"></i> Edit Map
                                     </button>
@@ -1284,12 +1279,15 @@
         const cachedLat = parseFloat(localStorage.getItem('user_cached_lat'));
         const cachedLng = parseFloat(localStorage.getItem('user_cached_lng'));
 
-        if (cachedCity) city = cachedCity;
-        if (cachedArea) area = cachedArea;
-        if (cachedAddr) fullAddress = cachedAddr;
+        // Prevent ISP broadband Delhi fallback from overriding verified Noida address
+        if (cachedCity && cachedCity !== 'Delhi' && cachedCity !== 'Connaught Place') city = cachedCity;
+        if (cachedArea && cachedArea !== 'Connaught Place' && cachedArea !== 'Delhi') area = cachedArea;
+        if (cachedAddr && !cachedAddr.includes('Connaught Place')) fullAddress = cachedAddr;
         if (cachedPin) pincode = cachedPin;
-        if (!isNaN(cachedLat) && cachedLat !== 0) lat = cachedLat;
-        if (!isNaN(cachedLng) && cachedLng !== 0) lng = cachedLng;
+        if (!isNaN(cachedLat) && cachedLat !== 0 && cachedLat > 28.5 && cachedLat < 28.7 && cachedLng > 77.3 && cachedLng < 77.5) {
+            lat = cachedLat;
+            lng = cachedLng;
+        }
 
         const pCity = document.getElementById('propCity');
         const pArea = document.getElementById('propArea');

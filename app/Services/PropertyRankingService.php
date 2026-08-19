@@ -87,6 +87,34 @@ class PropertyRankingService
     }
 
     /**
+     * Rank Eloquent Property collection and attach match_score and match_breakdown directly.
+     *
+     * @param \Illuminate\Support\Collection|iterable $properties
+     * @param array $intent
+     * @return \Illuminate\Support\Collection
+     */
+    public function rankModels($properties, array $intent): \Illuminate\Support\Collection
+    {
+        $collection = collect($properties);
+
+        $collection->each(function (Property $property) use ($intent) {
+            $analysis = $this->evaluateMatch($property, $intent);
+            $property->match_score = $analysis['score'];
+            $property->match_breakdown = $analysis['breakdown'];
+        });
+
+        return $collection->sort(function ($a, $b) {
+            if ($b->match_score !== $a->match_score) {
+                return $b->match_score <=> $a->match_score;
+            }
+            if ($b->rating !== $a->rating) {
+                return $b->rating <=> $a->rating;
+            }
+            return ($b->featured ? 1 : 0) <=> ($a->featured ? 1 : 0);
+        })->values();
+    }
+
+    /**
      * Calculate match score (0 - 100) and detailed breakdown for a property.
      *
      * @param Property $property

@@ -459,15 +459,11 @@ function renderAiResponse(data) {
             </div>
 
             <div class="flex flex-wrap gap-2 pt-2.5 border-t border-gray-100 mt-2.5">
-                <a href="{{ route('user.location') }}" class="inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-xs no-underline">
-                    <i class="fas fa-map-location-dot text-[10px]"></i> 🗺️ View on Interactive Map
-                </a>
+               
                 <a href="{{ route('user.search') }}?q=${encodeURIComponent(data.intent?.raw_query || '')}" class="inline-flex items-center gap-1.5 bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 text-xs font-bold px-3 py-1.5 rounded-xl transition border border-purple-200 no-underline">
                     <i class="fas fa-filter text-[10px]"></i> 🔍 Open in Search Grid
                 </a>
-                <a href="{{ route('user.bookings') }}" class="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 text-xs font-bold px-3 py-1.5 rounded-xl transition border border-blue-200 no-underline">
-                    <i class="fas fa-calendar-check text-[10px]"></i> 📅 Schedule Free Visit
-                </a>
+                
             </div>
         `;
     } else {

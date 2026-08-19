@@ -185,55 +185,97 @@ class UserHomeController extends Controller
     }
 
     /**
-     * Display Dynamic Search Page with Filters and Explore by Budget support.
+     * Display Dynamic Search Page with AI Natural Language / Hinglish Intent Parsing, Filters, and Match Scoring.
      */
-    public function search(Request $request)
-    {
+    public function search(
+        Request $request,
+        \App\Services\AiIntentParserService $intentParser,
+        \App\Services\PropertyRankingService $rankingService
+    ) {
+        $searchQuery = trim($request->query('q') ?? $request->query('search') ?? '');
+
+        // 1. Parse natural language / Hinglish query if provided
+        $intent = $searchQuery !== '' ? $intentParser->parse($searchQuery) : [
+            'raw_query' => '',
+            'city' => null,
+            'area' => null,
+            'gender' => null,
+            'max_budget' => null,
+            'min_budget' => null,
+            'amenities' => [],
+            'room_type' => null,
+            'keywords' => [],
+            'has_stay_intent' => false
+        ];
+
+        // 2. Read explicit URL parameters
+        $explicitCity = trim($request->query('city') ?? '');
+        $explicitGender = strtoupper(trim($request->query('gender') ?? $request->query('type') ?? ''));
+        $explicitBudget = trim($request->query('budget') ?? '');
+        $minPrice = $request->query('min_price');
+        $maxPrice = $request->query('max_price');
+        $sort = $request->query('sort', 'recommended');
+
+        // Checkbox states (if explicitly passed in request, override parsed intent)
+        $reqHasAC = $request->has('ac');
+        $reqHasFood = $request->has('food');
+        $reqHasWifi = $request->has('wifi');
+        $reqHasSecurity = $request->has('security');
+
+        $filterAC = $reqHasAC ? $request->boolean('ac') : in_array('ac', $intent['amenities'] ?? []);
+        $filterFood = $reqHasFood ? $request->boolean('food') : in_array('food', $intent['amenities'] ?? []);
+        $filterWifi = $reqHasWifi ? $request->boolean('wifi') : in_array('wifi', $intent['amenities'] ?? []);
+        $filterSecurity = $reqHasSecurity ? $request->boolean('security') : in_array('security', $intent['amenities'] ?? []);
+
+        // 3. Resolve effective filter values (combining explicit URL params & parsed intent)
+        $selectedCity = $explicitCity !== '' ? $explicitCity : ($intent['city'] ?? '');
+        $selectedArea = $intent['area'] ?? '';
+        
+        $selectedGender = '';
+        if ($explicitGender !== '') {
+            $selectedGender = $explicitGender;
+        } elseif (!empty($intent['gender'])) {
+            $g = strtolower($intent['gender']);
+            $selectedGender = ($g === 'boys' || $g === 'male') ? 'BOYS' : (($g === 'girls' || $g === 'female') ? 'GIRLS' : 'CO-ED');
+        }
+
+        $budget = $explicitBudget !== '' ? $explicitBudget : ($maxPrice !== null ? (string)$maxPrice : (!empty($intent['max_budget']) ? (string)$intent['max_budget'] : ''));
+
+        // 4. Build Eloquent Query for Approved & Verified Active Properties
         $query = Property::where('status', 'active')
             ->where('verification_status', 'verified')
             ->where('is_active', 1)
             ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
 
-        // 1. Text Query (name, address, landmark, description, city, area)
-        $searchQuery = trim($request->query('q') ?? $request->query('search') ?? '');
-        if ($searchQuery !== '') {
-            $query->where(function ($q) use ($searchQuery) {
-                $q->where('name', 'like', "%{$searchQuery}%")
-                  ->orWhere('address', 'like', "%{$searchQuery}%")
-                  ->orWhere('landmark', 'like', "%{$searchQuery}%")
-                  ->orWhere('description', 'like', "%{$searchQuery}%")
-                  ->orWhereHas('city', function ($cq) use ($searchQuery) {
-                      $cq->where('name', 'like', "%{$searchQuery}%");
-                  })
-                  ->orWhereHas('area', function ($aq) use ($searchQuery) {
-                      $aq->where('name', 'like', "%{$searchQuery}%");
-                  });
-            });
-        }
-
-        // 2. City Filter
-        $selectedCity = trim($request->query('city') ?? '');
+        // A. City Filter
         if ($selectedCity !== '') {
-            $query->whereHas('city', function ($q) use ($selectedCity) {
-                $q->where('name', 'like', "%{$selectedCity}%")->orWhere('slug', 'like', "%{$selectedCity}%");
+            $query->where(function ($q) use ($selectedCity) {
+                $q->whereHas('city', function ($cq) use ($selectedCity) {
+                    $cq->where('name', 'like', "%{$selectedCity}%")->orWhere('slug', 'like', "%{$selectedCity}%");
+                })->orWhere('address', 'like', "%{$selectedCity}%");
             });
         }
 
-        // 3. Gender / Room For Filter
-        $selectedGender = strtoupper(trim($request->query('gender') ?? $request->query('type') ?? ''));
-        if (in_array($selectedGender, ['BOYS', 'MALE'])) {
-            $query->whereIn('gender_preference', ['boys', 'male']);
-        } elseif (in_array($selectedGender, ['GIRLS', 'FEMALE'])) {
-            $query->whereIn('gender_preference', ['girls', 'female']);
-        } elseif (in_array($selectedGender, ['CO-ED', 'COED', 'UNISEX'])) {
-            $query->whereIn('gender_preference', ['co-ed', 'coed', 'unisex', 'both', 'any']);
+        // B. Area Filter (e.g. Sector 62, Koramangala, Saket, etc.)
+        if ($selectedArea !== '') {
+            $query->where(function ($q) use ($selectedArea) {
+                $q->whereHas('area', function ($aq) use ($selectedArea) {
+                    $aq->where('name', 'like', "%{$selectedArea}%")->orWhere('slug', 'like', "%{$selectedArea}%");
+                })->orWhere('address', 'like', "%{$selectedArea}%")
+                  ->orWhere('landmark', 'like', "%{$selectedArea}%");
+            });
         }
 
-        // 4. Budget Range & Price Limits Filter
-        $budget = trim($request->query('budget') ?? '');
-        $minPrice = $request->query('min_price');
-        $maxPrice = $request->query('max_price');
+        // C. Gender Filter
+        if ($selectedGender === 'BOYS' || $selectedGender === 'MALE') {
+            $query->whereIn('gender_preference', ['boys', 'male', 'co-ed', 'unisex', 'both', 'any', 'all']);
+        } elseif ($selectedGender === 'GIRLS' || $selectedGender === 'FEMALE') {
+            $query->whereIn('gender_preference', ['girls', 'female', 'co-ed', 'unisex', 'both', 'any', 'all']);
+        } elseif (in_array($selectedGender, ['CO-ED', 'COED', 'UNISEX'])) {
+            $query->whereIn('gender_preference', ['co-ed', 'coed', 'unisex', 'both', 'any', 'all']);
+        }
 
+        // D. Budget Range & Price Limits Filter
         if ($minPrice !== null && $maxPrice !== null && $minPrice !== '' && $maxPrice !== '') {
             $query->whereBetween('monthly_rent', [(float)$minPrice, (float)$maxPrice]);
         } elseif ($minPrice !== null && $minPrice !== '') {
@@ -250,36 +292,88 @@ class UserHomeController extends Controller
             } elseif ($budget === '15000-plus' || $budget === '20000' || $budget === '15000+') {
                 $query->where('monthly_rent', '>=', 15000);
             } elseif (is_numeric($budget)) {
-                $query->where('monthly_rent', '<=', (float)$budget);
+                // If budget was parsed from query or entered, allow tolerance (+1000) so close matches are included and scored
+                $query->where('monthly_rent', '<=', ((float)$budget) + 1000);
             }
         }
 
-        // 5. Amenities Filters (AC, Food, WiFi, Security)
-        if ($request->boolean('ac')) {
+        // E. Amenities Filters (AC, Food, WiFi, Security)
+        // If explicit checkboxes checked, apply strict filter
+        if ($reqHasAC && $filterAC) {
             $query->whereHas('amenities', fn($q) => $q->where('name', 'like', '%ac%')->orWhere('slug', 'like', '%ac%'));
         }
-        if ($request->boolean('food')) {
+        if ($reqHasFood && $filterFood) {
             $query->whereHas('amenities', fn($q) => $q->where('name', 'like', '%food%')->orWhere('name', 'like', '%meal%')->orWhere('slug', 'like', '%food%'));
         }
-        if ($request->boolean('wifi')) {
+        if ($reqHasWifi && $filterWifi) {
             $query->whereHas('amenities', fn($q) => $q->where('name', 'like', '%wifi%')->orWhere('slug', 'like', '%wifi%'));
         }
-
-        // 6. Sort
-        $sort = $request->query('sort', 'recommended');
-        if ($sort === 'price-asc') {
-            $query->orderBy('monthly_rent', 'asc');
-        } elseif ($sort === 'price-desc') {
-            $query->orderBy('monthly_rent', 'desc');
-        } elseif ($sort === 'rating') {
-            $query->orderByDesc('rating')->orderByDesc('total_reviews');
-        } else {
-            $query->orderByDesc('featured')->latest('created_at');
+        if ($reqHasSecurity && $filterSecurity) {
+            $query->whereHas('amenities', fn($q) => $q->where('name', 'like', '%security%')->orWhere('name', 'like', '%cctv%')->orWhere('slug', 'like', '%security%'));
         }
 
-        $properties = $query->get();
+        // F. Residual Keyword Search (if user searched specific PG name like "Royal", "Elite", "GPS", etc.)
+        if (!empty($intent['keywords'])) {
+            foreach ($intent['keywords'] as $kw) {
+                // Skip if keyword is the city or area name already filtered
+                if (strcasecmp($kw, $selectedCity) === 0 || strcasecmp($kw, $selectedArea) === 0) continue;
+                $query->where(function ($q) use ($kw) {
+                    $q->where('name', 'like', "%{$kw}%")
+                      ->orWhere('address', 'like', "%{$kw}%")
+                      ->orWhere('landmark', 'like', "%{$kw}%")
+                      ->orWhere('description', 'like', "%{$kw}%");
+                });
+            }
+        }
 
-        // 7. Distinct Cities for Dropdowns and Mobile Drawer
+        // 5. Fetch & Rank properties
+        $rawResults = $query->get();
+        $isFallback = false;
+
+        // If no results found with strict area/budget, fallback gracefully to broaden search in the same city/region
+        if ($rawResults->isEmpty() && ($selectedArea !== '' || $selectedCity !== '' || $selectedGender !== '')) {
+            $fallbackQuery = Property::where('status', 'active')
+                ->where('verification_status', 'verified')
+                ->where('is_active', 1)
+                ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
+
+            if ($selectedCity !== '') {
+                $fallbackQuery->where(function ($q) use ($selectedCity) {
+                    $q->whereHas('city', function ($cq) use ($selectedCity) {
+                        $cq->where('name', 'like', "%{$selectedCity}%")->orWhere('slug', 'like', "%{$selectedCity}%");
+                    })->orWhere('address', 'like', "%{$selectedCity}%");
+                });
+            }
+
+            if ($selectedGender === 'BOYS' || $selectedGender === 'MALE') {
+                $fallbackQuery->whereIn('gender_preference', ['boys', 'male', 'co-ed', 'unisex', 'all']);
+            } elseif ($selectedGender === 'GIRLS' || $selectedGender === 'FEMALE') {
+                $fallbackQuery->whereIn('gender_preference', ['girls', 'female', 'co-ed', 'unisex', 'all']);
+            }
+
+            $rawResults = $fallbackQuery->take(12)->get();
+            if ($rawResults->isNotEmpty()) {
+                $isFallback = true;
+            }
+        }
+
+        // Apply dynamic AI match ranking
+        if ($rawResults->isNotEmpty()) {
+            $properties = $rankingService->rankModels($rawResults, $intent);
+        } else {
+            $properties = collect();
+        }
+
+        // 6. Manual Sort override if requested
+        if ($sort === 'price-asc') {
+            $properties = $properties->sortBy('monthly_rent')->values();
+        } elseif ($sort === 'price-desc') {
+            $properties = $properties->sortByDesc('monthly_rent')->values();
+        } elseif ($sort === 'rating') {
+            $properties = $properties->sortByDesc('rating')->values();
+        }
+
+        // 7. Distinct Active Cities for Dropdowns and Mobile Drawer
         $rawCities = City::where('is_active', 1)
             ->withCount(['properties' => function ($q) {
                 $q->where('status', 'active')->where('verification_status', 'verified')->where('is_active', 1);
@@ -298,17 +392,170 @@ class UserHomeController extends Controller
             return true;
         });
 
+        // 8. Build Interactive Active Filter Chips for UI
+        $activeFilterChips = $this->buildFilterChips($intent, $selectedCity, $selectedArea, $selectedGender, $budget, $filterAC, $filterFood, $filterWifi, $filterSecurity);
+
+        // 9. Conversational Summary Message
+        $summaryMessage = $this->buildSummaryMessage($intent, $selectedCity, $selectedArea, $selectedGender, $budget, $properties->count(), $isFallback);
+
         return view('user.search', compact(
             'properties',
             'cities',
             'selectedCity',
+            'selectedArea',
             'selectedGender',
             'budget',
             'minPrice',
             'maxPrice',
+            'filterAC',
+            'filterFood',
+            'filterWifi',
+            'filterSecurity',
             'searchQuery',
-            'sort'
+            'sort',
+            'intent',
+            'activeFilterChips',
+            'summaryMessage',
+            'isFallback'
         ));
+    }
+
+    /**
+     * Helper to build removable UI filter badge chips.
+     */
+    protected function buildFilterChips(
+        array $intent,
+        string $selectedCity,
+        string $selectedArea,
+        string $selectedGender,
+        string $budget,
+        bool $filterAC,
+        bool $filterFood,
+        bool $filterWifi,
+        bool $filterSecurity
+    ): array {
+        $chips = [];
+
+        // Location Chip
+        if ($selectedCity !== '' || $selectedArea !== '') {
+            $locLabel = $selectedCity;
+            if ($selectedArea !== '') {
+                $locLabel = $selectedCity !== '' ? "{$selectedCity} ({$selectedArea})" : $selectedArea;
+            }
+            $chips[] = [
+                'type' => 'location',
+                'label' => "📍 {$locLabel}",
+                'icon' => 'map-marker-alt',
+                'value' => $selectedCity,
+                'clear_param' => 'city'
+            ];
+        }
+
+        // Gender Chip
+        if ($selectedGender !== '') {
+            $gLabel = $selectedGender === 'BOYS' ? '👨 Boys PG' : ($selectedGender === 'GIRLS' ? '👩 Girls PG' : '👥 Co-Ed / Unisex');
+            $chips[] = [
+                'type' => 'gender',
+                'label' => $gLabel,
+                'icon' => $selectedGender === 'BOYS' ? 'mars' : ($selectedGender === 'GIRLS' ? 'venus' : 'users'),
+                'value' => $selectedGender,
+                'clear_param' => 'gender'
+            ];
+        }
+
+        // Budget Chip
+        if ($budget !== '') {
+            $budgetFormatted = is_numeric($budget) ? '₹' . number_format((float)$budget) : $budget;
+            $chips[] = [
+                'type' => 'budget',
+                'label' => "💰 Under {$budgetFormatted}",
+                'icon' => 'tag',
+                'value' => $budget,
+                'clear_param' => 'budget'
+            ];
+        }
+
+        // Amenities Chips
+        if ($filterAC) {
+            $chips[] = [
+                'type' => 'amenity',
+                'label' => '❄️ AC',
+                'icon' => 'snowflake',
+                'value' => 'ac',
+                'clear_param' => 'ac'
+            ];
+        }
+        if ($filterFood) {
+            $chips[] = [
+                'type' => 'amenity',
+                'label' => '🍱 Food Included',
+                'icon' => 'utensils',
+                'value' => 'food',
+                'clear_param' => 'food'
+            ];
+        }
+        if ($filterWifi) {
+            $chips[] = [
+                'type' => 'amenity',
+                'label' => '📶 Free WiFi',
+                'icon' => 'wifi',
+                'value' => 'wifi',
+                'clear_param' => 'wifi'
+            ];
+        }
+        if ($filterSecurity) {
+            $chips[] = [
+                'type' => 'amenity',
+                'label' => '🛡️ 24x7 Security',
+                'icon' => 'shield-halved',
+                'value' => 'security',
+                'clear_param' => 'security'
+            ];
+        }
+
+        return $chips;
+    }
+
+    /**
+     * Helper to build conversational search summary message.
+     */
+    protected function buildSummaryMessage(
+        array $intent,
+        string $selectedCity,
+        string $selectedArea,
+        string $selectedGender,
+        string $budget,
+        int $count,
+        bool $isFallback
+    ): string {
+        if ($count === 0) {
+            $loc = $selectedArea ?: $selectedCity;
+            if ($loc) {
+                return "No approved verified properties found matching all your criteria in {$loc}. Try clearing some filters or expanding your budget.";
+            }
+            return "No matching verified properties found. Try searching with different keywords or clearing active filters.";
+        }
+
+        $parts = [];
+        if ($selectedGender === 'BOYS') $parts[] = 'Boys PGs';
+        elseif ($selectedGender === 'GIRLS') $parts[] = 'Girls PGs';
+        elseif ($selectedGender === 'CO-ED') $parts[] = 'Co-Living Stays';
+        else $parts[] = 'verified stays';
+
+        if ($selectedArea) $parts[] = "in {$selectedArea}";
+        elseif ($selectedCity) $parts[] = "in {$selectedCity}";
+
+        if ($budget) {
+            $parts[] = 'under ₹' . (is_numeric($budget) ? number_format((float)$budget) : $budget);
+        }
+
+        $desc = implode(' ', $parts);
+
+        if ($isFallback) {
+            return "Exact match not found for all strict constraints. Showing {$count} closest matching verified {$desc}:";
+        }
+
+        return "Found {$count} verified {$desc} ranked by StayNest Match Score:";
     }
 
     /**

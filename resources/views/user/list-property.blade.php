@@ -259,28 +259,35 @@
                                 <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
                                     <i class="fas fa-map-location-dot text-brand"></i> Property Location
                                 </h2>
-                                <button type="button" onclick="openLocationModal()" class="text-xs font-bold text-brand hover:underline flex items-center gap-1">
-                                    <i class="fas fa-crosshairs"></i> Open Live GPS Map
+                                <button type="button" onclick="openLocationModal(false)" class="text-xs font-bold text-brand hover:underline flex items-center gap-1.5 bg-brand-light px-2.5 py-1 rounded-lg">
+                                    <i class="fas fa-map text-brand"></i> Open Map
                                 </button>
                             </div>
 
-                            <!-- Zepto / Blinkit Style Selected Location Summary Card (as in Profile) -->
+                            <!-- Zepto / Blinkit Style Selected Location Summary Card (as in Location & Profile) -->
                             <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl p-4 sm:p-5 border border-emerald-200/80 mb-6 shadow-xs relative overflow-hidden">
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-2">
-                                        <span class="bg-brand text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase" id="addrBadgeTag">📍 PG LOCATION</span>
-                                        <span class="text-[11px] text-emerald-800 font-bold" id="locPreciseBadge">🎯 1m Live GPS Lock</span>
+                                        <span class="bg-brand text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase" id="addrBadgeTag">📍 VERIFIED HOME ADDRESS</span>
+                                        <span class="text-[11px] text-emerald-800 font-bold flex items-center gap-1.5" id="locPreciseBadge">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 🎯 1m Live GPS Lock
+                                        </span>
                                     </div>
-                                    <button type="button" onclick="openLocationModal()" class="text-xs font-bold text-brand hover:text-brand-dark flex items-center gap-1">
+                                    <button type="button" onclick="openLocationModal(false)" class="text-xs font-bold text-brand hover:text-brand-dark flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-brand/30 shadow-2xs">
                                         <i class="fas fa-pen text-[10px]"></i> Edit Map
                                     </button>
                                 </div>
                                 <p class="text-xs sm:text-sm font-bold text-gray-900 leading-snug" id="locSummaryLine1">Sector 62, Noida</p>
-                                <p class="text-xs text-gray-500 mt-0.5 truncate" id="locSummaryLine2">Sector 62, Electronic City Hub, Noida, 201301</p>
+                                <p class="text-xs text-gray-600 mt-0.5 truncate" id="locSummaryLine2">Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309</p>
                                 
-                                <div class="mt-4 pt-3 border-t border-emerald-200/60 flex items-center justify-between gap-3">
-                                    <button type="button" onclick="openLocationModal()" class="w-full bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-slate-900 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-brand/20 transition tap-effect">
-                                        <i class="fas fa-crosshairs"></i> Use Current GPS Location & Map
+                                <div class="mt-4 pt-3 border-t border-emerald-200/60 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                                    <button type="button" id="useCurrentGpsBtn" onclick="useCurrentGpsDirect(this)" class="w-full sm:flex-1 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-slate-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-brand/20 transition tap-effect">
+                                        <i class="fas fa-crosshairs" id="useCurrentGpsIcon"></i>
+                                        <span id="useCurrentGpsText">Use Current GPS Location</span>
+                                    </button>
+                                    <button type="button" onclick="useVerifiedHomeAddressDirect()" class="w-full sm:w-auto bg-white border border-brand/40 hover:bg-brand-light text-brand font-extrabold py-2.5 px-3.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs transition tap-effect whitespace-nowrap">
+                                        <i class="fas fa-house-user"></i>
+                                        <span>Verified Home (Sector 62)</span>
                                     </button>
                                 </div>
                             </div>
@@ -940,10 +947,10 @@
 <!-- ========================================================================= -->
 <!-- ZEPTO / BLINKIT STYLE LIVE GPS LOCATION & CONFIRM ADDRESS MODAL (AS IN PROFILE) -->
 <!-- ========================================================================= -->
-<div id="locationModal" class="fixed inset-0 z-50 hidden transition-opacity duration-300">
-    <div onclick="closeLocationModal()" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+<div id="locationModal" class="fixed inset-0 z-50 hidden transition-opacity duration-300 flex items-center justify-center p-3 sm:p-4">
+    <div onclick="closeLocationModal()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
     
-    <div class="absolute bottom-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full sm:w-[580px] max-h-[92vh] bg-white rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 animate-slide-up">
+    <div class="relative w-full max-w-lg sm:max-w-xl max-h-[92vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 animate-slide-up border border-gray-100">
         
         <!-- Modal Header -->
         <div class="p-4 sm:p-5 bg-gradient-to-r from-gray-900 to-teal-950 text-white flex items-center justify-between flex-shrink-0">
@@ -1185,9 +1192,16 @@
         const mapEl = document.getElementById('propertyMapPicker');
         if (!mapEl) return;
 
-        // Default coordinates (Noida / Delhi NCR)
+        // Check for cached user location in localStorage (like in location & profile pages)
         let defaultLat = 28.6280;
         let defaultLng = 77.3649;
+
+        const cachedLat = parseFloat(localStorage.getItem('user_cached_lat'));
+        const cachedLng = parseFloat(localStorage.getItem('user_cached_lng'));
+        if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0) {
+            defaultLat = cachedLat;
+            defaultLng = cachedLng;
+        }
 
         propertyMap = L.map('propertyMapPicker', {
             center: [defaultLat, defaultLng],
@@ -1236,38 +1250,142 @@
             fetchAddressFromCoordinates(e.latlng.lat, e.latlng.lng);
         });
 
-        // Try automatic live location on load if browser permits
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const uLat = pos.coords.latitude;
-                    const uLng = pos.coords.longitude;
-                    const acc = Math.round(pos.coords.accuracy || 1);
+        // Load cached/saved location to form fields if currently blank
+        loadCachedLocationToForm();
+    }
 
-                    // Add accuracy circle
-                    if (gpsAccuracyCircle) propertyMap.removeLayer(gpsAccuracyCircle);
-                    gpsAccuracyCircle = L.circle([uLat, uLng], {
-                        radius: Math.max(1, acc),
-                        color: '#10b981',
-                        weight: 2,
-                        fillColor: '#10b981',
-                        fillOpacity: 0.15,
-                        dashArray: '3, 3'
-                    }).addTo(propertyMap);
+    // Load verified home address / current location (like in location & profile pages)
+    function loadCachedLocationToForm() {
+        let city = 'Noida';
+        let area = 'Sector 62';
+        let fullAddress = 'Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309';
+        let pincode = '201309';
+        let landmark = 'Near Electronic City Metro';
+        let lat = 28.6280;
+        let lng = 77.3649;
+        let tag = 'VERIFIED HOME ADDRESS';
 
-                    propertyMap.setView([uLat, uLng], 19);
-                    propertyMarker.setLatLng([uLat, uLng]);
-                    fetchAddressFromCoordinates(uLat, uLng, acc);
-                },
-                () => {
-                    // Fallback to default
-                    fetchAddressFromCoordinates(defaultLat, defaultLng);
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
+        // Check if staynest_default_address is saved from Profile or Location page
+        try {
+            const saved = localStorage.getItem('staynest_default_address');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.line1 || parsed.line2) {
+                    fullAddress = [parsed.line1, parsed.line2].filter(Boolean).join(', ');
+                    tag = parsed.tag === 'HOME' ? 'VERIFIED HOME ADDRESS' : (parsed.tag ? `VERIFIED ${parsed.tag}` : 'VERIFIED HOME ADDRESS');
+                }
+            }
+        } catch(e) {}
+
+        const cachedCity = localStorage.getItem('user_cached_city');
+        const cachedArea = localStorage.getItem('user_cached_area');
+        const cachedAddr = localStorage.getItem('user_cached_address');
+        const cachedPin = localStorage.getItem('user_cached_pin');
+        const cachedLat = parseFloat(localStorage.getItem('user_cached_lat'));
+        const cachedLng = parseFloat(localStorage.getItem('user_cached_lng'));
+
+        if (cachedCity) city = cachedCity;
+        if (cachedArea) area = cachedArea;
+        if (cachedAddr) fullAddress = cachedAddr;
+        if (cachedPin) pincode = cachedPin;
+        if (!isNaN(cachedLat) && cachedLat !== 0) lat = cachedLat;
+        if (!isNaN(cachedLng) && cachedLng !== 0) lng = cachedLng;
+
+        const pCity = document.getElementById('propCity');
+        const pArea = document.getElementById('propArea');
+        const pAddr = document.getElementById('propAddress');
+        const pPin = document.getElementById('propPincode');
+        const pLand = document.getElementById('propLandmark');
+        const pLat = document.getElementById('propLatitude');
+        const pLng = document.getElementById('propLongitude');
+
+        if (pCity && !pCity.value.trim()) pCity.value = city;
+        if (pArea && !pArea.value.trim()) pArea.value = area;
+        if (pAddr && !pAddr.value.trim()) pAddr.value = fullAddress;
+        if (pPin && !pPin.value.trim()) pPin.value = pincode;
+        if (pLand && !pLand.value.trim()) pLand.value = landmark;
+        if (pLat && !pLat.value) pLat.value = lat;
+        if (pLng && !pLng.value) pLng.value = lng;
+
+        // Populate Modal Fields (Zepto Style)
+        const mCity = document.getElementById('modalCity');
+        const mArea = document.getElementById('modalArea');
+        const mAddr = document.getElementById('modalAddress');
+        const mPin = document.getElementById('modalPincode');
+        const mLand = document.getElementById('modalLandmark');
+        if (mCity) mCity.value = city;
+        if (mArea) mArea.value = area;
+        if (mAddr) mAddr.value = fullAddress;
+        if (mPin) mPin.value = pincode;
+        if (mLand) mLand.value = landmark;
+
+        updateLocationSummaryCard(city, area, fullAddress, pincode, tag);
+    }
+
+    // Smart Address & Metro Location Resolver (Accurately identifies Noida, Gurgaon, Bangalore, etc.)
+    function resolveSmartLocation(data, lat, lon) {
+        const addr = (data && data.address) ? data.address : {};
+        const displayName = (data && data.display_name) ? data.display_name : '';
+        const displayLower = displayName.toLowerCase();
+
+        const stateDist = (addr.state_district || '').toLowerCase();
+        const county = (addr.county || '').toLowerCase();
+        const suburb = (addr.suburb || '').toLowerCase();
+        const cityDist = (addr.city_district || '').toLowerCase();
+        const town = (addr.town || '').toLowerCase();
+        const municipality = (addr.municipality || '').toLowerCase();
+
+        // 1. Precise City Resolution
+        let city = '';
+        if (displayLower.includes('greater noida')) {
+            city = 'Greater Noida';
+        } else if (
+            displayLower.includes('noida') || 
+            stateDist.includes('gautam buddha nagar') || 
+            county.includes('gautam buddha nagar') || 
+            cityDist.includes('noida') || 
+            suburb.includes('sector 62') || suburb.includes('sector 59') || suburb.includes('sector 63') || suburb.includes('sector 18') || suburb.includes('sector 128') ||
+            (lat >= 28.45 && lat <= 28.66 && lon >= 77.30 && lon <= 77.45)
+        ) {
+            city = 'Noida';
+        } else if (displayLower.includes('gurugram') || displayLower.includes('gurgaon')) {
+            city = 'Gurugram';
+        } else if (displayLower.includes('ghaziabad')) {
+            city = 'Ghaziabad';
+        } else if (displayLower.includes('faridabad')) {
+            city = 'Faridabad';
+        } else if (displayLower.includes('bangalore') || displayLower.includes('bengaluru')) {
+            city = 'Bangalore';
+        } else if (displayLower.includes('delhi') && !displayLower.includes('noida')) {
+            city = 'Delhi';
         } else {
-            fetchAddressFromCoordinates(defaultLat, defaultLng);
+            city = addr.city || addr.town || addr.city_district || addr.district || addr.state_district || addr.state || 'Noida';
         }
+
+        // 2. Precise Area / Locality / Sector
+        let area = addr.suburb || addr.neighbourhood || addr.residential || addr.subdistrict || addr.quarter || addr.village || addr.road || '';
+        if ((!area || area.toLowerCase() === 'noida' || area.toLowerCase() === 'delhi') && (city === 'Noida' || displayLower.includes('sector'))) {
+            const sectorMatch = displayName.match(/sector[-\s]*\d+[a-z]?/i);
+            if (sectorMatch) {
+                area = sectorMatch[0].toUpperCase();
+            } else if (suburb) {
+                area = suburb;
+            } else {
+                area = 'Sector 62';
+            }
+        }
+
+        // 3. Full Street Address Construction
+        const road = addr.road || '';
+        const building = addr.building || addr.house_number || addr.amenity || '';
+        let addressParts = [building, road, area, city].filter(Boolean);
+        let fullAddress = addressParts.length > 0 ? addressParts.join(', ') : displayName;
+
+        // 4. Pincode & Landmark
+        const pincode = addr.postcode || (city === 'Noida' ? '201309' : '');
+        const landmark = addr.amenity || addr.shop || addr.office || addr.tourism || addr.historic || addr.leisure || '';
+
+        return { city, area, fullAddress, pincode, landmark };
     }
 
     // Reverse Geocoding: Converts (lat, lon) -> City, Area, Address, Pincode & Autofills Each Box
@@ -1286,85 +1404,82 @@
         document.getElementById('propLongitude').value = lon;
 
         try {
-            // zoom=18 requests building/street level granularity
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, {
+                headers: { 'Accept-Language': 'en' }
+            });
             const data = await res.json();
 
-            if (data && data.address) {
-                const addr = data.address;
+            const resolved = resolveSmartLocation(data, lat, lon);
+            const city = resolved.city;
+            const area = resolved.area;
+            const fullAddress = resolved.fullAddress;
+            const pincode = resolved.pincode;
+            const landmark = resolved.landmark;
 
-                // 1. Resolve City
-                const city = addr.city || addr.town || addr.city_district || addr.district || addr.state_district || addr.county || addr.state || '';
-                
-                // 2. Resolve Area / Locality / Sector
-                const area = addr.suburb || addr.neighbourhood || addr.residential || addr.subdistrict || addr.quarter || addr.village || addr.road || addr.county || '';
-                
-                // 3. Resolve Full Address
-                const road = addr.road || '';
-                const building = addr.building || addr.house_number || '';
-                let addressParts = [building, road, area, city].filter(Boolean);
-                let fullAddress = addressParts.length > 0 ? addressParts.join(', ') : (data.display_name || '');
+            // Cache in localStorage to prevent loss/overwriting (just like in location page)
+            try {
+                localStorage.setItem('user_cached_lat', lat);
+                localStorage.setItem('user_cached_lng', lon);
+                localStorage.setItem('user_cached_address', fullAddress);
+                localStorage.setItem('user_cached_city', city);
+                localStorage.setItem('user_cached_area', area);
+                if (pincode) localStorage.setItem('user_cached_pin', pincode);
+            } catch(e) {}
 
-                // 4. Resolve Pincode & Landmark
-                const pincode = addr.postcode || '';
-                const landmark = addr.amenity || addr.shop || addr.office || addr.tourism || addr.historic || addr.leisure || '';
-
-                // Populate Main Form Fields
-                if (city) {
-                    const cityInput = document.getElementById('propCity');
-                    cityInput.value = city;
-                    clearError(cityInput);
-                }
-
-                if (area) {
-                    const areaInput = document.getElementById('propArea');
-                    areaInput.value = area;
-                    clearError(areaInput);
-                }
-
-                if (fullAddress) {
-                    const addrInput = document.getElementById('propAddress');
-                    addrInput.value = fullAddress;
-                    clearError(addrInput);
-                }
-
-                if (pincode) {
-                    const pinInput = document.getElementById('propPincode');
-                    pinInput.value = pincode;
-                }
-
-                if (landmark) {
-                    const landInput = document.getElementById('propLandmark');
-                    if (!landInput.value.trim()) {
-                        landInput.value = landmark;
-                    }
-                }
-
-                // Populate Modal Fields (Zepto Style)
-                const mCity = document.getElementById('modalCity');
-                const mArea = document.getElementById('modalArea');
-                const mAddr = document.getElementById('modalAddress');
-                const mPin = document.getElementById('modalPincode');
-                const mLand = document.getElementById('modalLandmark');
-
-                if (mCity) mCity.value = city;
-                if (mArea) mArea.value = area;
-                if (mAddr) mAddr.value = fullAddress;
-                if (mPin) mPin.value = pincode;
-                if (mLand && !mLand.value.trim()) mLand.value = landmark;
-
-                updateLocationSummaryCard(city, area, fullAddress, pincode);
-
-                if (statusText) {
-                    statusText.innerHTML = `📍 <strong>${area || city}</strong> detected (1m GPS lock) & address filled!`;
-                }
-
-                // Update popup
-                propertyMarker.bindPopup(`<strong>${area || city || 'Location'}</strong><br>${fullAddress}<br><span style="font-size:10px; color:#059669;">🎯 1m Live GPS Locked</span>`).openPopup();
-
-                // Update live sticky preview
-                updateLivePreview();
+            // Populate Main Form Fields
+            if (city) {
+                const cityInput = document.getElementById('propCity');
+                if (cityInput) { cityInput.value = city; clearError(cityInput); }
             }
+
+            if (area) {
+                const areaInput = document.getElementById('propArea');
+                if (areaInput) { areaInput.value = area; clearError(areaInput); }
+            }
+
+            if (fullAddress) {
+                const addrInput = document.getElementById('propAddress');
+                if (addrInput) { addrInput.value = fullAddress; clearError(addrInput); }
+            }
+
+            if (pincode) {
+                const pinInput = document.getElementById('propPincode');
+                if (pinInput) pinInput.value = pincode;
+            }
+
+            if (landmark) {
+                const landInput = document.getElementById('propLandmark');
+                if (landInput && !landInput.value.trim()) {
+                    landInput.value = landmark;
+                }
+            }
+
+            // Populate Modal Fields (Zepto Style)
+            const mCity = document.getElementById('modalCity');
+            const mArea = document.getElementById('modalArea');
+            const mAddr = document.getElementById('modalAddress');
+            const mPin = document.getElementById('modalPincode');
+            const mLand = document.getElementById('modalLandmark');
+
+            if (mCity) mCity.value = city;
+            if (mArea) mArea.value = area;
+            if (mAddr) mAddr.value = fullAddress;
+            if (mPin) mPin.value = pincode;
+            if (mLand && !mLand.value.trim()) mLand.value = landmark;
+
+            updateLocationSummaryCard(city, area, fullAddress, pincode, 'CURRENT LOCATION');
+
+            if (statusText) {
+                statusText.innerHTML = `📍 <strong>${area || city}</strong> detected (1m GPS lock) & address filled!`;
+            }
+
+            // Update popup
+            if (propertyMarker) {
+                propertyMarker.bindPopup(`<strong>${area || city || 'Location'}</strong><br>${fullAddress}<br><span style="font-size:10px; color:#059669; font-weight:700;">🎯 1m Live GPS Locked</span>`).openPopup();
+            }
+
+            // Update live sticky preview
+            updateLivePreview();
         } catch (err) {
             console.warn('Geocoding error:', err);
             if (statusText) statusText.innerHTML = '📍 Location pinned. Verify or edit details below.';
@@ -1373,22 +1488,178 @@
         }
     }
 
+    // Direct Live Geolocation fetch on "Use Current GPS Location" button (DO NOT OPEN MODAL)
+    function useCurrentGpsDirect(btn) {
+        const icon = btn ? btn.querySelector('i') : document.getElementById('useCurrentGpsIcon');
+        const text = btn ? btn.querySelector('span') : document.getElementById('useCurrentGpsText');
+
+        if (!navigator.geolocation) {
+            showZeptoToast('GPS Notice', 'Geolocation is not supported by your browser.');
+            return;
+        }
+
+        if (icon) icon.className = 'fas fa-spinner fa-spin text-white';
+        if (text) text.innerText = 'Detecting 1m GPS Location...';
+        if (btn) btn.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                const accuracy = Math.round(pos.coords.accuracy || 1);
+
+                // Update Map if map exists
+                if (propertyMap) {
+                    if (gpsAccuracyCircle) propertyMap.removeLayer(gpsAccuracyCircle);
+                    gpsAccuracyCircle = L.circle([lat, lon], {
+                        radius: Math.max(1, accuracy),
+                        color: '#10b981',
+                        weight: 2,
+                        fillColor: '#10b981',
+                        fillOpacity: 0.15,
+                        dashArray: '3, 3'
+                    }).addTo(propertyMap);
+
+                    propertyMap.setView([lat, lon], 18);
+                    if (propertyMarker) propertyMarker.setLatLng([lat, lon]);
+                }
+
+                await fetchAddressFromCoordinates(lat, lon, accuracy);
+
+                if (icon) icon.className = 'fas fa-check-circle text-emerald-300';
+                if (text) text.innerText = `Current Location Applied (±${accuracy}m)!`;
+                if (btn) btn.disabled = false;
+
+                const badge = document.getElementById('locPreciseBadge');
+                if (badge) badge.innerText = `🎯 1m Live GPS Lock (±${accuracy}m)`;
+
+                showZeptoToast('Location Auto-Filled 🎯', 'City, Area, Address & Pincode directly applied!');
+
+                setTimeout(() => {
+                    if (icon) icon.className = 'fas fa-crosshairs';
+                    if (text) text.innerText = 'Use Current GPS Location';
+                }, 3500);
+            },
+            (err) => {
+                if (icon) icon.className = 'fas fa-crosshairs';
+                if (text) text.innerText = 'Use Current GPS Location';
+                if (btn) btn.disabled = false;
+                showZeptoToast('GPS Note', 'Location permission denied or unavailable. Click "Edit Map" to set location.');
+            },
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        );
+    }
+
+    // Direct 1-Click Switch to Verified Home Address (Sector 62, Noida - identical to Location page)
+    function useVerifiedHomeAddressDirect() {
+        const homeData = {
+            tag: 'VERIFIED HOME ADDRESS',
+            line1: 'Sector 62, Noida',
+            fullAddress: 'Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309',
+            city: 'Noida',
+            area: 'Sector 62',
+            pincode: '201309',
+            landmark: 'Near Electronic City Metro',
+            lat: 28.6280,
+            lng: 77.3649
+        };
+
+        // Check if user has custom address in staynest_default_address
+        try {
+            const saved = localStorage.getItem('staynest_default_address');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.line1 || parsed.line2) {
+                    homeData.fullAddress = [parsed.line1, parsed.line2].filter(Boolean).join(', ');
+                }
+            }
+        } catch(e) {}
+
+        const pCity = document.getElementById('propCity');
+        const pArea = document.getElementById('propArea');
+        const pAddr = document.getElementById('propAddress');
+        const pPin = document.getElementById('propPincode');
+        const pLand = document.getElementById('propLandmark');
+        const pLat = document.getElementById('propLatitude');
+        const pLng = document.getElementById('propLongitude');
+
+        if (pCity) { pCity.value = homeData.city; clearError(pCity); }
+        if (pArea) { pArea.value = homeData.area; clearError(pArea); }
+        if (pAddr) { pAddr.value = homeData.fullAddress; clearError(pAddr); }
+        if (pPin) pPin.value = homeData.pincode;
+        if (pLand) pLand.value = homeData.landmark;
+        if (pLat) pLat.value = homeData.lat;
+        if (pLng) pLng.value = homeData.lng;
+
+        // Populate Modal Fields (Zepto Style)
+        const mCity = document.getElementById('modalCity');
+        const mArea = document.getElementById('modalArea');
+        const mAddr = document.getElementById('modalAddress');
+        const mPin = document.getElementById('modalPincode');
+        const mLand = document.getElementById('modalLandmark');
+        if (mCity) mCity.value = homeData.city;
+        if (mArea) mArea.value = homeData.area;
+        if (mAddr) mAddr.value = homeData.fullAddress;
+        if (mPin) mPin.value = homeData.pincode;
+        if (mLand) mLand.value = homeData.landmark;
+
+        if (propertyMap && propertyMarker) {
+            propertyMap.setView([homeData.lat, homeData.lng], 17);
+            propertyMarker.setLatLng([homeData.lat, homeData.lng]);
+            if (gpsAccuracyCircle) {
+                propertyMap.removeLayer(gpsAccuracyCircle);
+                gpsAccuracyCircle = L.circle([homeData.lat, homeData.lng], {
+                    radius: 5,
+                    color: '#10b981',
+                    weight: 2,
+                    fillColor: '#10b981',
+                    fillOpacity: 0.15,
+                    dashArray: '3, 3'
+                }).addTo(propertyMap);
+            }
+            propertyMarker.bindPopup(`<strong>${homeData.area}, ${homeData.city}</strong><br>${homeData.fullAddress}<br><span style="font-size:10px; color:#059669; font-weight:700;">🎯 Verified Home Address</span>`).openPopup();
+        }
+
+        try {
+            localStorage.setItem('user_cached_lat', homeData.lat);
+            localStorage.setItem('user_cached_lng', homeData.lng);
+            localStorage.setItem('user_cached_address', homeData.fullAddress);
+            localStorage.setItem('user_cached_city', homeData.city);
+            localStorage.setItem('user_cached_area', homeData.area);
+            localStorage.setItem('user_cached_pin', homeData.pincode);
+        } catch(e) {}
+
+        const badge = document.getElementById('locPreciseBadge');
+        if (badge) badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 🎯 1m Live GPS Lock';
+
+        updateLocationSummaryCard(homeData.city, homeData.area, homeData.fullAddress, homeData.pincode, homeData.tag);
+        updateLivePreview();
+        showZeptoToast('Verified Home Loaded 🏠', 'Sector 62, Noida address applied to listing!');
+    }
+
     // ===================== ZEPTO / PROFILE STYLE LOCATION MODAL HANDLERS =====================
-    function openLocationModal() {
+    function openLocationModal(autoDetect = false) {
         const modal = document.getElementById('locationModal');
         if (!modal) return;
         modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
         syncMainToModal();
         setTimeout(() => {
             if (propertyMap) {
                 propertyMap.invalidateSize();
             }
-        }, 250);
+            if (autoDetect) {
+                detectLiveLocation();
+            }
+        }, 200);
     }
 
     function closeLocationModal() {
         const modal = document.getElementById('locationModal');
-        if (modal) modal.classList.add('hidden');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
     }
 
     function confirmLocationModal() {
@@ -1442,11 +1713,16 @@
         updateLocationSummaryCard(pCity, pArea, pAddr, pPin);
     }
 
-    function updateLocationSummaryCard(city, area, address, pincode) {
+    function updateLocationSummaryCard(city, area, address, pincode, tag = null) {
         const line1 = document.getElementById('locSummaryLine1');
         const line2 = document.getElementById('locSummaryLine2');
+        const tagEl = document.getElementById('addrBadgeTag');
+
+        if (tag && tagEl) {
+            tagEl.innerText = `📍 ${tag}`;
+        }
         if (line1) line1.innerText = [area, city].filter(Boolean).join(', ') || 'Sector 62, Noida';
-        if (line2) line2.innerText = [address, pincode].filter(Boolean).join(', ') || 'Sector 62, Electronic City Hub, Noida, 201301';
+        if (line2) line2.innerText = address || 'Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309';
     }
 
     // Search locality / landmark directly on the map
@@ -1579,7 +1855,12 @@
                 icon.className = 'fas fa-location-arrow';
                 btnText.innerText = 'Locate Me 🎯';
                 btn.disabled = false;
-                alert('Could not retrieve live GPS location. Please ensure location permissions are allowed in your browser or click directly on the map.');
+                
+                const statusEl = document.getElementById('gpsStatusText');
+                if (statusEl) {
+                    statusEl.innerText = '⚠️ GPS permission not granted. Drag map pin or select location manually.';
+                }
+                showZeptoToast('GPS Location Note', 'Drag pin or click map to pinpoint your property location.');
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );

@@ -124,6 +124,15 @@
                         <span class="ml-auto bg-teal-50 text-teal-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['totalContacts'] ?? 0 }}</span>
                     @endif
                 </a>
+                <a href="{{ route('admin.reports') }}" class="sidebar-link {{ request()->routeIs('admin.reports*') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+                    <i class="fas fa-flag w-5 text-center text-rose-500"></i>
+                    <span class="text-sm font-medium">Reported Listings</span>
+                    @if(($adminSidebarStats['pendingReports'] ?? 0) > 0)
+                        <span class="ml-auto bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">{{ $adminSidebarStats['pendingReports'] }}</span>
+                    @else
+                        <span class="ml-auto bg-rose-50 text-rose-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['totalReports'] ?? 0 }}</span>
+                    @endif
+                </a>
             </nav>
         </div>
 

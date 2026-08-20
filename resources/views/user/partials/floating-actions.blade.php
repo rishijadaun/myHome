@@ -374,7 +374,9 @@ function removeFilterChip(chipKey, amenityVal) {
         if (chipKey === 'gender') currentAiFilters.gender = null;
         if (chipKey === 'location' || chipKey === 'city') { currentAiFilters.city = null; currentAiFilters.area = null; }
         if (chipKey === 'area') currentAiFilters.area = null;
-        if (chipKey === 'budget') currentAiFilters.max_budget = null;
+        if (chipKey === 'budget' || chipKey === 'max_budget') currentAiFilters.max_budget = null;
+        if (chipKey === 'min_budget') currentAiFilters.min_budget = null;
+        if (chipKey === 'budget_range') { currentAiFilters.min_budget = null; currentAiFilters.max_budget = null; }
     }
 
     handleAiSubmit(null, currentAiFilters);
@@ -399,9 +401,108 @@ function renderAiResponse(data) {
         `;
     }
 
-    // Build Horizontal Multi-Card Slider HTML or No Record Found Card
+    // Build Horizontal Multi-Card Slider HTML or Full Property Detail Card or No Record Found Card
     let contentHtml = '';
-    if (data.properties && data.properties.length) {
+    if (data.response_type === 'property_detail' && data.property) {
+        const p = data.property;
+        contentHtml = `
+            <div class="mt-3 bg-gradient-to-br from-white via-purple-50/30 to-indigo-50/20 rounded-2xl border border-purple-100 shadow-sm overflow-hidden p-3.5 space-y-3">
+                <!-- Header Banner with Image & Badges -->
+                <div class="relative h-44 rounded-xl overflow-hidden shadow-xs bg-gray-100">
+                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+                    <div class="absolute top-2 left-2 flex items-center gap-1.5 flex-wrap">
+                        <span class="${p.tag_meta?.solid_badge || 'bg-emerald-500 text-white'} text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                            ${p.tag_meta?.label || 'Verified'}
+                        </span>
+                        <span class="${p.gender_class} text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">
+                            ${p.gender} PG
+                        </span>
+                    </div>
+                    <div class="absolute top-2 right-2 bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                        ⭐ ${p.rating} (${p.total_reviews} reviews)
+                    </div>
+                    <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                        <h4 class="font-extrabold text-sm sm:text-base leading-tight drop-shadow-sm">${p.name}</h4>
+                        <p class="text-xs text-gray-200 flex items-center gap-1 mt-0.5 truncate">
+                            <i class="fas fa-map-marker-alt text-brand"></i> ${p.location}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Gallery Thumbnails (if multiple images) -->
+                ${p.images && p.images.length > 1 ? `
+                    <div class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                        ${p.images.slice(0, 6).map(img => `
+                            <img src="${img}" alt="${p.name}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0 border border-purple-200/80 shadow-2xs">
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <!-- Pricing & Occupancy Matrix -->
+                <div class="grid grid-cols-3 gap-2 bg-white p-2.5 rounded-xl border border-gray-100 text-center shadow-2xs">
+                    <div>
+                        <span class="text-[10px] text-gray-400 font-bold uppercase block">Monthly Rent</span>
+                        <span class="text-xs sm:text-sm font-black text-gray-900">${p.formatted_price}</span>
+                    </div>
+                    <div class="border-x border-gray-100">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase block">Deposit</span>
+                        <span class="text-xs sm:text-sm font-bold text-gray-800">${p.formatted_deposit || p.formatted_price}</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-gray-400 font-bold uppercase block">Availability</span>
+                        <span class="text-xs sm:text-sm font-black ${p.available_beds > 0 ? 'text-emerald-600' : 'text-rose-600'}">
+                            ${p.available_beds > 0 ? `${p.available_beds} Beds Left` : 'Sold Out'}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Description Snippet -->
+                ${p.description ? `
+                    <div class="bg-white/80 rounded-xl p-2.5 border border-gray-100 text-xs text-gray-600 leading-relaxed">
+                        <p class="font-bold text-gray-800 text-[11px] mb-0.5"><i class="fas fa-info-circle text-brand mr-1"></i> About this PG:</p>
+                        ${p.description}
+                    </div>
+                ` : ''}
+
+                <!-- Amenities Pill Badges -->
+                <div>
+                    <p class="text-[11px] font-bold text-gray-700 mb-1.5 flex items-center gap-1">
+                        <i class="fas fa-sparkles text-purple-600"></i> Included Amenities & Services:
+                    </p>
+                    <div class="flex flex-wrap gap-1.5">
+                        ${(p.amenities || []).map(a => `
+                            <span class="inline-flex items-center gap-1 bg-white border border-gray-200 text-gray-700 text-[11px] font-medium px-2 py-1 rounded-lg shadow-2xs">
+                                <i class="fas fa-${a.icon || 'check'} text-brand text-[10px]"></i> ${a.name}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- House Rules -->
+                ${p.rules && p.rules.length ? `
+                    <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-2.5 text-[11px] text-amber-900 space-y-1">
+                        <p class="font-bold flex items-center gap-1 text-amber-950">
+                            <i class="fas fa-clipboard-check text-amber-600"></i> House Rules & Guidelines:
+                        </p>
+                        <ul class="list-disc list-inside space-y-0.5 text-gray-700 pl-1 text-[11px]">
+                            ${p.rules.slice(0, 4).map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+
+                <!-- Direct CTA Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-2 pt-1">
+                    <a href="${p.detail_url}" class="flex-1 bg-brand hover:bg-brand-dark text-white text-xs font-bold py-2.5 px-3 rounded-xl transition shadow-xs text-center no-underline flex items-center justify-center gap-1.5">
+                        <i class="fas fa-external-link-alt text-[10px]"></i> View Full Listing Page
+                    </a>
+                    <button type="button" onclick="askAiPrompt('Search similar PGs like ${p.name.replace(/'/g, "\\'")}')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 text-xs font-bold py-2.5 px-3 rounded-xl transition text-center flex items-center justify-center gap-1">
+                        <i class="fas fa-clone text-[10px]"></i> Similar PGs
+                    </button>
+                </div>
+            </div>
+        `;
+    } else if (data.properties && data.properties.length) {
         contentHtml = `
             <div class="mt-3">
                 <p class="text-[10px] sm:text-[11px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
@@ -449,9 +550,14 @@ function renderAiResponse(data) {
                                     </div>
                                 </div>
                             </div>
-                            <div class="p-2.5 pt-1.5 border-t border-gray-100 flex items-center justify-between">
+                            <div class="p-2.5 pt-1.5 border-t border-gray-100 flex items-center justify-between gap-1.5">
                                 <span class="text-xs sm:text-sm font-black text-gray-900">${p.formatted_price}</span>
-                                <a href="${p.detail_url}" class="bg-brand hover:bg-brand-dark text-white text-[11px] font-bold px-3 py-1.5 rounded-xl transition shadow-xs no-underline">View</a>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick="askAiPrompt('Give full details of ${p.name.replace(/'/g, "\\'")}')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 text-[10px] font-bold px-2 py-1.5 rounded-xl transition flex items-center gap-1" title="Get full details in chat">
+                                        <i class="fas fa-circle-info"></i> Detail
+                                    </button>
+                                    <a href="${p.detail_url}" class="bg-brand hover:bg-brand-dark text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition shadow-xs no-underline">View</a>
+                                </div>
                             </div>
                         </div>
                     `).join('')}
@@ -459,11 +565,9 @@ function renderAiResponse(data) {
             </div>
 
             <div class="flex flex-wrap gap-2 pt-2.5 border-t border-gray-100 mt-2.5">
-               
                 <a href="{{ route('user.search') }}?q=${encodeURIComponent(data.intent?.raw_query || '')}" class="inline-flex items-center gap-1.5 bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 text-xs font-bold px-3 py-1.5 rounded-xl transition border border-purple-200 no-underline">
                     <i class="fas fa-filter text-[10px]"></i> 🔍 Open in Search Grid
                 </a>
-                
             </div>
         `;
     } else {

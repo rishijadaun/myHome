@@ -25,10 +25,10 @@ class UserHomeController extends Controller
             ->where('is_active', 1)
             ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
 
-        // 2. PG Near Me Section (Properties with GPS Coordinates preferred, max 8)
+        // 2. PG Near Me Section (Properties with GPS Coordinates preferred, candidate pool)
         $nearMeProperties = (clone $approvedBase)
             ->latest()
-            ->take(8)
+            ->take(20)
             ->get();
 
         // 3. Recommended for You Section (Properties with high tags or top rated, max 4)
@@ -365,7 +365,18 @@ class UserHomeController extends Controller
         }
 
         // 6. Manual Sort override if requested
-        if ($sort === 'price-asc') {
+        if ($sort === 'distance-asc' || $request->has('near_me')) {
+            $userLat = (float)($request->query('lat') ?? 28.6280);
+            $userLng = (float)($request->query('lng') ?? 77.3649);
+            $properties = $properties->sortBy(function ($p) use ($userLat, $userLng) {
+                $pLat = (float)($p->map_latitude ?? 28.6280);
+                $pLng = (float)($p->map_longitude ?? 77.3649);
+                $dLat = deg2rad($pLat - $userLat);
+                $dLon = deg2rad($pLng - $userLng);
+                $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($userLat)) * cos(deg2rad($pLat)) * sin($dLon / 2) * sin($dLon / 2);
+                return 6371 * (2 * atan2(sqrt($a), sqrt(1 - $a)));
+            })->values();
+        } elseif ($sort === 'price-asc') {
             $properties = $properties->sortBy('monthly_rent')->values();
         } elseif ($sort === 'price-desc') {
             $properties = $properties->sortByDesc('monthly_rent')->values();

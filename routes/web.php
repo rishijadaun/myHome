@@ -12,11 +12,12 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminRelationshipManagerController;
 use App\Http\Controllers\Admin\AdminContactController;
+use App\Http\Controllers\Admin\AdminReportController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Guest Admin Routes
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit')->middleware('throttle:login');
     Route::match(['get', 'post'], '/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
     // Protected Admin Routes
@@ -33,7 +34,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Manage PGs Routes
         Route::get('/pgs', [AdminPropertyController::class, 'index'])->name('pgs');
-        Route::post('/pgs', [AdminPropertyController::class, 'store'])->name('pgs.store');
+        Route::post('/pgs', [AdminPropertyController::class, 'store'])->name('pgs.store')->middleware('throttle:property-submission');
         Route::get('/pgs/{id}', [AdminPropertyController::class, 'show'])->name('pgs.show');
         Route::post('/pgs/{id}/toggle-status', [AdminPropertyController::class, 'toggleStatus'])->name('pgs.toggle');
         Route::post('/pgs/{id}/approve', [AdminPropertyController::class, 'approve'])->name('pgs.approve');
@@ -44,6 +45,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/reviews/{id}/reject', [AdminPropertyController::class, 'rejectReview'])->name('reviews.reject');
         Route::post('/reviews/{id}/reply', [AdminPropertyController::class, 'replyReview'])->name('reviews.reply');
         Route::delete('/reviews/{id}', [AdminPropertyController::class, 'destroyReview'])->name('reviews.destroy');
+
+        // Manage Reported Listings & Moderation Routes
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
+        Route::get('/reports/{id}', [AdminReportController::class, 'show'])->name('reports.show');
+        Route::post('/reports/{id}/status', [AdminReportController::class, 'updateStatus'])->name('reports.status');
+        Route::post('/reports/{id}/property-action', [AdminReportController::class, 'takePropertyAction'])->name('reports.property-action');
+        Route::delete('/reports/{id}', [AdminReportController::class, 'destroy'])->name('reports.destroy');
 
         // Manage Brokers & Relationship Manager Assignment Routes
         Route::get('/brokers', [AdminBrokerController::class, 'index'])->name('brokers');
@@ -96,7 +104,7 @@ use App\Http\Controllers\Broker\BrokerPropertyController;
 Route::prefix('broker')->name('broker.')->group(function () {
     // Guest Broker Routes
     Route::get('/login', [BrokerAuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [BrokerAuthController::class, 'login'])->name('login.submit');
+    Route::post('/login', [BrokerAuthController::class, 'login'])->name('login.submit')->middleware('throttle:login');
     Route::match(['get', 'post'], '/logout', [BrokerAuthController::class, 'logout'])->name('logout');
 
     // Protected Broker Portal Routes
@@ -111,7 +119,7 @@ Route::prefix('broker')->name('broker.')->group(function () {
 
         // Dynamic PG Property Management
         Route::get('/pgs', [BrokerPropertyController::class, 'index'])->name('pgs');
-        Route::post('/pgs', [BrokerPropertyController::class, 'store'])->name('pgs.store');
+        Route::post('/pgs', [BrokerPropertyController::class, 'store'])->name('pgs.store')->middleware('throttle:property-submission');
         Route::get('/pgs/{id}', [BrokerPropertyController::class, 'show'])->name('pgs.show');
         Route::post('/pgs/{id}/update', [BrokerPropertyController::class, 'update'])->name('pgs.update');
         Route::post('/pgs/{id}/toggle-status', [BrokerPropertyController::class, 'toggleStatus'])->name('pgs.toggle-status');

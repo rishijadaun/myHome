@@ -1132,6 +1132,9 @@
                 localStorage.setItem('user_cached_lat', profileHomeData.lat);
                 localStorage.setItem('user_cached_lng', profileHomeData.lng);
                 localStorage.setItem('user_cached_address', userAddress);
+                localStorage.setItem('staynest_user_lat', profileHomeData.lat);
+                localStorage.setItem('staynest_user_lng', profileHomeData.lng);
+                localStorage.setItem('staynest_user_address_locked', 'true');
             } catch(e) {}
 
             renderUserMarker();

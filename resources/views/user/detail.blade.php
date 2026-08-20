@@ -75,6 +75,30 @@
 @section('content')
 <div class="pt-5 sm:pt-5 pb-10 md:pb-10 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
 
+    @if($property && ($property->status !== 'active' || $property->verification_status !== 'verified' || !$property->is_active))
+        <div class="mb-4 bg-amber-500/10 border border-amber-500/30 text-amber-900 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-md">
+                    <i class="fas fa-eye-slash text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm text-amber-900 flex items-center gap-2">
+                        <span>Admin / Owner Preview Mode</span>
+                        <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500 text-white">Status: {{ ucfirst($property->verification_status ?? 'Pending') }}</span>
+                    </h4>
+                    <p class="text-xs text-amber-800">This property is <strong>not visible to public users</strong> because it is pending admin approval. Only administrators and property owners can view this preview.</p>
+                </div>
+            </div>
+            @if(Auth::check() && Auth::user()->roles()->whereIn('slug', ['super_admin', 'admin'])->exists())
+                <div class="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+                    <a href="{{ route('admin.pgs') }}" class="w-full sm:w-auto text-center px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition shadow-xs">
+                        <i class="fas fa-shield-halved mr-1"></i> Admin Dashboard
+                    </a>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <!-- Breadcrumb & Top Actions -->
     <div class="flex flex-wrap items-center justify-between gap-2 py-3 mb-3 text-xs sm:text-sm">
         <div class="flex items-center gap-1.5 text-gray-500 flex-wrap">
@@ -96,7 +120,7 @@
             </button>
             
             <!-- Wishlist Button -->
-            <button type="button" onclick="heartToggle(this, { id: '{{ $property->id ?? '' }}', title: '{{ addslashes($propName) }}', price: '₹{{ $propRent }}', image: '{{ $propImages->first()->image_url ?? '' }}', location: '{{ addslashes($propLocation) }}', type: '{{ $propGenderMeta['label'] }}' })" data-prop-id="{{ $property->id ?? '' }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-rose-50 border border-gray-200 hover:border-rose-200 rounded-xl text-gray-600 hover:text-rose-500 transition text-xs font-semibold shadow-xs">
+            <button type="button" onclick="heartToggle(this, { id: '{{ $property->id ?? '' }}', slug: '{{ $property->slug ?? \Illuminate\Support\Str::slug($property->name ?? '') }}', title: '{{ addslashes($propName) }}', price: '₹{{ $propRent }}', image: '{{ $propImages->first()->image_url ?? '' }}', location: '{{ addslashes($propLocation) }}', type: '{{ $propGenderMeta['label'] }}' })" data-prop-id="{{ $property->id ?? '' }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-rose-50 border border-gray-200 hover:border-rose-200 rounded-xl text-gray-600 hover:text-rose-500 transition text-xs font-semibold shadow-xs">
                 <i class="far fa-heart"></i> <span class="hidden sm:inline">Save</span>
             </button>
 

@@ -145,9 +145,11 @@
             card.id = `savedCard_${pg.id}`;
 
             const badgeBg = pg.type === 'GIRLS' ? 'bg-pink-50 text-pink-600' : (pg.type === 'CO-ED' ? 'bg-purple-50 text-purple-600' : 'bg-blue-50 text-blue-600');
+            const slugVal = pg.slug || (pg.title ? pg.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : pg.id);
+            const detailUrl = `/detail/${slugVal}`;
 
             card.innerHTML = `
-                <div class="relative h-48 overflow-hidden bg-gray-100">
+                <a href="${detailUrl}" class="block relative h-48 overflow-hidden bg-gray-100 no-underline">
                     <img src="${pg.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'}" 
                          alt="${pg.title}" 
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -158,7 +160,7 @@
 
                     <!-- Remove from Wishlist Button -->
                     <button type="button" 
-                            onclick="removeSavedItem('${pg.id}', this)" 
+                            onclick="event.preventDefault(); event.stopPropagation(); removeSavedItem('${pg.id}', this)" 
                             class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-red-500 shadow-md hover:bg-white hover:scale-110 transition tap-effect" 
                             title="Remove from saved">
                         <i class="fas fa-heart text-sm"></i>
@@ -167,12 +169,14 @@
                     <div class="absolute bottom-2.5 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                         <i class="fas fa-star text-yellow-400 text-[9px]"></i> ${pg.rating || '4.8'}
                     </div>
-                </div>
+                </a>
 
                 <div class="p-4 flex flex-col flex-1 justify-between">
                     <div>
                         <div class="flex justify-between items-start gap-1.5 mb-1.5">
-                            <h3 class="font-black text-sm sm:text-base text-gray-900 truncate leading-tight">${pg.title}</h3>
+                            <h3 class="font-black text-sm sm:text-base text-gray-900 truncate leading-tight">
+                                <a href="${detailUrl}" class="hover:text-brand transition text-gray-900 no-underline">${pg.title}</a>
+                            </h3>
                             <span class="${badgeBg} text-[9px] font-black uppercase px-2 py-0.5 rounded-md flex-shrink-0">${pg.type || 'BOYS'}</span>
                         </div>
                         <p class="text-xs text-gray-500 flex items-center gap-1 mb-3 truncate">
@@ -185,7 +189,7 @@
                             <span class="text-[9px] text-gray-400 block font-semibold leading-none">Starting from</span>
                             <span class="text-base font-black text-gray-900">${pg.price || '₹8,500'}<span class="text-[10px] font-normal text-gray-500">/mo</span></span>
                         </div>
-                        <a href="{{ route('user.detail') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-md hover:shadow-brand/20 text-white text-xs font-bold px-4 py-2 rounded-xl transition tap-effect">
+                        <a href="${detailUrl}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-md hover:shadow-brand/20 text-white text-xs font-bold px-4 py-2 rounded-xl transition tap-effect no-underline">
                             View Details
                         </a>
                     </div>

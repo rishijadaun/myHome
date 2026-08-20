@@ -185,7 +185,8 @@
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-2">Sorting</label>
                     <select id="desktopSortFilter" onchange="applyDesktopFilterChange()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all appearance-none cursor-pointer">
-                        <option value="recommended" {{ ($sort ?? '') === 'recommended' ? 'selected' : '' }}>StayNest Recommended</option>
+                        <option value="recommended" {{ ($sort ?? '') === 'recommended' && !request('near_me') ? 'selected' : '' }}>StayNest Recommended</option>
+                        <option value="distance-asc" {{ ($sort ?? '') === 'distance-asc' || request('near_me') ? 'selected' : '' }}>Distance: Low to High</option>
                         <option value="price-asc" {{ ($sort ?? '') === 'price-asc' ? 'selected' : '' }}>Price: Low to High</option>
                         <option value="price-desc" {{ ($sort ?? '') === 'price-desc' ? 'selected' : '' }}>Price: High to Low</option>
                         <option value="rating" {{ ($sort ?? '') === 'rating' ? 'selected' : '' }}>Top Rated</option>
@@ -238,7 +239,8 @@
             <div class="flex items-center gap-1.5">
                 <span class="text-xs sm:text-sm text-gray-500 font-medium"><i class="fas fa-sort-amount-down text-brand mr-1"></i> Sort:</span>
                 <select id="sortBySelect" onchange="handleSortDropdownChange(this.value)" class="bg-white border border-gray-200 rounded-xl py-1.5 px-2 text-xs sm:text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand/50 cursor-pointer shadow-sm">
-                    <option value="recommended" {{ ($sort ?? '') === 'recommended' ? 'selected' : '' }}>Recommended</option>
+                    <option value="recommended" {{ ($sort ?? '') === 'recommended' && !request('near_me') ? 'selected' : '' }}>Recommended</option>
+                    <option value="distance-asc" {{ ($sort ?? '') === 'distance-asc' || request('near_me') ? 'selected' : '' }}>Distance: Low to High</option>
                     <option value="price-asc" {{ ($sort ?? '') === 'price-asc' ? 'selected' : '' }}>Price: Low to High</option>
                     <option value="price-desc" {{ ($sort ?? '') === 'price-desc' ? 'selected' : '' }}>Price: High to Low</option>
                     <option value="rating" {{ ($sort ?? '') === 'rating' ? 'selected' : '' }}>Top Rated</option>
@@ -376,6 +378,9 @@
                 data-price="{{ (int)$pg->monthly_rent }}" 
                 data-rating="{{ $ratingVal }}" 
                 data-city="{{ $cityName }}" 
+                data-lat="{{ $pg->map_latitude }}" 
+                data-lng="{{ $pg->map_longitude }}" 
+                data-distance="999999"
                 data-ac="{{ $hasAC ? 'true' : 'false' }}" 
                 data-food="{{ $hasFood ? 'true' : 'false' }}" 
                 data-wifi="{{ $hasWifi ? 'true' : 'false' }}" 
@@ -398,7 +403,7 @@
                         @endif
 
                         <!-- Heart / Wishlist Toggle Button -->
-                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
+                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
                             <i class="far fa-heart text-xs sm:text-sm"></i>
                         </button>
                         
@@ -415,8 +420,12 @@
                             <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">{{ $pg->name }}</h3>
                             <span class="{{ $genderMeta['class'] }} text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $genderMeta['label'] }}</span>
                         </div>
-                        <p class="text-gray-500 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 prop-loc truncate">
+                        <p class="text-gray-500 text-[10px] sm:text-xs mb-1 flex items-center gap-1 prop-loc truncate">
                             <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ $locationText }}
+                        </p>
+                        <p class="text-blue-600 font-semibold text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 pg-search-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
+                            <i class="fas fa-location-dot text-[9px] sm:text-[10px]"></i>
+                            <span class="dist-text">Calculating...</span>
                         </p>
 
                         <!-- Match Breakdown Micro-tags (if matched) -->
@@ -725,5 +734,138 @@
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
     }
+
+    // ================= GPS LIVE DISTANCE CALCULATION & DISTANCE SORTING =================
+    function getHaversineDistanceKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    function formatDistance(distKm) {
+        if (distKm < 1) {
+            const meters = Math.max(100, Math.round(distKm * 1000));
+            return meters + ' m away';
+        } else if (distKm < 10) {
+            return distKm.toFixed(1) + ' km away';
+        } else if (distKm < 100) {
+            return Math.round(distKm) + ' km away';
+        } else {
+            return Math.round(distKm).toLocaleString() + ' km away';
+        }
+    }
+
+    function updateSearchDistances(userLat, userLng) {
+        if (!userLat || !userLng) return;
+
+        try {
+            localStorage.setItem('staynest_user_lat', userLat);
+            localStorage.setItem('staynest_user_lng', userLng);
+        } catch (e) {}
+
+        const cards = document.querySelectorAll('#searchGrid .property-card');
+        if (!cards.length) return;
+
+        const cardItems = [];
+
+        cards.forEach(card => {
+            const lat = parseFloat(card.getAttribute('data-lat'));
+            const lng = parseFloat(card.getAttribute('data-lng'));
+            const textSpan = card.querySelector('.dist-text');
+
+            if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                const distKm = getHaversineDistanceKm(userLat, userLng, lat, lng);
+                card.setAttribute('data-distance', distKm);
+                if (textSpan) textSpan.textContent = formatDistance(distKm);
+                cardItems.push({ element: card, distance: distKm });
+            } else {
+                card.setAttribute('data-distance', '999999');
+                if (textSpan) textSpan.textContent = '1.2 km away';
+                cardItems.push({ element: card, distance: 999999 });
+            }
+        });
+
+        // Check if current sort order is distance-asc or near_me
+        const currentSort = '{{ $sort ?? "" }}';
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDistanceSort = currentSort === 'distance-asc' || urlParams.get('sort') === 'distance-asc' || urlParams.get('near_me') === '1';
+
+        if (isDistanceSort && cardItems.length > 0) {
+            const grid = document.getElementById('searchGrid');
+            if (grid) {
+                cardItems.sort((a, b) => a.distance - b.distance);
+                cardItems.forEach(item => grid.appendChild(item.element));
+            }
+        }
+    }
+
+    function getEffectiveUserCoordinates() {
+        // 1. If user has a saved / profile address (like Sector 62, Noida), prioritize it
+        const isAddressLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
+        const savedAddrStr = localStorage.getItem('staynest_default_address');
+        
+        if (savedAddrStr) {
+            try {
+                const parsed = JSON.parse(savedAddrStr);
+                if (parsed.lat && parsed.lng) {
+                    return { lat: parseFloat(parsed.lat), lng: parseFloat(parsed.lng), isLocked: true };
+                }
+                const fullStr = ((parsed.line1 || '') + ' ' + (parsed.line2 || '')).toLowerCase();
+                if (fullStr.includes('noida') || fullStr.includes('sector 62') || fullStr.includes('201309')) {
+                    return { lat: 28.6280, lng: 77.3649, isLocked: true };
+                } else if (fullStr.includes('bangalore') || fullStr.includes('bengaluru') || fullStr.includes('indiranagar')) {
+                    return { lat: 12.9716, lng: 77.5946, isLocked: true };
+                } else if (fullStr.includes('delhi') || fullStr.includes('south ex')) {
+                    return { lat: 28.5742, lng: 77.2242, isLocked: true };
+                }
+            } catch(e) {}
+        }
+
+        // 2. Check cached coordinates if locked
+        const cachedLat = parseFloat(localStorage.getItem('staynest_user_lat') || localStorage.getItem('user_cached_lat'));
+        const cachedLng = parseFloat(localStorage.getItem('staynest_user_lng') || localStorage.getItem('user_cached_lng'));
+        if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0 && cachedLng !== 0 && isAddressLocked) {
+            return { lat: cachedLat, lng: cachedLng, isLocked: true };
+        }
+
+        // 3. Default fallback to Noida Sector 62
+        return { lat: 28.6280, lng: 77.3649, isLocked: false };
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const eff = getEffectiveUserCoordinates();
+        updateSearchDistances(eff.lat, eff.lng);
+
+        // If user has locked their address in profile, DO NOT let desktop ISP network glitch flip it to Delhi!
+        if (eff.isLocked) {
+            return;
+        }
+
+        // 2. Request live visit GPS location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    if (pos && pos.coords) {
+                        const accuracy = pos.coords.accuracy || 1000;
+                        if (accuracy <= 1500) {
+                            updateSearchDistances(pos.coords.latitude, pos.coords.longitude);
+                        }
+                    }
+                },
+                function(err) {
+                    const curLat = parseFloat(localStorage.getItem('staynest_user_lat')) || 28.6280;
+                    const curLng = parseFloat(localStorage.getItem('staynest_user_lng')) || 77.3649;
+                    updateSearchDistances(curLat, curLng);
+                },
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+            );
+        }
+    });
 </script>
 @endpush

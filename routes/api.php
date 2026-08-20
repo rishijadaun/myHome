@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\v1\PropertySubmissionController;
 use App\Http\Controllers\Api\v1\ContactInquiryController;
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
     // ---------------- CONTACT & INQUIRIES ----------------
     Route::post('contact', [ContactInquiryController::class, 'submit']);
@@ -18,8 +18,8 @@ Route::prefix('v1')->group(function () {
 
     // ---------------- 1. AUTHENTICATION (USER & BROKER) ----------------
     Route::prefix('auth')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
+        Route::post('register', [AuthController::class, 'register'])->middleware('throttle:register');
+        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:login');
         
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('me', [AuthController::class, 'me']);
@@ -39,9 +39,9 @@ Route::prefix('v1')->group(function () {
 
     // ---------------- 3. PROPERTY SUBMISSION & TYPES (DYNAMIC) ----------------
     Route::get('property-types', [PropertySubmissionController::class, 'types']);
-    Route::post('properties/submit', [PropertySubmissionController::class, 'submit']);
+    Route::post('properties/submit', [PropertySubmissionController::class, 'submit'])->middleware('throttle:property-submission');
     Route::get('properties/details/{id}', [PropertySubmissionController::class, 'details']);
-    Route::post('properties/{id}/update', [PropertySubmissionController::class, 'update']);
+    Route::post('properties/{id}/update', [PropertySubmissionController::class, 'update'])->middleware('throttle:property-submission');
     Route::post('properties/{id}/report', [\App\Http\Controllers\User\UserHomeController::class, 'report']);
     Route::post('properties/{id}/review', [\App\Http\Controllers\User\UserHomeController::class, 'submitReview']);
 
@@ -66,7 +66,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('broker')->middleware('auth:sanctum')->group(function () {
         Route::get('dashboard', [BrokerController::class, 'dashboard']);
         Route::get('listings', [BrokerController::class, 'listings']);
-        Route::post('properties', [BrokerController::class, 'storeProperty']);
+        Route::post('properties', [BrokerController::class, 'storeProperty'])->middleware('throttle:property-submission');
         Route::get('bookings', [BrokerController::class, 'bookings']);
         Route::put('bookings/{id}/status', [BrokerController::class, 'updateBookingStatus']);
         Route::get('visits', [BrokerController::class, 'visits']);

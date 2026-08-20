@@ -134,7 +134,38 @@ class PropertyRankingService
         $propAmenities = $property->amenities ? $property->amenities->pluck('name')->map(fn($n) => strtolower($n))->toArray() : [];
 
         // 1. Budget Evaluation
-        if (!empty($intent['max_budget'])) {
+        if (!empty($intent['min_budget']) && !empty($intent['max_budget'])) {
+            $bMin = (int) $intent['min_budget'];
+            $bMax = (int) $intent['max_budget'];
+            if ($propPrice >= $bMin && $propPrice <= $bMax) {
+                $score += 20;
+                $breakdown[] = [
+                    'feature' => 'Rent ₹' . number_format($propPrice) . '/mo (Within ₹' . number_format($bMin) . ' - ₹' . number_format($bMax) . ')',
+                    'matched' => true,
+                ];
+            } else {
+                $score -= 10;
+                $breakdown[] = [
+                    'feature' => 'Rent: ₹' . number_format($propPrice) . '/mo (Target: ₹' . number_format($bMin) . ' - ₹' . number_format($bMax) . ')',
+                    'matched' => false,
+                ];
+            }
+        } elseif (!empty($intent['min_budget'])) {
+            $budgetMin = (int) $intent['min_budget'];
+            if ($propPrice >= $budgetMin) {
+                $score += 15;
+                $breakdown[] = [
+                    'feature' => 'Rent ₹' . number_format($propPrice) . '/mo (Above ₹' . number_format($budgetMin) . ')',
+                    'matched' => true,
+                ];
+            } else {
+                $score -= 15;
+                $breakdown[] = [
+                    'feature' => 'Rent ₹' . number_format($propPrice) . '/mo (Below minimum ₹' . number_format($budgetMin) . ')',
+                    'matched' => false,
+                ];
+            }
+        } elseif (!empty($intent['max_budget'])) {
             $budgetMax = (int) $intent['max_budget'];
             if ($propPrice <= $budgetMax) {
                 $score += 15;
@@ -257,6 +288,32 @@ class PropertyRankingService
             }
         }
 
+        // 5. PG Name & Keyword Evaluation
+        if (!empty($intent['property_name']) || !empty($intent['keywords'])) {
+            $propNameLower = strtolower($property->name ?? '');
+            $searchTerms = array_filter(array_merge(
+                !empty($intent['property_name']) ? [$intent['property_name']] : [],
+                $intent['keywords'] ?? []
+            ));
+
+            $hasExactNameMatch = false;
+            foreach ($searchTerms as $term) {
+                $t = strtolower(trim($term));
+                if (mb_strlen($t) >= 3 && str_contains($propNameLower, $t)) {
+                    $hasExactNameMatch = true;
+                    break;
+                }
+            }
+
+            if ($hasExactNameMatch) {
+                $score += 35;
+                $breakdown[] = [
+                    'feature' => 'Name Matched: ' . $property->name,
+                    'matched' => true,
+                ];
+            }
+        }
+
         // Verification bonus
         if ($property->verification_status === 'verified') {
             $score += 4;
@@ -265,8 +322,8 @@ class PropertyRankingService
             $score += 3;
         }
 
-        // Clamp between 65% and 98%
-        $finalScore = min(98, max(65, $score));
+        // Clamp between 65% and 99%
+        $finalScore = min(99, max(65, $score));
 
         return [
             'score' => $finalScore,

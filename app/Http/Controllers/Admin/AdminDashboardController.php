@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\City;
 use App\Models\Notification;
 use App\Models\Property;
+use App\Models\PropertyReport;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
@@ -113,6 +114,13 @@ class AdminDashboardController extends Controller
         // 7. Recent Notifications / System alerts
         $notifications = Notification::latest()->take(5)->get();
 
+        // 8. Pending Reports & Moderation
+        $pendingReportsCount = PropertyReport::where('status', 'pending')->count();
+        $recentReportsList = PropertyReport::with(['property.primaryImage', 'property.city', 'user'])
+            ->latest()
+            ->take(5)
+            ->get();
+
         return view('admin.dashboard', compact(
             'totalProperties',
             'verifiedProperties',
@@ -131,7 +139,9 @@ class AdminDashboardController extends Controller
             'recentBookings',
             'pendingPropertiesList',
             'pendingBrokersList',
-            'notifications'
+            'notifications',
+            'pendingReportsCount',
+            'recentReportsList'
         ));
     }
 

@@ -87,7 +87,7 @@
     $authEmail = $authUser?->email ?? '';
 @endphp
 
-<!-- Zepto Style Top Notification Toast -->
+<!--   Top Notification Toast -->
 <div id="zeptoToast" class="fixed top-6 right-4 md:right-8 z-50 hidden transition-all duration-300 transform translate-y-2">
     <div class="bg-gray-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/20">
         <div id="zeptoToastIcon" class="w-8 h-8 rounded-xl bg-brand flex items-center justify-center text-white text-xs shadow-sm">
@@ -1305,7 +1305,7 @@
         if (pLat && !pLat.value) pLat.value = lat;
         if (pLng && !pLng.value) pLng.value = lng;
 
-        // Populate Modal Fields (Zepto Style)
+        // Populate Modal Fields
         const mCity = document.getElementById('modalCity');
         const mArea = document.getElementById('modalArea');
         const mAddr = document.getElementById('modalAddress');

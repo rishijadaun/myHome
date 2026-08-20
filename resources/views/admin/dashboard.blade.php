@@ -53,6 +53,25 @@
         </div>
     </div>
 
+    <!-- Flagged Listing Moderation Alert Banner -->
+    @if(($pendingReportsCount ?? 0) > 0)
+        <div class="bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 rounded-2xl p-4 text-white shadow-lg shadow-rose-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg shrink-0">
+                    <i class="fas fa-shield-virus"></i>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm">Flagged Listing Moderation Required ({{ $pendingReportsCount }} Pending {{ $pendingReportsCount > 1 ? 'Reports' : 'Report' }})</h4>
+                    <p class="text-xs text-white/90">Users have reported property listings with potential violations. Review and take moderation action.</p>
+                </div>
+            </div>
+            <a href="{{ route('admin.reports') }}" class="bg-white text-rose-600 hover:bg-rose-50 font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-xs shrink-0 flex items-center justify-center gap-1.5 no-underline">
+                <span>Investigate Reports</span>
+                <i class="fas fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+    @endif
+
     <!-- 1. Stats Cards Row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <!-- Total Properties -->

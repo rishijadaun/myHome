@@ -21,24 +21,24 @@
 
         <!-- Error Headings -->
         <div class="space-y-3">
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
-                Oops! We Couldn't Find
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                {{ !empty($exception) && $exception->getMessage() ? $exception->getMessage() : "Oops! Property Not Found" }}
             </h1>
-            <!-- <p class="text-slate-600 text-sm md:text-base max-w-md mx-auto leading-relaxed">
-                The page or PG accommodation you are looking for might have been moved, booked, or is temporarily unavailable.
-            </p> -->
+            <p class="text-slate-600 text-sm md:text-base max-w-md mx-auto leading-relaxed">
+                The PG accommodation you are looking for is currently unapproved by admin, under review, or no longer publicly accessible.
+            </p>
         </div>
 
         <!-- Quick Search Bar -->
-        <!-- <form action="{{ route('user.search') }}" method="GET" class="max-w-lg mx-auto">
+        <form action="{{ route('user.search') }}" method="GET" class="max-w-lg mx-auto">
             <div class="relative flex items-center bg-white rounded-2xl p-1.5 shadow-sm border border-gray-200 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20 transition">
                 <span class="pl-4 text-gray-400 text-sm"><i class="fas fa-search"></i></span>
-                <input type="text" name="q" placeholder="Search by city, locality, or college..." class="w-full bg-transparent px-3 py-2.5 text-sm focus:outline-none text-slate-800 placeholder-gray-400">
+                <input type="text" name="q" placeholder="Search verified PGs by city or locality..." class="w-full bg-transparent px-3 py-2.5 text-sm focus:outline-none text-slate-800 placeholder-gray-400">
                 <button type="submit" class="bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-2.5 rounded-xl font-semibold text-xs tap-effect shadow-md shadow-brand/30 flex-shrink-0">
                     Search
                 </button>
             </div>
-        </form> -->
+        </form>
 
         <!-- Popular Quick Link Cards -->
         <div class="pt-4">

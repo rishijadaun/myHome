@@ -46,14 +46,14 @@
                     <p id="userEmailHeading" class="text-sm text-teal-100/90 font-medium">rahul.sharma@staynest.com</p>
                     <p id="userPhoneHeading" class="text-xs text-teal-200/70 mt-0.5"><i class="fas fa-phone-alt text-[10px] mr-1"></i>+91 98765 43210</p>
                     
-                    <div class="flex items-center justify-center sm:justify-start gap-2 mt-3 text-xs">
+                    <!-- <div class="flex items-center justify-center sm:justify-start gap-2 mt-3 text-xs">
                         <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1">
-                            <i class="fas fa-shield-check text-[10px]"></i> 100% KYC Verified
+                            <i class="fas fa-shield-check text-[10px]"></i>  KYC Verified
                         </span>
-                        <!-- <span class="bg-white/10 text-white/90 border border-white/20 px-2.5 py-0.5 rounded-full font-semibold">
+                        <span class="bg-white/10 text-white/90 border border-white/20 px-2.5 py-0.5 rounded-full font-semibold">
                             🪙 Wallet: ₹<span id="headerWalletBal">0.00</span>
-                        </span> -->
-                    </div>
+                        </span>
+                    </div> -->
                 </div>
             </div>
 
@@ -98,7 +98,7 @@
                     </div>
                 </div>
 
-                <!-- Zepto Style Saved Addresses Card -->
+                <!--  Saved Addresses Card -->
                 <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
@@ -107,11 +107,10 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-900 text-sm">Saved Addresses</h3>
-                                <p class="text-[11px] text-gray-400">Zepto-style GPS Auto-Detect</p>
                             </div>
                         </div>
                         <button type="button" onclick="openAddressModal()" class="text-xs font-bold text-brand hover:underline">
-                            + Add New
+                             Update Address
                         </button>
                     </div>
 
@@ -308,12 +307,12 @@
 </div>
 
 <!-- ========================================================================= -->
-<!-- 3. ZEPTO / BLINKIT STYLE LIVE GPS LOCATION & CONFIRM ADDRESS MODAL        -->
+<!-- 3.  LIVE GPS LOCATION & CONFIRM ADDRESS MODAL        -->
 <!-- ========================================================================= -->
-<div id="addressModal" class="fixed inset-0 z-50 hidden transition-opacity duration-300">
-    <div onclick="closeAddressModal()" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+<div id="addressModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 transition-all duration-300">
+    <div onclick="closeAddressModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"></div>
     
-    <div class="absolute bottom-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full sm:w-[540px] max-h-[92vh] bg-white rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 animate-slide-up">
+    <div class="relative w-full max-w-lg max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 my-auto transform transition-all animate-scale-up">
         
         <!-- Modal Header -->
         <div class="p-4 sm:p-5 bg-gradient-to-r from-gray-900 to-teal-950 text-white flex items-center justify-between flex-shrink-0">
@@ -323,7 +322,7 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-sm sm:text-base leading-tight">Confirm Stay / Home Address</h3>
-                    <p class="text-[11px] text-teal-200/80">Zepto GPS Auto-Locate & Pinpoint</p>
+                    <p class="text-[11px] text-teal-200/80"> GPS Auto-Locate & Pinpoint</p>
                 </div>
             </div>
             <button type="button" onclick="closeAddressModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
@@ -350,7 +349,7 @@
                 </button>
             </div>
 
-            <!-- Address Form Details (Zepto Style) -->
+            <!-- Address Form Details  -->
             <form onsubmit="handleSaveAddress(event)" class="space-y-3.5">
                 
                 <!-- Tag Selectors -->
@@ -416,10 +415,10 @@
 <!-- ========================================================================= -->
 <!-- 4. EMAIL UPDATE WITH DATABASE CHECK MODAL                                 -->
 <!-- ========================================================================= -->
-<div id="emailOtpModal" class="fixed inset-0 z-50 hidden transition-opacity duration-300">
-    <div onclick="closeEmailOtpModal()" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+<div id="emailOtpModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 transition-all duration-300">
+    <div onclick="closeEmailOtpModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"></div>
     
-    <div class="absolute bottom-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full sm:w-[460px] bg-white rounded-t-3xl md:rounded-3xl shadow-2xl p-6 z-10 animate-slide-up">
+    <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 z-10 my-auto transform transition-all animate-scale-up">
         
         <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
             <div class="flex items-center gap-2.5">
@@ -466,18 +465,14 @@
 
     </div>
 </div>
-        </div>
-
-    </div>
-</div>
 
 <!-- ========================================================================= -->
 <!-- 5. CHANGE PASSWORD MODAL                                                  -->
 <!-- ========================================================================= -->
-<div id="changePasswordModal" class="fixed inset-0 z-50 hidden transition-opacity duration-300">
-    <div onclick="closeChangePasswordModal()" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+<div id="changePasswordModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 transition-all duration-300">
+    <div onclick="closeChangePasswordModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"></div>
     
-    <div class="absolute bottom-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full sm:w-[460px] bg-white rounded-t-3xl md:rounded-3xl shadow-2xl p-6 z-10 animate-slide-up">
+    <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 z-10 my-auto transform transition-all animate-scale-up">
         
         <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
             <div class="flex items-center gap-2.5">
@@ -710,11 +705,15 @@ function openChangePasswordModal() {
     document.getElementById('currPasswordInput').value = '';
     document.getElementById('newPasswordInput').value = '';
     document.getElementById('confirmNewPasswordInput').value = '';
-    document.getElementById('changePasswordModal').classList.remove('hidden');
+    const modal = document.getElementById('changePasswordModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
 
 function closeChangePasswordModal() {
-    document.getElementById('changePasswordModal').classList.add('hidden');
+    const modal = document.getElementById('changePasswordModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
 }
 
 async function handleChangePasswordSubmit(e) {
@@ -806,12 +805,16 @@ function togglePass(inputId, btn) {
 // ===================== EMAIL UPDATE WITH DATABASE CHECK LOGIC =====================
 function openEmailOtpModal() {
     hideEmailError();
-    document.getElementById('emailOtpModal').classList.remove('hidden');
+    const modal = document.getElementById('emailOtpModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
     document.getElementById('newEmailInput').value = '';
 }
 
 function closeEmailOtpModal() {
-    document.getElementById('emailOtpModal').classList.add('hidden');
+    const modal = document.getElementById('emailOtpModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
 }
 
 function showEmailError(msg) {
@@ -895,13 +898,17 @@ async function handleUpdateEmailSubmit(e) {
     }
 }
 
-// ===================== ZEPTO GPS LIVE LOCATION & CONFIRM ADDRESS =====================
+// ===================== GPS LIVE LOCATION & CONFIRM ADDRESS =====================
 function openAddressModal() {
-    document.getElementById('addressModal').classList.remove('hidden');
+    const modal = document.getElementById('addressModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
 
 function closeAddressModal() {
-    document.getElementById('addressModal').classList.add('hidden');
+    const modal = document.getElementById('addressModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
 }
 
 function detectCurrentLocation() {
@@ -913,27 +920,49 @@ function detectCurrentLocation() {
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 btn.innerHTML = '<i class="fas fa-check"></i> Located!';
-                status.innerText = `Detected GPS: ${pos.coords.latitude.toFixed(4)}° N, ${pos.coords.longitude.toFixed(4)}° E (Sector 62, Noida)`;
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const accuracy = Math.round(pos.coords.accuracy || 1);
+
+                status.innerText = `Detected GPS: ${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E (±${accuracy}m)`;
                 
-                // Auto-fill address details
+                // Auto-fill address details (Sector 62, Noida)
                 document.getElementById('addrHouse').value = 'Flat 402, 4th Floor';
                 document.getElementById('addrBuilding').value = 'Tulip Heights';
                 document.getElementById('addrStreet').value = 'Sector 62, Electronic City Hub';
                 document.getElementById('addrLandmark').value = 'Near Metro Gate No. 2';
                 document.getElementById('addrPincode').value = '201309';
 
+                try {
+                    localStorage.setItem('staynest_user_lat', lat);
+                    localStorage.setItem('staynest_user_lng', lng);
+                    localStorage.setItem('user_cached_lat', lat);
+                    localStorage.setItem('user_cached_lng', lng);
+                } catch(e) {}
+
                 showToast('GPS Location Detected', 'Address auto-filled with high accuracy GPS!');
             },
             (err) => {
                 btn.innerHTML = 'Locate Me 🎯';
-                status.innerText = 'GPS permission denied. Using Sector 62, Noida as default.';
+                status.innerText = 'Using Sector 62, Noida (28.6280° N, 77.3649° E) as default.';
+                document.getElementById('addrHouse').value = 'Flat 402, 4th Floor';
+                document.getElementById('addrBuilding').value = 'Tulip Heights';
                 document.getElementById('addrStreet').value = 'Sector 62, Noida';
+                document.getElementById('addrLandmark').value = 'Near Electronic City Metro';
                 document.getElementById('addrPincode').value = '201309';
-            }
+
+                try {
+                    localStorage.setItem('staynest_user_lat', 28.6280);
+                    localStorage.setItem('staynest_user_lng', 77.3649);
+                    localStorage.setItem('user_cached_lat', 28.6280);
+                    localStorage.setItem('user_cached_lng', 77.3649);
+                } catch(e) {}
+            },
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
     } else {
         btn.innerHTML = 'Locate Me 🎯';
-        status.innerText = 'Geolocation not supported by browser.';
+        status.innerText = 'Geolocation not supported by browser. Using Sector 62, Noida.';
     }
 }
 
@@ -946,20 +975,68 @@ function handleSaveAddress(e) {
     const landmark = document.getElementById('addrLandmark').value.trim();
     const pincode = document.getElementById('addrPincode').value.trim();
 
+    // Determine exact coordinates based on address text / city
+    let userLat = 28.6280;
+    let userLng = 77.3649;
+
+    const fullAddrStr = `${house} ${bldg} ${street} ${landmark} ${pincode}`.toLowerCase();
+    if (fullAddrStr.includes('bangalore') || fullAddrStr.includes('bengaluru') || fullAddrStr.includes('indiranagar') || pincode.startsWith('560')) {
+        userLat = 12.9716;
+        userLng = 77.5946;
+    } else if (fullAddrStr.includes('delhi') || fullAddrStr.includes('south ex') || fullAddrStr.includes('saket') || pincode.startsWith('110')) {
+        userLat = 28.6139;
+        userLng = 77.2090;
+    } else if (fullAddrStr.includes('gurugram') || fullAddrStr.includes('gurgaon') || pincode.startsWith('122')) {
+        userLat = 28.4595;
+        userLng = 77.0266;
+    } else {
+        // Sector 62, Noida coordinates
+        userLat = 28.6280;
+        userLng = 77.3649;
+    }
+
     const savedAddr = {
         tag: tag,
         line1: `${house}, ${bldg}`,
-        line2: `${street}, ${landmark ? landmark + ', ' : ''}${pincode}`
+        line2: `${street}, ${landmark ? landmark + ', ' : ''}${pincode}`,
+        lat: userLat,
+        lng: userLng
     };
 
     localStorage.setItem('staynest_default_address', JSON.stringify(savedAddr));
+    localStorage.setItem('staynest_user_lat', userLat);
+    localStorage.setItem('staynest_user_lng', userLng);
+    localStorage.setItem('staynest_user_address_locked', 'true');
+    localStorage.setItem('user_cached_lat', userLat);
+    localStorage.setItem('user_cached_lng', userLng);
+    localStorage.setItem('user_cached_address', `${house}, ${bldg}, ${street}, ${pincode}`);
+    localStorage.setItem('user_cached_city', 'Noida');
+    localStorage.setItem('user_cached_area', street || 'Sector 62');
+    localStorage.setItem('user_cached_pin', pincode);
+
     renderSavedAddress(savedAddr);
     closeAddressModal();
-    showToast('Address Confirmed & Saved', `Tagged as ${tag} with live routing.`);
+    showToast('Address Confirmed & Saved', `Location locked to ${street || 'Sector 62, Noida'} for live distance calculation.`);
 }
 
 function loadSavedAddress() {
-    const addrStr = localStorage.getItem('staynest_default_address');
+    let addrStr = localStorage.getItem('staynest_default_address');
+    if (!addrStr) {
+        // Default initialized verified address for logged in profile
+        const defaultAddr = {
+            tag: 'HOME',
+            line1: 'Flat 402, B-Block, Tulip Heights',
+            line2: 'Sector 62, Near Electronic City Metro, Noida, 201309',
+            lat: 28.6280,
+            lng: 77.3649
+        };
+        localStorage.setItem('staynest_default_address', JSON.stringify(defaultAddr));
+        localStorage.setItem('staynest_user_lat', 28.6280);
+        localStorage.setItem('staynest_user_lng', 77.3649);
+        localStorage.setItem('staynest_user_address_locked', 'true');
+        addrStr = JSON.stringify(defaultAddr);
+    }
+
     if (addrStr) {
         try {
             renderSavedAddress(JSON.parse(addrStr));

@@ -135,16 +135,26 @@
         // 2. Extract or use property details
         let prop = propertyData;
         if (!prop || !prop.id) {
-            const card = btn.closest('.pg-card') || btn.closest('[data-property-id]');
+            const card = btn.closest('.pg-card') || btn.closest('[data-property-id]') || btn.closest('.property-card');
             const id = card?.getAttribute('data-property-id') || btn.getAttribute('data-id') || (btn.title || btn.id || 'pg_' + Date.now());
-            const title = card?.querySelector('.font-bold')?.innerText || 'Verified Premium Stay';
-            const price = card?.querySelector('.text-base, .text-xs, .text-xl')?.innerText || '₹8,500';
+            const title = card?.querySelector('.font-bold, .prop-title')?.innerText || 'Verified Premium Stay';
+            const price = card?.querySelector('.text-base, .text-xs, .text-xl, .text-lg')?.innerText || '₹8,500';
             const img = card?.querySelector('img')?.src || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600';
-            const location = card?.querySelector('.fa-map-marker-alt')?.parentNode?.innerText?.trim() || 'Sector 62, Noida';
+            const location = card?.querySelector('.fa-map-marker-alt, .prop-loc')?.parentNode?.innerText?.trim() || 'Sector 62, Noida';
             const type = card?.querySelector('[class*="bg-blue-50"], [class*="bg-pink-50"], [class*="bg-purple-50"]')?.innerText?.trim() || 'BOYS';
-            
+            const href = card?.getAttribute('href') || card?.querySelector('a[href*="/detail/"]')?.getAttribute('href');
+            let slug = '';
+            if (href && href.includes('/detail/')) {
+                slug = href.split('/detail/')[1].split('?')[0];
+            } else if (title) {
+                slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            } else {
+                slug = id;
+            }
+
             prop = {
                 id: id,
+                slug: slug,
                 title: title,
                 price: price,
                 image: img,
@@ -152,6 +162,12 @@
                 type: type,
                 rating: '4.8'
             };
+        } else if (!prop.slug) {
+            if (prop.title) {
+                prop.slug = prop.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            } else {
+                prop.slug = prop.id;
+            }
         }
 
         let savedList = getSavedProperties();

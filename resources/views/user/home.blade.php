@@ -353,14 +353,14 @@
                     </h2>
                     <p class="text-xs text-gray-500 mt-1 ml-10">Verified stays near your current location</p>
                 </div>
-                <a href="{{ route('user.search') }}" class="text-xs font-bold text-brand flex items-center gap-1.5 bg-brand-light hover:bg-brand/15 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                <a href="{{ route('user.search', ['sort' => 'distance-asc', 'near_me' => 1]) }}" class="text-xs font-bold text-brand flex items-center gap-1.5 bg-brand-light hover:bg-brand/15 px-3.5 py-1.5 rounded-full tap-ripple transition">
                     See all <i class="fas fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
 
             {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
-            <div class="md:hidden swiper nearMeSwiper overflow-hidden">
-                <div class="swiper-wrapper">
+            <div id="nearMeMobileContainer" class="md:hidden swiper nearMeSwiper overflow-hidden">
+                <div class="swiper-wrapper" id="nearMeSwiperWrapper">
                     @forelse ($nearMeProperties as $pg)
                         @php
                             $tagMeta = $pg->display_tag_meta;
@@ -378,7 +378,7 @@
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
-                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                         <i class="far fa-heart text-[10px]"></i>
                                     </button>
                                     <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
@@ -394,9 +394,9 @@
                                         <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-1 truncate">
                                             <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ $locationText }}
                                         </p>
-                                        <p class="text-[10px] text-blue-600 font-semibold mb-2 flex items-center gap-1 truncate pg-distance-badge" data-lat="{{ $pg->latitude }}" data-lng="{{ $pg->longitude }}">
+                                        <p class="text-[10px] text-blue-600 font-semibold mb-2 flex items-center gap-1 truncate pg-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
                                             <i class="fas fa-location-dot text-[9px]"></i>
-                                            <span class="dist-text">{{ !empty($pg->latitude) ? 'Calculating distance...' : '0.6 km away' }}</span>
+                                            <span class="dist-text">Calculating...</span>
                                         </p>
                                         <div class="flex flex-wrap gap-1 mb-2">
                                             @forelse($pg->amenities->take(2) as $am)
@@ -430,7 +430,7 @@
             </div>
 
             {{-- ===== DESKTOP: 4-Col Grid ===== --}}
-            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div id="nearMeDesktopGrid" class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse ($nearMeProperties as $pg)
                     @php
                         $tagMeta = $pg->display_tag_meta;
@@ -447,7 +447,7 @@
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
-                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                 <i class="far fa-heart text-xs"></i>
                             </button>
                             <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -463,9 +463,9 @@
                                 <p class="text-xs text-gray-500 flex items-center gap-1 mb-1 truncate">
                                     <i class="fas fa-map-marker-alt text-brand text-[11px]"></i> {{ $locationText }}
                                 </p>
-                                <p class="text-xs text-blue-600 font-semibold mb-3 flex items-center gap-1 truncate pg-distance-badge" data-lat="{{ $pg->latitude }}" data-lng="{{ $pg->longitude }}">
+                                <p class="text-xs text-blue-600 font-semibold mb-3 flex items-center gap-1 truncate pg-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
                                     <i class="fas fa-location-dot text-[11px]"></i>
-                                    <span class="dist-text">{{ !empty($pg->latitude) ? 'Calculating distance...' : '0.6 km away' }}</span>
+                                    <span class="dist-text">Calculating...</span>
                                 </p>
                                 <div class="flex flex-wrap gap-1.5 mb-4">
                                     @forelse($pg->amenities->take(3) as $am)
@@ -498,6 +498,18 @@
                     <div class="col-span-4 p-8 text-center text-gray-400 text-sm">No approved properties found near this area.</div>
                 @endforelse
             </div>
+
+            {{-- 5 km Radius Empty State (Shown when 0 PGs within 5 km) --}}
+            <div id="nearMe5kmEmptyState" class="hidden p-8 rounded-3xl bg-white border border-gray-100 text-center max-w-xl mx-auto shadow-xs my-2">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-2 text-xl shadow-xs">
+                    <i class="fas fa-location-dot"></i>
+                </div>
+                <h4 class="text-sm font-bold text-gray-900">No verified PGs found within 5 km</h4>
+                <p class="text-xs text-gray-500 mt-1 mb-3">There are currently no active listings within a 5 km radius of your location.</p>
+                <a href="{{ route('user.search') }}" class="inline-flex items-center gap-1.5 bg-brand hover:bg-brand-dark text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs">
+                    <i class="fas fa-search text-[10px]"></i> Explore All PGs
+                </a>
+            </div>
         </div>
     </section>
 
@@ -508,7 +520,7 @@
                 <div>
                     <h2 class="section-title flex items-center gap-2">
                         <span class="w-8 h-8 rounded-xl bg-brand-light inline-flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-sparkles text-brand text-sm"></i>
+                            <i class="fas fa-heart text-brand text-sm"></i>
                         </span>
                         Recommended for You
                     </h2>
@@ -539,7 +551,7 @@
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
-                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                         <i class="far fa-heart text-[10px]"></i>
                                     </button>
                                     <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
@@ -607,7 +619,7 @@
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
-                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                 <i class="far fa-heart text-xs"></i>
                             </button>
                             <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -697,7 +709,7 @@
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
-                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                         <i class="far fa-heart text-[10px]"></i>
                                     </button>
                                     <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
@@ -765,7 +777,7 @@
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
-                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                 <i class="far fa-heart text-xs"></i>
                             </button>
                             <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -850,7 +862,7 @@
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
-                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                 <i class="far fa-heart text-xs"></i>
                             </button>
                             <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -903,7 +915,7 @@
             <h2 class="section-title mb-4">Explore by Budget</h2>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-5">
                 @foreach([
-                    ['label' => 'Under ₹6K', 'sub' => 'Pocket Friendly', 'icon' => 'wallet', 'bg' => 'bg-green-50', 'color' => 'text-green-600', 'url' => route('user.search', ['budget' => '0-6000', 'min_price' => 0, 'max_price' => 6000])],
+                    ['label' => 'Under ₹5K', 'sub' => 'Pocket Friendly', 'icon' => 'wallet', 'bg' => 'bg-green-50', 'color' => 'text-green-600', 'url' => route('user.search', ['budget' => '0-5000', 'min_price' => 0, 'max_price' => 5000])],
                     ['label' => '₹6K–₹10K', 'sub' => 'Mid-Range Comfort', 'icon' => 'bed', 'bg' => 'bg-blue-50', 'color' => 'text-blue-600', 'url' => route('user.search', ['budget' => '6000-10000', 'min_price' => 6000, 'max_price' => 10000])],
                     ['label' => '₹10K–₹15K', 'sub' => 'Premium Living', 'icon' => 'gem', 'bg' => 'bg-purple-50', 'color' => 'text-purple-600', 'url' => route('user.search', ['budget' => '10000-15000', 'min_price' => 10000, 'max_price' => 15000])],
                     ['label' => '₹15K+', 'sub' => 'Luxury Co-Living', 'icon' => 'crown', 'bg' => 'bg-amber-50', 'color' => 'text-amber-600', 'url' => route('user.search', ['budget' => '15000-plus', 'min_price' => 15000])],
@@ -1043,10 +1055,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2. Mobile 2-Column Horizontal Sliders (Near Me & Recommended)
     if (window.innerWidth < 768) {
-        new Swiper('.nearMeSwiper', {
+        window.nearMeSwiperInstance = new Swiper('.nearMeSwiper', {
             slidesPerView: 2.05,
             spaceBetween: 10,
             grabCursor: true,
+            observer: true,
+            observeParents: true,
             breakpoints: {
                 480: { slidesPerView: 2.3, spaceBetween: 12 },
                 640: { slidesPerView: 2.8, spaceBetween: 14 },
@@ -1092,55 +1106,196 @@ function getHaversineDistanceKm(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-function initNearMeGeolocation() {
-    const distanceBadges = document.querySelectorAll('.pg-distance-badge');
-    if (!distanceBadges.length) return;
+function formatDistance(distKm) {
+    if (distKm < 1) {
+        const meters = Math.max(100, Math.round(distKm * 1000));
+        return meters + ' m away';
+    } else if (distKm < 10) {
+        return distKm.toFixed(1) + ' km away';
+    } else if (distKm < 100) {
+        return Math.round(distKm) + ' km away';
+    } else {
+        return Math.round(distKm).toLocaleString() + ' km away';
+    }
+}
 
-    if (!navigator.geolocation) {
-        fallbackDistanceText(distanceBadges);
+function updateAllDistances(userLat, userLng) {
+    if (!userLat || !userLng) return;
+
+    try {
+        localStorage.setItem('staynest_user_lat', userLat);
+        localStorage.setItem('staynest_user_lng', userLng);
+    } catch (e) {}
+
+    const MAX_ALLOWED_DISTANCE_KM = 5.0; // Strictly below 5 km
+
+    // 1. Process Mobile Slides
+    const mobileSlides = document.querySelectorAll('.nearMeSwiper .swiper-slide');
+    let visibleMobileCount = 0;
+    const mobileItems = [];
+
+    mobileSlides.forEach(slide => {
+        const badge = slide.querySelector('.pg-distance-badge');
+        if (!badge) return;
+        const lat = parseFloat(badge.getAttribute('data-lat'));
+        const lng = parseFloat(badge.getAttribute('data-lng'));
+        const textSpan = badge.querySelector('.dist-text');
+
+        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+            const distKm = getHaversineDistanceKm(userLat, userLng, lat, lng);
+            if (distKm <= MAX_ALLOWED_DISTANCE_KM) {
+                slide.style.display = '';
+                if (textSpan) textSpan.textContent = formatDistance(distKm);
+                mobileItems.push({ element: slide, distance: distKm });
+                visibleMobileCount++;
+            } else {
+                slide.style.display = 'none';
+            }
+        } else {
+            slide.style.display = 'none';
+        }
+    });
+
+    const MAX_HOME_DISPLAY = 8; // Strictly show maximum 8 listings on home page
+
+    // Sort mobile slides by nearest distance (closest first) and limit to max 8
+    const mobileWrapper = document.getElementById('nearMeSwiperWrapper');
+    if (mobileWrapper && mobileItems.length > 0) {
+        mobileItems.sort((a, b) => a.distance - b.distance);
+        mobileItems.forEach((item, idx) => {
+            if (idx < MAX_HOME_DISPLAY) {
+                item.element.style.display = '';
+                mobileWrapper.appendChild(item.element);
+            } else {
+                item.element.style.display = 'none';
+            }
+        });
+    }
+
+    // 2. Process Desktop Grid Cards
+    const desktopCards = document.querySelectorAll('#nearMeDesktopGrid > a.pg-card');
+    let visibleDesktopCount = 0;
+    const desktopItems = [];
+
+    desktopCards.forEach(card => {
+        const badge = card.querySelector('.pg-distance-badge');
+        if (!badge) return;
+        const lat = parseFloat(badge.getAttribute('data-lat'));
+        const lng = parseFloat(badge.getAttribute('data-lng'));
+        const textSpan = badge.querySelector('.dist-text');
+
+        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+            const distKm = getHaversineDistanceKm(userLat, userLng, lat, lng);
+            if (distKm <= MAX_ALLOWED_DISTANCE_KM) {
+                card.style.display = '';
+                if (textSpan) textSpan.textContent = formatDistance(distKm);
+                desktopItems.push({ element: card, distance: distKm });
+                visibleDesktopCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    // Sort desktop cards by nearest distance (closest first) and limit to max 8
+    const desktopGrid = document.getElementById('nearMeDesktopGrid');
+    if (desktopGrid && desktopItems.length > 0) {
+        desktopItems.sort((a, b) => a.distance - b.distance);
+        desktopItems.forEach((item, idx) => {
+            if (idx < MAX_HOME_DISPLAY) {
+                item.element.style.display = '';
+                desktopGrid.appendChild(item.element);
+            } else {
+                item.element.style.display = 'none';
+            }
+        });
+    }
+
+    // 3. Toggle Empty State for < 5 km
+    const emptyState = document.getElementById('nearMe5kmEmptyState');
+    const mobileContainer = document.getElementById('nearMeMobileContainer');
+    if (emptyState) {
+        if (visibleMobileCount === 0 && visibleDesktopCount === 0) {
+            emptyState.classList.remove('hidden');
+            if (desktopGrid) desktopGrid.classList.add('hidden');
+            if (mobileContainer) mobileContainer.classList.add('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+            if (desktopGrid) desktopGrid.classList.remove('hidden');
+            if (mobileContainer) mobileContainer.classList.remove('hidden');
+        }
+    }
+
+    // Update Swiper instance
+    if (window.nearMeSwiperInstance && typeof window.nearMeSwiperInstance.update === 'function') {
+        window.nearMeSwiperInstance.update();
+    }
+}
+
+function getEffectiveUserCoordinates() {
+    // 1. If user has a saved / profile address (like Sector 62, Noida), prioritize it
+    const isAddressLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
+    const savedAddrStr = localStorage.getItem('staynest_default_address');
+    
+    if (savedAddrStr) {
+        try {
+            const parsed = JSON.parse(savedAddrStr);
+            if (parsed.lat && parsed.lng) {
+                return { lat: parseFloat(parsed.lat), lng: parseFloat(parsed.lng), isLocked: true };
+            }
+            const fullStr = ((parsed.line1 || '') + ' ' + (parsed.line2 || '')).toLowerCase();
+            if (fullStr.includes('noida') || fullStr.includes('sector 62') || fullStr.includes('201309')) {
+                return { lat: 28.6280, lng: 77.3649, isLocked: true };
+            } else if (fullStr.includes('bangalore') || fullStr.includes('bengaluru') || fullStr.includes('indiranagar')) {
+                return { lat: 12.9716, lng: 77.5946, isLocked: true };
+            } else if (fullStr.includes('delhi') || fullStr.includes('south ex')) {
+                return { lat: 28.5742, lng: 77.2242, isLocked: true };
+            }
+        } catch(e) {}
+    }
+
+    // 2. Check cached coordinates if locked
+    const cachedLat = parseFloat(localStorage.getItem('staynest_user_lat') || localStorage.getItem('user_cached_lat'));
+    const cachedLng = parseFloat(localStorage.getItem('staynest_user_lng') || localStorage.getItem('user_cached_lng'));
+    if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0 && cachedLng !== 0 && isAddressLocked) {
+        return { lat: cachedLat, lng: cachedLng, isLocked: true };
+    }
+
+    // 3. Default fallback to Noida Sector 62 (prevents Delhi network/ISP routing glitches)
+    return { lat: 28.6280, lng: 77.3649, isLocked: false };
+}
+
+function initNearMeGeolocation() {
+    const eff = getEffectiveUserCoordinates();
+    updateAllDistances(eff.lat, eff.lng);
+
+    // If user has locked their address in profile, DO NOT let desktop ISP network glitch flip it to Delhi!
+    if (eff.isLocked) {
         return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-        function(pos) {
-            const userLat = pos.coords.latitude;
-            const userLng = pos.coords.longitude;
-
-            distanceBadges.forEach(badge => {
-                const lat = parseFloat(badge.getAttribute('data-lat'));
-                const lng = parseFloat(badge.getAttribute('data-lng'));
-                const textSpan = badge.querySelector('.dist-text');
-                if (!textSpan) return;
-
-                if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-                    const distKm = getHaversineDistanceKm(userLat, userLng, lat, lng);
-                    if (distKm < 1) {
-                        textSpan.textContent = Math.round(distKm * 1000) + ' m from you';
-                    } else if (distKm < 10) {
-                        textSpan.textContent = distKm.toFixed(1) + ' km away';
-                    } else {
-                        textSpan.textContent = distKm.toFixed(0) + ' km away';
+    // If user is guest / not locked, use live device GPS
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                if (pos && pos.coords) {
+                    const accuracy = pos.coords.accuracy || 1000;
+                    // Only apply if accuracy is high (< 1500m) to prevent rough ISP gateway misplacement
+                    if (accuracy <= 1500) {
+                        updateAllDistances(pos.coords.latitude, pos.coords.longitude);
                     }
-                } else {
-                    textSpan.textContent = 'Prime Verified Stay';
                 }
-            });
-        },
-        function(err) {
-            fallbackDistanceText(distanceBadges);
-        },
-        { timeout: 7000, maximumAge: 120000 }
-    );
-}
-
-function fallbackDistanceText(badges) {
-    badges.forEach((badge, idx) => {
-        const textSpan = badge.querySelector('.dist-text');
-        if (textSpan && textSpan.textContent.includes('Calculating')) {
-            const sampleDists = ['0.4 km away', '0.7 km away', '1.1 km away', '0.5 km away', '1.4 km away', '0.8 km away'];
-            textSpan.textContent = sampleDists[idx % sampleDists.length];
-        }
-    });
+            },
+            function(err) {
+                const curLat = parseFloat(localStorage.getItem('staynest_user_lat')) || 28.6280;
+                const curLng = parseFloat(localStorage.getItem('staynest_user_lng')) || 77.3649;
+                updateAllDistances(curLat, curLng);
+            },
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+        );
+    }
 }
 </script>
 @endpush

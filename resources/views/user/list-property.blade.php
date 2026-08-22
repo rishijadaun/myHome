@@ -75,11 +75,14 @@
 @php
     $authUser = Auth::user();
     $isLoggedIn = !empty($authUser);
+    $isAdmin = $authUser && ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || ($authUser->role ?? '') === 'admin');
     $authName = $authUser?->profile?->first_name 
         ? ($authUser->profile->first_name . ' ' . ($authUser->profile->last_name ?? '')) 
         : ($authUser?->name ?? '');
     $authPhone = $authUser?->phone ?? '';
     $authEmail = $authUser?->email ?? '';
+    // Regular brokers/users get auto-filled and locked to their own account. Admin is never locked to preserve original landlord details.
+    $isLockedToAuth = $isLoggedIn && !$isAdmin;
 @endphp
 
 <!--   Top Notification Toast -->
@@ -221,11 +224,11 @@
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
-                                    <input type="radio" name="listing_type" value="co-living" class="hidden" onchange="handleTypeChange('co-living')">
+                                    <input type="radio" name="listing_type" value="new-project" class="hidden" onchange="handleTypeChange('new-project')">
                                     <div class="type-pill border-2 border-gray-200 rounded-2xl p-4 text-center transition-all hover:border-brand/40">
-                                        <i class="fas fa-users text-xl mb-2 block"></i>
-                                        <div class="font-bold text-xs sm:text-sm">Co-Living</div>
-                                        <div class="text-[10px] opacity-80 mt-0.5">Managed Stays</div>
+                                        <i class="fas fa-building text-xl mb-2 block"></i>
+                                        <div class="font-bold text-xs sm:text-sm">New Projects</div>
+                                        <div class="text-[10px] opacity-80 mt-0.5">New</div>
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
@@ -310,7 +313,7 @@
                                         <label class="cursor-pointer">
                                             <input type="radio" name="gender_preference" value="co-ed" class="hidden peer" checked onchange="updateLivePreview()">
                                             <div class="peer-checked:bg-purple-50 peer-checked:border-purple-500 peer-checked:text-purple-700 py-3 text-center border-2 border-gray-200 rounded-xl text-xs sm:text-sm font-semibold transition hover:bg-gray-50">
-                                                <i class="fas fa-venus-mars mr-1"></i> Co-ed (Both)
+                                                <i class="fas fa-venus-mars mr-1"></i> Co-Living (Both)
                                             </div>
                                         </label>
                                     </div>
@@ -384,57 +387,73 @@
                             <p class="text-xs sm:text-sm text-gray-500 mb-6">Select available sharing options in your PG / Hostel (All amounts must be positive).</p>
 
                             <div class="space-y-3">
-                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition">
+                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition cursor-pointer">
                                     <div class="flex items-center gap-3">
-                                        <input type="checkbox" name="room_single" checked class="w-5 h-5 text-brand rounded focus:ring-brand">
+                                        <input type="checkbox" id="chk_room_single" name="room_single" checked class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
                                         <div>
                                             <div class="font-bold text-sm text-gray-900">Single Occupancy (Private Room)</div>
-                                            <div class="text-xs text-gray-500">1 person per room</div>
+                                            <div class="text-xs text-gray-500">1 person per room &bull; Personal space</div>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs text-gray-400">₹</span>
-                                        <input type="number" min="0" onkeydown="preventNegative(event)" oninput="sanitizePositive(this)" placeholder="Rent (₹)" value="12000" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand">
+                                        <input type="number" id="rent_room_single" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="12000" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
                                     </div>
                                 </label>
 
-                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition">
+                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition cursor-pointer">
                                     <div class="flex items-center gap-3">
-                                        <input type="checkbox" name="room_double" checked class="w-5 h-5 text-brand rounded focus:ring-brand">
+                                        <input type="checkbox" id="chk_room_double" name="room_double" checked class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
                                         <div>
                                             <div class="font-bold text-sm text-gray-900">Double Sharing Room</div>
-                                            <div class="text-xs text-gray-500">2 beds per room</div>
+                                            <div class="text-xs text-gray-500">2 beds per room &bull; Shared accommodation</div>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs text-gray-400">₹</span>
-                                        <input type="number" min="0" onkeydown="preventNegative(event)" oninput="sanitizePositive(this)" placeholder="Rent (₹)" value="8500" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand">
+                                        <input type="number" id="rent_room_double" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="8500" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
                                     </div>
                                 </label>
 
-                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition">
+                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition cursor-pointer">
                                     <div class="flex items-center gap-3">
-                                        <input type="checkbox" name="room_triple" class="w-5 h-5 text-brand rounded focus:ring-brand">
+                                        <input type="checkbox" id="chk_room_triple" name="room_triple" class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
                                         <div>
                                             <div class="font-bold text-sm text-gray-900">Triple Sharing Room</div>
-                                            <div class="text-xs text-gray-500">3 beds per room</div>
+                                            <div class="text-xs text-gray-500">3 beds per room &bull; Budget friendly</div>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs text-gray-400">₹</span>
-                                        <input type="number" min="0" onkeydown="preventNegative(event)" oninput="sanitizePositive(this)" placeholder="Rent (₹)" value="6500" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand">
+                                        <input type="number" id="rent_room_triple" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="6500" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition cursor-pointer">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" id="chk_room_four" name="room_four" class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-900">Four Sharing Room</div>
+                                            <div class="text-xs text-gray-500">4 beds per room &bull; Economical option</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-400">₹</span>
+                                        <input type="number" id="rent_room_four" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="5000" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
                                     </div>
                                 </label>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                                 <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Total Bed Capacity *</label>
-                                    <input type="number" id="propTotalBeds" name="total_beds" min="1" onkeydown="preventNegative(event)" oninput="sanitizePositive(this)" value="20" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
+                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Total Bed Capacity * <span class="text-[10px] text-gray-400 font-normal">(Max 5,000)</span></label>
+                                    <input type="number" id="propTotalBeds" name="total_beds" min="1" max="5000" maxlength="4" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 5000); clearError(this);" value="20" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
+                                    <div class="error-msg hidden" id="err-propTotalBeds">Total bed capacity must be between 1 and 5,000.</div>
                                 </div>
                                 <div>
                                     <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Currently Available Beds</label>
-                                    <input type="number" id="propAvailableBeds" name="available_beds" min="0" onkeydown="preventNegative(event)" oninput="sanitizePositive(this)" value="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
+                                    <input type="number" id="propAvailableBeds" name="available_beds" min="0" max="5000" maxlength="4" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 5000); clearError(this);" value="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
+                                    <div class="error-msg hidden" id="err-propAvailableBeds">Available beds cannot exceed total bed capacity.</div>
                                 </div>
                             </div>
                         </div>
@@ -594,23 +613,25 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Monthly Starting Rent (₹) * <span class="text-[10px] text-brand font-bold">(Min ₹500)</span></label>
-                                    <input type="number" id="propRent" name="monthly_rent" required min="500" placeholder="e.g. 6500" 
-                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this); updateLivePreview(); clearError(this);" 
+                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Monthly Starting Rent (₹) * <span class="text-[10px] text-brand font-bold">(₹500 - ₹10,00,000)</span></label>
+                                    <input type="number" id="propRent" name="monthly_rent" required min="500" max="1000000" maxlength="7" placeholder="e.g. 6500" 
+                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000); updateLivePreview(); clearError(this);" 
                                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
-                                    <div class="error-msg hidden" id="err-propRent">Monthly starting rent cannot be less than ₹500.</div>
+                                    <div class="error-msg hidden" id="err-propRent">Monthly starting rent must be between ₹500 and ₹10,00,000.</div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Security Deposit (₹) <span class="text-[10px] text-gray-400 font-normal">(Optional)</span></label>
-                                    <input type="number" id="propDeposit" name="security_deposit" min="0" placeholder="e.g. 500" 
-                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this); clearError(this);" 
+                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Security Deposit (₹) <span class="text-[10px] text-gray-400 font-normal">(Max ₹20,00,000)</span></label>
+                                    <input type="number" id="propDeposit" name="security_deposit" min="0" max="2000000" maxlength="7" placeholder="e.g. 500" 
+                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 2000000); clearError(this);" 
                                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                    <div class="error-msg hidden" id="err-propDeposit">Security deposit cannot exceed ₹20,00,000.</div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Maintenance (₹ / mo)</label>
-                                    <input type="number" id="propMaintenance" name="maintenance_charges" min="0" placeholder="e.g. 0" 
-                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this); clearError(this);" 
+                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Maintenance (₹ / mo) <span class="text-[10px] text-gray-400 font-normal">(Max ₹1,00,000)</span></label>
+                                    <input type="number" id="propMaintenance" name="maintenance_charges" min="0" max="100000" maxlength="6" placeholder="e.g. 0" 
+                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 100000); clearError(this);" 
                                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                    <div class="error-msg hidden" id="err-propMaintenance">Maintenance charges cannot exceed ₹1,00,000 / month.</div>
                                 </div>
                                 <div>
                                     <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Notice Period</label>
@@ -742,17 +763,21 @@
                                 <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
                                     <i class="fas fa-user-shield text-brand"></i> Owner / Landlord Contact Info
                                 </h2>
-                                @if($isLoggedIn)
-                                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-3 py-1 rounded-full border border-emerald-300 flex items-center gap-1 shadow-xs">
+                                @if($isLockedToAuth)
+                                    <span id="ownerLockBadge" class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-3 py-1 rounded-full border border-emerald-300 flex items-center gap-1 shadow-xs">
                                         <i class="fas fa-lock text-[9px] text-emerald-600"></i> Locked to Logged-in Account
+                                    </span>
+                                @elseif($isAdmin)
+                                    <span id="ownerLockBadge" class="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-3 py-1 rounded-full border border-purple-300 flex items-center gap-1 shadow-xs">
+                                        <i class="fas fa-user-shield text-[9px] text-purple-600"></i> Admin Mode &bull; Landlord Property Preserved
                                     </span>
                                 @endif
                             </div>
                             <p class="text-xs sm:text-sm text-gray-500 mb-6">Our verification team and interested tenants will reach out to these contact details.</p>
 
-                            @if($isLoggedIn)
+                            @if($isLockedToAuth)
                                 <!-- Verified Logged-in Account Badge -->
-                                <div class="mb-5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/90 rounded-2xl p-4 flex items-center justify-between shadow-xs">
+                                <div id="ownerProfileBanner" class="mb-5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/90 rounded-2xl p-4 flex items-center justify-between shadow-xs">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-base font-bold shadow-xs shrink-0">
                                             <i class="fas fa-shield-check"></i>
@@ -769,24 +794,42 @@
                                         <i class="fas fa-check-circle text-emerald-600"></i> Verified
                                     </span>
                                 </div>
+                            @elseif($isAdmin)
+                                <div id="ownerProfileBanner" class="mb-5 bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border border-purple-200/90 rounded-2xl p-4 flex items-center justify-between shadow-xs">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center text-base font-bold shadow-xs shrink-0">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-[11px] font-extrabold text-purple-900 uppercase tracking-wider flex items-center gap-1.5">
+                                                <span>Admin Edit Access: Landlord Profile Preserved</span>
+                                                <span class="bg-purple-200 text-purple-950 text-[9px] px-2 py-0.5 rounded-full font-black">ADMIN MODE</span>
+                                            </div>
+                                            <div id="adminOwnerPreview" class="text-xs font-bold text-gray-900 mt-0.5">Original property creator profile is preserved &bull; Admin details will NOT replace owner</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-purple-700 font-semibold hidden sm:flex items-center gap-1">
+                                        <i class="fas fa-shield-halved text-purple-600"></i> Admin Controls
+                                    </span>
+                                </div>
                             @endif
 
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                                        Your Full Name *
-                                        @if($isLoggedIn)
+                                        Owner / Landlord Full Name *
+                                        @if($isLockedToAuth)
                                             <span class="text-[10px] text-emerald-700 font-bold ml-1">(Auto-Filled & Locked)</span>
                                         @endif
                                     </label>
                                     <div class="relative">
                                         <input type="text" id="ownerName" name="owner_name" required 
-                                               value="{{ $authName }}"
-                                               {{ $isLoggedIn ? 'readonly' : '' }}
+                                               value="{{ $isLockedToAuth ? $authName : '' }}"
+                                               {{ $isLockedToAuth ? 'readonly' : '' }}
                                                placeholder="e.g. Rajesh Sharma" 
                                                oninput="clearError(this)"
-                                               class="w-full {{ $isLoggedIn ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
-                                        @if($isLoggedIn)
+                                               class="w-full {{ $isLockedToAuth ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
+                                        @if($isLockedToAuth)
                                             <span class="absolute right-4 top-3.5 text-gray-400 text-xs" title="Locked to logged-in profile"><i class="fas fa-lock"></i></span>
                                         @endif
                                     </div>
@@ -796,19 +839,19 @@
                                     <div>
                                         <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                                             Mobile Phone Number (10 Digits) *
-                                            @if($isLoggedIn)
+                                            @if($isLockedToAuth)
                                                 <span class="text-[10px] text-emerald-700 font-bold ml-1">(Auto-Filled & Locked)</span>
                                             @endif
                                         </label>
                                         <div class="relative">
                                             <span class="absolute left-4 top-3.5 text-sm font-semibold text-gray-500">+91</span>
                                             <input type="tel" id="ownerPhone" name="owner_phone" required 
-                                                   value="{{ $authPhone }}"
-                                                   {{ $isLoggedIn ? 'readonly' : '' }}
+                                                   value="{{ $isLockedToAuth ? $authPhone : '' }}"
+                                                   {{ $isLockedToAuth ? 'readonly' : '' }}
                                                    placeholder="98765 43210" maxlength="10"
                                                    onkeydown="preventNegative(event)" oninput="sanitizePhone(this); clearError(this);"
-                                                   class="w-full {{ $isLoggedIn ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl pl-14 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
-                                            @if($isLoggedIn)
+                                                   class="w-full {{ $isLockedToAuth ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl pl-14 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
+                                            @if($isLockedToAuth)
                                                 <span class="absolute right-4 top-3.5 text-gray-400 text-xs" title="Locked to logged-in profile"><i class="fas fa-lock"></i></span>
                                             @endif
                                         </div>
@@ -817,17 +860,17 @@
                                     <div>
                                         <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                                             Email Address
-                                            @if($isLoggedIn)
+                                            @if($isLockedToAuth)
                                                 <span class="text-[10px] text-emerald-700 font-bold ml-1">(Auto-Filled & Locked)</span>
                                             @endif
                                         </label>
                                         <div class="relative">
                                             <input type="email" id="ownerEmail" name="owner_email" 
-                                                   value="{{ $authEmail }}"
-                                                   {{ $isLoggedIn ? 'readonly' : '' }}
+                                                   value="{{ $isLockedToAuth ? $authEmail : '' }}"
+                                                   {{ $isLockedToAuth ? 'readonly' : '' }}
                                                    placeholder="rajesh@example.com" 
-                                                   class="w-full {{ $isLoggedIn ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl px-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
-                                            @if($isLoggedIn)
+                                                   class="w-full {{ $isLockedToAuth ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl px-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
+                                            @if($isLockedToAuth)
                                                 <span class="absolute right-4 top-3.5 text-gray-400 text-xs" title="Locked to logged-in profile"><i class="fas fa-lock"></i></span>
                                             @endif
                                         </div>
@@ -1779,10 +1822,24 @@
         }
     }
 
-    // Clamp positive numbers
-    function sanitizePositive(input) {
-        if (input.value !== '' && Number(input.value) < 0) {
-            input.value = 0;
+    // Clamp positive numbers and enforce maximum length & upper limit
+    function sanitizePositive(input, maxVal = null) {
+        if (!input) return;
+        if (input.value !== '') {
+            let clean = input.value.toString().replace(/\D/g, '');
+            const effectiveMax = maxVal !== null ? maxVal : (input.max ? Number(input.max) : null);
+            const effectiveMaxLength = input.maxLength > 0 ? input.maxLength : (input.getAttribute('maxlength') ? Number(input.getAttribute('maxlength')) : null);
+
+            if (effectiveMaxLength && clean.length > effectiveMaxLength) {
+                clean = clean.slice(0, effectiveMaxLength);
+            }
+            if (effectiveMax !== null && Number(clean) > effectiveMax) {
+                clean = String(effectiveMax);
+            }
+            if (clean !== '' && Number(clean) < 0) {
+                clean = '0';
+            }
+            input.value = clean;
         }
     }
 
@@ -1986,19 +2043,42 @@
 
         if (step === 2) {
             const totalBeds = document.getElementById('propTotalBeds');
-            if (totalBeds && (Number(totalBeds.value) < 1 || isNaN(totalBeds.value))) {
-                alert('Total bed capacity must be at least 1.');
-                isValid = false;
+            const availBeds = document.getElementById('propAvailableBeds');
+            if (totalBeds) {
+                const tbVal = Number(totalBeds.value);
+                if (isNaN(tbVal) || tbVal < 1 || tbVal > 5000) {
+                    showError('propTotalBeds', 'Total bed capacity must be between 1 and 5,000.');
+                    isValid = false;
+                }
+                if (availBeds) {
+                    const abVal = Number(availBeds.value);
+                    if (abVal > tbVal) {
+                        showError('propAvailableBeds', 'Available beds cannot exceed total bed capacity (' + tbVal + ').');
+                        isValid = false;
+                    }
+                }
             }
         }
 
         if (step === 3) {
             const rent = document.getElementById('propRent');
+            const deposit = document.getElementById('propDeposit');
+            const maintenance = document.getElementById('propMaintenance');
             const desc = document.getElementById('propDescription');
             const rules = document.getElementById('propRules');
 
-            if (!rent.value || Number(rent.value) < 500) {
-                showError('propRent', 'Monthly starting rent cannot be less than ₹500.');
+            if (!rent.value || Number(rent.value) < 500 || Number(rent.value) > 1000000) {
+                showError('propRent', 'Monthly starting rent must be between ₹500 and ₹10,00,000.');
+                isValid = false;
+            }
+
+            if (deposit && deposit.value !== '' && Number(deposit.value) > 2000000) {
+                showError('propDeposit', 'Security deposit cannot exceed ₹20,00,000.');
+                isValid = false;
+            }
+
+            if (maintenance && maintenance.value !== '' && Number(maintenance.value) > 100000) {
+                showError('propMaintenance', 'Maintenance charges cannot exceed ₹1,00,000 / month.');
                 isValid = false;
             }
 
@@ -2346,6 +2426,42 @@
         if (descInput) descInput.value = p.description || '';
         if (rulesInput) rulesInput.value = p.house_rules || '';
 
+        // Room Sharing Configurations
+        const chkSingle = document.getElementById('chk_room_single');
+        const chkDouble = document.getElementById('chk_room_double');
+        const chkTriple = document.getElementById('chk_room_triple');
+        const chkFour = document.getElementById('chk_room_four');
+
+        const rentSingle = document.getElementById('rent_room_single');
+        const rentDouble = document.getElementById('rent_room_double');
+        const rentTriple = document.getElementById('rent_room_triple');
+        const rentFour = document.getElementById('rent_room_four');
+
+        if (p.room_sharing && Array.isArray(p.room_sharing)) {
+            if (chkSingle) chkSingle.checked = false;
+            if (chkDouble) chkDouble.checked = false;
+            if (chkTriple) chkTriple.checked = false;
+            if (chkFour) chkFour.checked = false;
+
+            p.room_sharing.forEach(rs => {
+                const type = (rs.type || '').toLowerCase();
+                const rent = rs.rent || p.monthly_rent;
+                if (type === 'single') {
+                    if (chkSingle) chkSingle.checked = true;
+                    if (rentSingle && rent) rentSingle.value = rent;
+                } else if (type === 'double') {
+                    if (chkDouble) chkDouble.checked = true;
+                    if (rentDouble && rent) rentDouble.value = rent;
+                } else if (type === 'triple') {
+                    if (chkTriple) chkTriple.checked = true;
+                    if (rentTriple && rent) rentTriple.value = rent;
+                } else if (type === 'four') {
+                    if (chkFour) chkFour.checked = true;
+                    if (rentFour && rent) rentFour.value = rent;
+                }
+            });
+        }
+
         // Amenities
         if (p.amenities && Array.isArray(p.amenities)) {
             document.querySelectorAll('input[name="amenities[]"]').forEach(cb => {
@@ -2362,20 +2478,35 @@
             renderPhotoPreviews();
         }
 
-        // Step 4: Owner Info (Retain locked profile details if authenticated)
+        // Step 4: Owner Info (Load Original Landlord / Broker Details)
         const ownerNameInput = document.getElementById('ownerName');
         const ownerPhoneInput = document.getElementById('ownerPhone');
         const ownerEmailInput = document.getElementById('ownerEmail');
 
-        const isAuthUser = {{ $isLoggedIn ? 'true' : 'false' }};
-        if (!isAuthUser) {
-            if (ownerNameInput && p.owner_name) ownerNameInput.value = p.owner_name;
-            if (ownerPhoneInput && p.owner_phone) ownerPhoneInput.value = p.owner_phone;
-            if (ownerEmailInput && p.owner_email) ownerEmailInput.value = p.owner_email;
-        } else {
-            if (ownerNameInput && !ownerNameInput.value && p.owner_name) ownerNameInput.value = p.owner_name;
-            if (ownerPhoneInput && !ownerPhoneInput.value && p.owner_phone) ownerPhoneInput.value = p.owner_phone;
-            if (ownerEmailInput && !ownerEmailInput.value && p.owner_email) ownerEmailInput.value = p.owner_email;
+        const isAdminUser = {{ $isAdmin ? 'true' : 'false' }};
+
+        if (ownerNameInput && p.owner_name !== undefined) ownerNameInput.value = p.owner_name || '';
+        if (ownerPhoneInput && p.owner_phone !== undefined) ownerPhoneInput.value = p.owner_phone || '';
+        if (ownerEmailInput && p.owner_email !== undefined) ownerEmailInput.value = p.owner_email || '';
+
+        // If in Edit mode or if user is Admin, make owner inputs editable and remove readonly locks
+        if (editPropertyId || isAdminUser) {
+            if (ownerNameInput) {
+                ownerNameInput.readOnly = false;
+                ownerNameInput.className = 'w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition';
+            }
+            if (ownerPhoneInput) {
+                ownerPhoneInput.readOnly = false;
+                ownerPhoneInput.className = 'w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-xl pl-14 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition';
+            }
+            if (ownerEmailInput) {
+                ownerEmailInput.readOnly = false;
+                ownerEmailInput.className = 'w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-xl px-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition';
+            }
+            const adminOwnerPreview = document.getElementById('adminOwnerPreview');
+            if (adminOwnerPreview) {
+                adminOwnerPreview.innerText = `${p.owner_name || 'Landlord'} • ${p.owner_phone || p.owner_email || 'Verified Owner Contact'}`;
+            }
         }
 
         updateLocationSummaryCard(p.city, p.area, p.address, p.pincode);
@@ -2384,11 +2515,13 @@
 
     function initLoggedInContact() {
         const isAuthUser = {{ $isLoggedIn ? 'true' : 'false' }};
+        const isAdminUser = {{ $isAdmin ? 'true' : 'false' }};
         const ownerNameInput = document.getElementById('ownerName');
         const ownerPhoneInput = document.getElementById('ownerPhone');
         const ownerEmailInput = document.getElementById('ownerEmail');
 
-        if (isAuthUser) return; // Already handled server-side by Blade
+        // Never override fields if Admin is managing listings or if editing existing property
+        if (isAdminUser || editPropertyId || isAuthUser) return;
 
         try {
             const rawUser = localStorage.getItem('staynest_user') || localStorage.getItem('broker_user');
@@ -2494,6 +2627,37 @@
         const descriptionVal = descEl?.value.trim() || 'Premium accommodation and paying guest stay in prime location with full amenities.';
         const rulesVal = rulesEl?.value.trim() || '• Gate closes at 11:00 PM\n• No smoking inside rooms\n• Maintain cleanliness';
 
+        // Collect checked room sharing types & pricing
+        const roomSharing = [];
+        if (document.getElementById('chk_room_single')?.checked) {
+            roomSharing.push({
+                type: 'single',
+                name: 'Single Occupancy (Private Room)',
+                rent: Math.max(500, Number(document.getElementById('rent_room_single')?.value || 12000))
+            });
+        }
+        if (document.getElementById('chk_room_double')?.checked) {
+            roomSharing.push({
+                type: 'double',
+                name: 'Double Sharing Room',
+                rent: Math.max(500, Number(document.getElementById('rent_room_double')?.value || 8500))
+            });
+        }
+        if (document.getElementById('chk_room_triple')?.checked) {
+            roomSharing.push({
+                type: 'triple',
+                name: 'Triple Sharing Room',
+                rent: Math.max(500, Number(document.getElementById('rent_room_triple')?.value || 6500))
+            });
+        }
+        if (document.getElementById('chk_room_four')?.checked) {
+            roomSharing.push({
+                type: 'four',
+                name: 'Four Sharing Room',
+                rent: Math.max(500, Number(document.getElementById('rent_room_four')?.value || 5000))
+            });
+        }
+
         const payload = {
             listing_type: typeRadio ? typeRadio.value : 'pg-hostel',
             name: nameEl.value.trim(),
@@ -2517,6 +2681,7 @@
             owner_phone: finalPhone,
             owner_email: ownerEmailEl?.value.trim() || null,
             amenities: amenities,
+            room_sharing: roomSharing,
             photos: uploadedPhotos
         };
 

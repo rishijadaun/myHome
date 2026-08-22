@@ -39,6 +39,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/pgs/{id}/toggle-status', [AdminPropertyController::class, 'toggleStatus'])->name('pgs.toggle');
         Route::post('/pgs/{id}/approve', [AdminPropertyController::class, 'approve'])->name('pgs.approve');
         Route::post('/pgs/{id}/update-tag', [AdminPropertyController::class, 'updateTag'])->name('pgs.update-tag');
+        Route::delete('/pgs/{id}', [AdminPropertyController::class, 'destroy'])->name('pgs.destroy');
+        Route::delete('/properties/{id}', [AdminPropertyController::class, 'destroy'])->name('properties.destroy');
         // Manage Reviews & Moderation
         Route::get('/reviews', [AdminPropertyController::class, 'indexReviews'])->name('reviews');
         Route::post('/reviews/{id}/approve', [AdminPropertyController::class, 'approveReview'])->name('reviews.approve');

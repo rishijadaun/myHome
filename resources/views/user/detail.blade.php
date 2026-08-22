@@ -18,6 +18,7 @@
     $availBeds = $property->available_beds ?? min(4, $totalBeds);
     $propNoticePeriod = (int) ($property->notice_period_days ?? 30);
     $propMaintenance = (float) ($property->maintenance_charges ?? 0);
+    $roomConfigurations = $property ? $property->room_configurations : collect();
     $propSeoTitle = $propName . ' - ' . ucfirst($property->gender_preference ?? 'Co-living') . ' PG in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
     $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
     $propSeoKeywords = $propName . ', PG in ' . ($property->area->name ?? '') . ', PG in ' . ($property->city->name ?? '') . ', ' . ($propGenderMeta['label'] ?? 'Boys') . ' PG in ' . ($property->city->name ?? '') . ', Paying Guest ' . ($property->area->name ?? '') . ', StayNest';
@@ -239,9 +240,11 @@
             <a href="#sec-overview" data-target="sec-overview" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-bold text-gray-900 border-b-2 border-brand transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Overview</span>
             </a>
-            <a href="#sec-pricing" data-target="sec-pricing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>Room &amp; Pricing</span>
-            </a>
+            @if($roomConfigurations && $roomConfigurations->count() > 0)
+                <a href="#sec-pricing" data-target="sec-pricing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                    <span>Room &amp; Pricing</span>
+                </a>
+            @endif
             <a href="#sec-amenities" data-target="sec-amenities" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Amenities</span>
             </a>
@@ -331,52 +334,42 @@
             </div>
 
             <!-- 2. ROOM SHARING & PRICING SECTION -->
-            <div id="sec-pricing" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
-                <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-door-open text-brand"></i> Room Sharing &amp; Pricing
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <!-- Single Room -->
-                    <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 flex flex-col justify-between hover:border-brand transition">
-                        <div>
-                            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Private Room</span>
-                            <h3 class="text-sm font-black text-gray-900 mt-1">Single Occupancy</h3>
-                            <p class="text-[11px] text-gray-500 mt-0.5">Attached washroom &amp; balcony</p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-gray-200">
-                            <span class="text-base font-extrabold text-gray-900">₹{{ number_format((int)str_replace(',', '', $propRent) * 1.4) }}</span>
-                            <span class="text-[11px] text-gray-500">/mo</span>
-                        </div>
+            @if($roomConfigurations && $roomConfigurations->count() > 0)
+                <div id="sec-pricing" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-door-open text-brand"></i> Room Sharing &amp; Pricing
+                        </h2>
+                        <!-- <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-lg">
+                            {{ $roomConfigurations->count() }} {{ Str::plural('Option', $roomConfigurations->count()) }} Available
+                        </span> -->
                     </div>
-
-                    <!-- Double Sharing -->
-                    <div class="p-4 rounded-2xl border-2 border-brand bg-brand-light/30 flex flex-col justify-between relative shadow-xs">
-                        <span class="absolute -top-2.5 right-3 bg-brand text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Most Popular</span>
-                        <div>
-                            <span class="text-xs font-bold text-brand uppercase tracking-wider">Shared Room</span>
-                            <h3 class="text-sm font-black text-gray-900 mt-1">Double Sharing</h3>
-                            <p class="text-[11px] text-gray-500 mt-0.5">Separate beds &amp; wardrobes</p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-brand/20">
-                            <span class="text-base font-extrabold text-brand-dark">₹{{ $propRent }}</span>
-                            <span class="text-[11px] text-gray-500">/mo</span>
-                        </div>
-                    </div>
-
-                    <!-- Triple Sharing -->
-                    <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 flex flex-col justify-between hover:border-brand transition">
-                        <div>
-                            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Budget Shared</span>
-                            <h3 class="text-sm font-black text-gray-900 mt-1">Triple Sharing</h3>
-                            <p class="text-[11px] text-gray-500 mt-0.5">Spacious room with study desk</p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-gray-200">
-                            <span class="text-base font-extrabold text-gray-900">₹{{ number_format((int)str_replace(',', '', $propRent) * 0.85) }}</span>
-                            <span class="text-[11px] text-gray-500">/mo</span>
-                        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-{{ min(3, max(1, $roomConfigurations->count())) }} gap-3.5">
+                        @foreach($roomConfigurations as $rc)
+                            @php
+                                $isPopular = ($rc->room_type_slug === 'double') || ($roomConfigurations->count() === 1);
+                                $occLabel = $rc->max_occupancy == 1 ? 'Private Room' : ($rc->max_occupancy == 2 ? 'Shared Room' : ($rc->max_occupancy == 3 ? 'Triple Shared' : 'Group Sharing'));
+                                $occTitle = $rc->max_occupancy == 1 ? 'Single Occupancy' : ($rc->max_occupancy == 2 ? 'Double Sharing' : ($rc->max_occupancy == 3 ? 'Triple Sharing' : ($rc->max_occupancy == 4 ? 'Four Sharing' : $rc->room_type_name)));
+                                $occDesc = $rc->max_occupancy == 1 ? 'Attached washroom & personal space' : ($rc->max_occupancy . ' beds per room with separate wardrobes');
+                            @endphp
+                            <div class="p-4 rounded-2xl {{ $isPopular ? 'border-2 border-brand bg-brand-light/30 relative shadow-xs' : 'border border-gray-200 bg-gray-50/50 hover:border-brand transition' }} flex flex-col justify-between">
+                                @if($isPopular && $roomConfigurations->count() > 1)
+                                    <span class="absolute -top-2.5 right-3 bg-brand text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Most Popular</span>
+                                @endif
+                                <div>
+                                    <span class="text-xs font-bold {{ $isPopular ? 'text-brand' : 'text-gray-500' }} uppercase tracking-wider">{{ $occLabel }}</span>
+                                    <h3 class="text-sm font-black text-gray-900 mt-1">{{ $occTitle }}</h3>
+                                    <p class="text-[11px] text-gray-500 mt-0.5">{{ $occDesc }}</p>
+                                </div>
+                                <div class="mt-4 pt-3 {{ $isPopular ? 'border-t border-brand/20' : 'border-t border-gray-200' }}">
+                                    <span class="text-base font-extrabold {{ $isPopular ? 'text-brand-dark' : 'text-gray-900' }}">₹{{ number_format($rc->monthly_rent) }}</span>
+                                    <span class="text-[11px] text-gray-500">/mo</span>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-            </div>
+            @endif
 
             <!-- 3. AMENITIES SECTION -->
             <div id="sec-amenities" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">

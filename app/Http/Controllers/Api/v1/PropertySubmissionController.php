@@ -18,6 +18,7 @@ use App\Models\UserProfile;
 use App\Models\UserRole;
 use App\Services\ContentModerationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -92,15 +93,16 @@ class PropertySubmissionController extends Controller
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'gender_preference' => ['nullable', 'in:boys,girls,co-ed'],
-            'monthly_rent' => ['required', 'numeric', 'min:500'],
-            'security_deposit' => ['nullable', 'numeric', 'min:0'],
-            'maintenance_charges' => ['nullable', 'numeric', 'min:0'],
+            'monthly_rent' => ['required', 'numeric', 'min:500', 'max:1000000'],
+            'security_deposit' => ['nullable', 'numeric', 'min:0', 'max:2000000'],
+            'maintenance_charges' => ['nullable', 'numeric', 'min:0', 'max:100000'],
             'notice_period_days' => ['nullable', 'integer', 'min:0', 'max:365'],
-            'total_beds' => ['nullable', 'integer', 'min:1', 'max:1000'],
-            'available_beds' => ['nullable', 'integer', 'min:0', 'max:1000'],
+            'total_beds' => ['nullable', 'integer', 'min:1', 'max:5000'],
+            'available_beds' => ['nullable', 'integer', 'min:0', 'max:5000'],
             'description' => ['required', 'string', 'min:20', 'max:2000'],
             'house_rules' => ['required', 'string', 'min:5', 'max:2000'],
             'amenities' => ['nullable', 'array'],
+            'room_sharing' => ['nullable', 'array'],
             'photos' => ['nullable', 'array'],
             'photos.*' => ['nullable', 'string'],
             'owner_name' => ['required', 'string', 'min:2', 'max:100'],
@@ -113,10 +115,15 @@ class PropertySubmissionController extends Controller
             'address.required' => 'Full address is required for tenant navigation.',
             'monthly_rent.required' => 'Please enter the starting monthly rent.',
             'monthly_rent.min' => 'Monthly starting rent cannot be less than ₹500.',
+            'monthly_rent.max' => 'Monthly starting rent cannot exceed ₹10,00,000.',
             'security_deposit.min' => 'Security deposit cannot be a negative amount.',
+            'security_deposit.max' => 'Security deposit cannot exceed ₹20,00,000.',
             'maintenance_charges.min' => 'Maintenance charges cannot be negative.',
+            'maintenance_charges.max' => 'Maintenance charges cannot exceed ₹1,00,000.',
             'total_beds.min' => 'Total bed capacity must be at least 1.',
+            'total_beds.max' => 'Total bed capacity cannot exceed 5,000.',
             'available_beds.min' => 'Available beds cannot be negative.',
+            'available_beds.max' => 'Available beds cannot exceed 5,000.',
             'description.required' => 'Please provide a detailed property description (at least 20 characters).',
             'description.min' => 'Property description must be at least 20 characters long.',
             'house_rules.required' => 'Please specify house rules / tenant guidelines.',
@@ -146,25 +153,30 @@ class PropertySubmissionController extends Controller
             DB::beginTransaction();
 
             // 1. Identify or Create Owner / Broker User
-            $user = $request->user();
-            if (!$user) {
+            $authUser = $request->user() ?? Auth::user();
+            $isAdmin = $authUser && ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || ($authUser->role ?? '') === 'admin');
+
+            // If guest OR if logged in as Admin submitting on behalf of a landlord/owner:
+            if (!$authUser || $isAdmin) {
                 $rawPhone = !empty($validated['owner_phone']) ? preg_replace('/\D/', '', $validated['owner_phone']) : null;
                 $phone = $rawPhone ? (strlen($rawPhone) >= 10 ? substr($rawPhone, -10) : $rawPhone) : null;
                 $email = !empty($validated['owner_email']) ? trim($validated['owner_email']) : null;
 
-                // Find existing user by phone or email
-                $user = User::where(function ($q) use ($phone, $email) {
-                    if ($phone) {
-                        $q->where('phone', $phone)->orWhere('phone', 'like', "%{$phone}");
-                    }
-                    if ($email) {
-                        $q->orWhere('email', $email);
-                    }
-                })->first();
+                $ownerUser = null;
+                if ($phone || $email) {
+                    $ownerUser = User::where(function ($q) use ($phone, $email) {
+                        if ($phone) {
+                            $q->where('phone', $phone)->orWhere('phone', 'like', "%{$phone}");
+                        }
+                        if ($email) {
+                            $q->orWhere('email', $email);
+                        }
+                    })->first();
+                }
 
-                if (!$user) {
+                if (!$ownerUser && ($phone || $email || !empty($validated['owner_name']))) {
                     $generatedEmail = $email ?: ('owner_' . time() . '_' . Str::random(4) . '@staynest.com');
-                    $user = User::create([
+                    $ownerUser = User::create([
                         'id' => (string) Str::uuid(),
                         'email' => $generatedEmail,
                         'phone' => $phone,
@@ -176,7 +188,7 @@ class PropertySubmissionController extends Controller
                     $nameParts = explode(' ', $validated['owner_name'] ?? 'Property Owner', 2);
                     UserProfile::create([
                         'id' => (string) Str::uuid(),
-                        'user_id' => $user->id,
+                        'user_id' => $ownerUser->id,
                         'first_name' => $nameParts[0] ?? 'Property',
                         'last_name' => $nameParts[1] ?? 'Owner',
                     ]);
@@ -184,7 +196,7 @@ class PropertySubmissionController extends Controller
                     $brokerRole = Role::where('slug', 'broker')->first();
                     if ($brokerRole) {
                         UserRole::firstOrCreate([
-                            'user_id' => $user->id,
+                            'user_id' => $ownerUser->id,
                             'role_id' => $brokerRole->id,
                         ], [
                             'id' => (string) Str::uuid(),
@@ -193,6 +205,10 @@ class PropertySubmissionController extends Controller
                         ]);
                     }
                 }
+
+                $assignedBrokerId = $ownerUser ? $ownerUser->id : ($authUser ? $authUser->id : null);
+            } else {
+                $assignedBrokerId = $authUser->id;
             }
 
             // 2. Resolve City
@@ -246,7 +262,7 @@ class PropertySubmissionController extends Controller
             // 5. Create Property Record (Pending Admin Approval)
             $property = Property::create([
                 'id' => (string) Str::uuid(),
-                'broker_id' => $user->id,
+                'broker_id' => $assignedBrokerId,
                 'city_id' => $city->id,
                 'area_id' => $area->id,
                 'property_type_id' => $propertyType->id,
@@ -269,7 +285,7 @@ class PropertySubmissionController extends Controller
                 'featured' => false,
                 'is_active' => 1,
                 'version' => 1,
-                'created_by' => $user->id,
+                'created_by' => $authUser ? $authUser->id : $assignedBrokerId,
             ]);
 
             // 6. Attach Amenities
@@ -387,6 +403,9 @@ class PropertySubmissionController extends Controller
                 }
             }
 
+            // 7.8 Sync PG Room Sharing Types & Configurations
+            $this->syncPropertyRooms($property, $validated['room_sharing'] ?? []);
+
             // 8. Create Notification for Admin
             Notification::create([
                 'id' => (string) Str::uuid(),
@@ -475,6 +494,14 @@ class PropertySubmissionController extends Controller
             'owner_phone' => $property->broker?->phone ?? '',
             'owner_email' => $property->broker?->email ?? '',
             'amenities' => $amenitySlugs,
+            'room_sharing' => $property->room_configurations->map(function ($rc) {
+                return [
+                    'type' => $rc->room_type_slug,
+                    'name' => $rc->room_type_name,
+                    'rent' => (float) $rc->monthly_rent,
+                    'selected' => true,
+                ];
+            })->values()->toArray(),
             'photos' => $photos,
             'tag' => $property->tag,
             'tag_meta' => $property->tag_meta,
@@ -491,6 +518,8 @@ class PropertySubmissionController extends Controller
     public function update(Request $request, $id)
     {
         $property = Property::where('id', $id)->orWhere('slug', $id)->firstOrFail();
+        $user = $request->user() ?? Auth::user();
+        $isAdmin = $user && ($user->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || ($user->role ?? '') === 'admin');
 
         // Convert empty string owner_email to null so email validator doesn't fail on empty string
         if ($request->has('owner_email') && trim((string) $request->input('owner_email')) === '') {
@@ -508,20 +537,28 @@ class PropertySubmissionController extends Controller
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'gender_preference' => ['nullable', 'in:boys,girls,co-ed'],
-            'monthly_rent' => ['required', 'numeric', 'min:100'],
-            'security_deposit' => ['nullable', 'numeric', 'min:0'],
-            'maintenance_charges' => ['nullable', 'numeric', 'min:0'],
-            'notice_period_days' => ['nullable', 'integer', 'min:0'],
-            'total_beds' => ['nullable', 'integer', 'min:1'],
-            'available_beds' => ['nullable', 'integer', 'min:0'],
-            'description' => ['nullable', 'string'],
-            'house_rules' => ['nullable', 'string'],
+            'monthly_rent' => ['required', 'numeric', 'min:500', 'max:1000000'],
+            'security_deposit' => ['nullable', 'numeric', 'min:0', 'max:2000000'],
+            'maintenance_charges' => ['nullable', 'numeric', 'min:0', 'max:100000'],
+            'notice_period_days' => ['nullable', 'integer', 'min:0', 'max:365'],
+            'total_beds' => ['nullable', 'integer', 'min:1', 'max:5000'],
+            'available_beds' => ['nullable', 'integer', 'min:0', 'max:5000'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'house_rules' => ['nullable', 'string', 'max:2000'],
             'amenities' => ['nullable', 'array'],
+            'room_sharing' => ['nullable', 'array'],
             'photos' => ['nullable', 'array'],
-            'owner_name' => ['nullable', 'string'],
-            'owner_phone' => ['nullable', 'string'],
-            'owner_email' => ['nullable', 'email'],
+            'owner_name' => ['nullable', 'string', 'max:100'],
+            'owner_phone' => ['nullable', 'string', 'max:15'],
+            'owner_email' => ['nullable', 'email', 'max:150'],
             'status' => ['nullable', 'in:active,draft,inactive'],
+        ], [
+            'monthly_rent.min' => 'Monthly starting rent cannot be less than ₹500.',
+            'monthly_rent.max' => 'Monthly starting rent cannot exceed ₹10,00,000.',
+            'security_deposit.max' => 'Security deposit cannot exceed ₹20,00,000.',
+            'maintenance_charges.max' => 'Maintenance charges cannot exceed ₹1,00,000.',
+            'total_beds.max' => 'Total bed capacity cannot exceed 5,000.',
+            'available_beds.max' => 'Available beds cannot exceed 5,000.',
         ]);
 
         DB::beginTransaction();
@@ -702,83 +739,53 @@ class PropertySubmissionController extends Controller
             $ownerName = !empty($validated['owner_name']) ? trim($validated['owner_name']) : null;
 
             if ($ownerPhone || $ownerEmail || $ownerName) {
-                // Check if another user already exists with this phone or email
-                $matchedUser = User::where(function ($q) use ($ownerPhone, $ownerEmail) {
-                    if ($ownerPhone) {
-                        $q->where('phone', $ownerPhone)->orWhere('phone', 'like', "%{$ownerPhone}");
-                    }
-                    if ($ownerEmail) {
-                        $q->orWhere('email', $ownerEmail);
-                    }
-                })->first();
+                // If Admin is updating someone else's property, NEVER change ownership to Admin!
+                if ($isAdmin) {
+                    if ($property->broker) {
+                        $brokerIsAdmin = $property->broker->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || ($property->broker->role ?? '') === 'admin';
+                        if (!$brokerIsAdmin) {
+                            if ($ownerPhone) {
+                                $phoneExists = User::where('id', '!=', $property->broker->id)
+                                    ->where(fn($q) => $q->where('phone', $ownerPhone)->orWhere('phone', 'like', "%{$ownerPhone}"))
+                                    ->exists();
+                                if (!$phoneExists) {
+                                    $property->broker->phone = $ownerPhone;
+                                }
+                            }
+                            if ($ownerEmail) {
+                                $emailExists = User::where('id', '!=', $property->broker->id)
+                                    ->where('email', $ownerEmail)
+                                    ->exists();
+                                if (!$emailExists) {
+                                    $property->broker->email = $ownerEmail;
+                                }
+                            }
+                            $property->broker->save();
 
-                if ($matchedUser) {
-                    // Link property to this existing user if not already linked
-                    if ($property->broker_id !== $matchedUser->id) {
-                        $property->broker_id = $matchedUser->id;
-                        $property->save();
-                    }
-                    // Update user profile name if provided
-                    if ($ownerName && $matchedUser->profile) {
-                        $nameParts = explode(' ', $ownerName, 2);
-                        $matchedUser->profile->first_name = $nameParts[0] ?? 'Property';
-                        $matchedUser->profile->last_name = $nameParts[1] ?? 'Manager';
-                        $matchedUser->profile->save();
+                            if ($ownerName && $property->broker->profile) {
+                                $nameParts = explode(' ', $ownerName, 2);
+                                $property->broker->profile->first_name = $nameParts[0] ?? 'Property';
+                                $property->broker->profile->last_name = $nameParts[1] ?? 'Manager';
+                                $property->broker->profile->save();
+                            }
+                        }
                     }
                 } else {
-                    // No existing user with that phone/email
-                    if ($property->broker) {
-                        // Current broker exists and phone/email is free -> safely update
-                        if ($ownerPhone) {
-                            $property->broker->phone = $ownerPhone;
-                        }
-                        if ($ownerEmail) {
-                            $property->broker->email = $ownerEmail;
-                        }
-                        $property->broker->save();
-
-                        if ($ownerName && $property->broker->profile) {
+                    // Regular broker/owner updating their own property
+                    if ($property->broker && $property->broker_id === $user->id) {
+                        if ($ownerName && $user->profile) {
                             $nameParts = explode(' ', $ownerName, 2);
-                            $property->broker->profile->first_name = $nameParts[0] ?? 'Property';
-                            $property->broker->profile->last_name = $nameParts[1] ?? 'Manager';
-                            $property->broker->profile->save();
+                            $user->profile->first_name = $nameParts[0] ?? 'Property';
+                            $user->profile->last_name = $nameParts[1] ?? 'Manager';
+                            $user->profile->save();
                         }
-                    } else {
-                        // Create a new broker user and attach to property
-                        $newUserEmail = $ownerEmail ?: ('owner_' . time() . '_' . Str::random(4) . '@staynest.com');
-                        $newBroker = User::create([
-                            'id' => (string) Str::uuid(),
-                            'email' => $newUserEmail,
-                            'phone' => $ownerPhone,
-                            'password_hash' => Hash::make(Str::random(12)),
-                            'status' => 'active',
-                            'is_active' => 1,
-                        ]);
-
-                        $nameParts = explode(' ', $ownerName ?: 'Property Manager', 2);
-                        UserProfile::create([
-                            'id' => (string) Str::uuid(),
-                            'user_id' => $newBroker->id,
-                            'first_name' => $nameParts[0] ?? 'Property',
-                            'last_name' => $nameParts[1] ?? 'Manager',
-                        ]);
-
-                        $brokerRole = Role::where('slug', 'broker')->first();
-                        if ($brokerRole) {
-                            UserRole::firstOrCreate([
-                                'user_id' => $newBroker->id,
-                                'role_id' => $brokerRole->id,
-                            ], [
-                                'id' => (string) Str::uuid(),
-                                'is_primary' => 1,
-                                'is_active' => 1,
-                            ]);
-                        }
-
-                        $property->broker_id = $newBroker->id;
-                        $property->save();
                     }
                 }
+            }
+
+            // Sync Room Sharing configurations if provided
+            if (array_key_exists('room_sharing', $validated)) {
+                $this->syncPropertyRooms($property, $validated['room_sharing'] ?? []);
             }
 
             DB::commit();
@@ -792,6 +799,95 @@ class PropertySubmissionController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error('Failed to update property: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Synchronize PG Room Sharing Types & Capacity for a Property.
+     */
+    private function syncPropertyRooms(Property $property, array $roomSharing): void
+    {
+        // 1. Ensure Block & Floor exist for property
+        $block = DB::table('blocks')->where('property_id', $property->id)->first();
+        if (!$block) {
+            $blockId = (string) Str::uuid();
+            DB::table('blocks')->insert([
+                'id' => $blockId,
+                'property_id' => $property->id,
+                'name' => 'Main Block',
+                'is_active' => 1,
+                'version' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } else {
+            $blockId = $block->id;
+        }
+
+        $floor = DB::table('floors')->where('block_id', $blockId)->first();
+        if (!$floor) {
+            $floorId = (string) Str::uuid();
+            DB::table('floors')->insert([
+                'id' => $floorId,
+                'block_id' => $blockId,
+                'floor_number' => 1,
+                'name' => '1st Floor',
+                'is_active' => 1,
+                'version' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } else {
+            $floorId = $floor->id;
+        }
+
+        // Delete existing rooms on this floor to strictly mirror what owner selected
+        DB::table('rooms')->where('floor_id', $floorId)->delete();
+
+        if (empty($roomSharing)) {
+            return;
+        }
+
+        foreach ($roomSharing as $idx => $item) {
+            $slug = strtolower(trim($item['type'] ?? 'double'));
+            if (empty($slug)) continue;
+
+            $rt = DB::table('room_types')->where('slug', $slug)->first();
+            if (!$rt) {
+                $occupancy = $slug === 'single' ? 1 : ($slug === 'double' ? 2 : ($slug === 'triple' ? 3 : ($slug === 'four' ? 4 : 2)));
+                $rtId = (string) Str::uuid();
+                DB::table('room_types')->insert([
+                    'id' => $rtId,
+                    'name' => ucfirst($slug) . ($slug === 'single' ? ' Occupancy' : ' Sharing'),
+                    'slug' => $slug,
+                    'max_occupancy' => $occupancy,
+                    'is_active' => 1,
+                    'version' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $rt = DB::table('room_types')->where('id', $rtId)->first();
+            }
+
+            $roomRent = max(500, (float)($item['rent'] ?? $property->monthly_rent));
+            DB::table('rooms')->insert([
+                'id' => (string) Str::uuid(),
+                'floor_id' => $floorId,
+                'room_type_id' => $rt->id,
+                'room_number' => strtoupper(substr($slug, 0, 1)) . '-' . (101 + $idx),
+                'total_beds' => $rt->max_occupancy,
+                'available_beds' => max(0, $rt->max_occupancy - 1),
+                'monthly_rent' => $roomRent,
+                'security_deposit' => $property->security_deposit ?? ($roomRent * 2),
+                'attached_bathroom' => 1,
+                'ac_available' => 1,
+                'balcony' => 1,
+                'status' => 'available',
+                'is_active' => 1,
+                'version' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 }

@@ -355,7 +355,14 @@ class AdminPropertyController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $property = Property::findOrFail($id);
+        $property = Property::where('id', $id)->orWhere('slug', $id)->first();
+        if (!$property) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Property not found or already deleted.',
+            ], 404);
+        }
+
         $name = $property->name;
         $property->delete();
 

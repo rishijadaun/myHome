@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Property extends Model
@@ -326,6 +327,35 @@ class Property extends Model
     public function approvedReviews()
     {
         return $this->hasMany(Review::class, 'property_id', 'id')->where('status', 'approved');
+    }
+
+    /**
+     * Get active Room Configurations & Sharing Types for this Property.
+     */
+    public function getRoomConfigurationsAttribute()
+    {
+        return DB::table('rooms')
+            ->join('floors', 'rooms.floor_id', '=', 'floors.id')
+            ->join('blocks', 'floors.block_id', '=', 'blocks.id')
+            ->join('room_types', 'rooms.room_type_id', '=', 'room_types.id')
+            ->where('blocks.property_id', $this->id)
+            ->whereNull('rooms.deleted_at')
+            ->select(
+                'rooms.id as room_id',
+                'rooms.monthly_rent',
+                'rooms.security_deposit',
+                'rooms.total_beds',
+                'rooms.available_beds',
+                'rooms.attached_bathroom',
+                'rooms.ac_available',
+                'rooms.balcony',
+                'room_types.id as room_type_id',
+                'room_types.name as room_type_name',
+                'room_types.slug as room_type_slug',
+                'room_types.max_occupancy'
+            )
+            ->orderBy('room_types.max_occupancy', 'asc')
+            ->get();
     }
 
     /**

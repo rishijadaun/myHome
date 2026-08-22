@@ -35,12 +35,16 @@ class BrokerAuthController extends Controller
     public function login(Request $request)
     {
         $validated = $request->validate([
-            'login' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'login' => ['required', 'string', 'min:3', 'max:150'],
+            'password' => ['required', 'string', 'min:4', 'max:100'],
             'remember' => ['nullable', 'boolean'],
         ], [
             'login.required' => 'Please enter your registered broker email or phone number.',
+            'login.min' => 'Broker identifier must be at least 3 characters.',
+            'login.max' => 'Broker identifier cannot exceed 150 characters.',
             'password.required' => 'Please enter your password.',
+            'password.min' => 'Password must be at least 4 characters long.',
+            'password.max' => 'Password cannot exceed 100 characters.',
         ]);
 
         $throttleKey = 'broker-login:' . Str::lower($validated['login']) . '|' . $request->ip();

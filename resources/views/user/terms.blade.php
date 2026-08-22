@@ -1,6 +1,9 @@
 @extends('user.layouts.app')
 
-@section('title', 'Terms & Conditions - StayNest')
+@section('title', 'Terms of Service - StayNest')
+@section('meta_description', 'Read StayNest Terms and Conditions, platform usage policies, verified PG listing rules, tenant safety guidelines and cancellation policies.')
+@section('canonical', route('user.terms'))
+@section('robots', 'noindex, follow')
 
 @section('content')
 <div class="pt-20 md:pt-10 pb-20 max-w-4xl mx-auto px-4 md:px-6">

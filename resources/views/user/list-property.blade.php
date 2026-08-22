@@ -1,17 +1,12 @@
 @extends('user.layouts.app')
 
-@section('title', 'List Your PG & Property Online - 0% Commission | StayNest')
+@section('title', 'List Your PG Free - Reach 50,000+ Tenants with Zero Brokerage | StayNest')
+@section('meta_description', 'List your PG, Hostel, Flat or Co-Living space for rent on StayNest for FREE. Reach 50,000+ verified students and working professionals with 0% brokerage.')
+@section('meta_keywords', 'list PG online, list property for rent, PG owner registration, zero brokerage property listing, list hostel, list flat, StayNest landlord')
+@section('meta_image', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')
+@section('canonical', route('user.list-property'))
 
 @push('styles')
-<!-- SEO Meta Tags -->
-<meta name="description" content="List your PG, Hostel, Flat or Property for rent on StayNest for FREE. Reach 50,000+ verified students and working professionals with 0% brokerage.">
-<meta name="keywords" content="list PG online, list property for rent, PG owner registration, zero brokerage property listing, list hostel, list flat">
-<meta property="og:title" content="List Your PG & Property Online - Zero Commission | StayNest">
-<meta property="og:description" content="Get verified tenants fast. List your PG, Co-living, Flat or commercial space on StayNest. Free listing & instant admin verification.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="{{ url('/list-property') }}">
-<meta property="og:image" content="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80">
-<meta name="twitter:card" content="summary_large_image">
 
 <!-- Schema.org JSON-LD Structured Data -->
 <script type="application/ld+json">

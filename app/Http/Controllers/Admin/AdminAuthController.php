@@ -35,14 +35,17 @@ class AdminAuthController extends Controller
     {
         // 1. Validation
         $validated = $request->validate([
-            'email' => ['required', 'string', 'email:rfc,dns', 'max:150'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'min:5', 'max:150'],
             'password' => ['required', 'string', 'min:4', 'max:100'],
             'remember' => ['nullable', 'boolean'],
         ], [
             'email.required' => 'Admin email address is required.',
+            'email.min' => 'Admin email address must be at least 5 characters.',
+            'email.max' => 'Admin email address cannot exceed 150 characters.',
             'email.email' => 'Please provide a valid administrative email address.',
             'password.required' => 'Master password is required.',
             'password.min' => 'Password must be at least 4 characters long.',
+            'password.max' => 'Password cannot exceed 100 characters.',
         ]);
 
         $email = strtolower(trim($validated['email']));

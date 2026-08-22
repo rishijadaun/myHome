@@ -172,10 +172,15 @@ Route::name('user.')->group(function () {
         return view('user.profile');
     })->name('profile');
     Route::view('/pricing', 'user.pricing')->name('pricing');
-    Route::view('/about', 'user.about')->name('about');
-    Route::view('/contact', 'user.contact')->name('contact');
-    Route::view('/contact-us', 'user.contact');
-    Route::post('/contact', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit'])->name('contact.submit');
+    Route::view('/about-us', 'user.about')->name('about_us');
+    Route::view('/about-us', 'user.about')->name('about');
+    Route::view('/about', 'user.about');
+    
+    Route::view('/contact-us', 'user.contact')->name('contact_us');
+    Route::view('/contact-us', 'user.contact')->name('contact');
+    Route::view('/contact', 'user.contact');
+    Route::post('/contact-us', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit'])->name('contact.submit');
+    Route::post('/contact', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit']);
     Route::view('/terms', 'user.terms')->name('terms');
     Route::view('/terms-and-conditions', 'user.terms');
     Route::view('/privacy', 'user.privacy')->name('privacy');
@@ -187,6 +192,10 @@ Route::name('user.')->group(function () {
     Route::post('/property/{id}/review', [UserHomeController::class, 'submitReview'])->name('property.review');
     Route::post('/ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search'])->name('ai.search');
 });
+
+// Dynamic XML Sitemap for SEO
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+Route::get('/sitemap', [\App\Http\Controllers\SitemapController::class, 'index']);
 
 Route::post('/ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search'])->name('ai.search');
 

@@ -1,6 +1,56 @@
 @extends('user.layouts.app')
 
-@section('title', 'StayNest - Find Verified PGs & Co-living Spaces Across India')
+@section('title', 'StayNest - Find 100% Verified PGs & Co-Living Spaces in India | Zero Brokerage')
+@section('meta_description', 'Search & book 1,200+ verified PGs, luxury hostels, and co-living rooms in Bangalore, Noida, Delhi, Mumbai, Pune, and Gurgaon. Zero brokerage, free WiFi, meals & biometric security.')
+@section('meta_keywords', 'PG near me, Paying Guest Bangalore, Paying Guest Noida, Boys PG, Girls PG, Co-living Hostels, Zero Brokerage PG, StayNest India')
+@section('canonical', route('user.home'))
+
+@push('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{ route('user.home') }}/#organization",
+      "name": "StayNest",
+      "url": "{{ route('user.home') }}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ asset('images/favicon.png') }}"
+      },
+      "sameAs": [
+        "https://www.facebook.com/staynest",
+        "https://twitter.com/staynest",
+        "https://www.instagram.com/staynest"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+91-98765-43210",
+        "contactType": "customer service",
+        "areaServed": "IN",
+        "availableLanguage": ["English", "Hindi"]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "{{ route('user.home') }}/#website",
+      "url": "{{ route('user.home') }}",
+      "name": "StayNest",
+      "description": "Find verified PGs and co-living spaces with zero brokerage across India.",
+      "publisher": {
+        "@id": "{{ route('user.home') }}/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ route('user.search') }}?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+}
+</script>
+@endpush
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
@@ -139,7 +189,7 @@
 @endpush
 
 @section('content')
-<div class="w-full bg-gray-50/50 min-h-screen pb-24 md:pb-12">
+<div class="w-full bg-gray-50/50 min-h-screen pb-24 md:pb-0">
 
     {{-- ============================= 1. PROMO BANNER SWIPER ============================= --}}
     <section class="pt-4 sm:pt-6">
@@ -374,7 +424,7 @@
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -443,7 +493,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -547,7 +597,7 @@
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -615,7 +665,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -705,7 +755,7 @@
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -773,7 +823,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -858,7 +908,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-32 sm:h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -950,7 +1000,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
                 @forelse ($topCities as $c)
                     <a href="{{ route('user.search') }}?city={{ urlencode($c->name) }}" class="relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square tap-ripple group shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
-                        <img src="{{ $c->display_image_url }}" alt="{{ $c->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <img src="{{ $c->display_image_url }}" alt="{{ $c->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
                         <div class="absolute bottom-3 left-3 sm:bottom-3.5 sm:left-3.5 text-left text-white pr-2">
                             <p class="font-black text-sm sm:text-base leading-tight drop-shadow-md tracking-tight">{{ $c->name }}</p>
@@ -970,7 +1020,7 @@
                     @endphp
                     @foreach ($fallbackCities as $fc)
                         <a href="{{ route('user.search') }}?city={{ urlencode($fc['name']) }}" class="relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square tap-ripple group shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
-                            <img src="{{ $fc['img'] }}" alt="{{ $fc['name'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <img src="{{ $fc['img'] }}" alt="{{ $fc['name'] }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
                             <div class="absolute bottom-3 left-3 sm:bottom-3.5 sm:left-3.5 text-left text-white pr-2">
                                 <p class="font-black text-sm sm:text-base leading-tight drop-shadow-md tracking-tight">{{ $fc['name'] }}</p>
@@ -1014,7 +1064,7 @@
     </section>
 
     {{-- ============================= 9. HOST YOUR PG CTA ============================= --}}
-    <section class="mt-8 sm:mt-10 mb-4">
+    <section class="mt-8 sm:mt-10 mb-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-gray-900 rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
                 <div>
@@ -1034,6 +1084,40 @@
         </div>
     </section>
 
+    <section class="max-w-7xl mx-auto px-6 mb-12">
+                <div class="bg-gradient-to-br from-brand-50 to-white rounded-3xl p-12 border border-brand-100 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-96 h-96 bg-brand/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="max-w-xl">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-3">Get the StayNest App</h2>
+                            <p class="text-gray-600 mb-8 text-lg">Search, shortlist &amp; book your favourite stay on the go.</p>
+                            <div class="flex gap-4">
+                                <button class="bg-gray-900 text-white px-6 py-3.5 rounded-xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg">
+                                    <i class="fab fa-google-play text-3xl"></i>
+                                    <div class="text-left">
+                                        <div class="text-[10px] uppercase tracking-wider">GET IT ON</div>
+                                        <div class="text-base font-bold">Google Play</div>
+                                    </div>
+                                </button>
+                                <button class="bg-gray-900 text-white px-6 py-3.5 rounded-xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg">
+                                    <i class="fab fa-apple text-3xl"></i>
+                                    <div class="text-left">
+                                        <div class="text-[10px] uppercase tracking-wider">Download on the</div>
+                                        <div class="text-base font-bold">App Store</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <!-- <div class="bg-white p-4 rounded-2xl shadow-xl">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&amp;data=StayNestApp" alt="QR Code" class="w-32 h-32">
+                            </div> -->
+                            <img src="https://images.unsplash.com/photo-1512941937669-90a1b68c812f?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Mobile app" class="w-80 h-96 object-cover rounded-3xl shadow-2xl">
+                        </div>
+                    </div>
+                </div>
+            </section>
+   
 </div>
 @endsection
 

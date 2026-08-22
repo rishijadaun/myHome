@@ -21,6 +21,11 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::post('register', [AuthController::class, 'register'])->middleware('throttle:register');
         Route::post('login', [AuthController::class, 'login'])->middleware('throttle:login');
         
+        // Password Reset / Forgot Password Endpoints
+        Route::post('forgot-password/request', [AuthController::class, 'forgotPasswordRequest'])->middleware('throttle:5,1');
+        Route::post('forgot-password/verify', [AuthController::class, 'forgotPasswordVerify'])->middleware('throttle:10,1');
+        Route::post('forgot-password/reset', [AuthController::class, 'forgotPasswordReset'])->middleware('throttle:5,1');
+        
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('me', [AuthController::class, 'me']);
             Route::post('logout', [AuthController::class, 'logout']);

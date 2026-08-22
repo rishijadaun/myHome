@@ -6,14 +6,58 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon -->
-<link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-<link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
 
+    <!-- SEO Meta Tags -->
+    <title>@yield('title', 'StayNest - Best Paying Guest & Co-Living PG Discovery Network in India')</title>
+    <meta name="description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage. Explore amenities, high-speed WiFi, food options, and instant direct host booking on StayNest.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'PG near me, Paying Guest, Co-living spaces, Boys PG, Girls PG, Luxury Hostels, Bangalore PG, Noida PG, Delhi PG, StayNest')">
+    <meta name="robots" content="@yield('robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1')">
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+    <meta name="author" content="StayNest Technologies">
 
-    <title>@yield('title', 'StayNest - Find Your Perfect PG')</title>
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:title" content="@yield('title', 'StayNest - Find Your Perfect PG')">
+    <meta property="og:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on StayNest.')">
+    <meta property="og:url" content="@yield('canonical', url()->current())">
+    <meta property="og:site_name" content="StayNest">
+    <meta property="og:image" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta property="og:image:alt" content="StayNest - Verified PG & Co-Living Spaces">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'StayNest - Find Your Perfect PG')">
+    <meta name="twitter:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on StayNest.')">
+    <meta name="twitter:image" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta name="twitter:site" content="@StayNestIndia">
+
+    <!-- Mobile Theme Color -->
+    <meta name="theme-color" content="#4bb59d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="StayNest">
+
+    <!-- Dynamic Schema.org JSON-LD Structured Data -->
+    @stack('schema')
     
+    <!-- Performance Resource Preconnects & DNS Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+    
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     

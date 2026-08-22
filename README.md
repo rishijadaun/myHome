@@ -148,3 +148,7 @@ git config --global user.email "imrishi6@gmail.com"
 -------------------------------------
  "private_key_id": "d04fbae4f0915581169ed0a3396a98b0aa0a2a7d",
  --------------------------------------------------
+
+ cd /home/u262177735/domains/home.devpluss.com/public_html
+ composer install --no-dev --optimize-autoloader
+ -------------------------------------

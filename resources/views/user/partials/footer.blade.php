@@ -44,7 +44,7 @@
 </nav>
 
 <!-- Desktop Global Footer Component -->
-<footer class="hidden md:block bg-gray-900 text-gray-300 mt-12">
+<footer class="hidden md:block bg-gray-900 text-gray-300 mt-0">
     <div class="max-w-7xl mx-auto px-6 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
             <div class="lg:col-span-2">
@@ -97,7 +97,7 @@
                 <span>•</span>
                 <a href="{{ route('user.privacy') }}" class="hover:text-brand transition">Privacy</a>
                 <span>•</span>
-                <a href="{{ route('user.contact') }}" class="hover:text-brand transition">Contact</a>
+                <a href="{{ route('user.contact') }}" class="hover:text-brand transition">Contact Us</a>
                 <span>•</span>
                 <span>Made with <i class="fas fa-heart text-red-500"></i> in India</span>
             </div>

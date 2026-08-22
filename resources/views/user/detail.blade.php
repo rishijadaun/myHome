@@ -15,11 +15,61 @@
     $ownerName = $propOwner->name ?? 'Vikram Singh';
     $ownerPhone = $propOwner->phone ?? '919876543210';
     $cleanPhone = preg_replace('/[^0-9]/', '', $ownerPhone);
-    $totalBeds = $property->total_beds ?? 12;
     $availBeds = $property->available_beds ?? min(4, $totalBeds);
+    $propSeoTitle = $propName . ' - ' . ucfirst($property->gender_preference ?? 'Co-living') . ' PG in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
+    $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
+    $propSeoKeywords = $propName . ', PG in ' . ($property->area->name ?? '') . ', PG in ' . ($property->city->name ?? '') . ', ' . ($propGenderMeta['label'] ?? 'Boys') . ' PG in ' . ($property->city->name ?? '') . ', Paying Guest ' . ($property->area->name ?? '') . ', StayNest';
+    $propSeoImage = $property->display_image_url ?? ($propImages->first()->image_url ?? asset('images/favicon.png'));
+    $propCanonical = route('user.detail', ['slug' => $property->slug ?: $property->id]);
 @endphp
 
-@section('title', $propName . ' - StayNest')
+@section('title', $propSeoTitle)
+@section('meta_description', $propSeoDesc)
+@section('meta_keywords', $propSeoKeywords)
+@section('meta_image', $propSeoImage)
+@section('canonical', $propCanonical)
+@section('og_type', 'place')
+
+@push('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LodgingBusiness",
+  "name": "{{ $propName }}",
+  "image": "{{ $propSeoImage }}",
+  "url": "{{ $propCanonical }}",
+  "telephone": "+91{{ $cleanPhone }}",
+  "priceRange": "₹{{ $propRent }} - ₹{{ $propDeposit }}",
+  "description": "{{ addslashes(strip_tags($property->description ?? $propSeoDesc)) }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ addslashes($property->address ?: ($property->area->name ?? '')) }}",
+    "addressLocality": "{{ addslashes($property->area->name ?? '') }}",
+    "addressRegion": "{{ addslashes($property->city->name ?? 'Delhi NCR') }}",
+    "postalCode": "{{ $property->pincode ?? '201301' }}",
+    "addressCountry": "IN"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "{{ $property->latitude ?? '28.6280' }}",
+    "longitude": "{{ $property->longitude ?? '77.3649' }}"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ $propRating }}",
+    "reviewCount": "{{ max(1, (int)$propReviews) }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  "makesOffer": {
+    "@type": "Offer",
+    "price": "{{ (int)str_replace(',', '', $propRent) }}",
+    "priceCurrency": "INR",
+    "availability": "https://schema.org/InStock"
+  }
+}
+</script>
+@endpush
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
@@ -115,7 +165,7 @@
 
         <div class="flex items-center gap-2">
             <!-- Share Button -->
-            <button type="button" onclick="navigator.clipboard.writeText(window.location.href); alert('Listing link copied to clipboard!');" class="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl text-gray-600 hover:text-brand transition text-xs font-semibold shadow-xs">
+            <button type="button" onclick="openShareModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl text-gray-600 hover:text-brand transition text-xs font-semibold shadow-xs">
                 <i class="fas fa-share-alt"></i> <span class="hidden sm:inline">Share</span>
             </button>
             
@@ -294,7 +344,7 @@
                 <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <i class="fas fa-concierge-bell text-brand"></i> Verified Amenities & Facilities
                 </h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3 sm:gap-4">
                     @forelse($property ? $property->amenities : [] as $am)
                         <div class="flex items-center gap-3 p-3.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-brand hover:bg-brand-light/20 transition">
                             <div class="w-10 h-10 rounded-xl bg-white shadow-xs text-brand flex items-center justify-center text-base flex-shrink-0">
@@ -302,7 +352,7 @@
                             </div>
                             <div class="truncate">
                                 <p class="text-xs font-bold text-gray-900 truncate">{{ $am->name }}</p>
-                                <p class="text-[10px] text-emerald-600 font-semibold">Included</p>
+                                <!-- <p class="text-[10px] text-emerald-600 font-semibold">Included</p> -->
                             </div>
                         </div>
                     @empty
@@ -325,7 +375,7 @@
                                 </div>
                                 <div class="truncate">
                                     <p class="text-xs font-bold text-gray-900 truncate">{{ $dam['name'] }}</p>
-                                    <p class="text-[10px] text-emerald-600 font-semibold">Included</p>
+                                    <!-- <p class="text-[10px] text-emerald-600 font-semibold">Included</p> -->
                                 </div>
                             </div>
                         @endforeach
@@ -584,14 +634,15 @@
                             </p>
                         </div>
                     </div>
-                    <!-- <div class="grid grid-cols-2 gap-2 text-xs">
+                    <!-- Property Owner -->
+                    <div class="grid grid-cols-2 gap-2 text-xs">
                         <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I want to schedule a visit to ' . $propName) }}" target="_blank" class="p-2.5 bg-gray-50 hover:bg-emerald-50 rounded-xl border border-gray-200 text-center font-bold text-gray-700 hover:text-emerald-700 transition">
-                            <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> Visit Schedule
+                            <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> Chat
                         </a>
                         <a href="tel:{{ $cleanPhone }}" class="p-2.5 bg-gray-50 hover:bg-brand-light/30 rounded-xl border border-gray-200 text-center font-bold text-gray-700 hover:text-brand transition">
                             <i class="fas fa-phone mr-1 text-brand"></i> Call Now
                         </a>
-                    </div> -->
+                    </div>
                 </div>
 
             </div>
@@ -626,7 +677,7 @@
                                 <div>
                                     <!-- Card Image -->
                                     <div class="relative aspect-[4/3] overflow-hidden">
-                                        <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                        <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                         <div class="absolute top-2 left-2 {{ $simTag['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
                                             <i class="fas fa-{{ $simTag['icon'] }}"></i> {{ $simTag['label'] }}
                                         </div>
@@ -673,7 +724,7 @@
                         <div>
                             <!-- Card Image -->
                             <div class="relative aspect-[4/3] overflow-hidden">
-                                <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <div class="absolute top-2.5 left-2.5 {{ $simTag['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-sm">
                                     <i class="fas fa-{{ $simTag['icon'] }}"></i> {{ $simTag['label'] }}
                                 </div>
@@ -861,6 +912,73 @@
     </div>
 </div>
 
+<!-- ================= SHARE THIS PROPERTY MODAL ================= -->
+<div id="sharePropertyModal" class="fixed inset-0 z-[3000] hidden items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div onclick="closeShareModal()" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+
+    <!-- Modal Dialog (Matches Provided Design) -->
+    <div class="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 z-10 border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+        <!-- Modal Header -->
+        <div class="flex items-start justify-between mb-5">
+            <div>
+                <h3 class="text-xl font-bold text-gray-900">Share this property</h3>
+                <p class="text-sm text-gray-500 mt-1">Share this amazing stay with your friends and family</p>
+            </div>
+            <button type="button" onclick="closeShareModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition -mt-1 -mr-1" title="Close">
+                <i class="fas fa-times text-base"></i>
+            </button>
+        </div>
+
+        <div class="space-y-5">
+            <!-- Property Link Input Box -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Property Link</label>
+                <div class="flex items-center gap-2 border-2 border-[#4bb59d]/80 hover:border-[#4bb59d] focus-within:border-[#4bb59d] focus-within:ring-4 focus-within:ring-[#4bb59d]/15 rounded-2xl p-1.5 pl-3.5 bg-white transition shadow-2xs">
+                    <input type="text" id="sharePropertyUrlInput" readonly value="{{ url()->current() }}" onclick="copySharePropertyLink()" class="w-full bg-transparent text-xs sm:text-sm text-gray-800 font-medium outline-none truncate select-all cursor-pointer">
+                    <button type="button" onclick="copySharePropertyLink()" id="shareCopyBtn" class="w-9 h-9 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 flex items-center justify-center text-gray-600 hover:text-gray-900 transition flex-shrink-0 cursor-pointer" title="Copy to clipboard">
+                        <i class="far fa-copy text-sm" id="shareCopyIcon"></i>
+                    </button>
+                </div>
+                <p id="shareCopySuccessMsg" class="hidden text-xs font-semibold text-emerald-600 mt-1.5 flex items-center gap-1">
+                    <i class="fas fa-circle-check"></i> Link copied to clipboard!
+                </p>
+            </div>
+
+            <!-- Share on Social Media -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-800 mb-2.5">Share on social media</label>
+                <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
+                    <!-- Twitter / X -->
+                    <button type="button" onclick="shareToTwitter()" class="flex items-center justify-center gap-2 py-2.5 px-3 border border-gray-200 hover:border-gray-300 rounded-2xl hover:bg-gray-50 transition text-sm font-medium text-gray-800 group shadow-2xs cursor-pointer">
+                        <i class="fab fa-twitter text-[#1DA1F2] text-base group-hover:scale-110 transition-transform"></i>
+                        <span>Twitter</span>
+                    </button>
+
+                    <!-- Facebook -->
+                    <button type="button" onclick="shareToFacebook()" class="flex items-center justify-center gap-2 py-2.5 px-3 border border-gray-200 hover:border-gray-300 rounded-2xl hover:bg-gray-50 transition text-sm font-medium text-gray-800 group shadow-2xs cursor-pointer">
+                        <i class="fab fa-facebook text-[#1877F2] text-base group-hover:scale-110 transition-transform"></i>
+                        <span>Facebook</span>
+                    </button>
+
+                    <!-- WhatsApp -->
+                    <button type="button" onclick="shareToWhatsApp()" class="flex items-center justify-center gap-2 py-2.5 px-3 border border-gray-200 hover:border-gray-300 rounded-2xl hover:bg-gray-50 transition text-sm font-medium text-gray-800 group shadow-2xs cursor-pointer">
+                        <i class="fab fa-whatsapp text-[#25D366] text-lg group-hover:scale-110 transition-transform"></i>
+                        <span>WhatsApp</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Close Button -->
+        <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end">
+            <button type="button" onclick="closeShareModal()" class="px-6 py-2 rounded-2xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-800 font-semibold text-sm transition cursor-pointer">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Mobile Sticky Bottom Action Bar -->
 <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-50 px-4 py-3 pb-safe shadow-xl">
     <div class="flex items-center justify-between gap-3">
@@ -869,6 +987,9 @@
             <div class="text-lg font-black text-gray-900">₹{{ $propRent }}<span class="text-[10px] font-normal text-gray-500">/mo</span></div>
         </div>
         <div class="flex items-center gap-2 flex-1 justify-end">
+            <button type="button" onclick="openShareModal()" class="w-11 h-11 bg-gray-50 border border-gray-200 rounded-2xl flex items-center justify-center text-gray-700 hover:text-brand text-base tap-effect cursor-pointer" title="Share Property">
+                <i class="fas fa-share-alt"></i>
+            </button>
             <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I am interested in ' . $propName) }}" target="_blank" class="w-11 h-11 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-center text-emerald-600 text-lg tap-effect">
                 <i class="fab fa-whatsapp"></i>
             </a>
@@ -1134,5 +1255,98 @@
             submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Report';
         }
     }
+
+    /* ================= SHARE PROPERTY MODAL HANDLERS ================= */
+    function openShareModal() {
+        const modal = document.getElementById('sharePropertyModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            const urlInput = document.getElementById('sharePropertyUrlInput');
+            if (urlInput) {
+                urlInput.value = window.location.href;
+            }
+        }
+    }
+
+    function closeShareModal() {
+        const modal = document.getElementById('sharePropertyModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    function copySharePropertyLink() {
+        const url = window.location.href;
+        const icon = document.getElementById('shareCopyIcon');
+        const msg = document.getElementById('shareCopySuccessMsg');
+        const input = document.getElementById('sharePropertyUrlInput');
+
+        if (input) {
+            input.value = url;
+            input.select();
+        }
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(url).then(() => {
+                showCopySuccess();
+            }).catch(() => {
+                fallbackCopyText(url);
+            });
+        } else {
+            fallbackCopyText(url);
+        }
+
+        function showCopySuccess() {
+            if (icon) icon.className = 'fas fa-check text-emerald-600 text-sm';
+            if (msg) msg.classList.remove('hidden');
+            setTimeout(() => {
+                if (icon) icon.className = 'far fa-copy text-sm';
+                if (msg) msg.classList.add('hidden');
+            }, 2500);
+        }
+
+        function fallbackCopyText(text) {
+            try {
+                if (input) {
+                    input.select();
+                    document.execCommand('copy');
+                    showCopySuccess();
+                }
+            } catch (e) {
+                prompt('Copy this link:', text);
+            }
+        }
+    }
+
+    function shareToTwitter() {
+        const title = "{{ addslashes($propName) }} - Verified PG & Co-Living Stay on StayNest";
+        const url = window.location.href;
+        const shareUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url);
+        window.open(shareUrl, '_blank', 'width=600,height=450,scrollbars=yes');
+    }
+
+    function shareToFacebook() {
+        const url = window.location.href;
+        const shareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+        window.open(shareUrl, '_blank', 'width=600,height=450,scrollbars=yes');
+    }
+
+    function shareToWhatsApp() {
+        const title = "Check out {{ addslashes($propName) }} (₹{{ $propRent }}/mo) on StayNest:";
+        const url = window.location.href;
+        const shareUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(title + '\n' + url);
+        window.open(shareUrl, '_blank');
+    }
+
+    // Close modals on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeShareModal();
+            closeReportModal();
+            closeReviewModal();
+        }
+    });
 </script>
 @endpush

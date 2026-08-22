@@ -1,6 +1,44 @@
 @extends('user.layouts.app')
 
-@section('title', 'Pricing & Plans - StayNest')
+@section('title', 'Pricing Plans - Zero Brokerage for Tenants & Transparent Landlord Tiers | StayNest')
+@section('meta_description', 'Explore StayNest pricing plans. 100% free with zero brokerage forever for tenants. Affordable verified listing plans and lead management for PG landlords.')
+@section('meta_keywords', 'StayNest pricing, PG listing subscription, Zero brokerage student PG, Landlord listing plans')
+@section('canonical', route('user.pricing'))
+
+@push('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "StayNest Pricing Plans",
+  "url": "{{ route('user.pricing') }}",
+  "description": "Zero brokerage for tenants, flexible plans for PG owners.",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Tenant Plan",
+      "price": "0",
+      "priceCurrency": "INR",
+      "description": "100% free with zero brokerage forever for students & working professionals."
+    },
+    {
+      "@type": "Offer",
+      "name": "Single PG Host Plan",
+      "price": "999",
+      "priceCurrency": "INR",
+      "description": "Monthly verified listing with tenant lead management."
+    },
+    {
+      "@type": "Offer",
+      "name": "Pro Broker Network Plan",
+      "price": "2499",
+      "priceCurrency": "INR",
+      "description": "Unlimited listings with priority match engine placement."
+    }
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 <div class="pt-20 md:pt-10 pb-20 max-w-7xl mx-auto px-4 md:px-6 space-y-16">

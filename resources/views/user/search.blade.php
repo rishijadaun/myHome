@@ -1,6 +1,47 @@
 @extends('user.layouts.app')
+@php
+    $searchCity = request('city');
+    $searchQ = request('q') ?? request('search');
+    $searchGender = request('gender');
+    
+    if ($searchCity) {
+        $seoSearchTitle = 'PG in ' . ucfirst($searchCity) . ' - Best Boys, Girls & Luxury Co-Living Stays | StayNest';
+        $seoSearchDesc = 'Explore verified PGs and hostels in ' . ucfirst($searchCity) . ' starting from ₹5,000/mo. Zero brokerage, free WiFi, daily meals & biometric security. Compare rooms on StayNest.';
+    } elseif ($searchQ) {
+        $seoSearchTitle = 'Search Results for "' . e($searchQ) . '" - Verified PGs & Hostels | StayNest';
+        $seoSearchDesc = 'Browse top matching PG accommodations and student co-living spaces for "' . e($searchQ) . '" with zero brokerage on StayNest.';
+    } elseif ($searchGender) {
+        $seoSearchTitle = ucfirst($searchGender) . ' PG Accommodations - Verified Hostels & Stays | StayNest';
+        $seoSearchDesc = 'Find top-rated ' . strtolower($searchGender) . ' PGs and co-living stays across major Indian cities with zero brokerage on StayNest.';
+    } else {
+        $seoSearchTitle = 'Find PG Near You - 1,200+ Verified Boys, Girls & Co-Living Stays | StayNest';
+        $seoSearchDesc = 'Discover 1,200+ verified PGs, luxury hostels, and co-living spaces across Bangalore, Noida, Delhi, Mumbai, Pune, and Gurgaon. Zero brokerage, instant booking on StayNest.';
+    }
+    $seoSearchKeywords = 'PG in ' . ($searchCity ?: 'India') . ', paying guest, boys PG, girls PG, co-living spaces, luxury hostels, StayNest';
+@endphp
 
-@section('title', 'Search Properties - StayNest')
+@section('title', $seoSearchTitle)
+@section('meta_description', $seoSearchDesc)
+@section('meta_keywords', $seoSearchKeywords)
+@section('canonical', url()->current())
+
+@push('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SearchResultsPage",
+  "name": "{{ addslashes($seoSearchTitle) }}",
+  "description": "{{ addslashes($seoSearchDesc) }}",
+  "url": "{{ url()->current() }}",
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Verified Paying Guest Accommodations",
+    "itemListOrder": "https://schema.org/ItemListOrderDescending",
+    "numberOfItems": 20
+  }
+}
+</script>
+@endpush
 
 @push('styles')
 <style>

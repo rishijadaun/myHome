@@ -1,6 +1,9 @@
 @extends('user.layouts.app')
 
 @section('title', 'Privacy Policy - StayNest')
+@section('meta_description', 'Learn how StayNest protects your personal data, contact information, accommodation preferences, and KYC verification records.')
+@section('canonical', route('user.privacy'))
+@section('robots', 'noindex, follow')
 
 @section('content')
 <div class="pt-20 md:pt-10 pb-20 max-w-4xl mx-auto px-4 md:px-6">

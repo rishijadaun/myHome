@@ -19,71 +19,59 @@ class UserHomeController extends Controller
      */
     public function index()
     {
-        // 1. Base Query: Only Approved & Active listings
-        $approvedBase = Property::where('status', 'active')
+        // 1. Single-pass query for approved listings
+        $allApproved = Property::where('status', 'active')
             ->where('verification_status', 'verified')
             ->where('is_active', 1)
-            ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
-
-        // 2. PG Near Me Section (Properties with GPS Coordinates preferred, candidate pool)
-        $nearMeProperties = (clone $approvedBase)
-            ->latest()
-            ->take(20)
+            ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType'])
+            ->latest('created_at')
+            ->take(30)
             ->get();
+
+        // 2. PG Near Me Section (take 20)
+        $nearMeProperties = $allApproved->take(20);
 
         // 3. Recommended for You Section (Properties with high tags or top rated, max 4)
-        $recommendedProperties = (clone $approvedBase)
-            ->where(function ($q) {
-                $q->whereIn('tag', ['Guest Favourite', 'Popular', 'Top rated', 'Trending'])
-                  ->orWhere('featured', 1);
-            })
-            ->take(4)
-            ->get();
-
-        // If recommended is less than 4, fallback to include approved properties
+        $recommendedProperties = $allApproved->filter(function ($p) {
+            return in_array($p->tag, ['Guest Favourite', 'Popular', 'Top rated', 'Trending']) || $p->featured;
+        })->take(4);
         if ($recommendedProperties->count() < 4) {
-            $recommendedProperties = (clone $approvedBase)->take(4)->get();
+            $recommendedProperties = $allApproved->take(4);
         }
 
         // 4. Popular Boys PG Section (max 4)
-        $boysProperties = (clone $approvedBase)
-            ->where(function ($q) {
-                $q->where('gender_preference', 'boys')
-                  ->orWhere('gender_preference', 'male');
-            })
-            ->take(4)
-            ->get();
-
-        // If boys properties are few, fallback to any approved (max 4)
+        $boysProperties = $allApproved->filter(function ($p) {
+            $pref = strtolower($p->gender_preference ?? '');
+            return $pref === 'boys' || $pref === 'male';
+        })->take(4);
         if ($boysProperties->isEmpty()) {
-            $boysProperties = (clone $approvedBase)->take(4)->get();
+            $boysProperties = $allApproved->take(4);
         }
 
         // 5. Recently Added Section (max 4)
-        $recentProperties = (clone $approvedBase)
-            ->latest('created_at')
-            ->take(4)
-            ->get();
+        $recentProperties = $allApproved->take(4);
 
-        // 6. Top Cities with active property count (distinct top 6)
-        $rawCities = City::where('is_active', 1)
-            ->withCount(['properties' => function ($q) {
-                $q->where('status', 'active')->where('verification_status', 'verified')->where('is_active', 1);
-            }])
-            ->orderByDesc('properties_count')
-            ->orderByDesc('is_metro')
-            ->orderByDesc('is_tier1')
-            ->get();
+        // 6. Top Cities with active property count (cached for ultra-fast TTFB)
+        $topCities = \Illuminate\Support\Facades\Cache::remember('home_top_cities_v2', 300, function () {
+            $rawCities = City::where('is_active', 1)
+                ->withCount(['properties' => function ($q) {
+                    $q->where('status', 'active')->where('verification_status', 'verified')->where('is_active', 1);
+                }])
+                ->orderByDesc('properties_count')
+                ->orderByDesc('is_metro')
+                ->orderByDesc('is_tier1')
+                ->get();
 
-        $seenCityNames = [];
-        $topCities = $rawCities->filter(function ($city) use (&$seenCityNames) {
-            $normalized = strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $city->name)));
-            if (in_array($normalized, $seenCityNames)) {
-                return false;
-            }
-            $seenCityNames[] = $normalized;
-            return true;
-        })->take(6);
+            $seenCityNames = [];
+            return $rawCities->filter(function ($city) use (&$seenCityNames) {
+                $normalized = strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $city->name)));
+                if (in_array($normalized, $seenCityNames)) {
+                    return false;
+                }
+                $seenCityNames[] = $normalized;
+                return true;
+            })->take(6);
+        });
 
         return view('user.home', compact(
             'nearMeProperties',

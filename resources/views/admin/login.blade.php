@@ -121,6 +121,8 @@
                             name="email" 
                             value="{{ old('email', 'admin@staynest.com') }}" 
                             required 
+                            minlength="5"
+                            maxlength="150"
                             autocomplete="email"
                             placeholder="admin@staynest.com"
                             oninput="validateEmailField()"
@@ -145,6 +147,8 @@
                             name="password" 
                             value="admin123" 
                             required 
+                            minlength="4"
+                            maxlength="100"
                             autocomplete="current-password"
                             placeholder="••••••••"
                             oninput="validatePasswordField()"
@@ -286,6 +290,12 @@
             if (!val) {
                 setEmailError('Email is required');
                 return false;
+            } else if (val.length < 5) {
+                setEmailError('Min 5 characters');
+                return false;
+            } else if (val.length > 150) {
+                setEmailError('Max 150 characters');
+                return false;
             } else if (!emailRegex.test(val)) {
                 setEmailError('Invalid email format');
                 return false;
@@ -323,6 +333,9 @@
                 return false;
             } else if (val.length < 4) {
                 setPasswordError('Min 4 characters');
+                return false;
+            } else if (val.length > 100) {
+                setPasswordError('Max 100 characters');
                 return false;
             } else {
                 clearPasswordError();

@@ -1,6 +1,28 @@
 @extends('user.layouts.map')
 
-@section('title', 'Map View - StayNest')
+@section('title', 'Explore PGs on Map - Find Verified Stays & Hostels Near You | StayNest')
+@section('meta_description', 'Locate verified paying guest (PG) accommodations, boys & girls hostels, and luxury co-living spaces on an interactive GPS map. Filter by budget, gender, amenities, and get instant directions with zero brokerage.')
+@section('meta_keywords', 'PG on map, find PG near me, interactive PG map, PG locator India, hostel map, student housing near me, StayNest map, PG directions')
+@section('canonical', route('user.location'))
+@section('og_type', 'website')
+
+@push('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SearchResultsPage",
+  "name": "Explore Verified PGs and Stays on Interactive Map",
+  "description": "Locate verified paying guest accommodations, boys & girls PGs, and luxury co-living stays on an interactive map.",
+  "url": "{{ route('user.location') }}",
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Map Located Accommodations",
+    "itemListOrder": "https://schema.org/ItemListUnordered",
+    "numberOfItems": {{ isset($properties) ? count($properties) : 20 }}
+  }
+}
+</script>
+@endpush
 
 @push('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />

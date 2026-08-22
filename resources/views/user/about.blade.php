@@ -1,6 +1,33 @@
 @extends('user.layouts.app')
 
-@section('title', 'About Us - StayNest')
+@section('title', 'About Us - India\'s Trusted Zero Brokerage PG & Co-Living Discovery | StayNest')
+@section('meta_description', 'Learn about StayNest\'s mission to eliminate brokerages and provide safe, 100% verified, and comfortable student & professional paying guest accommodations across 18+ cities in India.')
+@section('meta_keywords', 'About StayNest, Co-living company India, Zero brokerage PG network, Verified hostel discovery')
+@section('canonical', route('user.about'))
+
+@push('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "About StayNest",
+  "url": "{{ route('user.about') }}",
+  "description": "StayNest is India's leading zero-brokerage PG and co-living discovery platform.",
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "StayNest Technologies Pvt. Ltd.",
+    "url": "{{ route('user.home') }}",
+    "foundingDate": "2023",
+    "founders": [
+      {
+        "@type": "Person",
+        "name": "StayNest Team"
+      }
+    ]
+  }
+}
+</script>
+@endpush
 
 @section('content')
 <div class="pt-20 md:pt-10 pb-20 max-w-7xl mx-auto px-4 md:px-6 space-y-16">
@@ -62,6 +89,7 @@
         <p class="text-white/80 max-w-xl mx-auto text-xs md:text-sm">Join thousands of students and professionals who found their dream accommodation on StayNest.</p>
         <div class="flex flex-col sm:flex-row justify-center gap-4">
             <a href="{{ route('user.search') }}" class="bg-white text-brand font-bold px-8 py-3.5 rounded-xl tap-effect shadow-md hover:bg-gray-50 transition text-sm">Find PG Now</a>
+            <a href="{{ route('user.contact') }}" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold px-8 py-3.5 rounded-xl tap-effect transition text-sm border border-white/30">Contact Us</a>
             <a href="{{ route('user.list-property') }}" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold px-8 py-3.5 rounded-xl tap-effect transition text-sm border border-white/30">List Property</a>
         </div>
     </div>

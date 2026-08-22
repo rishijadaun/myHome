@@ -1,6 +1,35 @@
 @extends('user.layouts.app')
 
-@section('title', 'Contact Us - StayNest')
+@section('title', 'Contact Us - 24/7 Dedicated Support & Broker Partnerships | StayNest')
+@section('meta_description', 'Contact StayNest customer care, landlord onboarding, and broker partnership team. Call +91 98765 43210, WhatsApp us or submit your query online for fast resolution.')
+@section('meta_keywords', 'Contact StayNest, StayNest customer care, PG landlord helpline, Broker partnership inquiry, StayNest phone number')
+@section('canonical', route('user.contact'))
+
+@push('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Contact StayNest",
+  "url": "{{ route('user.contact') }}",
+  "description": "Get in touch with StayNest support, host onboarding, and broker partnerships.",
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "StayNest",
+    "telephone": "+91-98765-43210",
+    "email": "support@staynest.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "#123, 4th Cross, 80 Feet Road, 4th Block, Koramangala",
+      "addressLocality": "Bengaluru",
+      "addressRegion": "Karnataka",
+      "postalCode": "560034",
+      "addressCountry": "IN"
+    }
+  }
+}
+</script>
+@endpush
 
 @section('content')
 <div class="pt-20 md:pt-10 pb-20 max-w-6xl mx-auto px-4 md:px-6">
@@ -146,16 +175,36 @@
                         <p id="err_email" class="text-[11px] text-rose-500 mt-1 hidden font-medium flex items-center gap-1"><i class="fas fa-circle-exclamation text-[10px]"></i> <span></span></p>
                     </div>
                     <div>
-                        <label for="contact_user_type" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">I am a</label>
+                        @php
+                            $requestedType = request('user_type', request('type', ''));
+                            $isPartnerLocked = in_array($requestedType, ['partner', 'broker', 'broker_partnership']);
+                        @endphp
+                        <label for="contact_user_type" class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide flex items-center justify-between">
+                            <span>I am a</span>
+                            @if($isPartnerLocked)
+                                <span class="bg-brand-50 text-brand border border-brand/20 text-[10px] font-bold px-2 py-0.5 rounded-md normal-case flex items-center gap-1">
+                                    <i class="fas fa-lock text-[9px]"></i> Broker Partner Selected
+                                </span>
+                            @endif
+                        </label>
                         <div class="relative">
-                            <select id="contact_user_type" name="user_type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition appearance-none">
-                                <option value="tenant">Student / Working Professional (Looking for PG)</option>
-                                <option value="owner">PG Owner / Host (Want to List Property)</option>
-                                <option value="partner">Corporate / Broker Partner</option>
-                                <option value="support">Existing Resident Needing Support</option>
-                                <option value="other">General Query / Other</option>
+                            <select id="contact_user_type" name="user_type" {{ $isPartnerLocked ? 'disabled' : '' }} class="w-full {{ $isPartnerLocked ? 'bg-gray-100 text-gray-700 font-semibold cursor-not-allowed' : 'bg-gray-50 text-gray-800' }} border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition appearance-none">
+                                <option value="tenant" {{ $requestedType === 'tenant' ? 'selected' : '' }}>Student / Working Professional (Looking for PG)</option>
+                                <option value="owner" {{ $requestedType === 'owner' ? 'selected' : '' }}>PG Owner / Host (Want to List Property)</option>
+                                <option value="partner" {{ $isPartnerLocked || $requestedType === 'partner' ? 'selected' : '' }}>Corporate / Broker Partner</option>
+                                <option value="support" {{ $requestedType === 'support' ? 'selected' : '' }}>Existing Resident Needing Support</option>
+                                <option value="other" {{ $requestedType === 'other' ? 'selected' : '' }}>General Query / Other</option>
                             </select>
-                            <span class="absolute right-3.5 top-3.5 text-gray-400 pointer-events-none text-xs"><i class="fas fa-chevron-down"></i></span>
+                            @if($isPartnerLocked)
+                                <input type="hidden" id="contact_user_type_hidden" name="user_type" value="partner">
+                            @endif
+                            <span class="absolute right-3.5 top-3.5 text-gray-400 pointer-events-none text-xs">
+                                @if($isPartnerLocked)
+                                    <i class="fas fa-lock text-gray-400"></i>
+                                @else
+                                    <i class="fas fa-chevron-down"></i>
+                                @endif
+                            </span>
                         </div>
                         <p id="err_user_type" class="text-[11px] text-rose-500 mt-1 hidden font-medium flex items-center gap-1"><i class="fas fa-circle-exclamation text-[10px]"></i> <span></span></p>
                     </div>
@@ -318,7 +367,7 @@
             name: document.getElementById('contact_name').value.trim(),
             phone: document.getElementById('contact_phone').value.trim(),
             email: document.getElementById('contact_email').value.trim(),
-            user_type: document.getElementById('contact_user_type').value,
+            user_type: document.getElementById('contact_user_type_hidden')?.value || document.getElementById('contact_user_type')?.value || 'tenant',
             city: document.getElementById('contact_city').value.trim(),
             message: document.getElementById('contact_message').value.trim(),
         };
@@ -376,6 +425,12 @@
                 
                 // Reset form
                 form.reset();
+
+                // If partner was locked, re-select partner
+                const hiddenType = document.getElementById('contact_user_type_hidden');
+                if (hiddenType && hiddenType.value === 'partner') {
+                    document.getElementById('contact_user_type').value = 'partner';
+                }
 
                 // Button success state
                 btn.innerHTML = '<i class="fas fa-check-circle text-sm"></i> <span>Message Sent Successfully!</span>';
@@ -452,5 +507,24 @@
             icon.classList.add('rotate-180');
         }
     }
+
+    // Auto-select and lock Broker Partner when referred from query string
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userTypeParam = urlParams.get('user_type') || urlParams.get('type');
+        if (userTypeParam === 'partner' || userTypeParam === 'broker' || userTypeParam === 'broker_partnership') {
+            const selectEl = document.getElementById('contact_user_type');
+            if (selectEl) {
+                selectEl.value = 'partner';
+                selectEl.disabled = true;
+                selectEl.classList.add('bg-gray-100', 'text-gray-700', 'font-semibold', 'cursor-not-allowed');
+                selectEl.classList.remove('bg-gray-50');
+            }
+            const msgEl = document.getElementById('contact_message');
+            if (msgEl && !msgEl.value) {
+                msgEl.placeholder = "Hello StayNest Team, I would like to partner with StayNest as a property broker. Here are my agency/property details...";
+            }
+        }
+    });
 </script>
 @endpush

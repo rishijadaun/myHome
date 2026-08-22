@@ -223,14 +223,14 @@
                                         <div class="text-[10px] opacity-80 mt-0.5">Students & Working</div>
                                     </div>
                                 </label>
-                                <label class="cursor-pointer">
+                                <!-- <label class="cursor-pointer">
                                     <input type="radio" name="listing_type" value="new-project" class="hidden" onchange="handleTypeChange('new-project')">
                                     <div class="type-pill border-2 border-gray-200 rounded-2xl p-4 text-center transition-all hover:border-brand/40">
                                         <i class="fas fa-building text-xl mb-2 block"></i>
                                         <div class="font-bold text-xs sm:text-sm">New Projects</div>
                                         <div class="text-[10px] opacity-80 mt-0.5">New</div>
                                     </div>
-                                </label>
+                                </label> -->
                                 <label class="cursor-pointer">
                                     <input type="radio" name="listing_type" value="flat-apartment" class="hidden" onchange="handleTypeChange('flat-apartment')">
                                     <div class="type-pill border-2 border-gray-200 rounded-2xl p-4 text-center transition-all hover:border-brand/40">

@@ -237,7 +237,7 @@
     <!-- ================= STICKY DETAIL NAVIGATION TABS (ScrollSpy) ================= -->
     <div id="detailStickyNav" class="sticky top-[58px] md:top-20 z-40 bg-white/95 backdrop-blur-md border-y border-gray-200 shadow-xs mb-6 -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8 transition-all">
         <div class="max-w-7xl mx-auto flex items-center gap-6 sm:gap-8 overflow-x-auto no-scrollbar py-0">
-            <a href="#sec-overview" data-target="sec-overview" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-bold text-gray-900 border-b-2 border-brand transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+            <a href="#sec-overview" data-target="sec-overview" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-bold text-brand border-b-2 border-brand transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Overview</span>
             </a>
             @if($roomConfigurations && $roomConfigurations->count() > 0)
@@ -248,19 +248,20 @@
             <a href="#sec-amenities" data-target="sec-amenities" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Amenities</span>
             </a>
-           
             <a href="#sec-location" data-target="sec-location" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Location</span>
             </a>
             <a href="#sec-rules" data-target="sec-rules" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Rules &amp; More</span>
             </a>
-             <a href="#sec-reviews" data-target="sec-reviews" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+            <a href="#sec-reviews" data-target="sec-reviews" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Reviews</span>
             </a>
-             <a href="#sec-more-listing" data-target="sec-more-listing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>Similar Listing</span>
-            </a>
+            @if(isset($similarProperties) && $similarProperties->count() > 0)
+                <a href="#sec-more-listing" data-target="sec-more-listing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                    <span>Similar Listing</span>
+                </a>
+            @endif
         </div>
     </div>
 
@@ -857,7 +858,7 @@
 
     <!-- ================= 3. SIMILAR RECOMMENDED STAYS ================= -->
     @if(isset($similarProperties) && $similarProperties->count() > 0)
-        <div  id="sec-more-listing" class="mt-12 sm:mt-16 pt-8 border-t border-gray-200">
+        <div id="sec-more-listing" class="mt-12 sm:mt-16 pt-8 border-t border-gray-200 scroll-mt-36 md:scroll-mt-40">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl sm:text-2xl font-black text-gray-900">Similar Verified Stays Nearby</h2>
@@ -1251,59 +1252,84 @@
             });
         }
 
-        /* ================= DETAIL TABS SCROLLSPY ================= */
+        /* ================= DETAIL TABS SCROLLSPY & CLICK ACTIVE STATE ================= */
         const navTabs = document.querySelectorAll('.detail-nav-tab');
-        const sections = [
-            document.getElementById('sec-overview'),
-            document.getElementById('sec-pricing'),
-            document.getElementById('sec-amenities'),
-            document.getElementById('sec-reviews'),
-            document.getElementById('sec-location'),
-            document.getElementById('sec-more-listing'),
-            document.getElementById('sec-rules')
-        ].filter(Boolean);
+        const stickyNavContainer = document.getElementById('detailStickyNav');
 
-        navTabs.forEach(tab => {
-            tab.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('data-target');
-                const targetEl = document.getElementById(targetId);
-                if (!targetEl) return;
+        function getSectionsInOrder() {
+            return Array.from(document.querySelectorAll('.detail-nav-tab')).map(tab => {
+                const targetId = tab.getAttribute('data-target') || (tab.getAttribute('href') ? tab.getAttribute('href').replace('#', '') : null);
+                return targetId ? document.getElementById(targetId) : null;
+            }).filter(Boolean);
+        }
 
-                const headerOffset = window.innerWidth < 768 ? 120 : 155;
-                const elementPosition = targetEl.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        let isManualScrolling = false;
+        let manualScrollTimer = null;
 
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-
-                setActiveNavTab(targetId);
-            });
-        });
-
-        function setActiveNavTab(targetId) {
+        function setActiveNavTab(targetId, shouldScrollNav = true) {
             navTabs.forEach(t => {
-                if (t.getAttribute('data-target') === targetId) {
-                    t.classList.add('text-gray-900', 'font-bold', 'border-brand');
+                const tTarget = t.getAttribute('data-target') || (t.getAttribute('href') ? t.getAttribute('href').replace('#', '') : null);
+                if (tTarget === targetId) {
+                    t.classList.add('text-brand', 'font-bold', 'border-brand');
                     t.classList.remove('text-gray-500', 'border-transparent', 'font-semibold');
-                    t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    
+                    if (shouldScrollNav && stickyNavContainer) {
+                        t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    }
                 } else {
-                    t.classList.remove('text-gray-900', 'font-bold', 'border-brand');
+                    t.classList.remove('text-brand', 'font-bold', 'border-brand');
                     t.classList.add('text-gray-500', 'border-transparent', 'font-semibold');
                 }
             });
         }
 
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-target') || (this.getAttribute('href') ? this.getAttribute('href').replace('#', '') : null);
+                const targetEl = targetId ? document.getElementById(targetId) : null;
+                if (!targetEl) return;
+
+                isManualScrolling = true;
+                if (manualScrollTimer) clearTimeout(manualScrollTimer);
+
+                setActiveNavTab(targetId, true);
+
+                const navHeight = stickyNavContainer ? stickyNavContainer.offsetHeight : 50;
+                const topBarHeight = window.innerWidth < 768 ? 58 : 80;
+                const totalOffset = topBarHeight + navHeight + 16;
+                const elementPosition = targetEl.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - totalOffset;
+
+                window.scrollTo({
+                    top: Math.max(0, offsetPosition),
+                    behavior: 'smooth'
+                });
+
+                manualScrollTimer = setTimeout(() => {
+                    isManualScrolling = false;
+                }, 800);
+            });
+        });
+
         let isScrollTicking = false;
         window.addEventListener('scroll', function() {
+            if (isManualScrolling) return;
+
             if (!isScrollTicking) {
                 window.requestAnimationFrame(function() {
-                    const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
-                    const headerOffset = window.innerWidth < 768 ? 130 : 165;
+                    const sections = getSectionsInOrder();
+                    if (!sections.length) {
+                        isScrollTicking = false;
+                        return;
+                    }
 
-                    let activeId = sections[0]?.id;
+                    const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
+                    const navHeight = stickyNavContainer ? stickyNavContainer.offsetHeight : 50;
+                    const topBarHeight = window.innerWidth < 768 ? 58 : 80;
+                    const headerOffset = topBarHeight + navHeight + 35;
+
+                    let activeId = sections[0].id;
 
                     for (let i = 0; i < sections.length; i++) {
                         const sec = sections[i];
@@ -1313,16 +1339,12 @@
                         }
                     }
 
+                    if ((window.innerHeight + window.pageYOffset) >= (document.documentElement.scrollHeight - 60)) {
+                        activeId = sections[sections.length - 1].id;
+                    }
+
                     if (activeId) {
-                        navTabs.forEach(t => {
-                            if (t.getAttribute('data-target') === activeId) {
-                                t.classList.add('text-gray-900', 'font-bold', 'border-brand');
-                                t.classList.remove('text-gray-500', 'border-transparent', 'font-semibold');
-                            } else {
-                                t.classList.remove('text-gray-900', 'font-bold', 'border-brand');
-                                t.classList.add('text-gray-500', 'border-transparent', 'font-semibold');
-                            }
-                        });
+                        setActiveNavTab(activeId, false);
                     }
 
                     isScrollTicking = false;

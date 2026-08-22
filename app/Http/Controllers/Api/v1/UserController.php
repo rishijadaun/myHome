@@ -181,13 +181,15 @@ class UserController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'current_password' => ['required', 'string'],
-            'new_password' => ['required', 'string', 'min:6', 'confirmed'],
-            'new_password_confirmation' => ['required_with:new_password', 'string'],
+            'current_password' => ['required', 'string', 'max:30'],
+            'new_password' => ['required', 'string', 'min:6', 'max:30', 'confirmed'],
+            'new_password_confirmation' => ['required_with:new_password', 'string', 'max:30'],
         ], [
             'current_password.required' => 'Please enter your current password.',
+            'current_password.max' => 'Current password cannot exceed 30 characters.',
             'new_password.required' => 'Please enter your new password.',
             'new_password.min' => 'New password must be at least 6 characters.',
+            'new_password.max' => 'New password cannot exceed 30 characters.',
             'new_password.confirmed' => 'New password and confirm password do not match.',
         ]);
 

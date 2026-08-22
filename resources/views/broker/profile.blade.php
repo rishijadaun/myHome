@@ -576,7 +576,7 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Current Password <span class="text-red-500">*</span></label>
                             <div class="relative">
-                                <input type="password" id="currentPasswordInput" name="current_password" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition pr-10">
+                                <input type="password" id="currentPasswordInput" name="current_password" required maxlength="30" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition pr-10">
                                 <button type="button" onclick="togglePasswordVisibility('currentPasswordInput')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                                     <i class="fas fa-eye text-xs"></i>
                                 </button>
@@ -587,7 +587,7 @@
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">New Password <span class="text-red-500">*</span></label>
                                 <div class="relative">
-                                    <input type="password" id="newPasswordInput" name="new_password" required minlength="6" placeholder="Min. 6 chars" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition pr-10">
+                                    <input type="password" id="newPasswordInput" name="new_password" required minlength="6" maxlength="30" placeholder="6 - 30 characters" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition pr-10">
                                     <button type="button" onclick="togglePasswordVisibility('newPasswordInput')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                                         <i class="fas fa-eye text-xs"></i>
                                     </button>
@@ -596,7 +596,7 @@
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Confirm New Password <span class="text-red-500">*</span></label>
                                 <div class="relative">
-                                    <input type="password" id="confirmPasswordInput" name="new_password_confirmation" required minlength="6" placeholder="Re-type new password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition pr-10">
+                                    <input type="password" id="confirmPasswordInput" name="new_password_confirmation" required minlength="6" maxlength="30" placeholder="Re-type new password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition pr-10">
                                     <button type="button" onclick="togglePasswordVisibility('confirmPasswordInput')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                                         <i class="fas fa-eye text-xs"></i>
                                     </button>

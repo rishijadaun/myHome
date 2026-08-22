@@ -377,7 +377,7 @@
                             </div>
                             <span class="font-bold text-3xl tracking-tight">StayNest</span>
                         </a>
-                        <h1 class="text-5xl font-bold mb-4 leading-tight">Find Your<br>Perfect Stay</h1>
+                        <h2 class="text-5xl font-bold mb-4 leading-tight">Find Your<br>Perfect Stay</h2>
                         <p class="text-lg text-white/80 max-w-md">Discover verified PGs, hostels & co-living spaces with 100% zero brokerage across India.</p>
                     </div>
                     <div class="space-y-4">

@@ -217,9 +217,9 @@
                                                     <i class="fas fa-shield-halved text-brand text-[10px]"></i> 100% Verified
                                                 </span>
                                             </div>
-                                            <h2 class="text-xl sm:text-3xl md:text-4xl font-black leading-tight mb-1.5 text-white">
+                                            <h3 class="text-xl sm:text-3xl md:text-4xl font-black leading-tight mb-1.5 text-white">
                                                 Save up to <span style="color:#7eebd4">₹15,000</span> on Zero Brokerage
-                                            </h2>
+                                            </h3>
                                             <p class="text-xs sm:text-sm text-white/70 mb-3 max-w-md line-clamp-2">Book directly with verified owners — WiFi, 3 Meals & 24/7 Security included.</p>
                                             <div class="flex flex-wrap gap-2.5">
                                                 <a href="{{ route('user.search') }}" class="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm tap-ripple transition shadow-lg shadow-brand/30">
@@ -391,7 +391,7 @@
     </section>
 
     {{-- ============================= 2. PG NEAR ME ============================= --}}
-    <section class="mt-8 sm:mt-10">
+    <section class="mt-8 sm:mt-10 hidden md:block">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-4">
                 <div>
@@ -418,8 +418,8 @@
                             $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
                             $displayImg = $pg->display_image_url;
                             $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
-                            $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
-                            $reviewCount = $pg->total_reviews ?: (65 + (abs(crc32($pg->id)) % 80));
+                            $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                            $reviewCount = $pg->dynamic_reviews_count;
                         @endphp
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
@@ -433,6 +433,9 @@
                                     </button>
                                     <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
                                         <i class="fas fa-star text-yellow-400 text-[8px]"></i> {{ $ratingVal }}
+                                        @if($reviewCount > 0)
+                                            <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
@@ -488,8 +491,8 @@
                         $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
                         $displayImg = $pg->display_image_url;
                         $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
-                        $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
-                        $reviewCount = $pg->total_reviews ?: (65 + (abs(crc32($pg->id)) % 80));
+                        $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                        $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden">
@@ -501,7 +504,12 @@
                                 <i class="far fa-heart text-xs"></i>
                             </button>
                             <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                                <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }} <span class="text-gray-300 font-normal">({{ $reviewCount }} reviews)</span>
+                                <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                @if($reviewCount > 0)
+                                    <span class="text-gray-300 font-normal">({{ $reviewCount }} {{ Str::plural('review', $reviewCount) }})</span>
+                                @else
+                                    <span class="text-gray-300 font-normal">(0 reviews)</span>
+                                @endif
                             </div>
                         </div>
                         <div class="p-4 flex flex-col flex-1 justify-between">
@@ -591,8 +599,8 @@
                             $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
                             $displayImg = $pg->display_image_url;
                             $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
-                            $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
-                            $reviewCount = $pg->total_reviews ?: (75 + (abs(crc32($pg->id)) % 80));
+                            $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                            $reviewCount = $pg->dynamic_reviews_count;
                         @endphp
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
@@ -606,6 +614,9 @@
                                     </button>
                                     <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
                                         <i class="fas fa-star text-yellow-400 text-[8px]"></i> {{ $ratingVal }}
+                                        @if($reviewCount > 0)
+                                            <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
@@ -660,8 +671,8 @@
                         $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
                         $displayImg = $pg->display_image_url;
                         $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
-                        $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
-                        $reviewCount = $pg->total_reviews ?: (75 + (abs(crc32($pg->id)) % 80));
+                        $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                        $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden">
@@ -673,7 +684,12 @@
                                 <i class="far fa-heart text-xs"></i>
                             </button>
                             <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                                <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }} <span class="text-gray-300 font-normal">({{ $reviewCount }} reviews)</span>
+                                <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                @if($reviewCount > 0)
+                                    <span class="text-gray-300 font-normal">({{ $reviewCount }} {{ Str::plural('review', $reviewCount) }})</span>
+                                @else
+                                    <span class="text-gray-300 font-normal">(0 reviews)</span>
+                                @endif
                             </div>
                         </div>
                         <div class="p-4 flex flex-col flex-1 justify-between">
@@ -722,7 +738,174 @@
         </div>
     </section>
 
-    {{-- ============================= 4. POPULAR BOYS PG ============================= --}}
+    {{-- ============================= 4. POPULAR GIRLS PG ============================= --}}
+    <section class="mt-8 sm:mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="section-title flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-xl bg-pink-50 inline-flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-venus text-pink-600 text-sm"></i>
+                        </span>
+                        Popular Girls PG
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-1 ml-10">Top-rated safe & verified stays with meals, CCTV & biometric security for girls</p>
+                </div>
+                <a href="{{ route('user.search') }}?gender=GIRLS" class="text-xs font-bold text-pink-600 flex items-center gap-1.5 bg-pink-50 hover:bg-pink-100 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                    View all <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+
+            {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
+            <div class="md:hidden swiper girlsPgSwiper overflow-hidden">
+                <div class="swiper-wrapper">
+                    @forelse ($girlsProperties as $pg)
+                        @php
+                            $tagMeta = $pg->display_tag_meta;
+                            $genderMeta = $pg->gender_type_meta;
+                            $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                            $displayImg = $pg->display_image_url;
+                            $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                            $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                            $reviewCount = $pg->dynamic_reviews_count;
+                        @endphp
+                        <div class="swiper-slide !h-auto">
+                            <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                                <div class="relative h-28 sm:h-36 overflow-hidden">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                        <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
+                                    </div>
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                        <i class="far fa-heart text-[10px]"></i>
+                                    </button>
+                                    <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                        <i class="fas fa-star text-yellow-400 text-[8px]"></i> {{ $ratingVal }}
+                                        @if($reviewCount > 0)
+                                            <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-center gap-1 mb-1">
+                                            <span class="font-bold text-xs text-gray-900 truncate">{{ $pg->name }}</span>
+                                            <span class="{{ $genderMeta['class'] }} text-[8px] font-extrabold px-1 py-0.5 rounded flex-shrink-0">{{ $genderMeta['label'] }}</span>
+                                        </div>
+                                        <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                            <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ $locationText }}
+                                        </p>
+                                        <p class="text-[10px] text-pink-600 font-semibold mb-2 flex items-center gap-1 truncate">
+                                            <i class="fas fa-shield-heart text-[9px]"></i> {{ $pg->landmark ?? 'Safe & Secure Stay' }}
+                                        </p>
+                                        <div class="flex flex-wrap gap-1 mb-2">
+                                            @forelse($pg->amenities->take(2) as $am)
+                                                <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                    <i class="fas fa-{{ $am->icon ?? 'wifi' }} text-brand text-[8px]"></i> {{ $am->name }}
+                                                </span>
+                                            @empty
+                                                <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                    <i class="fas fa-wifi text-brand text-[8px]"></i> WiFi
+                                                </span>
+                                                <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                    <i class="fas fa-shield-alt text-brand text-[8px]"></i> 24/7 Security
+                                                </span>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                    <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                        <div>
+                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
+                                            <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                        </div>
+                                        <span class="bg-pink-600 hover:bg-pink-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-pink-500/30 transition">View</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    @empty
+                        <div class="swiper-slide p-6 text-center text-gray-400 text-xs">No girls properties found.</div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- ===== DESKTOP: 4-Col Grid ===== --}}
+            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @forelse ($girlsProperties as $pg)
+                    @php
+                        $tagMeta = $pg->display_tag_meta;
+                        $genderMeta = $pg->gender_type_meta;
+                        $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                        $displayImg = $pg->display_image_url;
+                        $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                        $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                        $reviewCount = $pg->dynamic_reviews_count;
+                    @endphp
+                    <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                        <div class="relative h-44 overflow-hidden">
+                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
+                            </div>
+                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                <i class="far fa-heart text-xs"></i>
+                            </button>
+                            <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                @if($reviewCount > 0)
+                                    <span class="text-gray-300 font-normal">({{ $reviewCount }} {{ Str::plural('review', $reviewCount) }})</span>
+                                @else
+                                    <span class="text-gray-300 font-normal">(0 reviews)</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col flex-1 justify-between">
+                            <div>
+                                <div class="flex justify-between items-center gap-1 mb-1">
+                                    <span class="font-bold text-base text-gray-900 truncate">{{ $pg->name }}</span>
+                                    <span class="{{ $genderMeta['class'] }} text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">{{ $genderMeta['label'] }}</span>
+                                </div>
+                                <p class="text-xs text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                    <i class="fas fa-map-marker-alt text-brand text-[11px]"></i> {{ $locationText }}
+                                </p>
+                                <p class="text-xs text-pink-600 font-semibold mb-3 flex items-center gap-1 truncate">
+                                    <i class="fas fa-shield-heart text-[11px]"></i> {{ $pg->landmark ?? 'Safe, CCTV & Meals Included' }}
+                                </p>
+                                <div class="flex flex-wrap gap-1.5 mb-4">
+                                    @forelse($pg->amenities->take(3) as $am)
+                                        <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                            <i class="fas fa-{{ $am->icon ?? 'wifi' }} text-brand text-[10px]"></i> {{ $am->name }}
+                                        </span>
+                                    @empty
+                                        <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                            <i class="fas fa-wifi text-brand text-[10px]"></i> WiFi
+                                        </span>
+                                        <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                            <i class="fas fa-snowflake text-brand text-[10px]"></i> AC
+                                        </span>
+                                        <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                            <i class="fas fa-shield-alt text-brand text-[10px]"></i> Security
+                                        </span>
+                                    @endforelse
+                                </div>
+                            </div>
+                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                <div>
+                                    <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
+                                    <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                </div>
+                                <span class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-pink-500/30 transition">View</span>
+                            </div>
+                        </div>
+                    </a>
+                @empty
+                    <div class="col-span-4 p-8 text-center text-gray-400 text-sm">No girls properties found.</div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    {{-- ============================= 5. POPULAR BOYS PG ============================= --}}
     <section class="mt-8 sm:mt-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-4">
@@ -750,7 +933,8 @@
                             $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
                             $displayImg = $pg->display_image_url;
                             $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
-                            $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
+                            $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                            $reviewCount = $pg->dynamic_reviews_count;
                         @endphp
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
@@ -764,6 +948,9 @@
                                     </button>
                                     <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
                                         <i class="fas fa-star text-yellow-400 text-[8px]"></i> {{ $ratingVal }}
+                                        @if($reviewCount > 0)
+                                            <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
@@ -818,8 +1005,8 @@
                         $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
                         $displayImg = $pg->display_image_url;
                         $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
-                        $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
-                        $reviewCount = $pg->total_reviews ?: (80 + (abs(crc32($pg->id)) % 80));
+                        $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                        $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden">
@@ -831,7 +1018,12 @@
                                 <i class="far fa-heart text-xs"></i>
                             </button>
                             <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                                <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }} <span class="text-gray-300 font-normal">({{ $reviewCount }} reviews)</span>
+                                <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                @if($reviewCount > 0)
+                                    <span class="text-gray-300 font-normal">({{ $reviewCount }} {{ Str::plural('review', $reviewCount) }})</span>
+                                @else
+                                    <span class="text-gray-300 font-normal">(0 reviews)</span>
+                                @endif
                             </div>
                         </div>
                         <div class="p-4 flex flex-col flex-1 justify-between">
@@ -904,7 +1096,8 @@
                         $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
                         $displayImg = $pg->display_image_url;
                         $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
-                        $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
+                        $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                        $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-32 sm:h-44 overflow-hidden">
@@ -917,6 +1110,9 @@
                             </button>
                             <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                                 <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                @if($reviewCount > 0)
+                                    <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                @endif
                             </div>
                         </div>
                         <div class="p-3 sm:p-4 flex flex-col flex-1 justify-between">
@@ -1069,7 +1265,7 @@
             <div class="bg-gray-900 rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
                 <div>
                     <p class="text-xs font-bold text-brand uppercase tracking-widest mb-1.5">For Property Owners</p>
-                    <h3 class="text-xl sm:text-3xl font-extrabold text-white mb-2 leading-tight">List your PG and fill<br class="sm:hidden"> beds faster</h3>
+                    <h1 class="text-xl sm:text-3xl font-extrabold text-white mb-2 leading-tight">List your PG and fill<br class="sm:hidden"> beds faster</h1>
                     <p class="text-xs sm:text-sm text-gray-400 max-w-lg">Reach 50,000+ students & working professionals searching for verified accommodations every month.</p>
                 </div>
                 <div class="flex items-center gap-3 flex-shrink-0">
@@ -1084,39 +1280,53 @@
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-6 mb-12">
-                <div class="bg-gradient-to-br from-brand-50 to-white rounded-3xl p-12 border border-brand-100 relative overflow-hidden">
-                    <div class="absolute right-0 top-0 w-96 h-96 bg-brand/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
-                    <div class="flex items-center justify-between relative z-10">
-                        <div class="max-w-xl">
-                            <h2 class="text-3xl font-bold text-gray-900 mb-3">Get the StayNest App</h2>
-                            <p class="text-gray-600 mb-8 text-lg">Search, shortlist &amp; book your favourite stay on the go.</p>
-                            <div class="flex gap-4">
-                                <button class="bg-gray-900 text-white px-6 py-3.5 rounded-xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg">
-                                    <i class="fab fa-google-play text-3xl"></i>
-                                    <div class="text-left">
-                                        <div class="text-[10px] uppercase tracking-wider">GET IT ON</div>
-                                        <div class="text-base font-bold">Google Play</div>
-                                    </div>
-                                </button>
-                                <button class="bg-gray-900 text-white px-6 py-3.5 rounded-xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg">
-                                    <i class="fab fa-apple text-3xl"></i>
-                                    <div class="text-left">
-                                        <div class="text-[10px] uppercase tracking-wider">Download on the</div>
-                                        <div class="text-base font-bold">App Store</div>
-                                    </div>
-                                </button>
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16 hidden md:block">
+        <div class="bg-gradient-to-br from-brand-50/80 via-teal-50/30 to-white rounded-3xl p-6 sm:p-8 md:p-12 border border-brand/15 relative overflow-hidden shadow-xs">
+            <div class="absolute right-0 top-0 w-80 sm:w-96 h-80 sm:h-96 bg-brand/10 rounded-full -mr-24 -mt-24 blur-3xl pointer-events-none"></div>
+            <div class="absolute left-0 bottom-0 w-64 h-64 bg-teal-500/5 rounded-full -ml-20 -mb-20 blur-2xl pointer-events-none"></div>
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 relative z-10">
+                <div class="max-w-xl text-center lg:text-left">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider mb-3">
+                        <i class="fas fa-mobile-screen"></i> StayNest Mobile App
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 tracking-tight leading-tight">Get the StayNest App</h2>
+                    <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg leading-relaxed">Search, shortlist &amp; book your favourite verified stays, pay rent with zero brokerage, and get instant owner assistance on the go.</p>
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4">
+                        <button type="button" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
+                            <i class="fab fa-google-play text-2xl sm:text-3xl text-emerald-400"></i>
+                            <div class="text-left">
+                                <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">GET IT ON</div>
+                                <div class="text-xs sm:text-sm md:text-base font-bold">Google Play</div>
                             </div>
-                        </div>
-                        <div class="flex items-center gap-6">
-                            <!-- <div class="bg-white p-4 rounded-2xl shadow-xl">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&amp;data=StayNestApp" alt="QR Code" class="w-32 h-32">
-                            </div> -->
-                            <img src="https://images.unsplash.com/photo-1512941937669-90a1b68c812f?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Mobile app" class="w-80 h-96 object-cover rounded-3xl shadow-2xl">
+                        </button>
+                        <!-- <button type="button" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
+                            <i class="fab fa-apple text-2xl sm:text-3xl text-white"></i>
+                            <div class="text-left">
+                                <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">Download on the</div>
+                                <div class="text-xs sm:text-sm md:text-base font-bold">App Store</div>
+                            </div>
+                        </button> -->
+                    </div>
+                    <!-- <div class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 text-xs text-gray-500 font-medium">
+                        <span class="flex items-center gap-1.5"><i class="fas fa-star text-yellow-400"></i> 4.8★ Rating</span>
+                        <span class="w-1 h-1 rounded-full bg-gray-300 hidden sm:inline-block"></span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-download text-brand"></i> 50K+ Downloads</span>
+                        <span class="w-1 h-1 rounded-full bg-gray-300 hidden sm:inline-block"></span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-shield-alt text-blue-500"></i> 100% Free</span>
+                    </div> -->
+                </div>
+                <div class="flex items-center justify-center w-full lg:w-auto flex-shrink-0">
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-brand to-teal-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-35 transition duration-500"></div>
+                        <div class="relative bg-gray-900 p-2 sm:p-2.5 rounded-[2.2rem] sm:rounded-[2.5rem] shadow-2xl border-4 border-gray-800/80 max-w-[220px] sm:max-w-[260px] md:max-w-[280px] lg:max-w-[300px]">
+                            <div class="absolute top-2.5 left-1/2 -translate-x-1/2 w-12 h-1 bg-gray-700 rounded-full z-20"></div>
+                            <img src="/images/app-banner.png" alt="StayNest Mobile App Preview" loading="lazy" decoding="async" class="w-full h-auto object-contain rounded-[1.8rem] sm:rounded-[2.1rem] transition duration-500 group-hover:scale-[1.01]">
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </div>
+    </section>
    
 </div>
 @endsection
@@ -1161,7 +1371,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // 3. Boys PG horizontal card slider (mobile)
+        // 3. Girls PG horizontal card slider (mobile)
+        new Swiper('.girlsPgSwiper', {
+            slidesPerView: 2.05,
+            spaceBetween: 10,
+            grabCursor: true,
+            breakpoints: {
+                480: { slidesPerView: 2.3, spaceBetween: 12 },
+                640: { slidesPerView: 2.8, spaceBetween: 14 },
+            }
+        });
+
+        // 4. Boys PG horizontal card slider (mobile)
         new Swiper('.boysPgSwiper', {
             slidesPerView: 2.05,
             spaceBetween: 10,

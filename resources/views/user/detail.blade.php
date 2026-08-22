@@ -7,8 +7,8 @@
     $propRent = $property ? number_format($property->monthly_rent) : '8,500';
     $propDeposit = $property && $property->security_deposit ? number_format($property->security_deposit) : number_format((int)str_replace(',', '', $propRent) * 2);
     $propLocation = $property ? (($property->address ?: ($property->area->name ?? '')) . ', ' . ($property->city->name ?? 'Noida')) : 'Sector 62, Noida, Uttar Pradesh';
-    $propRating = isset($avgRating) ? $avgRating : ($property && $property->rating ? number_format($property->rating, 1) : '4.8');
-    $propReviews = isset($totalReviewsCount) ? $totalReviewsCount : ($property && $property->total_reviews ? $property->total_reviews : '0');
+    $propReviews = isset($totalReviewsCount) ? (int)$totalReviewsCount : ($property ? $property->dynamic_reviews_count : 0);
+    $propRating = $propReviews > 0 ? (isset($avgRating) && (float)$avgRating > 0 ? (string)$avgRating : ($property && $property->dynamic_rating > 0 ? $property->dynamic_rating : '4.8')) : 'New';
     $approvedReviews = isset($approvedReviews) ? $approvedReviews : collect();
     $propImages = ($property && $property->images->count() > 0) ? $property->images : collect([(object)['image_url' => $property->display_image_url ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80']]);
     $propOwner = $property->broker ?? null;
@@ -16,6 +16,8 @@
     $ownerPhone = $propOwner->phone ?? '919876543210';
     $cleanPhone = preg_replace('/[^0-9]/', '', $ownerPhone);
     $availBeds = $property->available_beds ?? min(4, $totalBeds);
+    $propNoticePeriod = (int) ($property->notice_period_days ?? 30);
+    $propMaintenance = (float) ($property->maintenance_charges ?? 0);
     $propSeoTitle = $propName . ' - ' . ucfirst($property->gender_preference ?? 'Co-living') . ' PG in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
     $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
     $propSeoKeywords = $propName . ', PG in ' . ($property->area->name ?? '') . ', PG in ' . ($property->city->name ?? '') . ', ' . ($propGenderMeta['label'] ?? 'Boys') . ' PG in ' . ($property->city->name ?? '') . ', Paying Guest ' . ($property->area->name ?? '') . ', StayNest';
@@ -231,70 +233,107 @@
         @endif
     </div>
 
+    <!-- ================= STICKY DETAIL NAVIGATION TABS (ScrollSpy) ================= -->
+    <div id="detailStickyNav" class="sticky top-[58px] md:top-20 z-40 bg-white/95 backdrop-blur-md border-y border-gray-200 shadow-xs mb-6 -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8 transition-all">
+        <div class="max-w-7xl mx-auto flex items-center gap-6 sm:gap-8 overflow-x-auto no-scrollbar py-0">
+            <a href="#sec-overview" data-target="sec-overview" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-bold text-gray-900 border-b-2 border-brand transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                <span>Overview</span>
+            </a>
+            <a href="#sec-pricing" data-target="sec-pricing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                <span>Room &amp; Pricing</span>
+            </a>
+            <a href="#sec-amenities" data-target="sec-amenities" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                <span>Amenities</span>
+            </a>
+           
+            <a href="#sec-location" data-target="sec-location" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                <span>Location</span>
+            </a>
+            <a href="#sec-rules" data-target="sec-rules" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                <span>Rules &amp; More</span>
+            </a>
+             <a href="#sec-reviews" data-target="sec-reviews" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                <span>Reviews</span>
+            </a>
+             <a href="#sec-more-listing" data-target="sec-more-listing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                <span>Similar Listing</span>
+            </a>
+        </div>
+    </div>
+
     <!-- ================= 2. MAIN DETAILS & SIDEBAR ================= -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
         <!-- Left Column: Details, Amenities, Rules, Location -->
         <div class="lg:col-span-2 space-y-6">
 
-            <!-- Title, Badges & Header Info -->
-            <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
-                <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                    <div>
-                        <h1 class="text-xl sm:text-3xl font-black text-gray-900 leading-tight mb-2">{{ $propName }}</h1>
-                        <p class="text-xs sm:text-sm text-gray-600 flex items-center gap-1.5">
-                            <i class="fas fa-map-marker-alt text-brand text-sm"></i>
-                            <span>{{ $propLocation }}</span>
-                        </p>
-                    </div>
-                    
-                    <div class="flex items-center gap-2">
-                        <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-1.5 rounded-2xl flex items-center gap-1.5 shadow-xs">
-                            <i class="fas fa-star text-yellow-500 text-sm"></i>
-                            <span class="font-extrabold text-sm">{{ $propRating }}</span>
-                            <span class="text-[11px] text-gray-500 font-medium">({{ $propReviews }} reviews)</span>
+            <!-- 1. OVERVIEW SECTION -->
+            <div id="sec-overview" class="space-y-6 scroll-mt-36 md:scroll-mt-40">
+                <!-- Title, Badges & Header Info -->
+                <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
+                    <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                        <div>
+                            <h1 class="text-xl sm:text-3xl font-black text-gray-900 leading-tight mb-2">{{ $propName }}</h1>
+                            <p class="text-xs sm:text-sm text-gray-600 flex items-center gap-1.5">
+                                <i class="fas fa-map-marker-alt text-brand text-sm"></i>
+                                <span>{{ $propLocation }}</span>
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-1.5 rounded-2xl flex items-center gap-1.5 shadow-xs">
+                                <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                <span class="font-extrabold text-sm">{{ $propRating }}</span>
+                                <span class="text-[11px] text-gray-500 font-medium">({{ $propReviews }} {{ Str::plural('review', (int)$propReviews) }})</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Bed Availability & Features Pill Row -->
-                <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl {{ $availBeds > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
-                        <i class="fas fa-bed"></i> {{ $availBeds > 0 ? $availBeds . ' Beds Available' : 'Fully Occupied' }}
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
-                        <i class="fas fa-shield-alt"></i> Verified Property
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200">
-                        <i class="fas fa-bolt"></i> 24/7 Power Backup
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
-                        <i class="fas fa-hand-holding-usd"></i> Zero Brokerage
-                    </span>
-                </div>
-            </div>
-
-            <!-- About / Description -->
-            <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
-                <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <i class="fas fa-info-circle text-brand"></i> About this Stay
-                </h2>
-                <p class="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                    {{ $property->description ?? ($propName . ' offers premium, fully furnished student and professional accommodation. Located in a prime area with 24/7 security, high-speed WiFi, hygienic meals, and daily housekeeping.') }}
-                </p>
-                
-                @if($property && $property->landmark)
-                    <div class="mt-4 p-3 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-2.5 text-xs text-gray-700">
-                        <i class="fas fa-compass text-brand text-base"></i>
-                        <span><strong>Key Landmark:</strong> {{ $property->landmark }}</span>
+                    <!-- Bed Availability & Features Pill Row -->
+                    <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl {{ $availBeds > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
+                            <i class="fas fa-bed"></i> {{ $availBeds > 0 ? $availBeds . ' Beds Available' : 'Fully Occupied' }}
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
+                            <i class="fas fa-shield-alt"></i> Verified Property
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200">
+                            <i class="fas fa-bolt"></i> 24/7 Power Backup
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
+                            <i class="fas fa-hand-holding-usd"></i> Zero Brokerage
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-teal-50 text-teal-700 border border-teal-200">
+                            <i class="fas fa-calendar-check"></i> {{ $propNoticePeriod }} Days Notice
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            <i class="fas fa-screwdriver-wrench"></i> {{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . '/mo Maint.' : 'Zero Maintenance' }}
+                        </span>
                     </div>
-                @endif
+                </div>
+
+                <!-- About / Description -->
+                <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
+                    <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-brand"></i> About this Stay
+                    </h2>
+                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                        {{ $property->description ?? ($propName . ' offers premium, fully furnished student and professional accommodation. Located in a prime area with 24/7 security, high-speed WiFi, hygienic meals, and daily housekeeping.') }}
+                    </p>
+                    
+                    @if($property && $property->landmark)
+                        <div class="mt-4 p-3 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-2.5 text-xs text-gray-700">
+                            <i class="fas fa-compass text-brand text-base"></i>
+                            <span><strong>Key Landmark:</strong> {{ $property->landmark }}</span>
+                        </div>
+                    @endif
+                </div>
             </div>
 
-            <!-- Room Sharing & Pricing Options -->
-            <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
+            <!-- 2. ROOM SHARING & PRICING SECTION -->
+            <div id="sec-pricing" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
                 <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-door-open text-brand"></i> Room Sharing & Pricing
+                    <i class="fas fa-door-open text-brand"></i> Room Sharing &amp; Pricing
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                     <!-- Single Room -->
@@ -302,7 +341,7 @@
                         <div>
                             <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Private Room</span>
                             <h3 class="text-sm font-black text-gray-900 mt-1">Single Occupancy</h3>
-                            <p class="text-[11px] text-gray-500 mt-0.5">Attached washroom & balcony</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5">Attached washroom &amp; balcony</p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-gray-200">
                             <span class="text-base font-extrabold text-gray-900">₹{{ number_format((int)str_replace(',', '', $propRent) * 1.4) }}</span>
@@ -316,7 +355,7 @@
                         <div>
                             <span class="text-xs font-bold text-brand uppercase tracking-wider">Shared Room</span>
                             <h3 class="text-sm font-black text-gray-900 mt-1">Double Sharing</h3>
-                            <p class="text-[11px] text-gray-500 mt-0.5">Separate beds & wardrobes</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5">Separate beds &amp; wardrobes</p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-brand/20">
                             <span class="text-base font-extrabold text-brand-dark">₹{{ $propRent }}</span>
@@ -339,56 +378,216 @@
                 </div>
             </div>
 
-            <!-- Amenities Grid -->
-            <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
-                <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-concierge-bell text-brand"></i> Verified Amenities & Facilities
-                </h2>
+            <!-- 3. AMENITIES SECTION -->
+            <div id="sec-amenities" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-concierge-bell text-brand"></i> Verified Amenities &amp; Facilities
+                    </h2>
+                    @if($property && $property->amenities->count() > 0)
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                            {{ $property->amenities->count() }} Amenities Included
+                        </span>
+                    @endif
+                </div>
+
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3 sm:gap-4">
-                    @forelse($property ? $property->amenities : [] as $am)
-                        <div class="flex items-center gap-3 p-3.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-brand hover:bg-brand-light/20 transition">
-                            <div class="w-10 h-10 rounded-xl bg-white shadow-xs text-brand flex items-center justify-center text-base flex-shrink-0">
-                                <i class="fas fa-{{ $am->icon ?? 'check-circle' }}"></i>
+                    @forelse($property && $property->amenities ? $property->amenities : [] as $am)
+                        @php
+                            $iconName = 'check-circle';
+                            $iconColor = 'text-brand';
+                            $slug = strtolower($am->slug ?? $am->name ?? '');
+                            if (str_contains($slug, 'wifi') || str_contains($slug, 'internet')) { $iconName = 'wifi'; $iconColor = 'text-brand'; }
+                            elseif (str_contains($slug, 'ac') || str_contains($slug, 'air')) { $iconName = 'snowflake'; $iconColor = 'text-cyan-500'; }
+                            elseif (str_contains($slug, 'food') || str_contains($slug, 'meal')) { $iconName = 'utensils'; $iconColor = 'text-orange-500'; }
+                            elseif (str_contains($slug, 'laundry') || str_contains($slug, 'wash')) { $iconName = 'tshirt'; $iconColor = 'text-indigo-500'; }
+                            elseif (str_contains($slug, 'power') || str_contains($slug, 'backup')) { $iconName = 'bolt'; $iconColor = 'text-yellow-500'; }
+                            elseif (str_contains($slug, 'cctv') || str_contains($slug, 'security')) { $iconName = 'shield-alt'; $iconColor = 'text-emerald-600'; }
+                            elseif (str_contains($slug, 'housekeeping') || str_contains($slug, 'clean')) { $iconName = 'broom'; $iconColor = 'text-teal-600'; }
+                            elseif (str_contains($slug, 'water') || str_contains($slug, 'ro')) { $iconName = 'tint'; $iconColor = 'text-sky-500'; }
+                            elseif (str_contains($slug, 'bath') || str_contains($slug, 'washroom')) { $iconName = 'bath'; $iconColor = 'text-purple-500'; }
+                            elseif (str_contains($slug, 'parking')) { $iconName = 'square-parking'; $iconColor = 'text-blue-600'; }
+                            elseif (str_contains($slug, 'fridge') || str_contains($slug, 'refrigerator')) { $iconName = 'temperature-low'; $iconColor = 'text-cyan-600'; }
+                            elseif (!empty($am->icon)) { $iconName = $am->icon; }
+                        @endphp
+                        <div class="flex items-center gap-3 p-3.5 bg-emerald-50/40 rounded-2xl border border-emerald-100 hover:border-brand hover:bg-brand-light/30 transition">
+                            <div class="w-10 h-10 rounded-xl bg-white shadow-xs {{ $iconColor }} flex items-center justify-center text-base flex-shrink-0 border border-emerald-100">
+                                <i class="fas fa-{{ $iconName }}"></i>
                             </div>
                             <div class="truncate">
                                 <p class="text-xs font-bold text-gray-900 truncate">{{ $am->name }}</p>
-                                <!-- <p class="text-[10px] text-emerald-600 font-semibold">Included</p> -->
+                                <p class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                                    <i class="fas fa-check-circle text-[9px]"></i> Available
+                                </p>
                             </div>
                         </div>
                     @empty
-                        @php
-                            $defaultAms = [
-                                ['name' => 'High-Speed WiFi', 'icon' => 'wifi'],
-                                ['name' => 'Air Conditioning', 'icon' => 'snowflake'],
-                                ['name' => 'Hygienic Meals / Food', 'icon' => 'utensils'],
-                                ['name' => 'Power Backup 24x7', 'icon' => 'bolt'],
-                                ['name' => 'CCTV & Security', 'icon' => 'shield-alt'],
-                                ['name' => 'Daily Housekeeping', 'icon' => 'broom'],
-                                ['name' => 'Attached Washroom', 'icon' => 'bath'],
-                                ['name' => 'RO Drinking Water', 'icon' => 'tint'],
-                            ];
-                        @endphp
-                        @foreach($defaultAms as $dam)
-                            <div class="flex items-center gap-3 p-3.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-brand hover:bg-brand-light/20 transition">
-                                <div class="w-10 h-10 rounded-xl bg-white shadow-xs text-brand flex items-center justify-center text-base flex-shrink-0">
-                                    <i class="fas fa-{{ $dam['icon'] }}"></i>
-                                </div>
-                                <div class="truncate">
-                                    <p class="text-xs font-bold text-gray-900 truncate">{{ $dam['name'] }}</p>
-                                    <!-- <p class="text-[10px] text-emerald-600 font-semibold">Included</p> -->
-                                </div>
-                            </div>
-                        @endforeach
+                        <div class="col-span-2 sm:col-span-3 p-6 text-center text-gray-500 text-xs bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                            <i class="fas fa-concierge-bell text-2xl text-gray-300 mb-1.5 block"></i>
+                            Standard accommodation facilities provided. Contact owner for full amenity inventory.
+                        </div>
                     @endforelse
                 </div>
             </div>
 
-            <!-- House Rules & Policies -->
-            <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
+            <!-- 4. FOOD & MEALS SECTION -->
+            <!-- <div id="sec-food" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
                 <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-clipboard-list text-brand"></i> House Rules & Stay Policies
+                    <i class="fas fa-utensils text-brand"></i> Food &amp; Meals Plan
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-4">
+                    <div class="p-4 rounded-2xl bg-orange-50/60 border border-orange-100/80">
+                        <div class="flex items-center gap-2 text-orange-600 font-bold text-xs mb-1">
+                            <i class="fas fa-sun"></i> Breakfast
+                        </div>
+                        <p class="text-sm font-black text-gray-900">8:00 AM - 10:30 AM</p>
+                        <p class="text-[11px] text-gray-500 mt-0.5">Poha, Idli/Dosa, Parathas &amp; Tea</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-100/80">
+                        <div class="flex items-center gap-2 text-amber-600 font-bold text-xs mb-1">
+                            <i class="fas fa-cloud-sun"></i> Lunch / Tiffin
+                        </div>
+                        <p class="text-sm font-black text-gray-900">1:00 PM - 3:00 PM</p>
+                        <p class="text-[11px] text-gray-500 mt-0.5">Dal, Seasonal Veg, Roti, Rice &amp; Salad</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100/80">
+                        <div class="flex items-center gap-2 text-indigo-600 font-bold text-xs mb-1">
+                            <i class="fas fa-moon"></i> Dinner
+                        </div>
+                        <p class="text-sm font-black text-gray-900">8:00 PM - 10:30 PM</p>
+                        <p class="text-[11px] text-gray-500 mt-0.5">Special Veg/Paneer, Dal Tadka &amp; Sweet</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs text-gray-600">
+                    <div class="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fas fa-seedling text-emerald-500"></i> Pure Veg &amp; Egg Options
+                    </div>
+                    <div class="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fas fa-tint text-blue-500"></i> RO Purified Water
+                    </div>
+                    <div class="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fas fa-snowflake text-cyan-500"></i> Common Refrigerator
+                    </div>
+                    <div class="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fas fa-kitchen-set text-purple-500"></i> Microwave Access
+                    </div>
+                </div>
+            </div> -->
+
+          
+
+            <!-- 6. LOCATION & NEIGHBORHOOD SECTION -->
+            @php
+                $mapLat = $property->map_latitude ?? $property->latitude ?? null;
+                $mapLng = $property->map_longitude ?? $property->longitude ?? null;
+                $fullAddressString = trim(($property->address ? $property->address . ', ' : '') . ($property->area->name ?? '') . ', ' . ($property->city->name ?? '') . ($property->pincode ? ' - ' . $property->pincode : ''));
+                if (empty($fullAddressString)) {
+                    $fullAddressString = $propLocation;
+                }
+                
+                if ($mapLat && $mapLng && is_numeric($mapLat) && is_numeric($mapLng) && floatval($mapLat) != 0 && floatval($mapLng) != 0) {
+                    $mapEmbedUrl = "https://maps.google.com/maps?q=" . $mapLat . "," . $mapLng . "&hl=en&z=15&output=embed";
+                    $googleDirectionsUrl = "https://www.google.com/maps/dir/?api=1&destination=" . $mapLat . "," . $mapLng;
+                } else {
+                    $mapEmbedUrl = "https://maps.google.com/maps?q=" . urlencode($fullAddressString . ', India') . "&hl=en&z=15&output=embed";
+                    $googleDirectionsUrl = "https://www.google.com/maps/search/?api=1&query=" . urlencode(($property->name ?? $propName) . ' ' . $fullAddressString);
+                }
+            @endphp
+            <div id="sec-location" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-map-location-dot text-brand"></i> Location &amp; Neighborhood
+                        </h2>
+                        <!-- <p class="text-xs text-gray-500 mt-0.5">{{ $fullAddressString }}</p> -->
+                    </div>
+                    <a href="{{ $googleDirectionsUrl }}" target="_blank" class="px-4 py-2 bg-brand-light hover:bg-brand text-brand hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
+                        <i class="fas fa-directions"></i> Get Directions
+                    </a>
+                </div>
+
+                <!-- Address Details Card -->
+                <div class="p-4 bg-gray-50/80 rounded-2xl border border-gray-100 mb-4 flex items-start gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center text-base flex-shrink-0 mt-0.5">
+                        <i class="fas fa-location-dot"></i>
+                    </div>
+                    <div class="text-xs space-y-1">
+                        <p class="font-bold text-gray-900">{{ $property->address ?: $propName }}</p>
+                        <p class="text-gray-600">{{ ($property->area->name ?? '') . ($property->city ? ', ' . $property->city->name : '') . ($property->pincode ? ' - ' . $property->pincode : '') }}</p>
+                        @if($property && $property->landmark)
+                            <p class="text-emerald-700 font-semibold flex items-center gap-1 pt-0.5">
+                                <i class="fas fa-compass text-[11px]"></i> <strong>Landmark:</strong> {{ $property->landmark }}
+                            </p>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                    <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base font-bold flex-shrink-0">
+                            <i class="fas fa-train-subway"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-900">Nearest Metro</p>
+                            <p class="text-[11px] text-gray-500">~500m (5-7 mins walk)</p>
+                        </div>
+                    </div>
+                    <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base font-bold flex-shrink-0">
+                            <i class="fas fa-building-columns"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-900">Tech Parks / Hubs</p>
+                            <p class="text-[11px] text-gray-500">Close to IT Parks &amp; Unis</p>
+                        </div>
+                    </div>
+                    <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-base font-bold flex-shrink-0">
+                            <i class="fas fa-basket-shopping"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-900">Market &amp; Hospital</p>
+                            <p class="text-[11px] text-gray-500">Within walking distance</p>
+                        </div>
+                    </div>
+                </div> -->
+
+                <!-- Google Maps Interactive Iframe -->
+                <div class="rounded-2xl overflow-hidden border border-gray-200 h-64 sm:h-72 relative bg-slate-100 shadow-inner">
+                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="{{ $mapEmbedUrl }}" loading="lazy" class="w-full h-full border-0"></iframe>
+                    
+                    <!-- Map Pin Floating Card -->
+                    <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-md border border-gray-100 text-xs flex items-center gap-2 max-w-[90%] pointer-events-none">
+                        <i class="fas fa-location-dot text-brand text-sm"></i>
+                        <span class="font-bold text-gray-900 truncate">{{ $property->name ?? $propName }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. HOUSE RULES & POLICIES SECTION -->
+            <div id="sec-rules" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
+                <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-clipboard-list text-brand"></i> House Rules &amp; Stay Policies
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <!-- Notice Period Policy -->
+                    <div class="flex items-start gap-3 p-3.5 bg-teal-50/50 rounded-2xl border border-teal-100">
+                        <i class="fas fa-calendar-check text-teal-600 text-sm mt-0.5 flex-shrink-0"></i>
+                        <div>
+                            <p class="text-xs font-bold text-gray-900">Notice Period</p>
+                            <p class="text-[11px] text-gray-600">{{ $propNoticePeriod }} days prior notice required before vacating room</p>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Policy -->
+                    <div class="flex items-start gap-3 p-3.5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                        <i class="fas fa-screwdriver-wrench text-indigo-600 text-sm mt-0.5 flex-shrink-0"></i>
+                        <div>
+                            <p class="text-xs font-bold text-gray-900">Maintenance Charges</p>
+                            <p class="text-[11px] text-gray-600">{{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . ' per month maintenance' : 'Zero maintenance charges (Included in rent)' }}</p>
+                        </div>
+                    </div>
+
                     @forelse($property ? $property->rules : [] as $rule)
                         <div class="flex items-start gap-3 p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
                             <i class="fas fa-check-circle text-emerald-500 text-sm mt-0.5 flex-shrink-0"></i>
@@ -412,29 +611,21 @@
                         <div class="flex items-start gap-3 p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
                             <i class="fas fa-ban text-rose-500 text-sm mt-0.5 flex-shrink-0"></i>
                             <div>
-                                <p class="text-xs font-bold text-gray-900">Smoking & Alcohol</p>
+                                <p class="text-xs font-bold text-gray-900">Smoking &amp; Alcohol</p>
                                 <p class="text-[11px] text-gray-500">Strictly prohibited inside room premises</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3 p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
-                            <i class="fas fa-calendar-alt text-brand text-sm mt-0.5 flex-shrink-0"></i>
-                            <div>
-                                <p class="text-xs font-bold text-gray-900">Notice Period</p>
-                                <p class="text-[11px] text-gray-500">30 days prior notice before vacate</p>
                             </div>
                         </div>
                     @endforelse
                 </div>
             </div>
-
-            <!-- ================= REVIEWS & RATINGS SECTION ================= -->
-            <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm" id="reviewsSection">
+              <!-- 5. REVIEWS & RATINGS SECTION -->
+            <div id="sec-reviews" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-5 border-b border-gray-100">
                     <div>
                         <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
                             <i class="fas fa-star text-yellow-400"></i> Verified Resident Reviews
                         </h2>
-                        <p class="text-xs text-gray-500 mt-0.5">Authentic feedback from verified guests & residents</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Authentic feedback from verified guests &amp; residents</p>
                     </div>
 
                     <button type="button" onclick="openReviewModal()" id="reviewTriggerBtn" class="px-4 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-2xl text-xs font-bold transition tap-effect shadow-md shadow-brand/20 flex items-center gap-2">
@@ -447,8 +638,11 @@
                     <div class="text-center sm:border-r sm:border-gray-200 sm:pr-4">
                         <div class="text-3xl sm:text-4xl font-black text-gray-900 leading-none mb-1">{{ $propRating }}</div>
                         <div class="flex items-center justify-center gap-1 text-yellow-400 text-sm mb-1">
+                            @php
+                                $starScore = is_numeric($propRating) ? round((float)$propRating) : 5;
+                            @endphp
                             @for($i = 1; $i <= 5; $i++)
-                                <i class="{{ $i <= round($propRating) ? 'fas' : 'far' }} fa-star"></i>
+                                <i class="{{ $i <= $starScore ? 'fas' : 'far' }} fa-star"></i>
                             @endfor
                         </div>
                         <p class="text-xs text-gray-500 font-semibold">{{ $propReviews }} Verified {{ Str::plural('Review', (int)$propReviews) }}</p>
@@ -571,11 +765,11 @@
         <div class="lg:col-span-1 space-y-6">
             
             <!-- Sticky Container -->
-            <div class="lg:sticky lg:top-24 space-y-6">
+            <div class="lg:sticky lg:top-40 space-y-6">
 
                 <!-- Rent & Booking Summary Card -->
                 <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl">
-                    <div class="flex items-baseline justify-between mb-4 pb-4 border-b border-gray-100">
+                    <div class="flex items-baseline justify-between mb-3 pb-3 border-b border-gray-100">
                         <div>
                             <span class="text-xs font-semibold text-gray-500 block">Monthly Rent</span>
                             <div class="text-2xl sm:text-3xl font-black text-gray-900 leading-none">
@@ -585,6 +779,24 @@
                         <div class="text-right">
                             <span class="text-[11px] font-semibold text-gray-500 block">Deposit</span>
                             <span class="text-sm font-bold text-gray-800">₹{{ $propDeposit }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Notice Period & Maintenance Badges -->
+                    <div class="grid grid-cols-2 gap-2 mb-4 p-2.5 rounded-2xl bg-gray-50 border border-gray-100 text-xs">
+                        <div>
+                            <span class="text-[10px] text-gray-400 font-bold uppercase block leading-none mb-1">Maintenance</span>
+                            <span class="font-bold text-gray-900 leading-tight flex items-center gap-1 text-xs">
+                                <i class="fas fa-screwdriver-wrench text-indigo-500 text-[10px]"></i>
+                                {{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . '/mo' : 'Included (₹0)' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-gray-400 font-bold uppercase block leading-none mb-1">Notice Period</span>
+                            <span class="font-bold text-gray-900 leading-tight flex items-center gap-1 text-xs">
+                                <i class="fas fa-calendar-day text-teal-600 text-[10px]"></i>
+                                {{ $propNoticePeriod }} Days
+                            </span>
                         </div>
                     </div>
 
@@ -609,20 +821,20 @@
                             <i class="fas fa-check-circle text-emerald-500"></i>
                             <span>Zero Booking Charges</span>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <!-- <div class="flex items-center gap-2">
                             <i class="fas fa-check-circle text-emerald-500"></i>
                             <span>100% Verified Accommodation</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <i class="fas fa-check-circle text-emerald-500"></i>
                             <span>Immediate Move-In Available</span>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
                 <!-- Host Profile Card -->
                 <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3.5">Listing Host / Manager</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3.5">Owner</h3>
                     <div class="flex items-center gap-3.5 mb-4">
                         <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand to-brand-light text-white flex items-center justify-center text-lg font-black shadow-sm">
                             {{ strtoupper(substr($ownerName, 0, 1)) }}
@@ -630,16 +842,16 @@
                         <div>
                             <p class="font-extrabold text-sm text-gray-900">{{ $ownerName }}</p>
                             <p class="text-xs text-emerald-600 font-semibold flex items-center gap-1">
-                                <i class="fas fa-check-circle text-[11px]"></i> Verified StayNest Host
+                                <i class="fas fa-check-circle text-[11px]"></i> Verified 
                             </p>
                         </div>
                     </div>
                     <!-- Property Owner -->
                     <div class="grid grid-cols-2 gap-2 text-xs">
-                        <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I want to schedule a visit to ' . $propName) }}" target="_blank" class="p-2.5 bg-gray-50 hover:bg-emerald-50 rounded-xl border border-gray-200 text-center font-bold text-gray-700 hover:text-emerald-700 transition">
+                        <a href="https://wa.me/91{{ $cleanPhone }}?text={{ urlencode('Hi, I want to schedule a visit to ' . $propName) }}" target="_blank" class="p-2.5 bg-gray-50 hover:bg-emerald-50 rounded-xl border border-gray-200 text-center font-bold text-gray-700 hover:text-emerald-700 transition">
                             <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> Chat
                         </a>
-                        <a href="tel:{{ $cleanPhone }}" class="p-2.5 bg-gray-50 hover:bg-brand-light/30 rounded-xl border border-gray-200 text-center font-bold text-gray-700 hover:text-brand transition">
+                        <a href="tel:91{{ $cleanPhone }}" class="p-2.5 bg-gray-50 hover:bg-brand-light/30 rounded-xl border border-gray-200 text-center font-bold text-gray-700 hover:text-brand transition">
                             <i class="fas fa-phone mr-1 text-brand"></i> Call Now
                         </a>
                     </div>
@@ -652,7 +864,7 @@
 
     <!-- ================= 3. SIMILAR RECOMMENDED STAYS ================= -->
     @if(isset($similarProperties) && $similarProperties->count() > 0)
-        <div class="mt-12 sm:mt-16 pt-8 border-t border-gray-200">
+        <div  id="sec-more-listing" class="mt-12 sm:mt-16 pt-8 border-t border-gray-200">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl sm:text-2xl font-black text-gray-900">Similar Verified Stays Nearby</h2>
@@ -1045,6 +1257,86 @@
                 }
             });
         }
+
+        /* ================= DETAIL TABS SCROLLSPY ================= */
+        const navTabs = document.querySelectorAll('.detail-nav-tab');
+        const sections = [
+            document.getElementById('sec-overview'),
+            document.getElementById('sec-pricing'),
+            document.getElementById('sec-amenities'),
+            document.getElementById('sec-reviews'),
+            document.getElementById('sec-location'),
+            document.getElementById('sec-more-listing'),
+            document.getElementById('sec-rules')
+        ].filter(Boolean);
+
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-target');
+                const targetEl = document.getElementById(targetId);
+                if (!targetEl) return;
+
+                const headerOffset = window.innerWidth < 768 ? 120 : 155;
+                const elementPosition = targetEl.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                setActiveNavTab(targetId);
+            });
+        });
+
+        function setActiveNavTab(targetId) {
+            navTabs.forEach(t => {
+                if (t.getAttribute('data-target') === targetId) {
+                    t.classList.add('text-gray-900', 'font-bold', 'border-brand');
+                    t.classList.remove('text-gray-500', 'border-transparent', 'font-semibold');
+                    t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                } else {
+                    t.classList.remove('text-gray-900', 'font-bold', 'border-brand');
+                    t.classList.add('text-gray-500', 'border-transparent', 'font-semibold');
+                }
+            });
+        }
+
+        let isScrollTicking = false;
+        window.addEventListener('scroll', function() {
+            if (!isScrollTicking) {
+                window.requestAnimationFrame(function() {
+                    const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
+                    const headerOffset = window.innerWidth < 768 ? 130 : 165;
+
+                    let activeId = sections[0]?.id;
+
+                    for (let i = 0; i < sections.length; i++) {
+                        const sec = sections[i];
+                        const top = sec.offsetTop - headerOffset;
+                        if (scrollPos >= top) {
+                            activeId = sec.id;
+                        }
+                    }
+
+                    if (activeId) {
+                        navTabs.forEach(t => {
+                            if (t.getAttribute('data-target') === activeId) {
+                                t.classList.add('text-gray-900', 'font-bold', 'border-brand');
+                                t.classList.remove('text-gray-500', 'border-transparent', 'font-semibold');
+                            } else {
+                                t.classList.remove('text-gray-900', 'font-bold', 'border-brand');
+                                t.classList.add('text-gray-500', 'border-transparent', 'font-semibold');
+                            }
+                        });
+                    }
+
+                    isScrollTicking = false;
+                });
+                isScrollTicking = true;
+            }
+        }, { passive: true });
     });
 
     function goToSlide(index) {

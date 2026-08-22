@@ -64,7 +64,7 @@
 
 <!-- Desktop Content -->
 <div class="hidden md:block max-w-7xl mx-auto px-6 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">My Bookings</h1>
+    <h2 class="text-3xl font-bold text-gray-900 mb-8">My Bookings</h2>
     <div class="flex gap-4 mb-8 border-b border-gray-200" id="desktopBookingTabs">
         <button onclick="filterUserBookings(this, 'UPCOMING')" class="tab-btn px-6 py-3 text-brand font-semibold border-b-2 border-brand -mb-px">Upcoming (2)</button>
         <button onclick="filterUserBookings(this, 'COMPLETED')" class="tab-btn px-6 py-3 text-gray-500 font-medium hover:text-gray-700 transition">Completed (5)</button>

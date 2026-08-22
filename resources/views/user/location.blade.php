@@ -338,7 +338,7 @@
 
                 <div class="flex items-center justify-between pt-1">
                     <div class="flex gap-2">
-                        <h2 class="text-base font-extrabold text-slate-900" id="listHeader">Nearby PGs</h2>
+                        <h1 class="text-base font-extrabold text-slate-900" id="listHeader">Nearby PGs</h1>
                         <p class="text-xs text-slate-500 mt-0.5"><span id="pgCountBadge" class="font-bold">0</span> properties found</p>
                     </div>
                 </div>

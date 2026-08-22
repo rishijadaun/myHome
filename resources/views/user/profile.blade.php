@@ -500,7 +500,7 @@
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Current Password <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <input type="password" id="currPasswordInput" placeholder="Enter current password" required
+                    <input type="password" id="currPasswordInput" maxlength="30" placeholder="Enter current password" required
                         class="w-full bg-white border border-gray-200 rounded-2xl py-2.5 pl-3.5 pr-10 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand/40">
                     <button type="button" onclick="togglePass('currPasswordInput', this)" class="absolute right-3.5 top-2.5 text-gray-400">
                         <i class="fas fa-eye"></i>
@@ -510,9 +510,9 @@
 
             <!-- New Password -->
             <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">New Password (Min. 6 characters) <span class="text-red-500">*</span></label>
+                <label class="block text-xs font-bold text-gray-700 mb-1">New Password (6 - 30 characters) <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <input type="password" id="newPasswordInput" placeholder="Enter new strong password" required
+                    <input type="password" id="newPasswordInput" minlength="6" maxlength="30" placeholder="Enter new strong password (max 30 chars)" required
                         class="w-full bg-white border border-gray-200 rounded-2xl py-2.5 pl-3.5 pr-10 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand/40">
                     <button type="button" onclick="togglePass('newPasswordInput', this)" class="absolute right-3.5 top-2.5 text-gray-400">
                         <i class="fas fa-eye"></i>
@@ -524,7 +524,7 @@
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Confirm New Password <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <input type="password" id="confirmNewPasswordInput" placeholder="Re-enter new password" required
+                    <input type="password" id="confirmNewPasswordInput" minlength="6" maxlength="30" placeholder="Re-enter new password" required
                         class="w-full bg-white border border-gray-200 rounded-2xl py-2.5 pl-3.5 pr-10 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand/40">
                     <button type="button" onclick="togglePass('confirmNewPasswordInput', this)" class="absolute right-3.5 top-2.5 text-gray-400">
                         <i class="fas fa-eye"></i>
@@ -728,6 +728,12 @@ async function handleChangePasswordSubmit(e) {
 
     if (newPass.length < 6) {
         alertMsg.innerText = 'New password must be at least 6 characters long.';
+        alertBox.classList.remove('hidden');
+        return;
+    }
+
+    if (newPass.length > 30) {
+        alertMsg.innerText = 'New password cannot exceed 30 characters.';
         alertBox.classList.remove('hidden');
         return;
     }

@@ -77,7 +77,7 @@
                 <p class="text-xs text-gray-500 mt-1">For single and multi-property PG owners</p>
                 <div class="text-4xl font-extrabold text-gray-900 my-6">₹0<span class="text-sm font-normal text-gray-400"> / listing fee</span></div>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-center gap-2"><i class="fas fa-check text-brand text-xs"></i> Up to 5 PG property listings</li>
+                    <li class="flex items-center gap-2"><i class="fas fa-check text-brand text-xs"></i> Up to 3 PG property listings</li>
                     <li class="flex items-center gap-2"><i class="fas fa-check text-brand text-xs"></i> Unlimited tenant leads & inquiries</li>
                     <li class="flex items-center gap-2"><i class="fas fa-check text-brand text-xs"></i> Broker management dashboard access</li>
                     <li class="flex items-center gap-2"><i class="fas fa-check text-brand text-xs"></i> Rent payment tracking & automated receipts</li>
@@ -100,7 +100,7 @@
                     <li class="flex items-center gap-2"><i class="fas fa-check text-brand text-xs"></i> Custom API & ERP integrations</li>
                 </ul>
             </div>
-            <a href="https://wa.me/919876543210" target="_blank" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3.5 rounded-xl text-center tap-effect transition text-sm">Contact Sales Team</a>
+            <a href="mailto:imrishikrishna@gmail.com" target="_blank" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3.5 rounded-xl text-center tap-effect transition text-sm">Contact Sales Team</a>
         </div>
     </div>
 </div>

@@ -39,19 +39,34 @@ class UserHomeController extends Controller
             $recommendedProperties = $allApproved->take(4);
         }
 
-        // 4. Popular Boys PG Section (max 4)
+        // 4. Popular Girls PG Section (max 4)
+        $girlsProperties = $allApproved->filter(function ($p) {
+            $pref = strtolower($p->gender_preference ?? '');
+            return in_array($pref, ['girls', 'female', 'women', 'co-ed']);
+        })->sortByDesc(function ($p) {
+            $pref = strtolower($p->gender_preference ?? '');
+            return in_array($pref, ['girls', 'female', 'women']) ? 1 : 0;
+        })->take(4);
+        if ($girlsProperties->isEmpty()) {
+            $girlsProperties = $allApproved->take(4);
+        }
+
+        // 5. Popular Boys PG Section (max 4)
         $boysProperties = $allApproved->filter(function ($p) {
             $pref = strtolower($p->gender_preference ?? '');
-            return $pref === 'boys' || $pref === 'male';
+            return in_array($pref, ['boys', 'male', 'co-ed']);
+        })->sortByDesc(function ($p) {
+            $pref = strtolower($p->gender_preference ?? '');
+            return in_array($pref, ['boys', 'male']) ? 1 : 0;
         })->take(4);
         if ($boysProperties->isEmpty()) {
             $boysProperties = $allApproved->take(4);
         }
 
-        // 5. Recently Added Section (max 4)
+        // 6. Recently Added Section (max 4)
         $recentProperties = $allApproved->take(4);
 
-        // 6. Top Cities with active property count (cached for ultra-fast TTFB)
+        // 7. Top Cities with active property count (cached for ultra-fast TTFB)
         $topCities = \Illuminate\Support\Facades\Cache::remember('home_top_cities_v2', 300, function () {
             $rawCities = City::where('is_active', 1)
                 ->withCount(['properties' => function ($q) {
@@ -76,6 +91,7 @@ class UserHomeController extends Controller
         return view('user.home', compact(
             'nearMeProperties',
             'recommendedProperties',
+            'girlsProperties',
             'boysProperties',
             'recentProperties',
             'topCities'
@@ -339,7 +355,7 @@ class UserHomeController extends Controller
                 $fallbackQuery->whereIn('gender_preference', ['girls', 'female', 'co-ed', 'unisex', 'all']);
             }
 
-            $rawResults = $fallbackQuery->take(12)->get();
+            $rawResults = $fallbackQuery->take(60)->get();
             if ($rawResults->isNotEmpty()) {
                 $isFallback = true;
             }
@@ -754,8 +770,8 @@ class UserHomeController extends Controller
                 'slug' => $p->slug ?: \Illuminate\Support\Str::slug($p->name),
                 'price' => number_format($p->monthly_rent),
                 'raw_price' => (float) $p->monthly_rent,
-                'rating' => $p->rating ? number_format($p->rating, 1) : '4.8',
-                'reviews_count' => $p->total_reviews ?: 12,
+                'rating' => $p->dynamic_rating > 0 ? $p->dynamic_rating : ($p->rating ? number_format($p->rating, 1) : 'New'),
+                'reviews_count' => (int) $p->dynamic_reviews_count,
                 'lat' => (float) $lat,
                 'lng' => (float) $lng,
                 'image' => $primaryImg,

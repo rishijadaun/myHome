@@ -268,9 +268,9 @@
         <!-- Row 2: Results Count & Sort By Dropdown -->
         <div class="flex items-center justify-between mt-2.5 px-1">
             <div class="flex items-center gap-2">
-                <p class="text-xs sm:text-sm text-gray-600">
-                    Showing <span class="font-bold text-gray-900" id="resultsCount">{{ $properties->count() }}</span> properties
-                </p>
+                <h1 class="text-xs sm:text-sm text-gray-600 font-normal">
+                    Showing <span class="font-bold text-gray-900" id="resultsCount">{{ $properties->count() }}</span> verified properties{{ !empty($selectedCity) ? ' in ' . $selectedCity : '' }}
+                </h1>
                 @if($activeBadgeCount > 0 || !empty($searchQuery))
                     <a href="{{ route('user.search') }}" class="text-[11px] sm:text-xs font-semibold text-red-500 hover:underline tap-effect flex items-center gap-1 no-underline">
                         <i class="fas fa-undo-alt text-[9px]"></i> Clear Filters
@@ -394,7 +394,7 @@
     <!-- ================= FULL WIDTH PROPERTY GRID (2-COLUMNS IN MOBILE, 3-4 COLUMNS IN DESKTOP) ================= -->
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 md:gap-6 w-full" id="searchGrid">
         
-        @forelse($properties as $pg)
+        @forelse($properties as $index => $pg)
             @php
                 $genderUpper = strtoupper($pg->gender_preference ?? 'CO-ED');
                 $tagMeta = $pg->display_tag_meta;
@@ -403,8 +403,8 @@
                 $displayImg = $pg->display_image_url;
                 $cityName = $pg->city ? $pg->city->name : '';
                 $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($cityName ?: 'City Center');
-                $ratingVal = $pg->rating ? number_format($pg->rating, 1) : '4.8';
-                $reviewCount = $pg->total_reviews ?: (75 + (abs(crc32($pg->id)) % 80));
+                $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                $reviewCount = $pg->dynamic_reviews_count;
                 
                 $hasAC = $pg->amenities->contains(fn($a) => stripos($a->name, 'ac') !== false || stripos($a->slug, 'ac') !== false);
                 $hasFood = $pg->amenities->contains(fn($a) => stripos($a->name, 'food') !== false || stripos($a->name, 'meal') !== false || stripos($a->slug, 'food') !== false);
@@ -414,7 +414,7 @@
                 $matchScore = $pg->match_score ?? null;
                 $matchBreakdown = $pg->match_breakdown ?? [];
             @endphp
-            <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
+            <div class="property-card {{ $index >= 12 ? 'extra-property-card hidden' : '' }} bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full" 
                 data-gender="{{ $genderUpper }}" 
                 data-price="{{ (int)$pg->monthly_rent }}" 
                 data-rating="{{ $ratingVal }}" 
@@ -452,7 +452,11 @@
                         <div class="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-gray-900/80 backdrop-blur text-white text-[9px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1">
                             <i class="fas fa-star text-yellow-400"></i>
                             <span class="font-bold">{{ $ratingVal }}</span>
-                            <span class="text-gray-300 hidden sm:inline">({{ $reviewCount }})</span>
+                            @if($reviewCount > 0)
+                                <span class="text-gray-300 hidden sm:inline">({{ $reviewCount }})</span>
+                            @else
+                                <span class="text-gray-300 hidden sm:inline">(0)</span>
+                            @endif
                         </div>
                     </div>
 
@@ -523,7 +527,7 @@
         </p>
 
         <!-- Direct Contact Box -->
-        <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6 mb-6 text-left">
+        <!-- <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6 mb-6 text-left">
             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Direct Support Desk</h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <a href="tel:+919876543210" class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl hover:border-brand transition shadow-xs no-underline">
@@ -545,7 +549,7 @@
                     </div>
                 </a>
             </div>
-        </div>
+        </div> -->
 
         <div class="flex flex-wrap items-center justify-center gap-3">
             <a href="{{ route('user.search') }}" class="bg-brand hover:bg-brand-dark text-white font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm transition tap-effect shadow-md shadow-brand/30 flex items-center gap-2 no-underline">
@@ -557,10 +561,12 @@
         </div>
     </div>
 
-    <!-- Load More Button -->
-    <div class="mt-10 text-center {{ $properties->isEmpty() ? 'hidden' : '' }}" id="loadMoreContainer">
-        <button onclick="loadMoreProperties(this)" class="bg-white border-2 border-gray-200 hover:border-brand hover:text-brand text-gray-700 font-bold py-3 px-8 rounded-2xl transition tap-effect shadow-sm flex items-center gap-2 mx-auto text-xs sm:text-sm">
-            <i class="fas fa-spinner"></i> All Properties Loaded
+    <!-- Load More Properties Button (Show only when more than 12 records) -->
+    <div class="mt-10 text-center {{ $properties->count() > 12 ? '' : 'hidden' }}" id="loadMoreContainer">
+        <button id="loadMoreBtn" onclick="loadMoreProperties(this)" class="bg-white border-2 border-gray-200 hover:border-brand hover:text-brand text-gray-700 font-bold py-3.5 px-8 rounded-2xl transition tap-effect shadow-sm flex items-center gap-2 mx-auto text-xs sm:text-sm cursor-pointer">
+            <i class="fas fa-plus-circle text-brand text-sm" id="loadMoreIcon"></i>
+            <span id="loadMoreLabel">Load More Properties</span>
+            <span class="bg-brand-light text-brand text-[11px] font-extrabold px-2.5 py-0.5 rounded-full" id="remainingCountBadge">{{ $properties->count() - 12 }} more</span>
         </button>
     </div>
 </div>
@@ -771,9 +777,55 @@
     }
 
     function loadMoreProperties(btn) {
-        btn.innerHTML = '<i class="fas fa-check"></i> All Properties Loaded';
+        const hiddenCards = Array.from(document.querySelectorAll('#searchGrid .extra-property-card.hidden'));
+        if (!hiddenCards.length) {
+            btn.innerHTML = '<i class="fas fa-check-circle text-emerald-500"></i> All Properties Loaded';
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-default');
+            return;
+        }
+
+        const icon = document.getElementById('loadMoreIcon');
+        const label = document.getElementById('loadMoreLabel');
+        const badge = document.getElementById('remainingCountBadge');
+
+        if (icon) icon.className = 'fas fa-spinner fa-spin text-brand text-sm';
+        if (label) label.textContent = 'Loading properties...';
+        if (badge) badge.classList.add('hidden');
         btn.disabled = true;
-        btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        setTimeout(() => {
+            // Reveal next 8 properties
+            const toReveal = hiddenCards.slice(0, 8);
+            toReveal.forEach(card => {
+                card.classList.remove('hidden');
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                card.style.transition = 'all 0.3s ease-out';
+                requestAnimationFrame(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Recalculate remaining hidden cards
+            const remaining = document.querySelectorAll('#searchGrid .extra-property-card.hidden').length;
+
+            if (remaining > 0) {
+                btn.disabled = false;
+                if (icon) icon.className = 'fas fa-plus-circle text-brand text-sm';
+                if (label) label.textContent = 'Load More Properties';
+                if (badge) {
+                    badge.textContent = `${remaining} more`;
+                    badge.classList.remove('hidden');
+                }
+            } else {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-check-circle text-emerald-500 text-sm"></i> All Properties Loaded';
+                btn.classList.add('opacity-70', 'cursor-default');
+                btn.classList.remove('hover:border-brand', 'hover:text-brand', 'cursor-pointer');
+            }
+        }, 200);
     }
 
     // ================= GPS LIVE DISTANCE CALCULATION & DISTANCE SORTING =================
@@ -841,7 +893,18 @@
             const grid = document.getElementById('searchGrid');
             if (grid) {
                 cardItems.sort((a, b) => a.distance - b.distance);
-                cardItems.forEach(item => grid.appendChild(item.element));
+                const hasHiddenInitially = document.querySelectorAll('#searchGrid .extra-property-card.hidden').length > 0;
+                const visibleCount = Array.from(cards).filter(c => !c.classList.contains('hidden')).length;
+                cardItems.forEach((item, idx) => {
+                    grid.appendChild(item.element);
+                    if (hasHiddenInitially) {
+                        if (idx < visibleCount) {
+                            item.element.classList.remove('hidden');
+                        } else {
+                            item.element.classList.add('hidden', 'extra-property-card');
+                        }
+                    }
+                });
             }
         }
     }

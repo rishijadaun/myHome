@@ -540,6 +540,20 @@
                                         <span class="text-xs sm:text-sm font-semibold">Attached Washroom</span>
                                     </div>
                                 </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="parking" checked class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-square-parking text-blue-600"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">Parking (Bike/Car)</span>
+                                    </div>
+                                </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="refrigerator" checked class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-temperature-low text-cyan-600"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">Fridge / Refrigerator</span>
+                                    </div>
+                                </label>
                             </div>
                         </div>
 
@@ -588,7 +602,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Security Deposit (₹) <span class="text-[10px] text-gray-400 font-normal">(Optional)</span></label>
-                                    <input type="number" id="propDeposit" name="security_deposit" min="0" placeholder="e.g. 5000" 
+                                    <input type="number" id="propDeposit" name="security_deposit" min="0" placeholder="e.g. 500" 
                                            onkeydown="preventNegative(event)" oninput="sanitizePositive(this); clearError(this);" 
                                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
                                 </div>
@@ -674,12 +688,18 @@
                                     <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
                                         <i class="fas fa-gavel text-brand"></i> House Rules & Guidelines *
                                     </h2>
-                                    <span class="text-[11px] text-gray-400">Required</span>
+                                    <!-- <span class="text-[11px] text-gray-400">Required</span> -->
                                 </div>
                                 <p class="text-xs text-gray-500 mb-3">Set clear expectations for tenants. Click presets below to add quickly.</p>
                                 
                                 <!-- Preset Quick Chips -->
                                 <div class="flex flex-wrap gap-2 mb-3">
+                                    <button type="button" onclick="appendRule('Opposite gender entry restricted to visiting hours in common areas')" class="text-xs font-semibold bg-gray-100 hover:bg-brand-light hover:text-brand border border-gray-200 px-3 py-1 rounded-lg transition">
+                                        + Opposite Gender Policy
+                                    </button>
+                                    <button type="button" onclick="appendRule('No parties or loud gatherings allowed on premises')" class="text-xs font-semibold bg-gray-100 hover:bg-brand-light hover:text-brand border border-gray-200 px-3 py-1 rounded-lg transition">
+                                        + No Party / Events
+                                    </button>
                                     <button type="button" onclick="appendRule('No loud music after 10:00 PM')" class="text-xs font-semibold bg-gray-100 hover:bg-brand-light hover:text-brand border border-gray-200 px-3 py-1 rounded-lg transition">
                                         + No loud music (10 PM)
                                     </button>
@@ -876,12 +896,12 @@
                                 PG or Property Name
                             </h4>
                             <p id="previewLocation" class="text-xs text-gray-500 mb-3 flex items-center gap-1">
-                                <i class="fas fa-map-marker-alt text-brand"></i> xxxx
+                                <i class="fas fa-map-marker-alt text-brand"></i> ****
                             </p>
                             <div class="flex items-center justify-between pt-3 border-t border-gray-200/60">
                                 <div>
                                     <span class="text-[10px] text-gray-400 block uppercase">Starting From</span>
-                                    <span id="previewRent" class="text-base font-extrabold text-brand">₹X,XXX</span><span class="text-xs text-gray-500">/mo</span>
+                                    <span id="previewRent" class="text-base font-extrabold text-brand">₹*,***</span><span class="text-xs text-gray-500">/mo</span>
                                 </div>
                                 <span class="bg-brand/10 text-brand text-xs font-semibold px-2.5 py-1 rounded-lg">
                                     0% Brokerage
@@ -1057,7 +1077,7 @@
             <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Tracking Reference ID</div>
             <div id="successTrackingId" class="text-lg font-mono font-bold text-brand">STAY-XXXXXX</div>
             <div id="successStatusBadge" class="text-xs text-amber-700 mt-2 font-medium flex items-center justify-center gap-1">
-                <i class="fas fa-clock text-amber-500"></i> Verification Status: <span class="font-bold">Pending Review (24h)</span>
+                <i class="fas fa-clock text-amber-500"></i> Verification Status: <span class="font-bold">Pending Review</span>
             </div>
         </div>
 
@@ -2071,9 +2091,9 @@
 
     function updateLivePreview() {
         const name = document.getElementById('propName').value.trim() || 'PG or Property Name';
-        const city = document.getElementById('propCity').value.trim() || 'xxxx';
-        const area = document.getElementById('propArea').value.trim() || 'xxxxx';
-        const rent = document.getElementById('propRent').value.trim() || 'X,XXX';
+        const city = document.getElementById('propCity').value.trim() || '****';
+        const area = document.getElementById('propArea').value.trim() || '****';
+        const rent = document.getElementById('propRent').value.trim() || '*,***';
         
         const typeRadio = document.querySelector('input[name="listing_type"]:checked');
         const typeVal = typeRadio ? typeRadio.value : 'pg-hostel';
@@ -2310,6 +2330,8 @@
         // Step 2 & 3: Pricing & Beds
         const rentInput = document.getElementById('propRent');
         const depositInput = document.getElementById('propDeposit');
+        const maintInput = document.getElementById('propMaintenance');
+        const noticeSelect = document.querySelector('select[name="notice_period_days"]');
         const totalBedsInput = document.getElementById('propTotalBeds');
         const availBedsInput = document.getElementById('propAvailableBeds');
         const descInput = document.getElementById('propDescription');
@@ -2317,6 +2339,8 @@
 
         if (rentInput) rentInput.value = p.monthly_rent || '';
         if (depositInput) depositInput.value = p.security_deposit || '';
+        if (maintInput) maintInput.value = p.maintenance_charges !== undefined ? p.maintenance_charges : '';
+        if (noticeSelect && p.notice_period_days !== undefined) noticeSelect.value = String(p.notice_period_days);
         if (totalBedsInput) totalBedsInput.value = p.total_beds || '';
         if (availBedsInput) availBedsInput.value = p.available_beds || '';
         if (descInput) descInput.value = p.description || '';
@@ -2325,7 +2349,10 @@
         // Amenities
         if (p.amenities && Array.isArray(p.amenities)) {
             document.querySelectorAll('input[name="amenities[]"]').forEach(cb => {
-                cb.checked = p.amenities.includes(cb.value);
+                const isSelected = p.amenities.includes(cb.value) || 
+                                   (cb.value === 'refrigerator' && p.amenities.includes('fridge')) ||
+                                   (cb.value === 'fridge' && p.amenities.includes('refrigerator'));
+                cb.checked = isSelected;
             });
         }
 

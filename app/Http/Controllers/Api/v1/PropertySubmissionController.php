@@ -262,6 +262,7 @@ class PropertySubmissionController extends Controller
                 'available_beds' => $validated['available_beds'] ?? ($validated['total_beds'] ?? 10),
                 'monthly_rent' => $validated['monthly_rent'],
                 'security_deposit' => $validated['security_deposit'] ?? $validated['monthly_rent'],
+                'maintenance_charges' => $validated['maintenance_charges'] ?? 0,
                 'notice_period_days' => $validated['notice_period_days'] ?? 30,
                 'verification_status' => 'pending', // PENDING ADMIN APPROVAL
                 'status' => 'draft',               // Remains draft until approved
@@ -275,7 +276,24 @@ class PropertySubmissionController extends Controller
             if (!empty($validated['amenities']) && is_array($validated['amenities'])) {
                 $amenityIds = [];
                 foreach ($validated['amenities'] as $item) {
-                    $amenity = Amenity::where('slug', $item)->orWhere('id', $item)->orWhere('name', $item)->first();
+                    $slugOrName = str_replace('_', '-', strtolower(trim($item)));
+                    $amenity = Amenity::where('slug', $slugOrName)->orWhere('slug', $item)->first();
+                    if (!$amenity && Str::isUuid($item)) {
+                        $amenity = Amenity::where('id', $item)->first();
+                    }
+                    if (!$amenity) {
+                        $amenity = Amenity::whereRaw('LOWER(name) = ?', [strtolower(trim($item))])->first();
+                    }
+                    if (!$amenity) {
+                        if ($slugOrName === 'fridge' || $slugOrName === 'refrigerator') {
+                            $amenity = Amenity::whereIn('slug', ['refrigerator', 'fridge'])->first();
+                        } elseif ($slugOrName === 'parking') {
+                            $amenity = Amenity::where('slug', 'parking')->first();
+                        } elseif ($slugOrName === 'ac' || $slugOrName === 'air-conditioner' || $slugOrName === 'air-conditioning') {
+                            $amenity = Amenity::where('slug', 'ac')->first();
+                        }
+                    }
+
                     if ($amenity) {
                         $amenityIds[] = $amenity->id;
                     }
@@ -283,7 +301,7 @@ class PropertySubmissionController extends Controller
                 if (!empty($amenityIds)) {
                     DB::table('property_amenities')->where('property_id', $property->id)->delete();
                     $pivotRows = [];
-                    foreach ($amenityIds as $aId) {
+                    foreach (array_unique($amenityIds) as $aId) {
                         $pivotRows[] = [
                             'id' => (string) Str::uuid(),
                             'property_id' => $property->id,
@@ -445,7 +463,7 @@ class PropertySubmissionController extends Controller
             'gender_preference' => $property->gender_preference ?? 'co-ed',
             'monthly_rent' => (float) $property->monthly_rent,
             'security_deposit' => (float) ($property->security_deposit ?? $property->monthly_rent),
-            'maintenance_charges' => 0,
+            'maintenance_charges' => (float) ($property->maintenance_charges ?? 0),
             'notice_period_days' => (int) ($property->notice_period_days ?? 30),
             'total_beds' => (int) ($property->total_beds ?? 10),
             'available_beds' => (int) ($property->available_beds ?? 0),
@@ -557,6 +575,7 @@ class PropertySubmissionController extends Controller
             $property->gender_preference = $validated['gender_preference'] ?? $property->gender_preference;
             $property->monthly_rent = $validated['monthly_rent'];
             $property->security_deposit = $validated['security_deposit'] ?? $property->security_deposit;
+            $property->maintenance_charges = $validated['maintenance_charges'] ?? $property->maintenance_charges;
             $property->notice_period_days = $validated['notice_period_days'] ?? $property->notice_period_days;
             $property->total_beds = $validated['total_beds'] ?? $property->total_beds;
             $property->available_beds = $validated['available_beds'] ?? $property->available_beds;
@@ -578,14 +597,31 @@ class PropertySubmissionController extends Controller
             if (isset($validated['amenities']) && is_array($validated['amenities'])) {
                 $amenityIds = [];
                 foreach ($validated['amenities'] as $item) {
-                    $amenity = Amenity::where('slug', $item)->orWhere('id', $item)->orWhere('name', $item)->first();
+                    $slugOrName = str_replace('_', '-', strtolower(trim($item)));
+                    $amenity = Amenity::where('slug', $slugOrName)->orWhere('slug', $item)->first();
+                    if (!$amenity && Str::isUuid($item)) {
+                        $amenity = Amenity::where('id', $item)->first();
+                    }
+                    if (!$amenity) {
+                        $amenity = Amenity::whereRaw('LOWER(name) = ?', [strtolower(trim($item))])->first();
+                    }
+                    if (!$amenity) {
+                        if ($slugOrName === 'fridge' || $slugOrName === 'refrigerator') {
+                            $amenity = Amenity::whereIn('slug', ['refrigerator', 'fridge'])->first();
+                        } elseif ($slugOrName === 'parking') {
+                            $amenity = Amenity::where('slug', 'parking')->first();
+                        } elseif ($slugOrName === 'ac' || $slugOrName === 'air-conditioner' || $slugOrName === 'air-conditioning') {
+                            $amenity = Amenity::where('slug', 'ac')->first();
+                        }
+                    }
+
                     if ($amenity) {
                         $amenityIds[] = $amenity->id;
                     }
                 }
                 DB::table('property_amenities')->where('property_id', $property->id)->delete();
                 $pivotRows = [];
-                foreach ($amenityIds as $aId) {
+                foreach (array_unique($amenityIds) as $aId) {
                     $pivotRows[] = [
                         'id' => (string) Str::uuid(),
                         'property_id' => $property->id,

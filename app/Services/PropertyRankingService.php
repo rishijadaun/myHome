@@ -44,8 +44,8 @@ class PropertyRankingService
                 'name' => $property->name,
                 'slug' => $property->slug ?? $property->id,
                 'image' => $property->display_image_url,
-                'rating' => (float) ($property->rating ?? 4.8),
-                'total_reviews' => (int) ($property->total_reviews ?? 12),
+                'rating' => (float) ($property->dynamic_rating > 0 ? $property->dynamic_rating : ($property->rating ?? 0)),
+                'total_reviews' => (int) $property->dynamic_reviews_count,
                 'verified' => $property->verification_status === 'verified',
                 'featured' => (bool) $property->featured,
                 'tag' => $property->tag ?? 'Popular',
@@ -253,9 +253,9 @@ class PropertyRankingService
                 if ($am === 'ac') {
                     $label = 'AC Cooling';
                     $hasAm = $this->checkAmenityPresence($propAmenities, ['ac', 'air conditioner']);
-                } elseif ($am === 'food') {
-                    $label = 'Food & Meals';
-                    $hasAm = $this->checkAmenityPresence($propAmenities, ['food', 'meal', 'mess', 'breakfast', 'dinner']);
+                // } elseif ($am === 'food') {
+                //     $label = 'Food & Meals';
+                //     $hasAm = $this->checkAmenityPresence($propAmenities, ['food', 'meal', 'mess', 'breakfast', 'dinner']);
                 } elseif ($am === 'wifi') {
                     $label = 'High-Speed WiFi';
                     $hasAm = $this->checkAmenityPresence($propAmenities, ['wifi', 'wi-fi', 'internet']);

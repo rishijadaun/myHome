@@ -75,10 +75,15 @@
             <div>
                 <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Explore Cities</h4>
                 <ul class="space-y-2.5 text-sm">
-                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Bangalore PGs</a></li>
-                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Noida PGs</a></li>
-                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Delhi PGs</a></li>
-                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Mumbai PGs</a></li>
+                    <li><a href="{{ route('user.search', ['city' => 'Ghaziabad']) }}" class="hover:text-brand transition">Ghaziabad PGs</a></li>
+                    <li><a href="{{ route('user.search', ['city' => 'Gurgaon']) }}" class="hover:text-brand transition">Gurgaon PGs</a></li>
+                    <li><a href="{{ route('user.search', ['city' => 'Noida']) }}" class="hover:text-brand transition">Noida PGs</a></li>
+                    <li><a href="{{ route('user.search', ['city' => 'Delhi']) }}" class="hover:text-brand transition">Delhi PGs</a></li>
+                    <li><a href="{{ route('user.search', ['city' => 'Bangalore']) }}" class="hover:text-brand transition">Bangalore PGs</a></li>
+                    <li><a href="{{ route('user.search', ['city' => 'Mumbai']) }}" class="hover:text-brand transition">Mumbai PGs</a></li>
+                    <li><a href="{{ route('user.search', ['city' => 'Hyderabad']) }}" class="hover:text-brand transition">Hyderabad PGs</a></li>
+                    <li><a href="{{ route('user.search', ['city' => 'Pune']) }}" class="hover:text-brand transition">Pune PGs</a></li> 
+                    <li><a href="{{ route('user.search', ['city' => 'Lucknow']) }}" class="hover:text-brand transition">Lucknow PGs</a></li> 
                 </ul>
             </div>
             <div>
@@ -86,7 +91,7 @@
                 <ul class="space-y-2.5 text-sm">
                     <li><a href="{{ route('user.bookings') }}" class="hover:text-brand transition">My Bookings</a></li>
                     <li><a href="{{ route('broker.login') }}" class="hover:text-brand transition">Broker Portal</a></li>
-                    <li><a href="{{ route('admin.login') }}" class="hover:text-brand transition">Admin Console</a></li>
+                    <!-- <li><a href="{{ route('admin.login') }}" class="hover:text-brand transition">Admin Console</a></li> -->
                 </ul>
             </div>
         </div>

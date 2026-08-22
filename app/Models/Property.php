@@ -35,6 +35,7 @@ class Property extends Model
         'available_beds',
         'monthly_rent',
         'security_deposit',
+        'maintenance_charges',
         'notice_period_days',
         'rating',
         'total_reviews',
@@ -217,6 +218,44 @@ class Property extends Model
             $slug = "{$baseSlug}-{$count}";
         }
         return $slug;
+    }
+
+    /**
+     * Get real dynamic approved reviews count from DB.
+     */
+    public function getDynamicReviewsCountAttribute(): int
+    {
+        if (isset($this->attributes['approved_reviews_count'])) {
+            return (int) $this->attributes['approved_reviews_count'];
+        }
+        if ($this->relationLoaded('approvedReviews')) {
+            return $this->approvedReviews->count();
+        }
+        if ($this->total_reviews !== null && (int)$this->total_reviews > 0) {
+            return (int) $this->total_reviews;
+        }
+        return (int) $this->approvedReviews()->count();
+    }
+
+    /**
+     * Get real dynamic rating from DB.
+     */
+    public function getDynamicRatingAttribute(): string
+    {
+        if ($this->relationLoaded('approvedReviews')) {
+            $count = $this->approvedReviews->count();
+            if ($count > 0) {
+                return number_format($this->approvedReviews->avg('rating'), 1);
+            }
+        }
+        if ($this->rating && floatval($this->rating) > 0) {
+            return number_format($this->rating, 1);
+        }
+        $avg = $this->approvedReviews()->avg('rating');
+        if ($avg) {
+            return number_format($avg, 1);
+        }
+        return '0.0';
     }
 
     public function propertyType()

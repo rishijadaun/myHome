@@ -97,8 +97,13 @@ class AdminSettingController extends Controller
             'last_name' => ['nullable', 'string', 'max:80'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email,' . $admin->id],
             'phone' => ['nullable', 'string', 'max:20', 'unique:users,phone,' . $admin->id],
-            'current_password' => ['nullable', 'string'],
-            'new_password' => ['nullable', 'string', 'min:6', 'confirmed'],
+            'current_password' => ['nullable', 'string', 'max:30'],
+            'new_password' => ['nullable', 'string', 'min:6', 'max:30', 'confirmed'],
+        ], [
+            'current_password.max' => 'Current password cannot exceed 30 characters.',
+            'new_password.min' => 'New password must be at least 6 characters.',
+            'new_password.max' => 'New password cannot exceed 30 characters.',
+            'new_password.confirmed' => 'New password confirmation does not match.',
         ]);
 
         // If updating password, verify current password

@@ -111,6 +111,23 @@ class UserBookingController extends Controller
         $property = Property::with(['broker'])->findOrFail($validated['property_id']);
         $user = Auth::user();
 
+        // Prevent duplicate active or pending bookings for the same property
+        $existingBooking = Booking::where('user_id', $user->id)
+            ->where('property_id', $property->id)
+            ->whereNotIn('booking_status', ['cancelled'])
+            ->where('broker_approval', '!=', 'rejected')
+            ->first();
+
+        if ($existingBooking) {
+            return response()->json([
+                'success' => false,
+                'already_booked' => true,
+                'booking_id' => $existingBooking->booking_id,
+                'message' => "You already have an active or pending booking (#{$existingBooking->booking_id}) for {$property->name}. You cannot book the same listing more than once.",
+                'redirect_url' => route('user.bookings')
+            ], 400);
+        }
+
         // Calculate rent amounts
         $baseRent = !empty($validated['base_rent']) && (float)$validated['base_rent'] > 0 
             ? (float)$validated['base_rent'] 

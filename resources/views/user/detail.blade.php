@@ -830,9 +830,24 @@
 
                     <!-- Direct Book & Contact CTA -->
                     <div class="space-y-3">
-                        <button type="button" onclick="openBookStayModal()" class="w-full bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md cursor-pointer">
-                            <i class="fas fa-calendar-check"></i> Book Stay Online
-                        </button>
+                        @if(isset($hasActiveBooking) && $hasActiveBooking)
+                            <div class="space-y-2.5">
+                                <div class="p-3.5 bg-emerald-50 border border-emerald-200/80 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-800">
+                                    <i class="fas fa-check-circle text-emerald-600 text-sm flex-shrink-0"></i>
+                                    <div>
+                                        <span class="font-bold block">Already Booked (#{{ $existingBooking->booking_id }})</span>
+                                        <span class="text-[10px] text-emerald-700">Status: {{ ucfirst($existingBooking->booking_status) }}</span>
+                                    </div>
+                                </div>
+                                <a href="{{ route('user.bookings') }}" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md cursor-pointer">
+                                    <i class="fas fa-calendar-check"></i> View My Reservation
+                                </a>
+                            </div>
+                        @else
+                            <button type="button" onclick="openBookStayModal()" class="w-full bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md cursor-pointer">
+                                <i class="fas fa-calendar-check"></i> Book Stay Online
+                            </button>
+                        @endif
 
                         <!-- <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I am interested in ' . $propName . ' (' . $propLocation . '). Please share room availability.') }}" target="_blank" class="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-xs">
                             <i class="fab fa-whatsapp text-lg text-emerald-600"></i> WhatsApp Host
@@ -1235,9 +1250,15 @@
             <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I am interested in ' . $propName) }}" target="_blank" class="w-11 h-11 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-center text-emerald-600 text-lg tap-effect">
                 <i class="fab fa-whatsapp"></i>
             </a>
-            <button type="button" onclick="openBookStayModal()" class="bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-2.5 px-5 rounded-2xl text-xs tap-effect shadow-md shadow-brand/30 cursor-pointer">
-                Book Stay
-            </button>
+            @if(isset($hasActiveBooking) && $hasActiveBooking)
+                <a href="{{ route('user.bookings') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-2xl text-xs tap-effect shadow-md flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-check-circle"></i> View Booking
+                </a>
+            @else
+                <button type="button" onclick="openBookStayModal()" class="bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-2.5 px-5 rounded-2xl text-xs tap-effect shadow-md shadow-brand/30 cursor-pointer">
+                    Book Stay
+                </button>
+            @endif
         </div>
     </div>
 </div>
@@ -1939,6 +1960,30 @@
             return;
         }
 
+        const isAlreadyBooked = {{ (isset($hasActiveBooking) && $hasActiveBooking) ? 'true' : 'false' }};
+        if (isAlreadyBooked) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Already Reserved! 🏨',
+                    text: 'You already have an active or pending booking for this property (#{{ $existingBooking?->booking_id }}). You cannot book the same listing more than once.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4bb59d',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'View My Bookings',
+                    cancelButtonText: 'Close'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('user.bookings') }}";
+                    }
+                });
+            } else {
+                alert('You already have an active or pending booking for this property (#{{ $existingBooking?->booking_id }}).');
+                window.location.href = "{{ route('user.bookings') }}";
+            }
+            return;
+        }
+
         if (roomName && roomRent) {
             const rentInput = document.getElementById('bookingBaseRentInput');
             const roomInput = document.getElementById('bookingRoomTypeInput');
@@ -2121,6 +2166,22 @@
             } else {
                 if (data.require_login) {
                     window.location.href = "{{ route('user.login') }}";
+                } else if (data.already_booked) {
+                    closeBookStayModal();
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Already Reserved! 🏨',
+                            text: data.message || 'You already have an active reservation for this property.',
+                            icon: 'info',
+                            confirmButtonColor: '#4bb59d',
+                            confirmButtonText: 'View My Bookings'
+                        }).then(() => {
+                            window.location.href = data.redirect_url || "{{ route('user.bookings') }}";
+                        });
+                    } else {
+                        alert(data.message);
+                        window.location.href = data.redirect_url || "{{ route('user.bookings') }}";
+                    }
                 } else {
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({

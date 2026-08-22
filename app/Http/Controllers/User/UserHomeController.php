@@ -228,12 +228,34 @@ class UserHomeController extends Controller
             }
         }
 
+        // Check if authenticated user already has an active or pending booking for this property
+        $existingBooking = null;
+        $hasActiveBooking = false;
+        if (Auth::check() && $property) {
+            $existingBooking = \App\Models\Booking::where('user_id', Auth::id())
+                ->where('property_id', $property->id)
+                ->whereNotIn('booking_status', ['cancelled'])
+                ->where('broker_approval', '!=', 'rejected')
+                ->latest('created_at')
+                ->first();
+            $hasActiveBooking = !empty($existingBooking);
+        }
+
         $totalReviewsCount = $approvedReviews->count();
         $avgRating = $totalReviewsCount > 0
             ? round($approvedReviews->avg('rating'), 1)
             : ($property && $property->rating ? number_format($property->rating, 1) : '4.8');
 
-        return view('user.detail', compact('property', 'similarProperties', 'approvedReviews', 'userPendingReview', 'avgRating', 'totalReviewsCount'));
+        return view('user.detail', compact(
+            'property',
+            'similarProperties',
+            'approvedReviews',
+            'userPendingReview',
+            'avgRating',
+            'totalReviewsCount',
+            'hasActiveBooking',
+            'existingBooking'
+        ));
     }
 
     /**

@@ -827,7 +827,15 @@ class UserHomeController extends Controller
         $query = Property::where('status', 'active')
             ->where('verification_status', 'verified')
             ->where('is_active', 1)
-            ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
+            ->select('id', 'name', 'slug', 'monthly_rent', 'rating', 'total_reviews', 'gender_preference', 'latitude', 'longitude', 'address', 'city_id', 'area_id', 'property_type_id', 'description', 'total_beds', 'created_at')
+            ->with([
+                'primaryImage:id,property_id,image_url',
+                'images:id,property_id,image_url',
+                'city:id,name,slug',
+                'area:id,name,slug',
+                'amenities:id,name,slug,icon',
+                'propertyType:id,name,slug'
+            ]);
 
         if ($request->filled('city')) {
             $cityParam = $request->query('city');
@@ -850,17 +858,33 @@ class UserHomeController extends Controller
         $rawProperties = $query->latest()->get();
         $propertyIds = $rawProperties->pluck('id')->toArray();
 
-        // Eagerly fetch room types mapped to property_id
-        $roomsData = DB::table('rooms')
-            ->join('floors', 'rooms.floor_id', '=', 'floors.id')
-            ->join('blocks', 'floors.block_id', '=', 'blocks.id')
-            ->join('room_types', 'rooms.room_type_id', '=', 'room_types.id')
-            ->whereIn('blocks.property_id', $propertyIds)
-            ->select('blocks.property_id', 'room_types.slug as rt_slug', 'room_types.name as rt_name', 'rooms.monthly_rent', 'rooms.total_beds', 'rooms.attached_bathroom', 'rooms.ac_available')
-            ->get()
-            ->groupBy('property_id');
+        // 1. Batch fetch review aggregates in a single query (eliminates N*2 queries)
+        $reviewAggregates = collect();
+        if (!empty($propertyIds)) {
+            $reviewAggregates = DB::table('reviews')
+                ->where('status', 'approved')
+                ->where('is_active', 1)
+                ->whereIn('property_id', $propertyIds)
+                ->select('property_id', DB::raw('COUNT(*) as total_reviews'), DB::raw('AVG(rating) as avg_rating'))
+                ->groupBy('property_id')
+                ->get()
+                ->keyBy('property_id');
+        }
 
-        $properties = $rawProperties->map(function ($p) use ($roomsData) {
+        // 2. Eagerly fetch room types mapped to property_id
+        $roomsData = collect();
+        if (!empty($propertyIds)) {
+            $roomsData = DB::table('rooms')
+                ->join('floors', 'rooms.floor_id', '=', 'floors.id')
+                ->join('blocks', 'floors.block_id', '=', 'blocks.id')
+                ->join('room_types', 'rooms.room_type_id', '=', 'room_types.id')
+                ->whereIn('blocks.property_id', $propertyIds)
+                ->select('blocks.property_id', 'room_types.slug as rt_slug', 'room_types.name as rt_name', 'rooms.monthly_rent', 'rooms.total_beds', 'rooms.attached_bathroom', 'rooms.ac_available')
+                ->get()
+                ->groupBy('property_id');
+        }
+
+        $properties = $rawProperties->map(function ($p) use ($roomsData, $reviewAggregates) {
             $primaryImg = $p->primaryImage->image_url ?? ($p->images->first()?->image_url ?? $p->display_image_url ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');
             $lat = $p->map_latitude;
             $lng = $p->map_longitude;
@@ -941,14 +965,21 @@ class UserHomeController extends Controller
                 }
             }
 
+            // Batch review data
+            $revAgg = $reviewAggregates->get($p->id);
+            $reviewCount = $revAgg ? (int)$revAgg->total_reviews : 0;
+            $avgRating = $revAgg && $revAgg->avg_rating > 0 
+                ? round((float)$revAgg->avg_rating, 1) 
+                : ($p->rating ? number_format($p->rating, 1) : 'New');
+
             return [
                 'id' => $p->id,
                 'name' => $p->name,
                 'slug' => $p->slug ?: \Illuminate\Support\Str::slug($p->name),
                 'price' => number_format($p->monthly_rent),
                 'raw_price' => (float) $p->monthly_rent,
-                'rating' => $p->dynamic_rating > 0 ? $p->dynamic_rating : ($p->rating ? number_format($p->rating, 1) : 'New'),
-                'reviews_count' => (int) $p->dynamic_reviews_count,
+                'rating' => $avgRating,
+                'reviews_count' => $reviewCount,
                 'lat' => (float) $lat,
                 'lng' => (float) $lng,
                 'image' => $primaryImg,
@@ -970,7 +1001,7 @@ class UserHomeController extends Controller
             ];
         });
 
-        $cities = City::where('is_active', 1)->orderBy('name')->get();
+        $cities = City::where('is_active', 1)->select('id', 'name', 'slug', 'latitude', 'longitude')->orderBy('name')->get();
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([

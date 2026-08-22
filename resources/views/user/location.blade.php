@@ -800,7 +800,7 @@
                 
                 pgMarker.bindPopup(`
                     <div class="font-sans">
-                        <img src="${pg.image}" class="w-full h-32 object-cover rounded-t-xl" alt="${pg.name}">
+                        <img src="${pg.image}" loading="lazy" decoding="async" class="w-full h-32 object-cover rounded-t-xl" alt="${pg.name}">
                         <div style="padding: 14px;">
                             <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:6px;">
                                 <h4 style="color:#0f172a; font-weight:800; font-size:15px; margin:0;">${pg.name}</h4>
@@ -945,7 +945,7 @@
                 card.id = `card-pg-${pg.id}`;
                 card.innerHTML = `
                     <div class="relative flex-shrink-0">
-                        <img src="${pg.image}" class="w-24 h-24 rounded-xl object-cover bg-gray-100" alt="${pg.name}">
+                        <img src="${pg.image}" loading="lazy" decoding="async" class="w-24 h-24 rounded-xl object-cover bg-gray-100" alt="${pg.name}">
                         <div class="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur rounded-md px-1.5 py-0.5 flex items-center gap-1 shadow-xs">
                             <i class="fas fa-star text-yellow-400 text-[9px]"></i>
                             <span class="text-[10px] font-bold text-slate-900">${pg.rating}</span>
@@ -1312,13 +1312,20 @@
             lastWidth = currentWidth;
         });
 
-        window.onload = () => {
+        function startLocationApp() {
             initMap();
             if (window.innerWidth < 768) {
-                document.getElementById('sidebar').style.transform = 'translateY(85%)';
+                const sb = document.getElementById('sidebar');
+                if (sb) sb.style.transform = 'translateY(85%)';
                 mobileSidebarOpen = false;
             }
             initUserLocation();
-        };
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startLocationApp);
+        } else {
+            startLocationApp();
+        }
     </script>
 @endpush

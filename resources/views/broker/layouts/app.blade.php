@@ -101,10 +101,10 @@
                     <span class="text-sm font-medium">Tenants</span>
                     <span class="ml-auto bg-blue-50 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ $brokerSidebarStats['tenants'] ?? 0 }}</span>
                 </a>
-                <a href="{{ route('broker.earnings') }}" class="sidebar-link {{ request()->routeIs('broker.earnings') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+                <!-- <a href="{{ route('broker.earnings') }}" class="sidebar-link {{ request()->routeIs('broker.earnings') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-rupee-sign w-5 text-center"></i>
                     <span class="text-sm font-medium">Earnings</span>
-                </a>
+                </a> -->
                 <a href="{{ route('broker.reviews') }}" class="sidebar-link {{ request()->routeIs('broker.reviews') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-star w-5 text-center"></i>
                     <span class="text-sm font-medium">Reviews</span>
@@ -159,6 +159,7 @@
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');

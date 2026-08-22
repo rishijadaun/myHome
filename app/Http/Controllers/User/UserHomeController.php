@@ -9,6 +9,7 @@ use App\Models\Property;
 use App\Models\PropertyReport;
 use App\Models\Review;
 use App\Models\User;
+use App\Services\ContentModerationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -776,6 +777,23 @@ class UserHomeController extends Controller
             'title' => 'nullable|string|max:150',
             'comment' => 'required|string|min:5|max:2000',
         ]);
+
+        // Server-Side Content Moderation Check (Gali, Profanity, Abuse, Sexual Content, Spam)
+        $modCheck = ContentModerationService::validateContent([
+            'name' => $validated['title'] ?? '',
+            'description' => $validated['comment']
+        ]);
+
+        if (!$modCheck['passed']) {
+            $reason = $modCheck['reason'] ?? 'inappropriate or abusive language.';
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Review contains restricted content: ' . $reason . ' Please remove any inappropriate words.'
+                ], 422);
+            }
+            return redirect()->back()->with('error', 'Review contains restricted content: ' . $reason);
+        }
 
         $review = Review::create([
             'id' => (string) \Illuminate\Support\Str::uuid(),

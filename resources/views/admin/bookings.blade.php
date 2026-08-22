@@ -359,6 +359,13 @@
 @push('scripts')
 <script>
     async function approveAdminBooking(bookingId, tenantName, bookingCode) {
+        if (typeof Swal === 'undefined') {
+            if (confirm(`Approve booking ${bookingCode} for ${tenantName}?`)) {
+                submitApproveAdminBooking(bookingId);
+            }
+            return;
+        }
+
         const result = await Swal.fire({
             title: `Approve Booking ${bookingCode}?`,
             text: `Confirm stay reservation for ${tenantName}?`,
@@ -371,18 +378,24 @@
         });
 
         if (result.isConfirmed) {
-            try {
-                const response = await fetch(`/admin/bookings/${bookingId}/approve`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                });
+            submitApproveAdminBooking(bookingId);
+        }
+    }
 
-                const data = await response.json();
-                if (data.success) {
+    async function submitApproveAdminBooking(bookingId) {
+        try {
+            const response = await fetch(`/admin/bookings/${bookingId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Booking Approved! 🎉',
                         text: data.message,
@@ -392,25 +405,44 @@
                         window.location.reload();
                     });
                 } else {
+                    alert(data.message || 'Booking approved!');
+                    window.location.reload();
+                }
+            } else {
+                if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Error',
                         text: data.message || 'Could not approve booking.',
                         icon: 'error',
                         confirmButtonColor: '#4bb59d'
                     });
+                } else {
+                    alert(data.message || 'Could not approve booking.');
                 }
-            } catch (err) {
+            }
+        } catch (err) {
+            if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     title: 'Network Error',
                     text: 'An error occurred while approving booking.',
                     icon: 'error',
                     confirmButtonColor: '#4bb59d'
                 });
+            } else {
+                alert('An error occurred while approving booking.');
             }
         }
     }
 
     async function rejectAdminBooking(bookingId, tenantName, bookingCode) {
+        if (typeof Swal === 'undefined') {
+            const reason = prompt(`Cancel Booking ${bookingCode}? Reason for cancellation:`, 'Cancelled by administration.');
+            if (reason !== null) {
+                submitRejectAdminBooking(bookingId, reason);
+            }
+            return;
+        }
+
         const { value: reason } = await Swal.fire({
             title: `Cancel Booking ${bookingCode}?`,
             text: `Please provide cancellation reason for ${tenantName}'s booking:`,
@@ -425,19 +457,25 @@
         });
 
         if (reason !== undefined) {
-            try {
-                const response = await fetch(`/admin/bookings/${bookingId}/reject`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ reason: reason || 'Cancelled by admin' })
-                });
+            submitRejectAdminBooking(bookingId, reason);
+        }
+    }
 
-                const data = await response.json();
-                if (data.success) {
+    async function submitRejectAdminBooking(bookingId, reason) {
+        try {
+            const response = await fetch(`/admin/bookings/${bookingId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ reason: reason || 'Cancelled by admin' })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Booking Cancelled',
                         text: data.message,
@@ -447,20 +485,31 @@
                         window.location.reload();
                     });
                 } else {
+                    alert(data.message || 'Booking cancelled.');
+                    window.location.reload();
+                }
+            } else {
+                if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Error',
                         text: data.message || 'Could not cancel booking.',
                         icon: 'error',
                         confirmButtonColor: '#4bb59d'
                     });
+                } else {
+                    alert(data.message || 'Could not cancel booking.');
                 }
-            } catch (err) {
+            }
+        } catch (err) {
+            if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     title: 'Network Error',
                     text: 'An error occurred while communicating with the server.',
                     icon: 'error',
                     confirmButtonColor: '#4bb59d'
                 });
+            } else {
+                alert('An error occurred while communicating with the server.');
             }
         }
     }

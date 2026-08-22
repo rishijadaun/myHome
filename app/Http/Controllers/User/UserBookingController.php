@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Notification;
 use App\Models\Property;
 use App\Models\User;
+use App\Services\ContentModerationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -85,6 +86,27 @@ class UserBookingController extends Controller
             'tenant_email' => 'nullable|email|max:150',
             'special_requests' => 'nullable|string|max:1000',
         ]);
+
+        // Server-Side Content Moderation Check (Gali, Profanity, Abuse, Prohibited Content)
+        if (!empty($validated['tenant_name'])) {
+            $modName = ContentModerationService::validateContent(['name' => $validated['tenant_name']]);
+            if (!$modName['passed']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your Full Name contains inappropriate terms. Please enter a valid name.',
+                ], 422);
+            }
+        }
+
+        if (!empty($validated['special_requests'])) {
+            $modReq = ContentModerationService::validateContent(['description' => $validated['special_requests']]);
+            if (!$modReq['passed']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Special Requests contain prohibited content: ' . ($modReq['reason'] ?? 'inappropriate terms.') . ' Please remove them.',
+                ], 422);
+            }
+        }
 
         $property = Property::with(['broker'])->findOrFail($validated['property_id']);
         $user = Auth::user();

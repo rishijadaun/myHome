@@ -892,7 +892,7 @@
 
     <!-- ================= 3. SIMILAR RECOMMENDED STAYS ================= -->
     @if(isset($similarProperties) && $similarProperties->count() > 0)
-        <div id="sec-more-listing" class="mt-12 sm:mt-16 pt-8 border-t border-gray-200 scroll-mt-36 md:scroll-mt-40">
+        <div id="sec-more-listing" class="mt-12 sm:mt-16 pt-8 border-t border-gray-200 scroll-mt-36 md:scroll-mt-40 mb-20">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl sm:text-2xl font-black text-gray-900">Similar Verified Stays Nearby</h2>
@@ -1124,13 +1124,15 @@
                 <!-- Review Title -->
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1.5">Review Title (Optional)</label>
-                    <input type="text" name="title" id="reviewTitle" placeholder="e.g. Great amenities and clean rooms!" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50">
+                    <input type="text" name="title" id="reviewTitle" placeholder="e.g. Great amenities and clean rooms!" oninput="validateBookingText(this)" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50">
+                    <div id="reviewTitleError" class="text-[10px] text-rose-600 font-semibold mt-1 hidden"></div>
                 </div>
 
                 <!-- Review Comments -->
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1.5">Your Experience & Feedback <span class="text-rose-500">*</span></label>
-                    <textarea name="comment" id="reviewComment" rows="4" required placeholder="Tell us about the food quality, WiFi speed, cleanliness, host behavior and room comfort..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50"></textarea>
+                    <textarea name="comment" id="reviewComment" rows="4" required placeholder="Tell us about the food quality, WiFi speed, cleanliness, host behavior and room comfort..." oninput="validateBookingText(this)" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50"></textarea>
+                    <div id="reviewCommentError" class="text-[10px] text-rose-600 font-semibold mt-1 hidden"></div>
                 </div>
 
                 <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center gap-2.5 text-[11px] text-blue-700">
@@ -1313,14 +1315,15 @@
                     <!-- Tenant Details (Auto filled) -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block font-semibold text-gray-600 mb-1">Your Full Name <span class="text-rose-500">*</span></label>
-                            <input type="text" name="tenant_name" id="bookingTenantName" required value="{{ auth()->user()?->name ?? '' }}" placeholder="Your Name" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium focus:ring-2 focus:ring-brand/50">
+                            <label class="block font-semibold text-gray-600 mb-1">Your Full Name </label>
+                            <input type="text" name="tenant_name" id="bookingTenantName" readonly value="{{ auth()->user()?->name ?? '' }}" placeholder="Your Name" oninput="validateBookingText(this)" class="w-full bg-gray-100/90 text-gray-500 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium cursor-not-allowed select-none">
+                            <div id="bookingTenantNameError" class="text-[10px] text-rose-600 font-semibold mt-1 hidden"></div>
                         </div>
                         <div>
-                            <label class="block font-semibold text-gray-600 mb-1">Phone Number (10 Digits) <span class="text-rose-500">*</span></label>
+                            <label class="block font-semibold text-gray-600 mb-1">Phone Number (Registered)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-2.5 text-xs font-bold text-gray-400">+91</span>
-                                <input type="tel" name="tenant_phone" id="bookingTenantPhone" required maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" value="{{ auth()->user()?->phone ? substr(preg_replace('/[^0-9]/', '', auth()->user()->phone), -10) : '' }}" placeholder="9876543210" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-3 text-xs font-medium focus:ring-2 focus:ring-brand/50">
+                                <input type="tel" name="tenant_phone" id="bookingTenantPhone" readonly value="{{ auth()->user()?->phone ? substr(preg_replace('/[^0-9]/', '', auth()->user()->phone), -10) : '' }}" placeholder="mobile number" class="w-full bg-gray-100/90 text-gray-500 border border-gray-200 rounded-xl py-2.5 pl-10 pr-3 text-xs font-medium cursor-not-allowed select-none">
                             </div>
                         </div>
                     </div>
@@ -1328,7 +1331,8 @@
                     <!-- Special Requests / Notes -->
                     <div>
                         <label class="block font-semibold text-gray-600 mb-1">Special Requests / Move-in Notes (Optional)</label>
-                        <textarea name="special_requests" id="bookingSpecialRequests" rows="2" placeholder="e.g. Preferred floor, early move-in time, 2-wheeler parking need..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs font-medium focus:ring-2 focus:ring-brand/50"></textarea>
+                        <textarea name="special_requests" id="bookingSpecialRequests" rows="2" placeholder="e.g. Preferred floor, early move-in time, 2-wheeler parking need..." oninput="validateBookingText(this)" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs font-medium focus:ring-2 focus:ring-brand/50"></textarea>
+                        <div id="bookingSpecialRequestsError" class="text-[10px] text-rose-600 font-semibold mt-1 hidden"></div>
                     </div>
                 </div>
 
@@ -1617,10 +1621,39 @@
         e.preventDefault();
         const form = document.getElementById('reviewForm');
         const submitBtn = document.getElementById('reviewSubmitBtn');
-        const comment = document.getElementById('reviewComment')?.value.trim();
+        const titleInput = document.getElementById('reviewTitle');
+        const commentInput = document.getElementById('reviewComment');
+        const comment = commentInput?.value.trim();
 
         if (!comment) {
-            alert('Please enter your review feedback.');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Feedback Required',
+                    text: 'Please enter your review feedback.',
+                    icon: 'warning',
+                    confirmButtonColor: '#4bb59d'
+                });
+            } else {
+                alert('Please enter your review feedback.');
+            }
+            return;
+        }
+
+        // Run Real-Time Content Moderation for Gali, Profanity, Abuse, Sex, Spam
+        const isTitleValid = checkBookingTextModeration(titleInput);
+        const isCommentValid = checkBookingTextModeration(commentInput);
+
+        if (!isTitleValid || !isCommentValid) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Restricted Content Detected ⚠️',
+                    text: 'Your review title or feedback contains inappropriate/abusive words. Please remove restricted terms to proceed.',
+                    icon: 'warning',
+                    confirmButtonColor: '#ef4444'
+                });
+            } else {
+                alert('Your review title or feedback contains inappropriate/abusive words. Please remove restricted terms to proceed.');
+            }
             return;
         }
 
@@ -1659,21 +1692,61 @@
 
             const data = await res.json();
             if (data.success) {
-                alert('✅ ' + data.message);
                 form.reset();
                 closeReviewModal();
-                window.location.reload();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Review Submitted! ⭐',
+                        text: data.message || 'Thank you! Your review has been submitted for moderation.',
+                        icon: 'success',
+                        confirmButtonColor: '#4bb59d'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    alert('✅ ' + data.message);
+                    window.location.reload();
+                }
             } else {
                 if (res.status === 401) {
-                    alert('⚠️ Please log in to submit your review.');
-                    window.location.href = "{{ route('user.login') }}";
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Sign In Required',
+                            text: 'Please sign in to submit your review.',
+                            icon: 'info',
+                            confirmButtonColor: '#4bb59d'
+                        }).then(() => {
+                            window.location.href = "{{ route('user.login') }}";
+                        });
+                    } else {
+                        alert('⚠️ Please log in to submit your review.');
+                        window.location.href = "{{ route('user.login') }}";
+                    }
                 } else {
-                    alert('⚠️ ' + (data.message || 'Could not submit review. Please try again.'));
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Could Not Submit Review',
+                            text: data.message || 'Please check your input and try again.',
+                            icon: 'error',
+                            confirmButtonColor: '#4bb59d'
+                        });
+                    } else {
+                        alert('⚠️ ' + (data.message || 'Could not submit review. Please try again.'));
+                    }
                 }
             }
         } catch (err) {
-            alert('✅ Thank you! Your review has been submitted for moderation and will appear publicly once approved.');
             closeReviewModal();
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Review Submitted! ⭐',
+                    text: 'Thank you! Your review has been submitted and will appear publicly once approved.',
+                    icon: 'success',
+                    confirmButtonColor: '#4bb59d'
+                });
+            } else {
+                alert('✅ Thank you! Your review has been submitted for moderation and will appear publicly once approved.');
+            }
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
@@ -1933,8 +2006,79 @@
         if (totEl) totEl.textContent = '₹' + total.toLocaleString('en-IN');
     }
 
+    // Client-side Content Moderation Filter (Gali / Profanity / Prohibited words)
+    const prohibitedBookingTermsRegex = [
+        { category: 'Vulgarity / Profanity', regex: /\b(fuck|fucking|fucked|fucker|fck|bitch|bitches|bastard|bastards|asshole|assholes|chutiya|chootiya|chutya|choot|bhenchod|behenchod|bc|madarchod|mc|gaand|gandu|harami|harampaye|lavde|lauda|loda|lodu|bhosadi|bhosdike|randi|kutiya|kamina|kameena|shit|cunt|cunts|pussy|dick)\b/i },
+        { category: 'Sexual Content & Escorts', regex: /\b(sex|sexy|sexual|intercourse|call\s*girl|call\s*girls|call\s*boy|call\s*boys|escort|escorts|russian\s*girl|paid\s*sex|adult\s*service|adult|adults|sex\s*service|nude|nudes|nudity|naked|porn|xxx|xx|erotic|sensual\s*massage|happy\s*ending|sax\s*sux|sax|sux|onlyfans|night\s*service|sugar\s*daddy|hookup)\b/i },
+        { category: 'Substances & Illicit Drugs', regex: /\b(cocaine|heroin|charas|ganja|weed|buy\s*weed|cannabis|meth|crystal\s*meth|mdma|ecstasy|lsd|smack|brown\s*sugar|narcotics|drug\s*party|afim|afeem)\b/i },
+        { category: 'Abuse & Harassment', regex: /\b(kill\s*you|murder|rape|threat|assault|beat\s*up|violence|terrorist|jihad|hate\s*all)\b/i },
+        { category: 'Scams & Phishing', regex: /\b(send\s*otp|share\s*otp|lottery\s*winner|crypto\s*investment|double\s*money|instant\s*loan\s*scam|free\s*recharge)\b/i }
+    ];
+
+    function checkBookingTextModeration(inputElement) {
+        if (!inputElement) return true;
+        const text = inputElement.value || '';
+        const errDivId = inputElement.id + 'Error';
+        const errDiv = document.getElementById(errDivId);
+
+        if (!text.trim()) {
+            if (errDiv) {
+                errDiv.textContent = '';
+                errDiv.classList.add('hidden');
+            }
+            inputElement.classList.remove('border-rose-500', 'bg-rose-50/40');
+            return true;
+        }
+
+        for (const rule of prohibitedBookingTermsRegex) {
+            if (rule.regex.test(text)) {
+                const matched = text.match(rule.regex);
+                const matchedWord = matched ? matched[0] : 'inappropriate term';
+                const msg = `⚠️ Contains restricted content [${rule.category}]: "${matchedWord}". Please remove it.`;
+                if (errDiv) {
+                    errDiv.textContent = msg;
+                    errDiv.classList.remove('hidden');
+                }
+                inputElement.classList.add('border-rose-500', 'bg-rose-50/40');
+                return false;
+            }
+        }
+
+        if (errDiv) {
+            errDiv.textContent = '';
+            errDiv.classList.add('hidden');
+        }
+        inputElement.classList.remove('border-rose-500', 'bg-rose-50/40');
+        return true;
+    }
+
+    function validateBookingText(inputElement) {
+        checkBookingTextModeration(inputElement);
+    }
+
     async function submitBookingRequest(event) {
         event.preventDefault();
+
+        // Validate text for prohibited / abusive words (Gali, xx, etc.)
+        const nameInput = document.getElementById('bookingTenantName');
+        const reqInput = document.getElementById('bookingSpecialRequests');
+        const isNameValid = checkBookingTextModeration(nameInput);
+        const isReqValid = checkBookingTextModeration(reqInput);
+
+        if (!isNameValid || !isReqValid) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Restricted Content Detected ⚠️',
+                    text: 'Your Name or Move-in Notes contain inappropriate/abusive words. Please remove restricted terms to proceed.',
+                    icon: 'warning',
+                    confirmButtonColor: '#ef4444'
+                });
+            } else {
+                alert('Your Name or Move-in Notes contain inappropriate/abusive words. Please remove restricted terms to proceed.');
+            }
+            return;
+        }
+
         const form = document.getElementById('bookStayForm');
         const btn = document.getElementById('bookingSubmitBtn');
         const origBtnHtml = btn ? btn.innerHTML : 'Submit Booking Request';

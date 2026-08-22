@@ -125,6 +125,8 @@ Route::prefix('broker')->name('broker.')->group(function () {
         // 1-Click Quick Actions
         Route::post('/bookings/{id}/approve', [BrokerBookingController::class, 'approve'])->name('bookings.approve');
         Route::post('/bookings/{id}/reject', [BrokerBookingController::class, 'reject'])->name('bookings.reject');
+        Route::post('/bookings/{id}/complete', [BrokerBookingController::class, 'complete'])->name('bookings.complete');
+        Route::get('/bookings/export', [BrokerBookingController::class, 'export'])->name('bookings.export');
 
         // Dynamic PG Property Management
         Route::get('/pgs', [BrokerPropertyController::class, 'index'])->name('pgs');

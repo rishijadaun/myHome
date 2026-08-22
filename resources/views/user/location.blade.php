@@ -561,10 +561,11 @@
                 result.maxPrice = val;
             }
 
-            // 4. Detect Amenities
+            // 4. Detect Amenities & Room Features
             if (/\b(ac|air conditioner|airconditioned|cooling)\b/i.test(q)) result.amenities.push('AC');
             if (/\b(wifi|wi-fi|internet|broadband)\b/i.test(q)) result.amenities.push('WiFi');
             if (/\b(food|meals?|khana|mess|breakfast|dinner)\b/i.test(q)) result.amenities.push('Food');
+            if (/\b(single|private room|1 bed|1-bed|single room)\b/i.test(q)) result.amenities.push('Single Room');
             if (/\b(gym|fitness|workout)\b/i.test(q)) result.amenities.push('Gym');
             if (/\b(attached bath|bathroom|washroom|private bath)\b/i.test(q)) result.amenities.push('Attached Bath');
             if (/\b(balcony|terrace|open air)\b/i.test(q)) result.amenities.push('Balcony');
@@ -869,23 +870,27 @@
                     return (pg.gender && (pg.gender.toLowerCase() === 'co-ed' || pg.gender.toLowerCase() === 'unisex' || pg.gender.toLowerCase() === 'coliving'));
                 }
                 if (f === 'ac') {
-                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('ac')));
+                    return Boolean(pg.has_ac) || (pg.tags && pg.tags.some(t => t.toLowerCase().includes('ac'))) || (pg.amenities && pg.amenities.some(a => a.toLowerCase().includes('ac')));
                 }
                 if (f === 'wifi') {
-                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('wifi')));
+                    return Boolean(pg.has_wifi) || (pg.tags && pg.tags.some(t => t.toLowerCase().includes('wifi'))) || (pg.amenities && pg.amenities.some(a => a.toLowerCase().includes('wifi')));
                 }
                 if (f === 'food') {
-                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('food') || t.toLowerCase().includes('meal') || t.toLowerCase().includes('mess')));
+                    return Boolean(pg.has_food) || 
+                           (pg.amenities && pg.amenities.some(a => a.toLowerCase().includes('food') || a.toLowerCase().includes('meal') || a.toLowerCase().includes('mess') || a.toLowerCase().includes('khana'))) || 
+                           (pg.tags && pg.tags.some(t => t.toLowerCase().includes('food') || t.toLowerCase().includes('meal') || t.toLowerCase().includes('mess')));
                 }
                 if (f === 'gym') {
-                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('gym') || t.toLowerCase().includes('fitness')));
+                    return Boolean(pg.has_gym) || (pg.tags && pg.tags.some(t => t.toLowerCase().includes('gym') || t.toLowerCase().includes('fitness'))) || (pg.amenities && pg.amenities.some(a => a.toLowerCase().includes('gym')));
                 }
                 if (f === 'single') {
-                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('single') || t.toLowerCase().includes('private'))) ||
+                    return Boolean(pg.has_single_room) || 
+                           (pg.room_types && pg.room_types.some(r => r.toLowerCase().includes('single') || r.toLowerCase().includes('private') || r.toLowerCase().includes('1-bed'))) || 
+                           (pg.tags && pg.tags.some(t => t.toLowerCase().includes('single') || t.toLowerCase().includes('private'))) ||
                            (pg.name && pg.name.toLowerCase().includes('single'));
                 }
                 if (f === 'bath') {
-                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('bath') || t.toLowerCase().includes('attached')));
+                    return Boolean(pg.has_attached_bath) || (pg.tags && pg.tags.some(t => t.toLowerCase().includes('bath') || t.toLowerCase().includes('attached'))) || (pg.amenities && pg.amenities.some(a => a.toLowerCase().includes('washroom') || a.toLowerCase().includes('bathroom')));
                 }
                 if (f === 'metro') {
                     return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('metro'))) ||
@@ -906,6 +911,19 @@
                 const tagMatch = pg.tags && pg.tags.some(t => t.toLowerCase().includes(f));
                 const nameMatch = pg.name && pg.name.toLowerCase().includes(f);
                 return tagMatch || nameMatch;
+            });
+
+            // Synchronize map markers layer with active filter
+            currentPGList.forEach(pg => {
+                const marker = markerMap[pg.id];
+                if (marker) {
+                    const isVisible = filtered.some(f => f.id === pg.id);
+                    if (isVisible) {
+                        if (!markersLayer.hasLayer(marker)) markersLayer.addLayer(marker);
+                    } else {
+                        if (markersLayer.hasLayer(marker)) markersLayer.removeLayer(marker);
+                    }
+                }
             });
 
             const headerEl = document.getElementById('listHeader');

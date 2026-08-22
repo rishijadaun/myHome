@@ -224,11 +224,11 @@
                                     </div>
                                 </label>
                                 <!-- <label class="cursor-pointer">
-                                    <input type="radio" name="listing_type" value="new-project" class="hidden" onchange="handleTypeChange('new-project')">
+                                    <input type="radio" name="listing_type" value="co-living" class="hidden" onchange="handleTypeChange('co-living')">
                                     <div class="type-pill border-2 border-gray-200 rounded-2xl p-4 text-center transition-all hover:border-brand/40">
-                                        <i class="fas fa-building text-xl mb-2 block"></i>
-                                        <div class="font-bold text-xs sm:text-sm">New Projects</div>
-                                        <div class="text-[10px] opacity-80 mt-0.5">New</div>
+                                        <i class="fas fa-users text-xl mb-2 block"></i>
+                                        <div class="font-bold text-xs sm:text-sm">Co-Living</div>
+                                        <div class="text-[10px] opacity-80 mt-0.5">Managed Stays</div>
                                     </div>
                                 </label> -->
                                 <label class="cursor-pointer">
@@ -1172,6 +1172,7 @@
         initHeroBannerTimer();
         renderPhotoPreviews();
         initPropertyMap();
+        updateLivePreview();
         checkForEditMode();
     });
 
@@ -2170,10 +2171,10 @@
     }
 
     function updateLivePreview() {
-        const name = document.getElementById('propName').value.trim() || 'PG or Property Name';
-        const city = document.getElementById('propCity').value.trim() || '****';
-        const area = document.getElementById('propArea').value.trim() || '****';
-        const rent = document.getElementById('propRent').value.trim() || '*,***';
+        const name = document.getElementById('propName')?.value.trim() || 'PG or Property Name';
+        const city = document.getElementById('propCity')?.value.trim() || '****';
+        const area = document.getElementById('propArea')?.value.trim() || '****';
+        const rent = document.getElementById('propRent')?.value.trim() || '*,***';
         
         const typeRadio = document.querySelector('input[name="listing_type"]:checked');
         const typeVal = typeRadio ? typeRadio.value : 'pg-hostel';
@@ -2181,20 +2182,44 @@
         const genderRadio = document.querySelector('input[name="gender_preference"]:checked');
         const genderVal = genderRadio ? genderRadio.value : 'co-ed';
 
-        document.getElementById('previewTitle').innerText = name;
-        document.getElementById('previewLocation').innerHTML = `<i class="fas fa-map-marker-alt text-brand"></i> ${area}, ${city}`;
-        document.getElementById('previewRent').innerText = `₹${Number(rent >= 500 ? rent : (rent > 0 ? rent : 0)).toLocaleString('en-IN')}`;
+        const previewTitle = document.getElementById('previewTitle');
+        if (previewTitle) previewTitle.innerText = name;
+
+        const previewLocation = document.getElementById('previewLocation');
+        if (previewLocation) previewLocation.innerHTML = `<i class="fas fa-map-marker-alt text-brand"></i> ${area}, ${city}`;
+
+        const previewRent = document.getElementById('previewRent');
+        if (previewRent) previewRent.innerText = `₹${Number(rent >= 500 ? rent : (rent > 0 ? rent : 0)).toLocaleString('en-IN')}`;
 
         const typeBadge = document.getElementById('previewTypeBadge');
-        if (typeVal === 'pg-hostel') typeBadge.innerText = 'PG / Hostel';
-        else if (typeVal === 'co-living') typeBadge.innerText = 'Co-Living';
-        else if (typeVal === 'flat-apartment') typeBadge.innerText = 'Flat / House';
-        else typeBadge.innerText = 'Commercial';
+        if (typeBadge) {
+            if (typeVal === 'pg-hostel') typeBadge.innerText = 'PG / Hostel';
+            else if (typeVal === 'co-living') typeBadge.innerText = 'Co-Living';
+            else if (typeVal === 'flat-apartment') typeBadge.innerText = 'Flat / House';
+            else typeBadge.innerText = 'Commercial';
+        }
 
+        // Show Gender Preference in Live Listing Preview ONLY when pg-hostel (or co-living) is selected
         const genderBadge = document.getElementById('previewGenderBadge');
-        if (genderVal === 'boys') genderBadge.innerText = 'Boys Only';
-        else if (genderVal === 'girls') genderBadge.innerText = 'Girls Only';
-        else genderBadge.innerText = 'Co-ed';
+        if (genderBadge) {
+            if (typeVal === 'pg-hostel' || typeVal === 'co-living') {
+                genderBadge.classList.remove('hidden');
+                genderBadge.style.display = '';
+                if (genderVal === 'boys') {
+                    genderBadge.innerText = 'Boys Only';
+                    genderBadge.className = 'absolute top-2 right-2 bg-blue-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg';
+                } else if (genderVal === 'girls') {
+                    genderBadge.innerText = 'Girls Only';
+                    genderBadge.className = 'absolute top-2 right-2 bg-pink-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg';
+                } else {
+                    genderBadge.innerText = 'Co-Living';
+                    genderBadge.className = 'absolute top-2 right-2 bg-purple-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg';
+                }
+            } else {
+                genderBadge.classList.add('hidden');
+                genderBadge.style.display = 'none';
+            }
+        }
     }
 
     // Multiple Photo Uploads (Accumulates without clearing)
@@ -2658,8 +2683,18 @@
             });
         }
 
+        const selectedListingType = typeRadio ? typeRadio.value : 'pg-hostel';
+        let calculatedGender = 'co-ed';
+        if (selectedListingType === 'commercial') {
+            calculatedGender = null;
+        } else if (selectedListingType === 'flat-apartment') {
+            calculatedGender = 'all';
+        } else {
+            calculatedGender = genderRadio ? genderRadio.value : 'co-ed';
+        }
+
         const payload = {
-            listing_type: typeRadio ? typeRadio.value : 'pg-hostel',
+            listing_type: selectedListingType,
             name: nameEl.value.trim(),
             city: cityEl.value.trim(),
             area: areaEl?.value.trim() || '',
@@ -2668,7 +2703,7 @@
             pincode: pinEl?.value.trim() || '',
             latitude: latEl?.value ? Number(latEl.value) : null,
             longitude: lngEl?.value ? Number(lngEl.value) : null,
-            gender_preference: genderRadio ? genderRadio.value : 'co-ed',
+            gender_preference: calculatedGender,
             monthly_rent: Math.max(100, Number(rentEl.value)),
             security_deposit: depositVal,
             maintenance_charges: maintVal,

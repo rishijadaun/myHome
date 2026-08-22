@@ -43,12 +43,21 @@ class Property extends Model
         'verification_status',
         'status',
         'featured',
+        'is_recommended',
         'tag',
         'is_active',
         'version',
         'created_by',
         'updated_by',
         'deleted_by',
+    ];
+
+    protected $casts = [
+        'is_recommended' => 'boolean',
+        'featured' => 'boolean',
+        'is_active' => 'boolean',
+        'rating' => 'float',
+        'monthly_rent' => 'float',
     ];
 
     public const ALLOWED_TAGS = [
@@ -145,7 +154,34 @@ class Property extends Model
 
     public function getGenderTypeMetaAttribute(): array
     {
-        $gender = strtolower($this->gender_preference ?? 'co-ed');
+        $typeSlug = strtolower($this->propertyType?->slug ?? '');
+        $gender = strtolower($this->gender_preference ?? '');
+
+        // 1. Commercial Property (no gender preference concept)
+        if (in_array($typeSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space']) || $gender === 'not_applicable') {
+            return [
+                'label' => 'COMMERCIAL',
+                'class' => 'bg-amber-50 text-amber-700',
+                'btn_class' => 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-500/30',
+                'text_color' => 'text-amber-700',
+                'bg_color' => 'bg-amber-50',
+                'is_commercial' => true,
+            ];
+        }
+
+        // 2. Flat / House Rentals (families, couples, mixed groups / all)
+        if (in_array($typeSlug, ['flat', 'flat-apartment', 'apartment', 'house', 'villa']) || in_array($gender, ['all', 'any'])) {
+            return [
+                'label' => 'FLAT',
+                'class' => 'bg-indigo-50 text-indigo-700',
+                'btn_class' => 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/30',
+                'text_color' => 'text-indigo-700',
+                'bg_color' => 'bg-indigo-50',
+                'is_flat' => true,
+            ];
+        }
+
+        // 3. PG / Hostel
         if ($gender === 'boys' || $gender === 'male') {
             return [
                 'label' => 'BOYS',

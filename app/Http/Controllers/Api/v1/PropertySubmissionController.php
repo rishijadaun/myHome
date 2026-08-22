@@ -92,7 +92,7 @@ class PropertySubmissionController extends Controller
             'pincode' => ['nullable', 'string', 'regex:/^[1-9][0-9]{5}$/'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-            'gender_preference' => ['nullable', 'in:boys,girls,co-ed'],
+            'gender_preference' => ['nullable', 'string', 'in:boys,girls,co-ed,all,any,not_applicable'],
             'monthly_rent' => ['required', 'numeric', 'min:500', 'max:1000000'],
             'security_deposit' => ['nullable', 'numeric', 'min:0', 'max:2000000'],
             'maintenance_charges' => ['nullable', 'numeric', 'min:0', 'max:100000'],
@@ -243,23 +243,19 @@ class PropertySubmissionController extends Controller
             }
 
             // 4. Resolve Property Type
-            $typeSlug = !empty($validated['listing_type']) ? Str::slug($validated['listing_type']) : 'pg-hostel';
-            $propertyType = PropertyType::where('slug', $typeSlug)
-                ->orWhere('name', 'like', "%{$typeSlug}%")
-                ->first();
-
-            if (!$propertyType) {
-                $propertyType = PropertyType::firstOrCreate(
-                    ['slug' => $typeSlug],
-                    [
-                        'id' => (string) Str::uuid(),
-                        'name' => ucwords(str_replace('-', ' ', $typeSlug)),
-                        'is_active' => 1
-                    ]
-                );
-            }
+            $propertyType = $this->resolvePropertyType($validated['listing_type'] ?? null);
 
             // 5. Create Property Record (Pending Admin Approval)
+            $ptSlug = strtolower($propertyType->slug ?? '');
+            $finalGender = $validated['gender_preference'] ?? null;
+            if (in_array($ptSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space'])) {
+                $finalGender = null;
+            } elseif (in_array($ptSlug, ['flat', 'flat-apartment', 'house', 'apartment', 'villa'])) {
+                $finalGender = $finalGender ?: 'all';
+            } else {
+                $finalGender = $finalGender ?: 'co-ed';
+            }
+
             $property = Property::create([
                 'id' => (string) Str::uuid(),
                 'broker_id' => $assignedBrokerId,
@@ -273,7 +269,7 @@ class PropertySubmissionController extends Controller
                 'landmark' => $validated['landmark'] ?? null,
                 'latitude' => $validated['latitude'] ?? null,
                 'longitude' => $validated['longitude'] ?? null,
-                'gender_preference' => $validated['gender_preference'] ?? 'co-ed',
+                'gender_preference' => $finalGender,
                 'total_beds' => $validated['total_beds'] ?? 10,
                 'available_beds' => $validated['available_beds'] ?? ($validated['total_beds'] ?? 10),
                 'monthly_rent' => $validated['monthly_rent'],
@@ -536,7 +532,7 @@ class PropertySubmissionController extends Controller
             'pincode' => ['nullable', 'string'],
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
-            'gender_preference' => ['nullable', 'in:boys,girls,co-ed'],
+            'gender_preference' => ['nullable', 'string', 'in:boys,girls,co-ed,all,any,not_applicable'],
             'monthly_rent' => ['required', 'numeric', 'min:500', 'max:1000000'],
             'security_deposit' => ['nullable', 'numeric', 'min:0', 'max:2000000'],
             'maintenance_charges' => ['nullable', 'numeric', 'min:0', 'max:100000'],
@@ -597,19 +593,22 @@ class PropertySubmissionController extends Controller
                 $areaId = $area->id;
             }
 
-            // Resolve Type
-            $typeSlug = $validated['listing_type'] ?? 'pg-hostel';
-            $propertyType = PropertyType::where('slug', $typeSlug)->first() ?? PropertyType::first();
-
-            $property->name = $validated['name'];
-            $property->city_id = $city->id;
-            $property->area_id = $areaId;
-            if ($propertyType) {
-                $property->property_type_id = $propertyType->id;
+            // Resolve Type & Gender Preference
+            $propertyType = $this->resolvePropertyType($validated['listing_type'] ?? null);
+            $ptSlug = strtolower($propertyType->slug ?? '');
+            $finalGender = $validated['gender_preference'] ?? null;
+            if (in_array($ptSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space'])) {
+                $finalGender = null;
+            } elseif (in_array($ptSlug, ['flat', 'flat-apartment', 'house', 'apartment', 'villa'])) {
+                $finalGender = $finalGender ?: 'all';
+            } else {
+                $finalGender = $finalGender ?: ($property->gender_preference ?: 'co-ed');
             }
+
+            $property->property_type_id = $propertyType->id;
             $property->address = $validated['address'];
             $property->landmark = $validated['landmark'] ?? $property->landmark;
-            $property->gender_preference = $validated['gender_preference'] ?? $property->gender_preference;
+            $property->gender_preference = $finalGender;
             $property->monthly_rent = $validated['monthly_rent'];
             $property->security_deposit = $validated['security_deposit'] ?? $property->security_deposit;
             $property->maintenance_charges = $validated['maintenance_charges'] ?? $property->maintenance_charges;
@@ -889,5 +888,67 @@ class PropertySubmissionController extends Controller
                 'updated_at' => now(),
             ]);
         }
+    }
+
+    /**
+     * Resolve or provision a PropertyType record based on listing type slug or name.
+     */
+    protected function resolvePropertyType(?string $rawType): PropertyType
+    {
+        $typeSlug = !empty($rawType) ? Str::slug($rawType) : 'pg-hostel';
+        
+        if (in_array($typeSlug, ['flat-apartment', 'flat', 'apartment', 'house', 'flat-house'])) {
+            $type = PropertyType::whereIn('slug', ['flat-apartment', 'flat', 'apartment', 'house', 'flat-house'])->first();
+            if (!$type) {
+                $type = PropertyType::create([
+                    'id' => (string) Str::uuid(),
+                    'name' => 'Flat / Apartment',
+                    'slug' => 'flat-apartment',
+                    'is_active' => 1
+                ]);
+            }
+            return $type;
+        }
+
+        if (in_array($typeSlug, ['pg-hostel', 'pg', 'hostel', 'co-living'])) {
+            $type = PropertyType::whereIn('slug', ['pg-hostel', 'pg', 'hostel', 'co-living'])->first();
+            if (!$type) {
+                $type = PropertyType::create([
+                    'id' => (string) Str::uuid(),
+                    'name' => 'PG / Hostel',
+                    'slug' => 'pg-hostel',
+                    'is_active' => 1
+                ]);
+            }
+            return $type;
+        }
+
+        if (in_array($typeSlug, ['commercial', 'commercial-property', 'shop-office', 'shop', 'office'])) {
+            $type = PropertyType::whereIn('slug', ['commercial', 'commercial-property', 'shop-office', 'shop', 'office'])->first();
+            if (!$type) {
+                $type = PropertyType::create([
+                    'id' => (string) Str::uuid(),
+                    'name' => 'Commercial',
+                    'slug' => 'commercial',
+                    'is_active' => 1
+                ]);
+            }
+            return $type;
+        }
+
+        $type = PropertyType::where('slug', $typeSlug)
+            ->orWhere('name', 'like', "%{$typeSlug}%")
+            ->first();
+
+        if (!$type) {
+            $type = PropertyType::create([
+                'id' => (string) Str::uuid(),
+                'name' => ucwords(str_replace('-', ' ', $typeSlug)),
+                'slug' => $typeSlug,
+                'is_active' => 1
+            ]);
+        }
+
+        return $type;
     }
 }

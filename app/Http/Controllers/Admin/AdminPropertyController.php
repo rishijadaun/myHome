@@ -35,7 +35,27 @@ class AdminPropertyController extends Controller
               ->orWhere('status', 'draft');
         })->count();
 
-        // 2. Query Builder with Eager Loading
+        // 2. Listing Type Tabs Aggregation
+        $pgCount = Property::whereHas('propertyType', function ($q) {
+            $q->whereIn('slug', ['pg-hostel', 'pg', 'hostel', 'co-living']);
+        })->count();
+
+        $flatCount = Property::whereHas('propertyType', function ($q) {
+            $q->whereIn('slug', ['flat-apartment', 'flat', 'apartment', 'house', 'flat-house']);
+        })->count();
+
+        $commercialCount = Property::whereHas('propertyType', function ($q) {
+            $q->whereIn('slug', ['commercial', 'commercial-property', 'office', 'shop']);
+        })->count();
+
+        $tabCounts = [
+            'all' => $totalCount,
+            'pg-hostel' => $pgCount,
+            'flat-apartment' => $flatCount,
+            'commercial' => $commercialCount,
+        ];
+
+        // 3. Query Builder with Eager Loading
         $query = Property::with([
             'broker.profile',
             'city',
@@ -63,18 +83,21 @@ class AdminPropertyController extends Controller
             });
         }
 
-        // Type / Gender Filter
-        if ($request->filled('type')) {
-            $type = $request->query('type');
-            if (in_array(strtoupper($type), ['BOYS', 'GIRLS', 'CO-ED', 'COED'])) {
-                $gender = strtolower($type) === 'co-ed' || strtolower($type) === 'coed' ? 'co-ed' : strtolower($type);
+        // Listing Type Filter (from Tabs or Dropdown)
+        $currentType = $request->query('type') ?? $request->query('listing_type', 'all');
+        if ($currentType && $currentType !== 'all') {
+            if ($currentType === 'pg-hostel' || $currentType === 'pg') {
+                $query->whereHas('propertyType', fn($q) => $q->whereIn('slug', ['pg-hostel', 'pg', 'hostel', 'co-living']));
+            } elseif ($currentType === 'flat-apartment' || $currentType === 'flat' || $currentType === 'flat-house') {
+                $query->whereHas('propertyType', fn($q) => $q->whereIn('slug', ['flat-apartment', 'flat', 'apartment', 'house', 'flat-house']));
+            } elseif ($currentType === 'commercial') {
+                $query->whereHas('propertyType', fn($q) => $q->whereIn('slug', ['commercial', 'commercial-property', 'office', 'shop']));
+            } elseif (in_array(strtoupper($currentType), ['BOYS', 'GIRLS', 'CO-ED', 'COED'])) {
+                $gender = strtolower($currentType) === 'co-ed' || strtolower($currentType) === 'coed' ? 'co-ed' : strtolower($currentType);
                 $query->where('gender_preference', $gender);
             } else {
-                $query->where(function ($q) use ($type) {
-                    $q->whereHas('propertyType', function ($pt) use ($type) {
-                        $pt->where('slug', $type)
-                           ->orWhere('name', 'like', "%{$type}%");
-                    })->orWhere('gender_preference', strtolower($type));
+                $query->whereHas('propertyType', function ($q) use ($currentType) {
+                    $q->where('slug', $currentType)->orWhere('name', 'like', "%{$currentType}%");
                 });
             }
         }
@@ -118,10 +141,28 @@ class AdminPropertyController extends Controller
             }
         }
 
-        // 3. Paginated Results
+        // Recommended / Featured Filter
+        if ($request->filled('recommended')) {
+            $recFilter = trim($request->query('recommended'));
+            if ($recFilter === '1' || $recFilter === 'yes' || $recFilter === 'recommended') {
+                $query->where(function ($q) {
+                    $q->where('is_recommended', 1)->orWhere('featured', 1);
+                });
+            } elseif ($recFilter === '0' || $recFilter === 'no' || $recFilter === 'not_recommended') {
+                $query->where(function ($q) {
+                    $q->where('is_recommended', 0)->where('featured', 0);
+                });
+            }
+        }
+
+        // 4. Paginated Results
         $properties = $query->latest()->paginate(15)->withQueryString();
 
-        // 4. Dropdown Options
+        $recommendedCount = Property::where(function ($q) {
+            $q->where('is_recommended', 1)->orWhere('featured', 1);
+        })->count();
+
+        // 5. Dropdown Options
         $cities = City::where('is_active', 1)->orderBy('name')->get();
         $propertyTypes = PropertyType::where('is_active', 1)->orderBy('name')->get();
         $allowedTags = Property::ALLOWED_TAGS;
@@ -138,7 +179,10 @@ class AdminPropertyController extends Controller
             'totalCount',
             'approvedCount',
             'pendingCount',
-            'inactiveCount'
+            'inactiveCount',
+            'recommendedCount',
+            'tabCounts',
+            'currentType'
         ));
     }
 
@@ -153,7 +197,7 @@ class AdminPropertyController extends Controller
             'city_id' => ['required', 'string'],
             'property_type_id' => ['nullable', 'string'],
             'tag' => ['nullable', 'string', 'max:50'],
-            'gender_preference' => ['required', 'string', 'in:boys,girls,co-ed,male,female,any'],
+            'gender_preference' => ['nullable', 'string', 'in:boys,girls,co-ed,male,female,any,all,not_applicable'],
             'total_beds' => ['required', 'integer', 'min:1', 'max:500'],
             'monthly_rent' => ['required', 'numeric', 'min:500'],
             'security_deposit' => ['nullable', 'numeric', 'min:0'],
@@ -171,11 +215,23 @@ class AdminPropertyController extends Controller
             $propertyTypeId = $defaultType ? $defaultType->id : null;
         }
 
+        $pt = PropertyType::find($propertyTypeId);
+        $ptSlug = strtolower($pt?->slug ?? '');
+        $finalGender = !empty($validated['gender_preference']) ? strtolower($validated['gender_preference']) : null;
+        if (in_array($ptSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space'])) {
+            $finalGender = null;
+        } elseif (in_array($ptSlug, ['flat', 'flat-apartment', 'house', 'apartment', 'villa'])) {
+            $finalGender = $finalGender ?: 'all';
+        } else {
+            $finalGender = $finalGender ?: 'co-ed';
+        }
+
         // Auto resolve default area for city
         $area = Area::where('city_id', $validated['city_id'])->first();
         $areaId = $area ? $area->id : null;
 
         $isInstantApprove = $request->boolean('instant_approve', true);
+        $isRecommended = $request->boolean('is_recommended', false);
 
         $property = Property::create([
             'id' => (string) Str::uuid(),
@@ -185,7 +241,7 @@ class AdminPropertyController extends Controller
             'area_id' => $areaId,
             'property_type_id' => $propertyTypeId,
             'tag' => !empty($validated['tag']) && strtolower($validated['tag']) !== 'none' ? $validated['tag'] : null,
-            'gender_preference' => strtolower($validated['gender_preference']),
+            'gender_preference' => $finalGender,
             'total_beds' => $validated['total_beds'],
             'available_beds' => $validated['total_beds'],
             'monthly_rent' => $validated['monthly_rent'],
@@ -195,6 +251,8 @@ class AdminPropertyController extends Controller
             'description' => $validated['description'] ?? 'Modern, fully furnished stay with 24/7 power backup, high-speed WiFi, and security.',
             'verification_status' => $isInstantApprove ? 'verified' : 'pending',
             'status' => 'active',
+            'is_recommended' => $isRecommended,
+            'featured' => $isRecommended,
             'is_active' => true,
             'version' => 1,
         ]);
@@ -316,6 +374,28 @@ class AdminPropertyController extends Controller
             'status' => strtoupper($property->status),
             'is_active' => (bool) $property->is_active,
             'message' => "Status for \"{$property->name}\" updated to {$property->status}.",
+        ]);
+    }
+
+    /**
+     * Toggle property Recommended / Not Recommended status.
+     */
+    public function toggleRecommended(Request $request, $id)
+    {
+        $property = Property::findOrFail($id);
+        $newState = !$property->is_recommended;
+        $property->is_recommended = $newState;
+        $property->featured = $newState;
+        $property->save();
+
+        return response()->json([
+            'success' => true,
+            'is_recommended' => (bool) $property->is_recommended,
+            'property_id' => $property->id,
+            'property_name' => $property->name,
+            'message' => $property->is_recommended
+                ? "⭐ \"{$property->name}\" marked as Recommended!"
+                : "Listing \"{$property->name}\" removed from Recommended.",
         ]);
     }
 

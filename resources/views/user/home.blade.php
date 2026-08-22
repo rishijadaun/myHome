@@ -185,6 +185,45 @@
         background: rgba(255,255,255,1);
         box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     }
+
+    /* ===================== PROPERTY TYPE SWITCHER CARDS (OPTION 3) ===================== */
+    .property-type-card {
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .property-type-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px -2px rgba(0,0,0,0.06);
+    }
+    .property-type-card.active-pg {
+        border-color: #1fa37a !important;
+        border-width: 2px !important;
+        background-color: #eefaf6 !important;
+        box-shadow: 0 4px 14px -2px rgba(31, 163, 122, 0.18) !important;
+    }
+
+    .property-type-card.active-flat {
+        border-color: #4f46e5 !important;
+        border-width: 2px !important;
+        background-color: #eff4ff !important;
+        box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.18) !important;
+    }
+
+    .property-type-card.active-commercial {
+        border-color: #ea580c !important;
+        border-width: 2px !important;
+        background-color: #fff9ed !important;
+        box-shadow: 0 4px 14px -2px rgba(234, 88, 12, 0.18) !important;
+    }
+
+    .view-container-fade {
+        animation: fadeInView 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes fadeInView {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 @endpush
 
@@ -390,8 +429,107 @@
         </div>
     </section>
 
+    {{-- ============================= PROPERTY TYPE SWITCHER CARDS (OPTION 3) ============================= --}}
+    <section class="mt-4 sm:mt-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl sm:max-w-3xl mx-auto" id="propertyTypeSwitcherGrid">
+                
+                <!-- Card 1: PG & Hostels (Main Priority) -->
+                <button type="button" onclick="switchPropertyType('pg-hostel', false)" id="card-type-pg-hostel" 
+                    class="property-type-card {{ $selectedType === 'pg-hostel' ? 'active-pg' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
+                        <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Left taller green building -->
+                            <rect x="11" y="14" width="22" height="42" rx="3" fill="#4bb59d" stroke="#134e48" stroke-width="2"/>
+                            <rect x="15.5" y="19" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                            <rect x="24" y="19" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                            <rect x="15.5" y="28" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                            <rect x="24" y="28" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                            <rect x="15.5" y="37" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                            <rect x="24" y="37" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                            <rect x="19" y="47" width="6" height="9" rx="1" fill="#134e48"/>
+                            <!-- Right building with pitched roof -->
+                            <path d="M30 25L45 15L54 25V56H30V25Z" fill="#ffffff" stroke="#134e48" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M28 25L45 13L56 25" stroke="#134e48" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                            <path d="M30 25L45 15L54 25" fill="#34d399"/>
+                            <rect x="36" y="29" width="5" height="6" rx="1" fill="#a7f3d0" stroke="#134e48" stroke-width="1.2"/>
+                            <rect x="45" y="29" width="5" height="6" rx="1" fill="#a7f3d0" stroke="#134e48" stroke-width="1.2"/>
+                            <rect x="40" y="42" width="7" height="14" rx="1" fill="#4bb59d" stroke="#134e48" stroke-width="1.3"/>
+                            <circle cx="8" cy="51" r="3.5" fill="#10b981"/>
+                            <circle cx="56" cy="49" r="4" fill="#10b981"/>
+                            <line x1="6" y1="56" x2="58" y2="56" stroke="#134e48" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">PG & Hostels</p>
+                    <p class="text-[9px] sm:text-xs text-slate-500 font-semibold mt-0.5">{{ $propertyTypeCounts['pg'] > 0 ? $propertyTypeCounts['pg'] . '+ Stays' : '850+ Stays' }}</p>
+                </button>
+
+                <!-- Card 2: Flats & Houses -->
+                <button type="button" onclick="switchPropertyType('flat-apartment', false)" id="card-type-flat-apartment" 
+                    class="property-type-card {{ $selectedType === 'flat-apartment' ? 'active-flat' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
+                        <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Left tall building -->
+                            <rect x="13" y="12" width="22" height="44" rx="3" fill="#ffffff" stroke="#1e1b4b" stroke-width="2"/>
+                            <rect x="17.5" y="16.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="25.5" y="16.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="17.5" y="24" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="25.5" y="24" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="17.5" y="31.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="25.5" y="31.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="17.5" y="39" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="25.5" y="39" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="21" y="48.5" width="6" height="7.5" rx="1" fill="#312e81"/>
+                            <!-- Right building -->
+                            <rect x="33" y="22" width="18" height="34" rx="2" fill="#e0e7ff" stroke="#1e1b4b" stroke-width="2"/>
+                            <rect x="37" y="26.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="43.5" y="26.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="37" y="34" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="43.5" y="34" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="37" y="41.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                            <rect x="43.5" y="41.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                            <circle cx="9" cy="50" r="3.5" fill="#34d399"/>
+                            <circle cx="55" cy="48" r="4" fill="#34d399"/>
+                            <line x1="7" y1="56" x2="57" y2="56" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Flats & Houses</p>
+                    <p class="text-[9px] sm:text-xs text-slate-500 font-semibold mt-0.5">{{ $propertyTypeCounts['flat'] > 0 ? $propertyTypeCounts['flat'] . '+ Properties' : '0+ Properties' }}</p>
+                </button>
+
+                <!-- Card 3: Commercial -->
+                <button type="button" onclick="switchPropertyType('commercial', false)" id="card-type-commercial" 
+                    class="property-type-card {{ $selectedType === 'commercial' ? 'active-commercial' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
+                        <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="11" y="22" width="42" height="34" rx="2" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+                            <rect x="9" y="16" width="46" height="7" rx="2" fill="#1e3a8a" stroke="#1e293b" stroke-width="1.8"/>
+                            <path d="M10 23L13 32H51L54 23H10Z" fill="#3b82f6" stroke="#1e293b" stroke-width="1.8" stroke-linejoin="round"/>
+                            <path d="M19 23L18 32M28 23L27 32M37 23L37 32M46 23L47 32" stroke="#ffffff" stroke-width="2"/>
+                            <path d="M13 32Q15.5 35 18 32Q20.5 35 23 32Q25.5 35 28 32Q30.5 35 33 32Q35.5 35 38 32Q40.5 35 43 32Q45.5 35 48 32Q50.5 35 51 32" fill="#60a5fa" stroke="#1e293b" stroke-width="1.5"/>
+                            <rect x="16" y="37" width="10" height="12" rx="1" fill="#dbeafe" stroke="#1e293b" stroke-width="1.2"/>
+                            <line x1="21" y1="37" x2="21" y2="49" stroke="#93c5fd" stroke-width="1"/>
+                            <rect x="29" y="36" width="10" height="20" rx="1" fill="#1d4ed8" stroke="#1e293b" stroke-width="1.2"/>
+                            <rect x="31" y="38" width="6" height="9" fill="#bfdbfe"/>
+                            <circle cx="37" cy="48" r="0.9" fill="#ffffff"/>
+                            <rect x="42" y="37" width="8" height="12" rx="1" fill="#dbeafe" stroke="#1e293b" stroke-width="1.2"/>
+                            <circle cx="7" cy="50" r="3" fill="#22c55e"/>
+                            <circle cx="57" cy="50" r="3" fill="#22c55e"/>
+                            <line x1="5" y1="56" x2="59" y2="56" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Commercial</p>
+                    <p class="text-[9px] sm:text-xs text-slate-500 font-semibold mt-0.5">{{ $propertyTypeCounts['commercial'] > 0 ? $propertyTypeCounts['commercial'] . '+ Spaces' : '120+ Spaces' }}</p>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    {{-- ============================= PG / HOSTEL VIEW CONTAINER (DEFAULT PRIORITY) ============================= --}}
+    <div id="pgViewContainer" class="{{ $selectedType === 'pg-hostel' ? '' : 'hidden' }}">
+
     {{-- ============================= 2. PG NEAR ME ============================= --}}
-    <section class="mt-8 sm:mt-10 hidden md:block">
+    <section class="mt-8 sm:mt-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-4">
                 <div>
@@ -399,7 +537,7 @@
                         <span class="w-8 h-8 rounded-xl bg-blue-50 inline-flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-location-crosshairs text-blue-600 text-sm"></i>
                         </span>
-                        PG Near Me
+                        PG Near You
                     </h2>
                     <p class="text-xs text-gray-500 mt-1 ml-10">Verified stays near your current location</p>
                 </div>
@@ -572,6 +710,7 @@
     </section>
 
     {{-- ============================= 3. RECOMMENDED FOR YOU ============================= --}}
+    @if($recommendedProperties->isNotEmpty())
     <section class="mt-8 sm:mt-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-4">
@@ -592,7 +731,7 @@
             {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
             <div class="md:hidden swiper recommendedSwiper overflow-hidden">
                 <div class="swiper-wrapper">
-                    @forelse ($recommendedProperties as $pg)
+                    @foreach ($recommendedProperties as $pg)
                         @php
                             $tagMeta = $pg->display_tag_meta;
                             $genderMeta = $pg->gender_type_meta;
@@ -656,15 +795,13 @@
                                 </div>
                             </a>
                         </div>
-                    @empty
-                        <div class="swiper-slide p-6 text-center text-gray-400 text-xs">No recommended stays found.</div>
-                    @endforelse
+                    @endforeach
                 </div>
             </div>
 
             {{-- ===== DESKTOP: 4-Col Grid ===== --}}
             <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                @forelse ($recommendedProperties as $pg)
+                @foreach ($recommendedProperties as $pg)
                     @php
                         $tagMeta = $pg->display_tag_meta;
                         $genderMeta = $pg->gender_type_meta;
@@ -731,12 +868,11 @@
                             </div>
                         </div>
                     </a>
-                @empty
-                    <div class="col-span-4 p-8 text-center text-gray-400 text-sm">No recommended properties available.</div>
-                @endforelse
+                @endforeach
             </div>
         </div>
     </section>
+    @endif
 
     {{-- ============================= 4. POPULAR GIRLS PG ============================= --}}
     <section class="mt-8 sm:mt-10">
@@ -1181,21 +1317,542 @@
         </div>
     </section>
 
+    </div> {{-- ============================= END PG / HOSTEL VIEW CONTAINER ============================= --}}
+
+    {{-- ============================= FLAT / HOUSE VIEW CONTAINER ============================= --}}
+    <div id="flatViewContainer" class="{{ $selectedType === 'flat-apartment' ? '' : 'hidden' }}">
+        <section class="mt-8 sm:mt-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="section-title flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-indigo-50 inline-flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-building text-indigo-600 text-sm"></i>
+                            </span>
+                            Flats & Houses Near You
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1 ml-10">100% Verified 1BHK, 2BHK, 3BHK & Full Houses with Zero Brokerage</p>
+                    </div>
+                    <a href="{{ route('user.search') }}?type=flat-apartment" class="text-xs font-bold text-indigo-600 flex items-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                        See all Flats <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                @if($flatProperties->isNotEmpty())
+                    {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
+                    <div id="flatNearMeMobileContainer" class="md:hidden swiper flatNearMeSwiper overflow-hidden">
+                        <div class="swiper-wrapper" id="flatNearMeSwiperWrapper">
+                            @foreach ($flatProperties as $pg)
+                                @php
+                                    $tagMeta = $pg->display_tag_meta;
+                                    $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                                    $displayImg = $pg->display_image_url;
+                                    $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                                    $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                                    $reviewCount = $pg->dynamic_reviews_count;
+                                @endphp
+                                <div class="swiper-slide !h-auto">
+                                    <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                                        <div class="relative h-28 sm:h-36 overflow-hidden">
+                                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                            <div class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                                <i class="fas fa-building text-[8px]"></i> Flat
+                                            </div>
+                                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Flat', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                                <i class="far fa-heart text-[10px]"></i>
+                                            </button>
+                                            <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                                <i class="fas fa-star text-yellow-400 text-[8px]"></i> {{ $ratingVal }}
+                                                @if($reviewCount > 0)
+                                                    <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
+                                            <div>
+                                                <div class="flex justify-between items-center gap-1 mb-1">
+                                                    <span class="font-bold text-xs text-gray-900 truncate">{{ $pg->name }}</span>
+                                                    <span class="bg-indigo-50 text-indigo-700 text-[8px] font-extrabold px-1 py-0.5 rounded flex-shrink-0">Flat</span>
+                                                </div>
+                                                <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                                    <i class="fas fa-map-marker-alt text-indigo-600 text-[9px]"></i> {{ $locationText }}
+                                                </p>
+                                                <p class="text-[10px] text-indigo-600 font-semibold mb-2 flex items-center gap-1 truncate pg-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
+                                                    <i class="fas fa-location-dot text-[9px]"></i>
+                                                    <span class="dist-text">Calculating...</span>
+                                                </p>
+                                                <div class="flex flex-wrap gap-1 mb-2">
+                                                    @forelse($pg->amenities->take(2) as $am)
+                                                        <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                            <i class="fas fa-{{ $am->icon ?? 'check' }} text-indigo-600 text-[8px]"></i> {{ $am->name }}
+                                                        </span>
+                                                    @empty
+                                                        <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                            <i class="fas fa-car text-indigo-600 text-[8px]"></i> Parking
+                                                        </span>
+                                                        <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                            <i class="fas fa-bolt text-indigo-600 text-[8px]"></i> Power Backup
+                                                        </span>
+                                                    @endforelse
+                                                </div>
+                                            </div>
+                                            <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                                <div>
+                                                    <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
+                                                    <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                                </div>
+                                                <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-indigo-500/30 transition">View</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- ===== DESKTOP: 4-Col Grid ===== --}}
+                    <div id="flatNearMeDesktopGrid" class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        @foreach ($flatProperties as $pg)
+                            @php
+                                $tagMeta = $pg->display_tag_meta;
+                                $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                                $displayImg = $pg->display_image_url;
+                                $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                                $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                                $reviewCount = $pg->dynamic_reviews_count;
+                            @endphp
+                            <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                                <div class="relative h-44 overflow-hidden">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <div class="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                        <i class="fas fa-building text-[9px]"></i> Flat / Apartment
+                                    </div>
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Flat', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                        <i class="far fa-heart text-xs"></i>
+                                    </button>
+                                    <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                        <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                        @if($reviewCount > 0)
+                                            <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="p-4 flex flex-col flex-1 justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-center gap-1 mb-1">
+                                            <span class="font-bold text-base text-gray-900 truncate">{{ $pg->name }}</span>
+                                            <span class="bg-indigo-50 text-indigo-700 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">Verified Flat</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                            <i class="fas fa-map-marker-alt text-indigo-600 text-[11px]"></i> {{ $locationText }}
+                                        </p>
+                                        <p class="text-xs text-indigo-600 font-semibold mb-3 flex items-center gap-1 truncate pg-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
+                                            <i class="fas fa-location-dot text-[11px]"></i>
+                                            <span class="dist-text">Calculating...</span>
+                                        </p>
+                                        <div class="flex flex-wrap gap-1.5 mb-4">
+                                            @forelse($pg->amenities->take(3) as $am)
+                                                <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                    <i class="fas fa-{{ $am->icon ?? 'check' }} text-indigo-600 text-[10px]"></i> {{ $am->name }}
+                                                </span>
+                                            @empty
+                                                <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                    <i class="fas fa-car text-indigo-600 text-[10px]"></i> Parking
+                                                </span>
+                                                <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                    <i class="fas fa-bolt text-indigo-600 text-[10px]"></i> Power Backup
+                                                </span>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                    <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                        <div>
+                                            <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
+                                            <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                        </div>
+                                        <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-indigo-500/30 transition">View Details</span>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="rounded-3xl p-8 sm:p-12 text-center bg-gradient-to-br from-indigo-50/70 via-white to-white border border-indigo-100 shadow-sm max-w-3xl mx-auto my-4">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-4 text-2xl shadow-xs">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black text-gray-900 mb-2">Verified Flats & Houses Coming Soon!</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 mb-6 max-w-md mx-auto">We are onboarding 100% verified 1BHK, 2BHK, 3BHK apartments and independent houses with zero brokerage across top residential hubs.</p>
+                        <div class="flex flex-wrap items-center justify-center gap-3">
+                            <a href="{{ route('user.search') }}?type=flat-apartment" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition tap-ripple">
+                                <i class="fas fa-search mr-1.5"></i> Search All Flats
+                            </a>
+                            <a href="{{ route('user.list-property') }}" class="bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-xs transition tap-ripple">
+                                <i class="fas fa-plus-circle text-indigo-600 mr-1.5"></i> List Your Flat Free
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </section>
+
+        {{-- ============================= FLAT RECOMMENDED FOR YOU ============================= --}}
+        @if($flatRecommended->isNotEmpty())
+        <section class="mt-8 sm:mt-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="section-title flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-indigo-50 inline-flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-heart text-indigo-600 text-sm"></i>
+                            </span>
+                            Recommended for You
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1 ml-10">Handpicked top-rated apartments & houses with verified amenities</p>
+                    </div>
+                    <a href="{{ route('user.search') }}?type=flat-apartment" class="text-xs font-bold text-indigo-600 flex items-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                        View all <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
+                <div class="md:hidden swiper flatRecommendedSwiper overflow-hidden">
+                    <div class="swiper-wrapper">
+                        @foreach ($flatRecommended as $pg)
+                            @php
+                                $tagMeta = $pg->display_tag_meta;
+                                $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                                $displayImg = $pg->display_image_url;
+                                $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                                $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                                $reviewCount = $pg->dynamic_reviews_count;
+                            @endphp
+                            <div class="swiper-slide !h-auto">
+                                <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                                    <div class="relative h-28 sm:h-36 overflow-hidden">
+                                        <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                        <div class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                            <i class="fas fa-{{ $tagMeta['icon'] ?? 'building' }} text-[8px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Flat' }}
+                                        </div>
+                                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Flat', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                            <i class="far fa-heart text-[10px]"></i>
+                                        </button>
+                                        <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                            <i class="fas fa-star text-yellow-400 text-[8px]"></i> {{ $ratingVal }}
+                                            @if($reviewCount > 0)
+                                                <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
+                                        <div>
+                                            <div class="flex justify-between items-center gap-1 mb-1">
+                                                <span class="font-bold text-xs text-gray-900 truncate">{{ $pg->name }}</span>
+                                                <span class="bg-indigo-50 text-indigo-700 text-[8px] font-extrabold px-1 py-0.5 rounded flex-shrink-0">Flat</span>
+                                            </div>
+                                            <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                                <i class="fas fa-map-marker-alt text-indigo-600 text-[9px]"></i> {{ $locationText }}
+                                            </p>
+                                            <p class="text-[10px] text-indigo-600 font-semibold mb-2 flex items-center gap-1 truncate">
+                                                <i class="fas fa-circle-check text-[9px]"></i> {{ $pg->landmark ?? 'Top Rated Flat' }}
+                                            </p>
+                                            <div class="flex flex-wrap gap-1 mb-2">
+                                                @forelse($pg->amenities->take(2) as $am)
+                                                    <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                        <i class="fas fa-{{ $am->icon ?? 'check' }} text-indigo-600 text-[8px]"></i> {{ $am->name }}
+                                                    </span>
+                                                @empty
+                                                    <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                        <i class="fas fa-car text-indigo-600 text-[8px]"></i> Parking
+                                                    </span>
+                                                    <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                        <i class="fas fa-bolt text-indigo-600 text-[8px]"></i> Power Backup
+                                                    </span>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                        <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                            <div>
+                                                <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
+                                                <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                            </div>
+                                            <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-indigo-500/30 transition">View</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- ===== DESKTOP: 4-Col Grid ===== --}}
+                <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach ($flatRecommended as $pg)
+                        @php
+                            $tagMeta = $pg->display_tag_meta;
+                            $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                            $displayImg = $pg->display_image_url;
+                            $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                            $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                            $reviewCount = $pg->dynamic_reviews_count;
+                        @endphp
+                        <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                            <div class="relative h-44 overflow-hidden">
+                                <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                    <i class="fas fa-{{ $tagMeta['icon'] ?? 'building' }} text-[9px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Flat / House' }}
+                                </div>
+                                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Flat', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                    <i class="far fa-heart text-xs"></i>
+                                </button>
+                                <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                    @if($reviewCount > 0)
+                                        <span class="text-gray-300 font-normal">({{ $reviewCount }} {{ Str::plural('review', $reviewCount) }})</span>
+                                    @else
+                                        <span class="text-gray-300 font-normal">(0 reviews)</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="p-4 flex flex-col flex-1 justify-between">
+                                <div>
+                                    <div class="flex justify-between items-center gap-1 mb-1">
+                                        <span class="font-bold text-base text-gray-900 truncate">{{ $pg->name }}</span>
+                                        <span class="bg-indigo-50 text-indigo-700 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">Verified Flat</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                        <i class="fas fa-map-marker-alt text-indigo-600 text-[11px]"></i> {{ $locationText }}
+                                    </p>
+                                    <p class="text-xs text-indigo-600 font-semibold mb-3 flex items-center gap-1 truncate">
+                                        <i class="fas fa-circle-check text-[11px]"></i> {{ $pg->landmark ?? 'Verified Stay' }}
+                                    </p>
+                                    <div class="flex flex-wrap gap-1.5 mb-4">
+                                        @forelse($pg->amenities->take(3) as $am)
+                                            <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                <i class="fas fa-{{ $am->icon ?? 'check' }} text-indigo-600 text-[10px]"></i> {{ $am->name }}
+                                            </span>
+                                        @empty
+                                            <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                <i class="fas fa-car text-indigo-600 text-[10px]"></i> Parking
+                                            </span>
+                                            <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                <i class="fas fa-bolt text-indigo-600 text-[10px]"></i> Power Backup
+                                            </span>
+                                        @endforelse
+                                    </div>
+                                </div>
+                                <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                    <div>
+                                        <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
+                                        <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                    </div>
+                                    <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-indigo-500/30 transition">View</span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
+    </div> {{-- ============================= END FLAT / HOUSE VIEW CONTAINER ============================= --}}
+
+    {{-- ============================= COMMERCIAL VIEW CONTAINER ============================= --}}
+    <div id="commercialViewContainer" class="{{ $selectedType === 'commercial' ? '' : 'hidden' }}">
+        <section class="mt-8 sm:mt-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="section-title flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-amber-50 inline-flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-store text-amber-600 text-sm"></i>
+                            </span>
+                            Commercial Spaces Near You
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1 ml-10">Prime Retail Shops, Showrooms & Modern Office Spaces with Zero Brokerage</p>
+                    </div>
+                    <a href="{{ route('user.search') }}?type=commercial" class="text-xs font-bold text-amber-600 flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                        See all Commercial <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                @if($commercialProperties->isNotEmpty())
+                    {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
+                    <div id="commercialNearMeMobileContainer" class="md:hidden swiper commercialNearMeSwiper overflow-hidden">
+                        <div class="swiper-wrapper" id="commercialNearMeSwiperWrapper">
+                            @foreach ($commercialProperties as $pg)
+                                @php
+                                    $tagMeta = $pg->display_tag_meta;
+                                    $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                                    $displayImg = $pg->display_image_url;
+                                    $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                                    $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                                    $reviewCount = $pg->dynamic_reviews_count;
+                                @endphp
+                                <div class="swiper-slide !h-auto">
+                                    <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                                        <div class="relative h-28 sm:h-36 overflow-hidden">
+                                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                            <div class="absolute top-2 left-2 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                                <i class="fas fa-store text-[8px]"></i> Shop
+                                            </div>
+                                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Commercial', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                                <i class="far fa-heart text-[10px]"></i>
+                                            </button>
+                                            <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                                <i class="fas fa-star text-yellow-400 text-[8px]"></i> {{ $ratingVal }}
+                                                @if($reviewCount > 0)
+                                                    <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
+                                            <div>
+                                                <div class="flex justify-between items-center gap-1 mb-1">
+                                                    <span class="font-bold text-xs text-gray-900 truncate">{{ $pg->name }}</span>
+                                                    <span class="bg-amber-50 text-amber-800 text-[8px] font-extrabold px-1 py-0.5 rounded flex-shrink-0">Commercial</span>
+                                                </div>
+                                                <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                                    <i class="fas fa-map-marker-alt text-amber-600 text-[9px]"></i> {{ $locationText }}
+                                                </p>
+                                                <p class="text-[10px] text-amber-700 font-semibold mb-2 flex items-center gap-1 truncate pg-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
+                                                    <i class="fas fa-location-dot text-[9px]"></i>
+                                                    <span class="dist-text">Calculating...</span>
+                                                </p>
+                                                <div class="flex flex-wrap gap-1 mb-2">
+                                                    @forelse($pg->amenities->take(2) as $am)
+                                                        <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                            <i class="fas fa-{{ $am->icon ?? 'check' }} text-amber-600 text-[8px]"></i> {{ $am->name }}
+                                                        </span>
+                                                    @empty
+                                                        <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                            <i class="fas fa-shield-alt text-amber-600 text-[8px]"></i> 24/7 Security
+                                                        </span>
+                                                        <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                            <i class="fas fa-bolt text-amber-600 text-[8px]"></i> Power Backup
+                                                        </span>
+                                                    @endforelse
+                                                </div>
+                                            </div>
+                                            <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                                <div>
+                                                    <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
+                                                    <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                                </div>
+                                                <span class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-amber-500/30 transition">View</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- ===== DESKTOP: 4-Col Grid ===== --}}
+                    <div id="commercialNearMeDesktopGrid" class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        @foreach ($commercialProperties as $pg)
+                            @php
+                                $tagMeta = $pg->display_tag_meta;
+                                $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                                $displayImg = $pg->display_image_url;
+                                $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                                $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                                $reviewCount = $pg->dynamic_reviews_count;
+                            @endphp
+                            <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                                <div class="relative h-44 overflow-hidden">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <div class="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                        <i class="fas fa-store text-[9px]"></i> Commercial
+                                    </div>
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Commercial', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                        <i class="far fa-heart text-xs"></i>
+                                    </button>
+                                    <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                        <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                        @if($reviewCount > 0)
+                                            <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="p-4 flex flex-col flex-1 justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-center gap-1 mb-1">
+                                            <span class="font-bold text-base text-gray-900 truncate">{{ $pg->name }}</span>
+                                            <span class="bg-amber-50 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">Commercial</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                            <i class="fas fa-map-marker-alt text-amber-600 text-[11px]"></i> {{ $locationText }}
+                                        </p>
+                                        <p class="text-xs text-amber-700 font-semibold mb-3 flex items-center gap-1 truncate pg-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
+                                            <i class="fas fa-location-dot text-[11px]"></i>
+                                            <span class="dist-text">Calculating...</span>
+                                        </p>
+                                        <div class="flex flex-wrap gap-1.5 mb-4">
+                                            @forelse($pg->amenities->take(3) as $am)
+                                                <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                    <i class="fas fa-{{ $am->icon ?? 'check' }} text-amber-600 text-[10px]"></i> {{ $am->name }}
+                                                </span>
+                                            @empty
+                                                <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                    <i class="fas fa-shield-alt text-amber-600 text-[10px]"></i> 24/7 Security
+                                                </span>
+                                                <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                    <i class="fas fa-bolt text-amber-600 text-[10px]"></i> Power Backup
+                                                </span>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                    <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                        <div>
+                                            <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
+                                            <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                        </div>
+                                        <span class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-amber-500/30 transition">View Details</span>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="rounded-3xl p-8 sm:p-12 text-center bg-gradient-to-br from-amber-50/70 via-white to-white border border-amber-100 shadow-sm max-w-3xl mx-auto my-4">
+                        <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4 text-2xl shadow-xs">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black text-gray-900 mb-2">Prime Commercial Spaces</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 mb-6 max-w-md mx-auto">Discover high-footfall retail shops, showrooms, warehouses, and modern office spaces with zero brokerage and direct owner contact.</p>
+                        <div class="flex flex-wrap items-center justify-center gap-3">
+                            <a href="{{ route('user.search') }}?type=commercial" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/25 transition tap-ripple">
+                                <i class="fas fa-search mr-1.5"></i> Explore All Commercial
+                            </a>
+                            <a href="{{ route('user.list-property') }}" class="bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-xs transition tap-ripple">
+                                <i class="fas fa-plus-circle text-amber-600 mr-1.5"></i> List Commercial Space Free
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </section>
+    </div> {{-- ============================= END COMMERCIAL VIEW CONTAINER ============================= --}}
+
     {{-- ============================= 7. EXPLORE TOP CITIES ============================= --}}
     <section class="mt-8 sm:mt-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-4">
                 <div>
                     <h2 class="section-title">Top Cities</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">Explore verified student & co-living hubs across India</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Explore verified stays and properties across India</p>
                 </div>
-                <a href="{{ route('user.search') }}" class="text-xs font-bold text-brand flex items-center gap-1.5 bg-brand-light hover:bg-brand/15 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                <a href="{{ route('user.search') }}{{ $selectedType && $selectedType !== 'pg-hostel' ? '?type=' . $selectedType : '' }}" id="allCitiesHeaderLink" class="text-xs font-bold text-brand flex items-center gap-1.5 bg-brand-light hover:bg-brand/15 px-3.5 py-1.5 rounded-full tap-ripple transition">
                     All Cities <i class="fas fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4" id="topCitiesGrid">
                 @forelse ($topCities as $c)
-                    <a href="{{ route('user.search') }}?city={{ urlencode($c->name) }}" class="relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square tap-ripple group shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
+                    @php
+                        $citySearchUrl = route('user.search') . '?city=' . urlencode($c->name) . ($selectedType && $selectedType !== 'pg-hostel' ? '&type=' . $selectedType : '');
+                    @endphp
+                    <a href="{{ $citySearchUrl }}" data-city-name="{{ $c->name }}" class="city-card-link relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square tap-ripple group shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
                         <img src="{{ $c->display_image_url }}" alt="{{ $c->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
                         <div class="absolute bottom-3 left-3 sm:bottom-3.5 sm:left-3.5 text-left text-white pr-2">
@@ -1215,7 +1872,10 @@
                         ];
                     @endphp
                     @foreach ($fallbackCities as $fc)
-                        <a href="{{ route('user.search') }}?city={{ urlencode($fc['name']) }}" class="relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square tap-ripple group shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
+                        @php
+                            $fallbackSearchUrl = route('user.search') . '?city=' . urlencode($fc['name']) . ($selectedType && $selectedType !== 'pg-hostel' ? '&type=' . $selectedType : '');
+                        @endphp
+                        <a href="{{ $fallbackSearchUrl }}" data-city-name="{{ $fc['name'] }}" class="city-card-link relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square tap-ripple group shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
                             <img src="{{ $fc['img'] }}" alt="{{ $fc['name'] }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
                             <div class="absolute bottom-3 left-3 sm:bottom-3.5 sm:left-3.5 text-left text-white pr-2">
@@ -1387,6 +2047,32 @@ document.addEventListener('DOMContentLoaded', function() {
             slidesPerView: 2.05,
             spaceBetween: 10,
             grabCursor: true,
+            breakpoints: {
+                480: { slidesPerView: 2.3, spaceBetween: 12 },
+                640: { slidesPerView: 2.8, spaceBetween: 14 },
+            }
+        });
+
+        // 5. Flats & Houses Near You horizontal slider (mobile)
+        window.flatNearMeSwiperInstance = new Swiper('.flatNearMeSwiper', {
+            slidesPerView: 2.05,
+            spaceBetween: 10,
+            grabCursor: true,
+            observer: true,
+            observeParents: true,
+            breakpoints: {
+                480: { slidesPerView: 2.3, spaceBetween: 12 },
+                640: { slidesPerView: 2.8, spaceBetween: 14 },
+            }
+        });
+
+        // 6. Commercial Spaces Near You horizontal slider (mobile)
+        window.commercialNearMeSwiperInstance = new Swiper('.commercialNearMeSwiper', {
+            slidesPerView: 2.05,
+            spaceBetween: 10,
+            grabCursor: true,
+            observer: true,
+            observeParents: true,
             breakpoints: {
                 480: { slidesPerView: 2.3, spaceBetween: 12 },
                 640: { slidesPerView: 2.8, spaceBetween: 14 },
@@ -1600,6 +2286,106 @@ function initNearMeGeolocation() {
             },
             { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
         );
+    }
+}
+
+// ===================== SWITCH PROPERTY TYPE (OPTION 3) =====================
+function switchPropertyType(type, triggerScroll = false) {
+    const pgContainer = document.getElementById('pgViewContainer');
+    const flatContainer = document.getElementById('flatViewContainer');
+    const commercialContainer = document.getElementById('commercialViewContainer');
+
+    const cardPg = document.getElementById('card-type-pg-hostel');
+    const cardFlat = document.getElementById('card-type-flat-apartment');
+    const cardCommercial = document.getElementById('card-type-commercial');
+
+    // Reset all cards
+    [cardPg, cardFlat, cardCommercial].forEach(c => {
+        if (!c) return;
+        c.classList.remove('active-pg', 'active-flat', 'active-commercial');
+    });
+
+    // Hide all containers
+    [pgContainer, flatContainer, commercialContainer].forEach(cnt => {
+        if (cnt) cnt.classList.add('hidden');
+    });
+
+    if (type === 'flat-apartment') {
+        if (cardFlat) cardFlat.classList.add('active-flat');
+        if (flatContainer) {
+            flatContainer.classList.remove('hidden');
+            flatContainer.classList.add('view-container-fade');
+        }
+    } else if (type === 'commercial') {
+        if (cardCommercial) cardCommercial.classList.add('active-commercial');
+        if (commercialContainer) {
+            commercialContainer.classList.remove('hidden');
+            commercialContainer.classList.add('view-container-fade');
+        }
+    } else {
+        // Default PG / Hostel
+        type = 'pg-hostel';
+        if (cardPg) cardPg.classList.add('active-pg');
+        if (pgContainer) {
+            pgContainer.classList.remove('hidden');
+            pgContainer.classList.add('view-container-fade');
+        }
+    }
+
+    // Update URL query param without full reload
+    try {
+        const url = new URL(window.location.href);
+        if (type === 'pg-hostel') {
+            url.searchParams.delete('type');
+        } else {
+            url.searchParams.set('type', type);
+        }
+        window.history.replaceState({ propertyType: type }, '', url.toString());
+    } catch (e) {}
+
+    // Update all City Card links & All Cities button dynamically
+    try {
+        const cityLinks = document.querySelectorAll('.city-card-link');
+        const allCitiesBtn = document.getElementById('allCitiesHeaderLink');
+        const searchBase = "{{ route('user.search') }}";
+
+        cityLinks.forEach(link => {
+            const cityName = link.getAttribute('data-city-name') || '';
+            const params = new URLSearchParams();
+            if (cityName) params.set('city', cityName);
+            if (type && type !== 'pg-hostel') {
+                params.set('type', type);
+            }
+            link.href = searchBase + (params.toString() ? '?' + params.toString() : '');
+        });
+
+        if (allCitiesBtn) {
+            if (type && type !== 'pg-hostel') {
+                allCitiesBtn.href = searchBase + '?type=' + encodeURIComponent(type);
+            } else {
+                allCitiesBtn.href = searchBase;
+            }
+        }
+    } catch (e) {}
+
+    // Refresh Swipers to ensure smooth rendering on container toggle
+    setTimeout(() => {
+        if (window.nearMeSwiperInstance && typeof window.nearMeSwiperInstance.update === 'function') {
+            window.nearMeSwiperInstance.update();
+        }
+        if (window.flatNearMeSwiperInstance && typeof window.flatNearMeSwiperInstance.update === 'function') {
+            window.flatNearMeSwiperInstance.update();
+        }
+        if (window.commercialNearMeSwiperInstance && typeof window.commercialNearMeSwiperInstance.update === 'function') {
+            window.commercialNearMeSwiperInstance.update();
+        }
+    }, 60);
+
+    if (triggerScroll) {
+        const target = document.getElementById(type === 'flat-apartment' ? 'flatViewContainer' : (type === 'commercial' ? 'commercialViewContainer' : 'pgViewContainer'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 }
 </script>

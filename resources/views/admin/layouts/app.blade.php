@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
     <title>@yield('title', 'Admin Panel') - StayNest</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -86,7 +88,7 @@
                 </a>
                 <a href="{{ route('admin.pgs') }}" class="sidebar-link {{ request()->routeIs('admin.pgs') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-building w-5 text-center"></i>
-                    <span class="text-sm font-medium">Manage PGs</span>
+                    <span class="text-sm font-medium">All Properties</span>
                     <span class="ml-auto bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['properties'] ?? 0 }}</span>
                 </a>
                 <a href="{{ route('admin.brokers') }}" class="sidebar-link {{ request()->routeIs('admin.brokers') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">

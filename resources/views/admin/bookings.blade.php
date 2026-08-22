@@ -7,7 +7,7 @@
 <header class="hidden lg:flex bg-white border-b border-gray-100 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">All System Bookings</h1>
-        <p class="text-sm text-gray-500">389 total platform bookings • 12 awaiting admin/broker confirmation</p>
+        <p class="text-sm text-gray-500">300 total platform bookings • 12 awaiting admin/broker confirmation</p>
     </div>
     <div class="flex items-center gap-3">
         <button onclick="alert('Exporting system booking records to CSV...')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-semibold tap-effect flex items-center gap-2 transition">

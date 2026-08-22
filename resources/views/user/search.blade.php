@@ -105,6 +105,7 @@
             <input type="hidden" name="gender" id="hiddenGenderInput" value="{{ $selectedGender ?? '' }}">
             <input type="hidden" name="budget" id="hiddenBudgetInput" value="{{ $budget ?? '' }}">
             <input type="hidden" name="sort" id="hiddenSortInput" value="{{ $sort ?? 'recommended' }}">
+            @if(!empty($selectedPropertyType)) <input type="hidden" name="type" id="hiddenTypeInput" value="{{ $selectedPropertyType }}"> @endif
             @if(!empty($filterAC)) <input type="hidden" name="ac" value="1"> @endif
             @if(!empty($filterFood)) <input type="hidden" name="food" value="1"> @endif
             @if(!empty($filterWifi)) <input type="hidden" name="wifi" value="1"> @endif

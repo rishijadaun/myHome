@@ -11,13 +11,14 @@ use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserHomeController extends Controller
 {
     /**
      * Display the dynamic Home Page.
      */
-    public function index()
+    public function index(Request $request)
     {
         // 1. Single-pass query for approved listings
         $allApproved = Property::where('status', 'active')
@@ -25,22 +26,39 @@ class UserHomeController extends Controller
             ->where('is_active', 1)
             ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType'])
             ->latest('created_at')
-            ->take(30)
             ->get();
 
-        // 2. PG Near Me Section (take 20)
-        $nearMeProperties = $allApproved->take(20);
+        // 2. Classify by Property Type
+        $pgProperties = $allApproved->filter(function ($p) {
+            $slug = strtolower($p->propertyType?->slug ?? '');
+            return empty($slug) || in_array($slug, ['pg-hostel', 'co-living', 'pg', 'hostel', 'coliving']);
+        });
 
-        // 3. Recommended for You Section (Properties with high tags or top rated, max 4)
-        $recommendedProperties = $allApproved->filter(function ($p) {
-            return in_array($p->tag, ['Guest Favourite', 'Popular', 'Top rated', 'Trending']) || $p->featured;
-        })->take(4);
-        if ($recommendedProperties->count() < 4) {
-            $recommendedProperties = $allApproved->take(4);
-        }
+        $flatProperties = $allApproved->filter(function ($p) {
+            $slug = strtolower($p->propertyType?->slug ?? '');
+            return in_array($slug, ['flat', 'flat-apartment', 'apartment', 'house', 'villa']);
+        });
 
-        // 4. Popular Girls PG Section (max 4)
-        $girlsProperties = $allApproved->filter(function ($p) {
+        $commercialProperties = $allApproved->filter(function ($p) {
+            $slug = strtolower($p->propertyType?->slug ?? '');
+            return in_array($slug, ['commercial', 'shop', 'office', 'retail', 'showroom', 'warehouse']);
+        });
+
+        // Dynamic Counts for Category Switcher Cards
+        $propertyTypeCounts = [
+            'pg' => $pgProperties->count(),
+            'flat' => $flatProperties->count(),
+            'commercial' => $commercialProperties->count(),
+        ];
+
+        // 3. PG Sections (Main Priority)
+        $nearMeProperties = $pgProperties->take(20);
+
+        $recommendedProperties = $pgProperties->filter(function ($p) {
+            return (bool) $p->is_recommended || (bool) $p->featured;
+        })->take(8)->values();
+
+        $girlsProperties = $pgProperties->filter(function ($p) {
             $pref = strtolower($p->gender_preference ?? '');
             return in_array($pref, ['girls', 'female', 'women', 'co-ed']);
         })->sortByDesc(function ($p) {
@@ -48,11 +66,10 @@ class UserHomeController extends Controller
             return in_array($pref, ['girls', 'female', 'women']) ? 1 : 0;
         })->take(4);
         if ($girlsProperties->isEmpty()) {
-            $girlsProperties = $allApproved->take(4);
+            $girlsProperties = $pgProperties->take(4);
         }
 
-        // 5. Popular Boys PG Section (max 4)
-        $boysProperties = $allApproved->filter(function ($p) {
+        $boysProperties = $pgProperties->filter(function ($p) {
             $pref = strtolower($p->gender_preference ?? '');
             return in_array($pref, ['boys', 'male', 'co-ed']);
         })->sortByDesc(function ($p) {
@@ -60,11 +77,30 @@ class UserHomeController extends Controller
             return in_array($pref, ['boys', 'male']) ? 1 : 0;
         })->take(4);
         if ($boysProperties->isEmpty()) {
-            $boysProperties = $allApproved->take(4);
+            $boysProperties = $pgProperties->take(4);
         }
 
-        // 6. Recently Added Section (max 4)
-        $recentProperties = $allApproved->take(4);
+        $recentProperties = $pgProperties->take(4);
+
+        // 4. Flat / House Sections
+        $flatNearMe = $flatProperties->take(20);
+        $flatRecommended = $flatProperties->filter(function ($p) {
+            return (bool) $p->is_recommended || (bool) $p->featured;
+        })->take(8)->values();
+        $flatFeatured = $flatRecommended;
+
+        // 5. Commercial Sections
+        $commercialNearMe = $commercialProperties->take(20);
+        $commercialRecommended = $commercialProperties->filter(function ($p) {
+            return (bool) $p->is_recommended || (bool) $p->featured;
+        })->take(8)->values();
+        $commercialFeatured = $commercialRecommended;
+
+        // 6. Selected Active Property Type (default 'pg-hostel')
+        $selectedType = $request->query('type', 'pg-hostel');
+        if (!in_array($selectedType, ['pg-hostel', 'flat-apartment', 'commercial'])) {
+            $selectedType = 'pg-hostel';
+        }
 
         // 7. Top Cities with active property count (cached for ultra-fast TTFB)
         $topCities = \Illuminate\Support\Facades\Cache::remember('home_top_cities_v2', 300, function () {
@@ -89,11 +125,22 @@ class UserHomeController extends Controller
         });
 
         return view('user.home', compact(
+            'pgProperties',
+            'flatProperties',
+            'commercialProperties',
+            'propertyTypeCounts',
+            'selectedType',
             'nearMeProperties',
             'recommendedProperties',
             'girlsProperties',
             'boysProperties',
             'recentProperties',
+            'flatNearMe',
+            'flatRecommended',
+            'flatFeatured',
+            'commercialNearMe',
+            'commercialRecommended',
+            'commercialFeatured',
             'topCities'
         ));
     }
@@ -214,7 +261,29 @@ class UserHomeController extends Controller
 
         // 2. Read explicit URL parameters
         $explicitCity = trim($request->query('city') ?? '');
-        $explicitGender = strtoupper(trim($request->query('gender') ?? $request->query('type') ?? ''));
+        $rawGenderParam = trim($request->query('gender') ?? '');
+        $rawTypeParam = strtolower(trim($request->query('property_type') ?? $request->query('type') ?? ''));
+        
+        $explicitGender = '';
+        $selectedPropertyType = '';
+
+        if (!empty($rawGenderParam)) {
+            $explicitGender = strtoupper($rawGenderParam);
+        }
+
+        // Determine if type is gender or property type
+        if (in_array($rawTypeParam, ['boys', 'girls', 'co-ed', 'coed', 'male', 'female', 'unisex'])) {
+            if (empty($explicitGender)) {
+                $explicitGender = strtoupper($rawTypeParam);
+            }
+        } elseif (in_array($rawTypeParam, ['pg-hostel', 'pg', 'hostel', 'co-living', 'coliving'])) {
+            $selectedPropertyType = 'pg-hostel';
+        } elseif (in_array($rawTypeParam, ['flat-apartment', 'flat', 'apartment', 'house', 'villa'])) {
+            $selectedPropertyType = 'flat-apartment';
+        } elseif (in_array($rawTypeParam, ['commercial', 'shop', 'office', 'retail', 'commercial-space'])) {
+            $selectedPropertyType = 'commercial';
+        }
+
         $explicitBudget = trim($request->query('budget') ?? '');
         $minPrice = $request->query('min_price');
         $maxPrice = $request->query('max_price');
@@ -250,6 +319,23 @@ class UserHomeController extends Controller
             ->where('verification_status', 'verified')
             ->where('is_active', 1)
             ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
+
+        // Property Type Filter
+        if ($selectedPropertyType === 'pg-hostel') {
+            $query->where(function($q) {
+                $q->whereHas('propertyType', function($ptq) {
+                    $ptq->whereIn('slug', ['pg-hostel', 'co-living', 'pg', 'hostel', 'coliving']);
+                })->orWhereNull('property_type_id');
+            });
+        } elseif ($selectedPropertyType === 'flat-apartment') {
+            $query->whereHas('propertyType', function($ptq) {
+                $ptq->whereIn('slug', ['flat', 'flat-apartment', 'apartment', 'house', 'villa']);
+            });
+        } elseif ($selectedPropertyType === 'commercial') {
+            $query->whereHas('propertyType', function($ptq) {
+                $ptq->whereIn('slug', ['commercial', 'shop', 'office', 'retail', 'commercial-space']);
+            });
+        }
 
         // A. City Filter
         if ($selectedCity !== '') {
@@ -408,7 +494,7 @@ class UserHomeController extends Controller
         });
 
         // 8. Build Interactive Active Filter Chips for UI
-        $activeFilterChips = $this->buildFilterChips($intent, $selectedCity, $selectedArea, $selectedGender, $budget, $filterAC, $filterFood, $filterWifi, $filterSecurity);
+        $activeFilterChips = $this->buildFilterChips($intent, $selectedCity, $selectedArea, $selectedGender, $selectedPropertyType, $budget, $filterAC, $filterFood, $filterWifi, $filterSecurity);
 
         // 9. Conversational Summary Message
         $summaryMessage = $this->buildSummaryMessage($intent, $selectedCity, $selectedArea, $selectedGender, $budget, $properties->count(), $isFallback);
@@ -419,6 +505,7 @@ class UserHomeController extends Controller
             'selectedCity',
             'selectedArea',
             'selectedGender',
+            'selectedPropertyType',
             'budget',
             'minPrice',
             'maxPrice',
@@ -443,6 +530,7 @@ class UserHomeController extends Controller
         string $selectedCity,
         string $selectedArea,
         string $selectedGender,
+        string $selectedPropertyType,
         string $budget,
         bool $filterAC,
         bool $filterFood,
@@ -450,6 +538,18 @@ class UserHomeController extends Controller
         bool $filterSecurity
     ): array {
         $chips = [];
+
+        // Property Type Chip
+        if ($selectedPropertyType !== '') {
+            $ptLabel = $selectedPropertyType === 'flat-apartment' ? '🏢 Flats & Houses' : ($selectedPropertyType === 'commercial' ? '🏪 Commercial Spaces' : '🏠 PG & Hostels');
+            $chips[] = [
+                'type' => 'property_type',
+                'label' => $ptLabel,
+                'icon' => $selectedPropertyType === 'flat-apartment' ? 'building' : ($selectedPropertyType === 'commercial' ? 'store' : 'bed'),
+                'value' => $selectedPropertyType,
+                'clear_param' => 'type'
+            ];
+        }
 
         // Location Chip
         if ($selectedCity !== '' || $selectedArea !== '') {
@@ -747,21 +847,98 @@ class UserHomeController extends Controller
             $query->where('monthly_rent', '<=', (float)$request->query('max_price'));
         }
 
-        $properties = $query->latest()->get()->map(function ($p) {
+        $rawProperties = $query->latest()->get();
+        $propertyIds = $rawProperties->pluck('id')->toArray();
+
+        // Eagerly fetch room types mapped to property_id
+        $roomsData = DB::table('rooms')
+            ->join('floors', 'rooms.floor_id', '=', 'floors.id')
+            ->join('blocks', 'floors.block_id', '=', 'blocks.id')
+            ->join('room_types', 'rooms.room_type_id', '=', 'room_types.id')
+            ->whereIn('blocks.property_id', $propertyIds)
+            ->select('blocks.property_id', 'room_types.slug as rt_slug', 'room_types.name as rt_name', 'rooms.monthly_rent', 'rooms.total_beds', 'rooms.attached_bathroom', 'rooms.ac_available')
+            ->get()
+            ->groupBy('property_id');
+
+        $properties = $rawProperties->map(function ($p) use ($roomsData) {
             $primaryImg = $p->primaryImage->image_url ?? ($p->images->first()?->image_url ?? $p->display_image_url ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');
             $lat = $p->map_latitude;
             $lng = $p->map_longitude;
+
+            $pRooms = $roomsData->get($p->id, collect());
+            $roomTypeSlugs = $pRooms->pluck('rt_slug')->map(fn($s) => strtolower($s))->unique()->toArray();
+            $roomTypeNames = $pRooms->pluck('rt_name')->unique()->toArray();
+
+            $descLower = strtolower(($p->description ?? '') . ' ' . $p->name . ' ' . ($p->address ?? ''));
+
+            // 1. Single room detection (from room configurations, beds, description or name)
+            $hasSingleRoom = in_array('single', $roomTypeSlugs) || 
+                             in_array('single-room', $roomTypeSlugs) || 
+                             in_array('1-bed', $roomTypeSlugs) || 
+                             in_array('private', $roomTypeSlugs) || 
+                             $pRooms->contains(fn($r) => str_contains(strtolower($r->rt_name), 'single') || (int)$r->total_beds === 1) || 
+                             str_contains($descLower, 'single') || 
+                             str_contains($descLower, 'private room') ||
+                             (int)$p->total_beds === 1;
+
+            // 2. Food / Meals detection
+            $amenitySlugs = $p->amenities->pluck('slug')->map(fn($s) => strtolower($s))->toArray();
+            $amenityNames = $p->amenities->pluck('name')->toArray();
+
+            $hasFood = in_array('food', $amenitySlugs) || 
+                       in_array('meals', $amenitySlugs) || 
+                       in_array('mess', $amenitySlugs) || 
+                       in_array('breakfast', $amenitySlugs) || 
+                       $p->amenities->contains(fn($am) => str_contains(strtolower($am->name), 'food') || str_contains(strtolower($am->name), 'meal') || str_contains(strtolower($am->name), 'mess')) ||
+                       str_contains($descLower, 'food') || 
+                       str_contains($descLower, 'meal') || 
+                       str_contains($descLower, 'mess') || 
+                       str_contains($descLower, 'breakfast') || 
+                       str_contains($descLower, 'dinner') || 
+                       str_contains($descLower, 'khana');
+
+            // 3. AC detection
+            $hasAc = in_array('ac', $amenitySlugs) || 
+                     in_array('air-conditioning', $amenitySlugs) || 
+                     $pRooms->contains(fn($r) => (int)$r->ac_available === 1) || 
+                     str_contains($descLower, 'ac ') || 
+                     str_contains($descLower, 'air condition');
+
+            // 4. WiFi detection
+            $hasWifi = in_array('wifi', $amenitySlugs) || 
+                       in_array('high-speed-wifi', $amenitySlugs) || 
+                       str_contains($descLower, 'wifi') || 
+                       str_contains($descLower, 'internet');
+
+            // 5. Attached Washroom detection
+            $hasAttachedBath = in_array('attached-washroom', $amenitySlugs) || 
+                               in_array('attached-bathroom', $amenitySlugs) || 
+                               $pRooms->contains(fn($r) => (int)$r->attached_bathroom === 1) || 
+                               str_contains($descLower, 'attached bath') || 
+                               str_contains($descLower, 'attached washroom');
+
+            // 6. Gym detection
+            $hasGym = in_array('gym', $amenitySlugs) || 
+                      in_array('fitness', $amenitySlugs) || 
+                      str_contains($descLower, 'gym') || 
+                      str_contains($descLower, 'fitness');
+
+            // Build dynamic display tags
             $tags = [];
             if ($p->gender_preference) {
                 $tags[] = ucfirst($p->gender_preference === 'co-ed' ? 'Unisex' : $p->gender_preference);
             }
-            if ($p->amenities->count() > 0) {
-                foreach ($p->amenities->take(2) as $am) {
-                    $tags[] = $am->name;
+            if ($hasSingleRoom) $tags[] = 'Single Room';
+            if ($hasFood) $tags[] = 'Food Included';
+            if ($hasAc) $tags[] = 'AC';
+            if ($hasWifi) $tags[] = 'WiFi';
+            if ($hasAttachedBath) $tags[] = 'Attached Bath';
+            if ($hasGym) $tags[] = 'Gym';
+
+            foreach ($amenityNames as $an) {
+                if (!in_array($an, $tags) && count($tags) < 5) {
+                    $tags[] = $an;
                 }
-            } else {
-                $tags[] = 'WiFi';
-                $tags[] = 'AC';
             }
 
             return [
@@ -781,6 +958,14 @@ class UserHomeController extends Controller
                 'address' => $p->address ?: (($p->area->name ?? '') . ', ' . ($p->city->name ?? 'Noida')),
                 'city' => $p->city->name ?? 'Noida',
                 'tags' => $tags,
+                'amenities' => array_merge($amenityNames, $amenitySlugs),
+                'room_types' => array_merge($roomTypeNames, $roomTypeSlugs),
+                'has_single_room' => $hasSingleRoom,
+                'has_food' => $hasFood,
+                'has_ac' => $hasAc,
+                'has_wifi' => $hasWifi,
+                'has_attached_bath' => $hasAttachedBath,
+                'has_gym' => $hasGym,
                 'detail_url' => route('user.detail', ['slug' => $p->slug ?: \Illuminate\Support\Str::slug($p->name)]),
             ];
         });

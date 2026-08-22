@@ -19,9 +19,18 @@
     $propNoticePeriod = (int) ($property->notice_period_days ?? 30);
     $propMaintenance = (float) ($property->maintenance_charges ?? 0);
     $roomConfigurations = $property ? $property->room_configurations : collect();
-    $propSeoTitle = $propName . ' - ' . ucfirst($property->gender_preference ?? 'Co-living') . ' PG in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
+    $isCommercial = strtolower($property->propertyType?->slug ?? '') === 'commercial' || ($property->gender_preference === 'not_applicable');
+    $isFlat = in_array(strtolower($property->propertyType?->slug ?? ''), ['flat', 'flat-apartment', 'apartment', 'house', 'villa']) || in_array(strtolower($property->gender_preference ?? ''), ['all', 'any']);
+    
+    if ($isCommercial) {
+        $propSeoTitle = $propName . ' - Commercial Space in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
+    } elseif ($isFlat) {
+        $propSeoTitle = $propName . ' - Flat & House Rental in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
+    } else {
+        $propSeoTitle = $propName . ' - ' . ucfirst($property->gender_preference ?? 'Co-living') . ' PG in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
+    }
     $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
-    $propSeoKeywords = $propName . ', PG in ' . ($property->area->name ?? '') . ', PG in ' . ($property->city->name ?? '') . ', ' . ($propGenderMeta['label'] ?? 'Boys') . ' PG in ' . ($property->city->name ?? '') . ', Paying Guest ' . ($property->area->name ?? '') . ', StayNest';
+    $propSeoKeywords = $propName . ', ' . ($isCommercial ? 'Commercial Space' : ($isFlat ? 'Flat for Rent' : 'PG')) . ' in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', StayNest';
     $propSeoImage = $property->display_image_url ?? ($propImages->first()->image_url ?? asset('images/favicon.png'));
     $propCanonical = route('user.detail', ['slug' => $property->slug ?: $property->id]);
 @endphp
@@ -211,9 +220,19 @@
                 <span class="{{ $propTagMeta['solid_badge'] }} text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md">
                     <i class="fas fa-{{ $propTagMeta['icon'] }} text-[11px]"></i> {{ $propTagMeta['label'] }}
                 </span>
-                <span class="{{ $propGenderMeta['class'] }} bg-white/95 backdrop-blur text-xs font-black px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wide">
-                    {{ $propGenderMeta['label'] }} STAY
-                </span>
+                @if($isCommercial)
+                    <span class="bg-amber-50 text-amber-800 bg-white/95 backdrop-blur text-xs font-black px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wide">
+                        <i class="fas fa-store mr-1 text-amber-600"></i> COMMERCIAL
+                    </span>
+                @elseif($isFlat)
+                    <span class="bg-indigo-50 text-indigo-700 bg-white/95 backdrop-blur text-xs font-black px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wide">
+                        <i class="fas fa-building mr-1 text-indigo-600"></i> FLAT / HOUSE
+                    </span>
+                @else
+                    <span class="{{ $propGenderMeta['class'] }} bg-white/95 backdrop-blur text-xs font-black px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wide">
+                        {{ $propGenderMeta['label'] }} STAY
+                    </span>
+                @endif
             </div>
 
             <div class="absolute bottom-3.5 right-3.5 sm:right-5 z-10 bg-black/75 backdrop-blur text-white text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md">
@@ -293,11 +312,21 @@
                         </div>
                     </div>
 
-                    <!-- Bed Availability & Features Pill Row -->
+                    <!-- Bed / Space Availability & Features Pill Row -->
                     <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
-                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl {{ $availBeds > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
-                            <i class="fas fa-bed"></i> {{ $availBeds > 0 ? $availBeds . ' Beds Available' : 'Fully Occupied' }}
-                        </span>
+                        @if($isCommercial)
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
+                                <i class="fas fa-store"></i> Ready to Occupy
+                            </span>
+                        @elseif($isFlat)
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                <i class="fas fa-house-user"></i> Full Flat / House
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl {{ $availBeds > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
+                                <i class="fas fa-bed"></i> {{ $availBeds > 0 ? $availBeds . ' Beds Available' : 'Fully Occupied' }}
+                            </span>
+                        @endif
                         <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
                             <i class="fas fa-shield-alt"></i> Verified Property
                         </span>
@@ -319,7 +348,7 @@
                 <!-- About / Description -->
                 <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
                     <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <i class="fas fa-info-circle text-brand"></i> About this Stay
+                        <i class="fas fa-info-circle text-brand"></i> {{ $isCommercial ? 'About this Commercial Space' : ($isFlat ? 'About this Flat / House' : 'About this Stay') }}
                     </h2>
                     <p class="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
                         {{ $property->description ?? ($propName . ' offers premium, fully furnished student and professional accommodation. Located in a prime area with 24/7 security, high-speed WiFi, hygienic meals, and daily housekeeping.') }}

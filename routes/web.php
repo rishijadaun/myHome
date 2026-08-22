@@ -37,6 +37,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/pgs', [AdminPropertyController::class, 'store'])->name('pgs.store')->middleware('throttle:property-submission');
         Route::get('/pgs/{id}', [AdminPropertyController::class, 'show'])->name('pgs.show');
         Route::post('/pgs/{id}/toggle-status', [AdminPropertyController::class, 'toggleStatus'])->name('pgs.toggle');
+        Route::post('/pgs/{id}/toggle-recommended', [AdminPropertyController::class, 'toggleRecommended'])->name('pgs.toggle-recommended');
         Route::post('/pgs/{id}/approve', [AdminPropertyController::class, 'approve'])->name('pgs.approve');
         Route::post('/pgs/{id}/update-tag', [AdminPropertyController::class, 'updateTag'])->name('pgs.update-tag');
         Route::delete('/pgs/{id}', [AdminPropertyController::class, 'destroy'])->name('pgs.destroy');

@@ -1,17 +1,17 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Manage All PGs')
+@section('title', 'Manage All Properties')
 
 @section('content')
 <!-- Header -->
 <header class="hidden lg:flex bg-white border-b border-gray-100 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">Manage PG Properties</h1>
+        <h1 class="text-2xl font-bold text-gray-900">All Properties Management</h1>
         <p class="text-sm text-gray-500">{{ $totalCount }} properties listed across {{ $cities->count() }} major cities</p>
     </div>
     <div class="flex items-center gap-3">
         <a href="{{ route('user.list-property') }}" class="bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-2.5 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 hover:shadow-xl transition flex items-center gap-2 cursor-pointer">
-            <i class="fas fa-plus text-sm"></i> Add PG Listing
+            <i class="fas fa-plus text-sm"></i> Add New Property
         </a>
     </div>
 </header>
@@ -29,15 +29,66 @@
     <!-- Mobile Add Button -->
     <div class="lg:hidden">
         <a href="{{ route('user.list-property') }}" class="w-full bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-3 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 flex items-center justify-center gap-2 cursor-pointer">
-            <i class="fas fa-plus"></i> Add New PG Property
+            <i class="fas fa-plus"></i> Add New Property
         </a>
     </div>
 
+    <!-- ================= LISTING TYPE TABS BAR ================= -->
+    <div class="bg-white rounded-2xl p-2.5 border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <!-- Tab: All Properties -->
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'all', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'all' || empty($currentType)) ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-layer-group text-xs sm:text-sm"></i>
+                <span>All Properties</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'all' || empty($currentType)) ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['all'] ?? $totalCount) }}
+                </span>
+            </a>
+
+            <!-- Tab: PG / Hostel -->
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'pg-hostel', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'pg-hostel' || $currentType === 'pg') ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-bed text-xs sm:text-sm"></i>
+                <span>PG / Hostel</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'pg-hostel' || $currentType === 'pg') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['pg-hostel'] ?? 0) }}
+                </span>
+            </a>
+
+            <!-- Tab: Flat / House -->
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'flat-apartment', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'flat-apartment' || $currentType === 'flat') ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-building text-xs sm:text-sm"></i>
+                <span>Flat / House</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'flat-apartment' || $currentType === 'flat') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['flat-apartment'] ?? 0) }}
+                </span>
+            </a>
+
+            <!-- Tab: Commercial -->
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'commercial', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'commercial') ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-store text-xs sm:text-sm"></i>
+                <span>Commercial</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'commercial') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['commercial'] ?? 0) }}
+                </span>
+            </a>
+        </div>
+    </div>
+
     <!-- Stats Row -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
             <div class="text-2xl md:text-3xl font-extrabold text-gray-900">{{ number_format($totalCount) }}</div>
             <div class="text-xs text-gray-500 mt-1 font-medium">Total Listings</div>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm">
+            <div class="text-2xl md:text-3xl font-extrabold text-amber-600">{{ number_format($recommendedCount ?? 0) }}</div>
+            <div class="text-xs text-amber-700 mt-1 font-bold flex items-center gap-1">
+                <i class="fas fa-star text-amber-500 text-[10px]"></i> Recommended
+            </div>
         </div>
         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
             <div class="text-2xl md:text-3xl font-extrabold text-emerald-600">{{ number_format($approvedCount) }}</div>
@@ -47,7 +98,7 @@
             <div class="text-2xl md:text-3xl font-extrabold text-amber-600">{{ number_format($pendingCount) }}</div>
             <div class="text-xs text-gray-500 mt-1 font-medium">Pending Verification</div>
         </div>
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm col-span-2 sm:col-span-1">
             <div class="text-2xl md:text-3xl font-extrabold text-red-600">{{ number_format($inactiveCount) }}</div>
             <div class="text-xs text-gray-500 mt-1 font-medium">Suspended / Inactive</div>
         </div>
@@ -55,7 +106,10 @@
 
     <!-- Search & Filter Form -->
     <form method="GET" action="{{ route('admin.pgs') }}" id="adminPgFilterForm" class="bg-white rounded-2xl p-4 md:p-5 border border-gray-100 shadow-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        @if(request('type'))
+            <input type="hidden" name="type" value="{{ request('type') }}">
+        @endif
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
             <!-- Search Text -->
             <div class="lg:col-span-2 relative">
                 <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
@@ -64,28 +118,40 @@
                     name="search" 
                     id="adminPgSearch" 
                     value="{{ request('search') }}" 
-                    placeholder="Search by property, broker, city, landmark..." 
+                    placeholder="Search property, broker, city..." 
                     class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:bg-white transition"
                 >
             </div>
 
-            <!-- Type Filter -->
+            <!-- Gender Preference / Sub-Type Filter -->
             <div>
-                <select name="type" id="adminPgType" onchange="document.getElementById('adminPgFilterForm').submit()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition">
-                    <option value="">All Listing Types</option>
-                    <option value="boys" {{ request('type') == 'boys' ? 'selected' : '' }}>Boys PG</option>
-                    <option value="girls" {{ request('type') == 'girls' ? 'selected' : '' }}>Girls PG</option>
-                    <option value="co-ed" {{ request('type') == 'co-ed' ? 'selected' : '' }}>Co-Living / Co-Ed</option>
+                <select name="type" id="adminPgType" onchange="document.getElementById('adminPgFilterForm').submit()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition font-medium">
+                    <option value="">All Types</option>
+                    <option value="pg-hostel" {{ request('type') == 'pg-hostel' ? 'selected' : '' }}>🏠 PG / Hostel</option>
+                    <option value="flat-apartment" {{ request('type') == 'flat-apartment' ? 'selected' : '' }}>🏢 Flat / House</option>
+                    <option value="commercial" {{ request('type') == 'commercial' ? 'selected' : '' }}>🏪 Commercial</option>
+                    <option value="boys" {{ request('type') == 'boys' ? 'selected' : '' }}>👦 Boys Stays</option>
+                    <option value="girls" {{ request('type') == 'girls' ? 'selected' : '' }}>👧 Girls Stays</option>
+                    <option value="co-ed" {{ request('type') == 'co-ed' ? 'selected' : '' }}>👫 Co-Living / Co-Ed</option>
                     @foreach($propertyTypes as $pt)
                         <option value="{{ $pt->slug }}" {{ request('type') == $pt->slug ? 'selected' : '' }}>{{ $pt->name }}</option>
                     @endforeach
                 </select>
             </div>
 
+            <!-- Recommended Filter -->
+            <div>
+                <select name="recommended" id="adminPgRecommended" onchange="document.getElementById('adminPgFilterForm').submit()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition font-medium">
+                    <option value="">All Recommendations</option>
+                    <option value="1" {{ request('recommended') === '1' ? 'selected' : '' }}>⭐ Recommended</option>
+                    <option value="0" {{ request('recommended') === '0' ? 'selected' : '' }}>☆ Not Recommended</option>
+                </select>
+            </div>
+
             <!-- Tag / Badge Filter -->
             <div>
                 <select name="tag" id="adminPgTag" onchange="document.getElementById('adminPgFilterForm').submit()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition font-medium">
-                    <option value="">All Tags / Badges</option>
+                    <option value="">All Badges</option>
                     <option value="Popular" {{ request('tag') == 'Popular' ? 'selected' : '' }}>🔥 Popular</option>
                     <option value="Verified" {{ request('tag') == 'Verified' ? 'selected' : '' }}>🛡️ Verified</option>
                     <option value="Guest Favourite" {{ request('tag') == 'Guest Favourite' ? 'selected' : '' }}>❤️ Guest Favourite</option>
@@ -98,7 +164,7 @@
 
             <!-- City Filter -->
             <div>
-                <select name="city" id="adminPgCity" onchange="document.getElementById('adminPgFilterForm').submit()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition">
+                <select name="city" id="adminPgCity" onchange="document.getElementById('adminPgFilterForm').submit()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition font-medium">
                     <option value="">All Cities</option>
                     @foreach($cities as $city)
                         <option value="{{ $city->id }}" {{ request('city') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
@@ -108,14 +174,14 @@
 
             <!-- Status Filter & Submit -->
             <div class="flex items-center gap-2">
-                <select name="status" id="adminPgStatus" onchange="document.getElementById('adminPgFilterForm').submit()" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition">
+                <select name="status" id="adminPgStatus" onchange="document.getElementById('adminPgFilterForm').submit()" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 text-gray-700 transition font-medium">
                     <option value="">All Status</option>
                     <option value="APPROVED" {{ request('status') == 'APPROVED' ? 'selected' : '' }}>Approved</option>
                     <option value="PENDING" {{ request('status') == 'PENDING' ? 'selected' : '' }}>Pending Review</option>
                     <option value="SUSPENDED" {{ request('status') == 'SUSPENDED' ? 'selected' : '' }}>Suspended / Inactive</option>
                 </select>
 
-                @if(request()->hasAny(['search', 'type', 'city', 'status', 'tag']) && (request('search') || request('type') || request('city') || request('status') || request('tag')))
+                @if(request()->hasAny(['search', 'type', 'city', 'status', 'tag', 'recommended']) && (request('search') || request('type') || request('city') || request('status') || request('tag') || request('recommended') !== null))
                     <a href="{{ route('admin.pgs') }}" class="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-bold transition flex items-center gap-1" title="Clear Filters">
                         <i class="fas fa-times"></i>
                     </a>
@@ -134,6 +200,7 @@
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Broker / Owner</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">City / Area</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Recommended</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tag / Badge</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Capacity</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Price / Mo</th>
@@ -148,15 +215,25 @@
                             
                             $brokerName = $property->broker->profile->full_name ?? ($property->broker->name ?? ($property->broker->email ?? 'Direct / Admin'));
                             
+                            $typeSlug = strtolower($property->propertyType->slug ?? '');
+                            $typeName = $property->propertyType->name ?? 'PG / Hostel';
                             $gender = strtolower($property->gender_preference ?? 'co-ed');
-                            $typeClass = 'bg-purple-50 text-purple-600';
-                            $typeLabel = 'CO-LIVING';
-                            if ($gender === 'boys' || $gender === 'male') {
-                                $typeClass = 'bg-blue-50 text-blue-600';
-                                $typeLabel = 'BOYS';
+                            
+                            $typeClass = 'bg-purple-50 text-purple-700 border border-purple-200';
+                            $typeLabel = strtoupper($typeName);
+
+                            if (str_contains($typeSlug, 'commercial')) {
+                                $typeClass = 'bg-amber-50 text-amber-700 border border-amber-200';
+                                $typeLabel = 'COMMERCIAL';
+                            } elseif (str_contains($typeSlug, 'flat') || str_contains($typeSlug, 'apartment') || str_contains($typeSlug, 'house')) {
+                                $typeClass = 'bg-teal-50 text-teal-700 border border-teal-200';
+                                $typeLabel = 'FLAT / HOUSE';
+                            } elseif ($gender === 'boys' || $gender === 'male') {
+                                $typeClass = 'bg-blue-50 text-blue-700 border border-blue-200';
+                                $typeLabel = 'BOYS PG';
                             } elseif ($gender === 'girls' || $gender === 'female') {
-                                $typeClass = 'bg-pink-50 text-pink-600';
-                                $typeLabel = 'GIRLS';
+                                $typeClass = 'bg-pink-50 text-pink-700 border border-pink-200';
+                                $typeLabel = 'GIRLS PG';
                             }
                             
                             $isVerified = ($property->verification_status === 'verified' && $property->status === 'active');
@@ -187,6 +264,19 @@
                                 <span class="{{ $typeClass }} text-[11px] font-bold px-2.5 py-1 rounded-lg uppercase">
                                     {{ $typeLabel }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                @php
+                                    $isRec = (bool) ($property->is_recommended || $property->featured);
+                                @endphp
+                                <button type="button" 
+                                        onclick="togglePropertyRecommended('{{ $property->id }}')" 
+                                        id="rec-btn-{{ $property->id }}" 
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer shadow-2xs {{ $isRec ? 'bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200' : 'bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100 hover:text-gray-700' }}"
+                                        title="Click to toggle Recommended on Home Page">
+                                    <i id="rec-icon-{{ $property->id }}" class="{{ $isRec ? 'fas fa-star text-amber-500' : 'far fa-star text-gray-400' }} text-[11px]"></i>
+                                    <span id="rec-label-{{ $property->id }}">{{ $isRec ? 'Recommended' : 'Standard' }}</span>
+                                </button>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex flex-col gap-1.5 min-w-[145px]" id="tag-container-{{ $property->id }}">
@@ -252,7 +342,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-12 text-center text-gray-400">
+                            <td colspan="10" class="px-6 py-12 text-center text-gray-400">
                                 <div class="w-12 h-12 rounded-full bg-gray-50 text-gray-300 flex items-center justify-center mx-auto mb-2 text-xl">
                                     <i class="fas fa-search"></i>
                                 </div>
@@ -284,9 +374,32 @@
             @php
                 $imgUrl = $property->primaryImage->image_url ?? ($property->images->first()->image_url ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80');
                 $brokerName = $property->broker->profile->full_name ?? ($property->broker->name ?? ($property->broker->email ?? 'Direct / Admin'));
+                
+                $typeSlug = strtolower($property->propertyType->slug ?? '');
+                $typeName = $property->propertyType->name ?? 'PG / Hostel';
+                $gender = strtolower($property->gender_preference ?? 'co-ed');
+                
+                $typeClass = 'bg-purple-50 text-purple-700 border border-purple-200';
+                $typeLabel = strtoupper($typeName);
+
+                if (str_contains($typeSlug, 'commercial')) {
+                    $typeClass = 'bg-amber-50 text-amber-700 border border-amber-200';
+                    $typeLabel = 'COMMERCIAL';
+                } elseif (str_contains($typeSlug, 'flat') || str_contains($typeSlug, 'apartment') || str_contains($typeSlug, 'house')) {
+                    $typeClass = 'bg-teal-50 text-teal-700 border border-teal-200';
+                    $typeLabel = 'FLAT / HOUSE';
+                } elseif ($gender === 'boys' || $gender === 'male') {
+                    $typeClass = 'bg-blue-50 text-blue-700 border border-blue-200';
+                    $typeLabel = 'BOYS PG';
+                } elseif ($gender === 'girls' || $gender === 'female') {
+                    $typeClass = 'bg-pink-50 text-pink-700 border border-pink-200';
+                    $typeLabel = 'GIRLS PG';
+                }
+                
                 $isVerified = ($property->verification_status === 'verified' && $property->status === 'active');
                 $isPending = ($property->verification_status === 'pending');
                 $tagMeta = $property->tag_meta;
+                $isRecMobile = (bool) ($property->is_recommended || $property->featured);
             @endphp
             <div id="pg-mobile-card-{{ $property->id }}" class="admin-pg-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm space-y-3">
                 <div class="flex gap-3">
@@ -298,6 +411,11 @@
                                 {{ $isVerified ? 'APPROVED' : ($isPending ? 'PENDING' : strtoupper($property->status)) }}
                             </span>
                         </div>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="{{ $typeClass }} text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                {{ $typeLabel }}
+                            </span>
+                        </div>
                         <p class="text-xs text-gray-500 mt-1 pg-city">
                             <i class="fas fa-map-marker-alt text-brand"></i> {{ $property->city->name ?? 'City' }} {{ !empty($property->area->name) ? '• ' . $property->area->name : '' }}
                         </p>
@@ -306,7 +424,7 @@
                     </div>
                 </div>
 
-                <!-- Mobile Tag Selector Bar -->
+                <!-- Mobile Tag & Recommended Bar -->
                 <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
                     <div class="flex items-center gap-1.5">
                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Tag:</span>
@@ -327,6 +445,18 @@
                         <option value="New" {{ strcasecmp($property->tag, 'New') === 0 ? 'selected' : '' }}>✨ New</option>
                         <option value="none">❌ Clear</option>
                     </select>
+                </div>
+
+                <!-- Mobile Recommended Toggle -->
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Home Showcase:</span>
+                    <button type="button" 
+                            onclick="togglePropertyRecommended('{{ $property->id }}')" 
+                            id="mobile-rec-btn-{{ $property->id }}" 
+                            class="px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1 {{ $isRecMobile ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-gray-50 text-gray-500 border-gray-200' }}">
+                        <i id="mobile-rec-icon-{{ $property->id }}" class="{{ $isRecMobile ? 'fas fa-star text-amber-500' : 'far fa-star text-gray-400' }} text-[9px]"></i>
+                        <span id="mobile-rec-label-{{ $property->id }}">{{ $isRecMobile ? '⭐ Recommended' : '☆ Standard' }}</span>
+                    </button>
                 </div>
 
                 <div class="flex gap-2 pt-2 border-t border-gray-100">
@@ -451,12 +581,20 @@
                 </div>
             </div>
 
-            <!-- Instant Publish Checkbox -->
-            <div class="flex items-center gap-2 pt-2">
-                <input type="checkbox" name="instant_approve" value="1" checked id="instantApproveCheck" class="w-4 h-4 text-brand rounded border-gray-300 focus:ring-brand/50 accent-brand">
-                <label for="instantApproveCheck" class="text-xs font-semibold text-gray-700 cursor-pointer select-none">
-                    Instant Approve & Publish Live (Bypass pending review)
-                </label>
+            <!-- Instant Publish & Recommended Checkboxes -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="instant_approve" value="1" checked id="instantApproveCheck" class="w-4 h-4 text-brand rounded border-gray-300 focus:ring-brand/50 accent-brand">
+                    <label for="instantApproveCheck" class="text-xs font-semibold text-gray-700 cursor-pointer select-none">
+                        Instant Approve & Publish Live
+                    </label>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="is_recommended" value="1" id="isRecommendedCheck" class="w-4 h-4 text-amber-500 rounded border-gray-300 focus:ring-amber-400 accent-amber-500">
+                    <label for="isRecommendedCheck" class="text-xs font-bold text-amber-800 cursor-pointer select-none flex items-center gap-1">
+                        <i class="fas fa-star text-amber-500 text-xs"></i> Mark as Recommended Listing
+                    </label>
+                </div>
             </div>
 
             <!-- Actions -->
@@ -524,6 +662,52 @@
             toast.classList.remove('translate-y-0', 'opacity-100');
             toast.classList.add('translate-y-20', 'opacity-0');
         }, 3200);
+    }
+
+    // 1-Click Toggle Property Recommended Status (AJAX)
+    async function togglePropertyRecommended(propertyId) {
+        try {
+            const res = await fetch(`/admin/pgs/${propertyId}/toggle-recommended`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                showPgToast(data.message, 'success');
+
+                const isRec = data.is_recommended;
+                const btn = document.getElementById(`rec-btn-${propertyId}`);
+                const icon = document.getElementById(`rec-icon-${propertyId}`);
+                const label = document.getElementById(`rec-label-${propertyId}`);
+
+                const mBtn = document.getElementById(`mobile-rec-btn-${propertyId}`);
+                const mIcon = document.getElementById(`mobile-rec-icon-${propertyId}`);
+                const mLabel = document.getElementById(`mobile-rec-label-${propertyId}`);
+
+                if (btn) {
+                    btn.className = `inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer shadow-2xs ${isRec ? 'bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 animate-pulse' : 'bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100 hover:text-gray-700'}`;
+                    if (icon) icon.className = (isRec ? 'fas fa-star text-amber-500' : 'far fa-star text-gray-400') + ' text-[11px]';
+                    if (label) label.textContent = isRec ? 'Recommended' : 'Standard';
+                    setTimeout(() => btn.classList.remove('animate-pulse'), 500);
+                }
+
+                if (mBtn) {
+                    mBtn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1 ${isRec ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-gray-50 text-gray-500 border-gray-200'}`;
+                    if (mIcon) mIcon.className = (isRec ? 'fas fa-star text-amber-500' : 'far fa-star text-gray-400') + ' text-[9px]';
+                    if (mLabel) mLabel.textContent = isRec ? '⭐ Recommended' : '☆ Standard';
+                }
+            } else {
+                showPgToast(data.message || 'Error updating recommended status', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            showPgToast('Network error while updating recommendation', 'error');
+        }
     }
 
     // 1-Click Update Property Tag / Badge Direct (AJAX)
@@ -788,32 +972,43 @@
                 const tagBadgeIcon = tagMeta ? tagMeta.icon : 'tag';
                 const tagBadgeLabel = tagMeta ? tagMeta.label : 'No Tag';
 
+                const isRecProperty = Boolean(p.is_recommended || p.featured);
+
                 bodyEl.innerHTML = `
                     <div class="space-y-4">
                         <img src="${imgUrl}" alt="${p.name}" class="w-full h-48 rounded-2xl object-cover border border-gray-100 shadow-xs">
                         
-                        <!-- Tag Modifier Row -->
-                        <div class="bg-gray-50 p-3.5 rounded-2xl flex items-center justify-between gap-3 border border-gray-100">
-                            <div>
-                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Property Tag / Badge</span>
-                                <span id="modal-tag-badge-${p.id}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border ${tagBadgeClass}">
-                                    <i class="fas fa-${tagBadgeIcon} text-xs"></i> <span>${tagBadgeLabel}</span>
-                                </span>
+                        <!-- Recommendation & Tag Modifier Row -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="bg-gray-50 p-3.5 rounded-2xl flex items-center justify-between gap-2 border border-gray-100">
+                                <div>
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Recommended Showcase</span>
+                                    <button type="button" onclick="togglePropertyRecommended('${p.id}'); this.querySelector('span').textContent = this.querySelector('span').textContent.includes('Recommended') ? '☆ Standard' : '⭐ Recommended';" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border ${isRecProperty ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-white text-gray-600 border-gray-200'}">
+                                        <i class="fas fa-star text-amber-500 text-xs"></i> <span>${isRecProperty ? '⭐ Recommended' : '☆ Standard'}</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1 text-right">Change Tag</label>
-                                <select onchange="changePropertyTag('${p.id}', this.value)" 
-                                        id="modal-tag-select-${p.id}"
-                                        class="text-xs font-semibold bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer shadow-xs">
-                                    <option value="" ${!p.tag ? 'selected' : ''}>No Tag (None)</option>
-                                    <option value="Popular" ${p.tag && p.tag.toLowerCase() === 'popular' ? 'selected' : ''}>🔥 Popular</option>
-                                    <option value="Verified" ${p.tag && p.tag.toLowerCase() === 'verified' ? 'selected' : ''}>🛡️ Verified</option>
-                                    <option value="Guest Favourite" ${p.tag && p.tag.toLowerCase() === 'guest favourite' ? 'selected' : ''}>❤️ Guest Favourite</option>
-                                    <option value="Trending" ${p.tag && p.tag.toLowerCase() === 'trending' ? 'selected' : ''}>⚡ Trending</option>
-                                    <option value="Top rated" ${p.tag && p.tag.toLowerCase() === 'top rated' ? 'selected' : ''}>⭐ Top rated</option>
-                                    <option value="New" ${p.tag && p.tag.toLowerCase() === 'new' ? 'selected' : ''}>✨ New</option>
-                                    <option value="none">❌ Clear Tag</option>
-                                </select>
+                            <div class="bg-gray-50 p-3.5 rounded-2xl flex items-center justify-between gap-3 border border-gray-100">
+                                <div>
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Property Tag</span>
+                                    <span id="modal-tag-badge-${p.id}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border ${tagBadgeClass}">
+                                        <i class="fas fa-${tagBadgeIcon} text-xs"></i> <span>${tagBadgeLabel}</span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <select onchange="changePropertyTag('${p.id}', this.value)" 
+                                            id="modal-tag-select-${p.id}"
+                                            class="text-xs font-semibold bg-white border border-gray-200 rounded-xl px-2.5 py-1.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer shadow-xs">
+                                        <option value="" ${!p.tag ? 'selected' : ''}>No Tag (None)</option>
+                                        <option value="Popular" ${p.tag && p.tag.toLowerCase() === 'popular' ? 'selected' : ''}>🔥 Popular</option>
+                                        <option value="Verified" ${p.tag && p.tag.toLowerCase() === 'verified' ? 'selected' : ''}>🛡️ Verified</option>
+                                        <option value="Guest Favourite" ${p.tag && p.tag.toLowerCase() === 'guest favourite' ? 'selected' : ''}>❤️ Guest Favourite</option>
+                                        <option value="Trending" ${p.tag && p.tag.toLowerCase() === 'trending' ? 'selected' : ''}>⚡ Trending</option>
+                                        <option value="Top rated" ${p.tag && p.tag.toLowerCase() === 'top rated' ? 'selected' : ''}>⭐ Top rated</option>
+                                        <option value="New" ${p.tag && p.tag.toLowerCase() === 'new' ? 'selected' : ''}>✨ New</option>
+                                        <option value="none">❌ Clear Tag</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 

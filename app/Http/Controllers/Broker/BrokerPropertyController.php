@@ -203,7 +203,7 @@ class BrokerPropertyController extends Controller
             'city_id' => 'required|exists:cities,id',
             'area_name' => 'nullable|string|max:100',
             'property_type_id' => 'nullable|exists:property_types,id',
-            'gender_preference' => 'required|in:boys,girls,co-ed',
+            'gender_preference' => 'nullable|string|in:boys,girls,co-ed,all,any,not_applicable',
             'monthly_rent' => 'required|numeric|min:500|max:1000000',
             'security_deposit' => 'nullable|numeric|min:0|max:2000000',
             'total_beds' => 'required|integer|min:1|max:5000',
@@ -232,6 +232,16 @@ class BrokerPropertyController extends Controller
         }
 
         $propertyTypeId = $validated['property_type_id'] ?? PropertyType::where('slug', 'pg')->value('id') ?? PropertyType::first()?->id;
+        $pt = PropertyType::find($propertyTypeId);
+        $ptSlug = strtolower($pt?->slug ?? '');
+        $finalGender = !empty($validated['gender_preference']) ? strtolower($validated['gender_preference']) : null;
+        if (in_array($ptSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space'])) {
+            $finalGender = null;
+        } elseif (in_array($ptSlug, ['flat', 'flat-apartment', 'house', 'apartment', 'villa'])) {
+            $finalGender = $finalGender ?: 'all';
+        } else {
+            $finalGender = $finalGender ?: 'co-ed';
+        }
 
         $property = Property::create([
             'id' => (string) Str::uuid(),
@@ -241,7 +251,7 @@ class BrokerPropertyController extends Controller
             'area_id' => $areaId,
             'property_type_id' => $propertyTypeId,
             'name' => $validated['name'],
-            'gender_preference' => $validated['gender_preference'],
+            'gender_preference' => $finalGender,
             'monthly_rent' => $validated['monthly_rent'],
             'security_deposit' => $validated['security_deposit'] ?? ($validated['monthly_rent'] * 2),
             'total_beds' => $validated['total_beds'],
@@ -302,18 +312,28 @@ class BrokerPropertyController extends Controller
             'security_deposit' => 'nullable|numeric|min:0|max:2000000',
             'total_beds' => 'required|integer|min:1|max:5000',
             'available_beds' => 'required|integer|min:0|max:5000',
-            'gender_preference' => 'required|in:boys,girls,co-ed',
+            'gender_preference' => 'nullable|string|in:boys,girls,co-ed,all,any,not_applicable',
             'address' => 'required|string|max:500',
             'landmark' => 'nullable|string|max:255',
             'status' => 'nullable|in:active,draft,inactive',
         ]);
+
+        $ptSlug = strtolower($property->propertyType?->slug ?? '');
+        $finalGender = !empty($validated['gender_preference']) ? strtolower($validated['gender_preference']) : null;
+        if (in_array($ptSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space'])) {
+            $finalGender = null;
+        } elseif (in_array($ptSlug, ['flat', 'flat-apartment', 'house', 'apartment', 'villa'])) {
+            $finalGender = $finalGender ?: 'all';
+        } else {
+            $finalGender = $finalGender ?: ($property->gender_preference ?: 'co-ed');
+        }
 
         $property->name = $validated['name'];
         $property->monthly_rent = $validated['monthly_rent'];
         $property->security_deposit = $validated['security_deposit'] ?? $property->security_deposit;
         $property->total_beds = $validated['total_beds'];
         $property->available_beds = $validated['available_beds'];
-        $property->gender_preference = $validated['gender_preference'];
+        $property->gender_preference = $finalGender;
         $property->address = $validated['address'];
         $property->landmark = $validated['landmark'] ?? $property->landmark;
 

@@ -1833,6 +1833,166 @@
                 @endif
             </div>
         </section>
+
+        {{-- ============================= COMMERCIAL RECOMMENDED FOR YOU ============================= --}}
+        @if($commercialRecommended->isNotEmpty())
+        <section class="mt-8 sm:mt-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="section-title flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-amber-50 inline-flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-heart text-amber-600 text-sm"></i>
+                            </span>
+                            Recommended for You
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1 ml-10">Handpicked prime shops, showrooms & modern office spaces</p>
+                    </div>
+                    <a href="{{ route('user.search') }}?type=commercial" class="text-xs font-bold text-amber-600 flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                        View all <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
+                <div class="md:hidden swiper commercialRecommendedSwiper overflow-hidden">
+                    <div class="swiper-wrapper">
+                        @foreach ($commercialRecommended as $pg)
+                            @php
+                                $tagMeta = $pg->display_tag_meta;
+                                $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                                $displayImg = $pg->display_image_url;
+                                $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                                $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                                $reviewCount = $pg->dynamic_reviews_count;
+                            @endphp
+                            <div class="swiper-slide !h-auto">
+                                <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                                    <div class="relative h-28 sm:h-36 overflow-hidden">
+                                        <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                        <div class="absolute top-2 left-2 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                            <i class="fas fa-{{ $tagMeta['icon'] ?? 'store' }} text-[8px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Shop' }}
+                                        </div>
+                                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Commercial', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                            <i class="far fa-heart text-[10px]"></i>
+                                        </button>
+                                        <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                            <i class="fas fa-star text-yellow-400 text-[8px]"></i> {{ $ratingVal }}
+                                            @if($reviewCount > 0)
+                                                <span class="text-gray-300 font-normal">({{ $reviewCount }})</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="p-2.5 sm:p-3 flex flex-col flex-1 justify-between">
+                                        <div>
+                                            <div class="flex justify-between items-center gap-1 mb-1">
+                                                <span class="font-bold text-xs text-gray-900 truncate">{{ $pg->name }}</span>
+                                                <span class="bg-amber-50 text-amber-800 text-[8px] font-extrabold px-1 py-0.5 rounded flex-shrink-0">Commercial</span>
+                                            </div>
+                                            <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                                <i class="fas fa-map-marker-alt text-amber-600 text-[9px]"></i> {{ $locationText }}
+                                            </p>
+                                            <p class="text-[10px] text-amber-700 font-semibold mb-2 flex items-center gap-1 truncate">
+                                                <i class="fas fa-circle-check text-[9px]"></i> {{ $pg->landmark ?? 'Prime Space' }}
+                                            </p>
+                                            <div class="flex flex-wrap gap-1 mb-2">
+                                                @forelse($pg->amenities->take(2) as $am)
+                                                    <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                        <i class="fas fa-{{ $am->icon ?? 'check' }} text-amber-600 text-[8px]"></i> {{ $am->name }}
+                                                    </span>
+                                                @empty
+                                                    <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                        <i class="fas fa-shield-alt text-amber-600 text-[8px]"></i> Security
+                                                    </span>
+                                                    <span class="text-[9px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-gray-100">
+                                                        <i class="fas fa-bolt text-amber-600 text-[8px]"></i> Power Backup
+                                                    </span>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                        <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                            <div>
+                                                <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
+                                                <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                            </div>
+                                            <span class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-amber-500/30 transition">View</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- ===== DESKTOP: 4-Col Grid ===== --}}
+                <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach ($commercialRecommended as $pg)
+                        @php
+                            $tagMeta = $pg->display_tag_meta;
+                            $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
+                            $displayImg = $pg->display_image_url;
+                            $locationText = ($pg->area ? $pg->area->name . ', ' : '') . ($pg->city ? $pg->city->name : 'City Center');
+                            $ratingVal = $pg->dynamic_rating > 0 ? $pg->dynamic_rating : 'New';
+                            $reviewCount = $pg->dynamic_reviews_count;
+                        @endphp
+                        <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
+                            <div class="relative h-44 overflow-hidden">
+                                <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                    <i class="fas fa-{{ $tagMeta['icon'] ?? 'store' }} text-[9px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Commercial' }}
+                                </div>
+                                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Commercial', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                    <i class="far fa-heart text-xs"></i>
+                                </button>
+                                <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $ratingVal }}
+                                    @if($reviewCount > 0)
+                                        <span class="text-gray-300 font-normal">({{ $reviewCount }} {{ Str::plural('review', $reviewCount) }})</span>
+                                    @else
+                                        <span class="text-gray-300 font-normal">(0 reviews)</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="p-4 flex flex-col flex-1 justify-between">
+                                <div>
+                                    <div class="flex justify-between items-center gap-1 mb-1">
+                                        <span class="font-bold text-base text-gray-900 truncate">{{ $pg->name }}</span>
+                                        <span class="bg-amber-50 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">Commercial</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 flex items-center gap-1 mb-1 truncate">
+                                        <i class="fas fa-map-marker-alt text-amber-600 text-[11px]"></i> {{ $locationText }}
+                                    </p>
+                                    <p class="text-xs text-amber-700 font-semibold mb-3 flex items-center gap-1 truncate">
+                                        <i class="fas fa-circle-check text-[11px]"></i> {{ $pg->landmark ?? 'Prime Space' }}
+                                    </p>
+                                    <div class="flex flex-wrap gap-1.5 mb-4">
+                                        @forelse($pg->amenities->take(3) as $am)
+                                            <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                <i class="fas fa-{{ $am->icon ?? 'check' }} text-amber-600 text-[10px]"></i> {{ $am->name }}
+                                            </span>
+                                        @empty
+                                            <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                <i class="fas fa-shield-alt text-amber-600 text-[10px]"></i> Security
+                                            </span>
+                                            <span class="text-xs bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md flex items-center gap-1 border border-gray-100">
+                                                <i class="fas fa-bolt text-amber-600 text-[10px]"></i> Power Backup
+                                            </span>
+                                        @endforelse
+                                    </div>
+                                </div>
+                                <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                    <div>
+                                        <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
+                                        <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                    </div>
+                                    <span class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-amber-500/30 transition">View</span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
     </div> {{-- ============================= END COMMERCIAL VIEW CONTAINER ============================= --}}
 
     {{-- ============================= 7. EXPLORE TOP CITIES ============================= --}}
@@ -2066,8 +2226,34 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // 6. Commercial Spaces Near You horizontal slider (mobile)
+        // 6. Flat Recommended horizontal slider (mobile)
+        window.flatRecommendedSwiperInstance = new Swiper('.flatRecommendedSwiper', {
+            slidesPerView: 2.05,
+            spaceBetween: 10,
+            grabCursor: true,
+            observer: true,
+            observeParents: true,
+            breakpoints: {
+                480: { slidesPerView: 2.3, spaceBetween: 12 },
+                640: { slidesPerView: 2.8, spaceBetween: 14 },
+            }
+        });
+
+        // 7. Commercial Spaces Near You horizontal slider (mobile)
         window.commercialNearMeSwiperInstance = new Swiper('.commercialNearMeSwiper', {
+            slidesPerView: 2.05,
+            spaceBetween: 10,
+            grabCursor: true,
+            observer: true,
+            observeParents: true,
+            breakpoints: {
+                480: { slidesPerView: 2.3, spaceBetween: 12 },
+                640: { slidesPerView: 2.8, spaceBetween: 14 },
+            }
+        });
+
+        // 8. Commercial Recommended horizontal slider (mobile)
+        window.commercialRecommendedSwiperInstance = new Swiper('.commercialRecommendedSwiper', {
             slidesPerView: 2.05,
             spaceBetween: 10,
             grabCursor: true,
@@ -2210,14 +2396,25 @@ function updateAllDistances(userLat, userLng) {
     if (emptyState) {
         if (visibleMobileCount === 0 && visibleDesktopCount === 0) {
             emptyState.classList.remove('hidden');
-            if (desktopGrid) desktopGrid.classList.add('hidden');
-            if (mobileContainer) mobileContainer.classList.add('hidden');
+            if (desktopGrid) desktopGrid.style.display = 'none';
+            if (mobileContainer) mobileContainer.style.display = 'none';
         } else {
             emptyState.classList.add('hidden');
-            if (desktopGrid) desktopGrid.classList.remove('hidden');
-            if (mobileContainer) mobileContainer.classList.remove('hidden');
+            if (desktopGrid) desktopGrid.style.display = '';
+            if (mobileContainer) mobileContainer.style.display = '';
         }
     }
+
+    // 4. Update distance text for Flat & Commercial cards
+    document.querySelectorAll('#flatNearMeMobileContainer .pg-distance-badge, #flatNearMeDesktopGrid .pg-distance-badge, #commercialNearMeMobileContainer .pg-distance-badge, #commercialNearMeDesktopGrid .pg-distance-badge').forEach(badge => {
+        const lat = parseFloat(badge.getAttribute('data-lat'));
+        const lng = parseFloat(badge.getAttribute('data-lng'));
+        const textSpan = badge.querySelector('.dist-text');
+        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+            const distKm = getHaversineDistanceKm(userLat, userLng, lat, lng);
+            if (textSpan) textSpan.textContent = formatDistance(distKm);
+        }
+    });
 
     // Update Swiper instance
     if (window.nearMeSwiperInstance && typeof window.nearMeSwiperInstance.update === 'function') {
@@ -2376,8 +2573,14 @@ function switchPropertyType(type, triggerScroll = false) {
         if (window.flatNearMeSwiperInstance && typeof window.flatNearMeSwiperInstance.update === 'function') {
             window.flatNearMeSwiperInstance.update();
         }
+        if (window.flatRecommendedSwiperInstance && typeof window.flatRecommendedSwiperInstance.update === 'function') {
+            window.flatRecommendedSwiperInstance.update();
+        }
         if (window.commercialNearMeSwiperInstance && typeof window.commercialNearMeSwiperInstance.update === 'function') {
             window.commercialNearMeSwiperInstance.update();
+        }
+        if (window.commercialRecommendedSwiperInstance && typeof window.commercialRecommendedSwiperInstance.update === 'function') {
+            window.commercialRecommendedSwiperInstance.update();
         }
     }, 60);
 

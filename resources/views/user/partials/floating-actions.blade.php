@@ -52,7 +52,7 @@
                 <div>
                     <div class="flex items-center gap-1.5">
                         <h3 class="font-bold text-sm sm:text-base leading-tight">StayNest AI Assistant</h3>
-                        <span class="bg-yellow-400/25 text-yellow-300 text-[9px] font-extrabold px-1.5 py-0.2 rounded border border-yellow-400/30">MATCH ENGINE v5</span>
+                        <!-- <span class="bg-yellow-400/25 text-yellow-300 text-[9px] font-extrabold px-1.5 py-0.2 rounded border border-yellow-400/30">MATCH ENGINE v5</span> -->
                     </div>
                     <p class="text-[11px] text-purple-200/80">Conversational Property Search &amp; Match Scoring</p>
                 </div>

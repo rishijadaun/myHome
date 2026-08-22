@@ -122,6 +122,52 @@
 
         .chip-active { background: #4bb59d !important; color: white !important; border-color: #4bb59d !important; }
 
+        /* Property Type Segmented Tab Bar */
+        .prop-type-segmented-bar {
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .loc-type-tab {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            outline: none;
+            color: #64748b;
+            background: transparent;
+            user-select: none;
+        }
+        .loc-type-tab:hover:not(.active-loc-tab) {
+            color: #0f172a;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .loc-type-tab.active-loc-tab {
+            background: linear-gradient(135deg, #4bb59d 0%, #3a9a85 100%);
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(75, 181, 157, 0.35);
+        }
+        .tab-divider {
+            height: 16px;
+            width: 1px;
+            background-color: #cbd5e1;
+            margin: 0 2px;
+            transition: opacity 0.2s;
+        }
+
         .fab-btn {
             background: white;
             border: none;
@@ -336,14 +382,41 @@
                     </div>
                 </div>
 
+                <!-- Property Type Segmented Tab Bar (Matches High-End App UI/UX) -->
+                <div class="prop-type-segmented-bar mt-1 mb-2" id="propertyTypeTabBar">
+                    <button type="button" 
+                        onclick="switchLocationPropertyType('pg-hostel')" 
+                        id="locTab-pg-hostel" 
+                        class="loc-type-tab {{ ($selectedType ?? 'pg-hostel') === 'pg-hostel' ? 'active-loc-tab' : '' }}">
+                        <i class="fas fa-house-chimney text-xs"></i>
+                        <span>PG / Hostel</span>
+                    </button>
+                    <div class="tab-divider" id="divider-pg-flat" style="{{ ($selectedType ?? 'pg-hostel') === 'pg-hostel' || ($selectedType ?? '') === 'flat-apartment' ? 'opacity: 0;' : '' }}"></div>
+                    <button type="button" 
+                        onclick="switchLocationPropertyType('flat-apartment')" 
+                        id="locTab-flat-apartment" 
+                        class="loc-type-tab {{ ($selectedType ?? '') === 'flat-apartment' ? 'active-loc-tab' : '' }}">
+                        <i class="fas fa-building text-xs"></i>
+                        <span>Flat / House</span>
+                    </button>
+                    <div class="tab-divider" id="divider-flat-comm" style="{{ ($selectedType ?? '') === 'flat-apartment' || ($selectedType ?? '') === 'commercial' ? 'opacity: 0;' : '' }}"></div>
+                    <button type="button" 
+                        onclick="switchLocationPropertyType('commercial')" 
+                        id="locTab-commercial" 
+                        class="loc-type-tab {{ ($selectedType ?? '') === 'commercial' ? 'active-loc-tab' : '' }}">
+                        <i class="fas fa-store text-xs"></i>
+                        <span>Commercial</span>
+                    </button>
+                </div>
+
                 <div class="flex items-center justify-between pt-1">
                     <div class="flex gap-2">
                         <h1 class="text-base font-extrabold text-slate-900" id="listHeader">Nearby PGs</h1>
                         <p class="text-xs text-slate-500 mt-0.5"><span id="pgCountBadge" class="font-bold">0</span> properties found</p>
                     </div>
                 </div>
-                <!-- Open & Versatile Filter Pills -->
-                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                <!-- Dynamic Sub Filter Pills -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="subFilterChipsContainer">
                     <button onclick="filterPGs('all', this)" class="chip-active whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all">All Stays</button>
                     <button onclick="filterPGs('boys', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-male mr-1 text-blue-500"></i> Boys</button>
                     <button onclick="filterPGs('girls', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-female mr-1 text-pink-500"></i> Girls</button>
@@ -406,6 +479,7 @@
         let userAddress = "Fetching location...";
         let routingControl = null;
         let currentLayer = 'standard';
+        let currentSelectedPropertyType = '{{ $selectedType ?? 'pg-hostel' }}';
         let activeFilter = 'all';
         let rawDatabaseProperties = @json($properties ?? []);
         let allCitiesList = @json($cities ?? []);
@@ -502,12 +576,22 @@
             const q = query.toLowerCase().trim();
             const result = {
                 rawQuery: query,
+                propertyType: null,
                 city: null,
                 gender: null,
                 maxPrice: null,
                 amenities: [],
                 keywords: []
             };
+
+            // 0. Detect Property Type
+            if (/\b(flat|flats|apartment|apartments|bhk|1bhk|2bhk|3bhk|house|houses|villa|villas|builder floor|builder-floor)\b/i.test(q)) {
+                result.propertyType = 'flat-apartment';
+            } else if (/\b(commercial|shop|shops|office|offices|showroom|showrooms|retail|warehouse|commercial space)\b/i.test(q)) {
+                result.propertyType = 'commercial';
+            } else if (/\b(pg|hostel|hostels|paying guest|coliving|co-living|bed|student stay)\b/i.test(q)) {
+                result.propertyType = 'pg-hostel';
+            }
 
             // 1. Detect City / Locality
             const cityAliases = [
@@ -656,6 +740,12 @@
             aiParsedResult = ai;
             aiSearchActive = true;
 
+            // If AI query specified a property type, switch tabs automatically
+            if (ai.propertyType && ai.propertyType !== currentSelectedPropertyType) {
+                switchLocationPropertyType(ai.propertyType);
+            }
+            aiSearchActive = true;
+
             // Determine candidate location for boundary highlight (e.g. Orai, Jhansi, Kanpur, Noida, Bangalore, etc.)
             let searchLocation = ai.city;
             if (!searchLocation) {
@@ -774,6 +864,108 @@
             }
         }
 
+        function switchLocationPropertyType(type) {
+            if (!type || (type !== 'pg-hostel' && type !== 'flat-apartment' && type !== 'commercial')) {
+                type = 'pg-hostel';
+            }
+            currentSelectedPropertyType = type;
+            activeFilter = 'all';
+
+            // 1. Update Tab Buttons UI & Dividers
+            const tabPg = document.getElementById('locTab-pg-hostel');
+            const tabFlat = document.getElementById('locTab-flat-apartment');
+            const tabComm = document.getElementById('locTab-commercial');
+
+            const divider1 = document.getElementById('divider-pg-flat');
+            const divider2 = document.getElementById('divider-flat-comm');
+
+            [tabPg, tabFlat, tabComm].forEach(btn => {
+                if (btn) btn.classList.remove('active-loc-tab');
+            });
+
+            if (type === 'flat-apartment') {
+                if (tabFlat) tabFlat.classList.add('active-loc-tab');
+                if (divider1) divider1.style.opacity = '0';
+                if (divider2) divider2.style.opacity = '0';
+            } else if (type === 'commercial') {
+                if (tabComm) tabComm.classList.add('active-loc-tab');
+                if (divider1) divider1.style.opacity = '1';
+                if (divider2) divider2.style.opacity = '0';
+            } else {
+                type = 'pg-hostel';
+                if (tabPg) tabPg.classList.add('active-loc-tab');
+                if (divider1) divider1.style.opacity = '0';
+                if (divider2) divider2.style.opacity = '1';
+            }
+
+            // 2. Render sub-filter chips
+            renderSubFilterChips(type);
+
+            // 3. Update URL param without page reload
+            try {
+                const url = new URL(window.location.href);
+                if (type === 'pg-hostel') url.searchParams.delete('type');
+                else url.searchParams.set('type', type);
+                window.history.replaceState({ propertyType: type }, '', url.toString());
+            } catch (e) {}
+
+            // 4. Re-render map and list
+            const refLat = userLocation ? userLocation[0] : 28.6280;
+            const refLng = userLocation ? userLocation[1] : 77.3649;
+            generatePGsForRegion(refLat, refLng, type === 'flat-apartment' ? 'Flats & Houses' : (type === 'commercial' ? 'Commercial Spaces' : 'PGs'));
+        }
+
+        function renderSubFilterChips(type) {
+            const container = document.getElementById('subFilterChipsContainer');
+            if (!container) return;
+
+            if (type === 'flat-apartment') {
+                container.innerHTML = `
+                    <button onclick="filterPGs('all', this)" class="chip-active whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all">All Flats</button>
+                    <button onclick="filterPGs('1bhk', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-door-open mr-1 text-indigo-500"></i> 1 BHK</button>
+                    <button onclick="filterPGs('2bhk', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-house mr-1 text-indigo-500"></i> 2 BHK</button>
+                    <button onclick="filterPGs('3bhk', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-building mr-1 text-indigo-500"></i> 3 BHK+</button>
+                    <button onclick="filterPGs('furnished', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-couch mr-1 text-purple-500"></i> Furnished</button>
+                    <button onclick="filterPGs('parking', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-car mr-1 text-blue-500"></i> Parking</button>
+                    <button onclick="filterPGs('power_backup', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-bolt mr-1 text-amber-500"></i> Power Backup</button>
+                    <button onclick="filterPGs('ac', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-snowflake mr-1 text-cyan-500"></i> AC</button>
+                    <button onclick="filterPGs('under15k', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-tag mr-1 text-green-500"></i> Under ₹15K</button>
+                    <button onclick="filterPGs('luxury', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-crown mr-1 text-yellow-500"></i> Luxury</button>
+                    <button onclick="filterPGs('top_rated', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-star mr-1 text-amber-400"></i> Top Rated 4.5+</button>
+                `;
+            } else if (type === 'commercial') {
+                container.innerHTML = `
+                    <button onclick="filterPGs('all', this)" class="chip-active whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all">All Commercial</button>
+                    <button onclick="filterPGs('shop', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-store mr-1 text-amber-600"></i> Retail Shop</button>
+                    <button onclick="filterPGs('office', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-briefcase mr-1 text-blue-600"></i> Office Space</button>
+                    <button onclick="filterPGs('showroom', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-shop mr-1 text-emerald-600"></i> Showroom</button>
+                    <button onclick="filterPGs('main_road', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-road mr-1 text-slate-600"></i> Main Road</button>
+                    <button onclick="filterPGs('security', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-shield-halved mr-1 text-red-500"></i> 24/7 Security</button>
+                    <button onclick="filterPGs('power_backup', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-bolt mr-1 text-amber-500"></i> Power Backup</button>
+                    <button onclick="filterPGs('parking', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-car mr-1 text-blue-500"></i> Parking</button>
+                    <button onclick="filterPGs('under25k', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-tag mr-1 text-green-500"></i> Under ₹25K</button>
+                    <button onclick="filterPGs('top_rated', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-star mr-1 text-amber-400"></i> Top Rated 4.5+</button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="filterPGs('all', this)" class="chip-active whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all">All Stays</button>
+                    <button onclick="filterPGs('boys', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-male mr-1 text-blue-500"></i> Boys</button>
+                    <button onclick="filterPGs('girls', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-female mr-1 text-pink-500"></i> Girls</button>
+                    <button onclick="filterPGs('co-ed', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-users mr-1 text-purple-500"></i> Co-Ed / Unisex</button>
+                    <button onclick="filterPGs('ac', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-snowflake mr-1 text-cyan-500"></i> AC</button>
+                    <button onclick="filterPGs('wifi', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-wifi mr-1 text-indigo-500"></i> WiFi</button>
+                    <button onclick="filterPGs('food', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-utensils mr-1 text-emerald-500"></i> Food</button>
+                    <button onclick="filterPGs('gym', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-dumbbell mr-1 text-orange-500"></i> Gym</button>
+                    <button onclick="filterPGs('single', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-door-closed mr-1 text-teal-500"></i> Single Room</button>
+                    <button onclick="filterPGs('bath', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-bath mr-1 text-sky-500"></i> Attached Bath</button>
+                    <button onclick="filterPGs('metro', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-train-subway mr-1 text-amber-500"></i> Near Metro</button>
+                    <button onclick="filterPGs('under8k', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-tag mr-1 text-green-500"></i> Under ₹8K</button>
+                    <button onclick="filterPGs('luxury', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-crown mr-1 text-yellow-500"></i> Luxury</button>
+                    <button onclick="filterPGs('top_rated', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-star mr-1 text-amber-400"></i> Top Rated 4.5+</button>
+                `;
+            }
+        }
+
         function renderCustomPGList(list, regionTitle, customLat, customLng) {
             markersLayer.clearLayers();
             markerMap = {};
@@ -782,7 +974,18 @@
             const refLat = customLat !== undefined ? customLat : (userLocation ? userLocation[0] : 28.6280);
             const refLng = customLng !== undefined ? customLng : (userLocation ? userLocation[1] : 77.3649);
 
-            currentPGList = list.map(p => ({
+            // Filter properties according to the selected property type tab
+            const typeFiltered = list.filter(p => {
+                if (currentSelectedPropertyType === 'flat-apartment') {
+                    return Boolean(p.is_flat);
+                } else if (currentSelectedPropertyType === 'commercial') {
+                    return Boolean(p.is_commercial);
+                } else {
+                    return Boolean(p.is_pg);
+                }
+            });
+
+            currentPGList = typeFiltered.map(p => ({
                 ...p,
                 distance: calculateDistance(refLat, refLng, p.lat, p.lng)
             }));
@@ -869,6 +1072,47 @@
                 if (f === 'co-ed' || f === 'unisex' || f === 'coliving') {
                     return (pg.gender && (pg.gender.toLowerCase() === 'co-ed' || pg.gender.toLowerCase() === 'unisex' || pg.gender.toLowerCase() === 'coliving'));
                 }
+                // Flat BHK filters
+                if (f === '1bhk') {
+                    return (pg.room_types && pg.room_types.some(r => /1\s*bhk/i.test(r))) || /1\s*bhk/i.test(pg.name) || (pg.tags && pg.tags.some(t => /1\s*bhk/i.test(t)));
+                }
+                if (f === '2bhk') {
+                    return (pg.room_types && pg.room_types.some(r => /2\s*bhk/i.test(r))) || /2\s*bhk/i.test(pg.name) || (pg.tags && pg.tags.some(t => /2\s*bhk/i.test(t)));
+                }
+                if (f === '3bhk') {
+                    return (pg.room_types && pg.room_types.some(r => /(3|4)\s*bhk/i.test(r))) || /(3|4)\s*bhk/i.test(pg.name) || (pg.tags && pg.tags.some(t => /(3|4)\s*bhk/i.test(t)));
+                }
+                if (f === 'furnished') {
+                    return (pg.amenities && pg.amenities.some(a => /furnish/i.test(a))) || (pg.tags && pg.tags.some(t => /furnish/i.test(t))) || /furnish/i.test(pg.name);
+                }
+                if (f === 'gated') {
+                    return (pg.amenities && pg.amenities.some(a => /gated|security/i.test(a))) || (pg.tags && pg.tags.some(t => /gated|society/i.test(t)));
+                }
+                if (f === 'parking') {
+                    return (pg.amenities && pg.amenities.some(a => /park/i.test(a))) || (pg.tags && pg.tags.some(t => /park/i.test(t)));
+                }
+                if (f === 'power_backup') {
+                    return (pg.amenities && pg.amenities.some(a => /power|backup|inverter|generator/i.test(a))) || (pg.tags && pg.tags.some(t => /power|backup/i.test(t)));
+                }
+                if (f === 'lift') {
+                    return (pg.amenities && pg.amenities.some(a => /lift|elevator/i.test(a))) || (pg.tags && pg.tags.some(t => /lift|elevator/i.test(t)));
+                }
+                // Commercial filters
+                if (f === 'shop') {
+                    return (pg.room_types && pg.room_types.some(r => /shop|retail/i.test(r))) || /shop|retail/i.test(pg.name) || (pg.tags && pg.tags.some(t => /shop|retail/i.test(t)));
+                }
+                if (f === 'office') {
+                    return (pg.room_types && pg.room_types.some(r => /office/i.test(r))) || /office/i.test(pg.name) || (pg.tags && pg.tags.some(t => /office/i.test(t)));
+                }
+                if (f === 'showroom') {
+                    return (pg.room_types && pg.room_types.some(r => /showroom/i.test(r))) || /showroom/i.test(pg.name) || (pg.tags && pg.tags.some(t => /showroom/i.test(t)));
+                }
+                if (f === 'main_road') {
+                    return (pg.tags && pg.tags.some(t => /road|corner|highway/i.test(t))) || /road|corner|highway/i.test(pg.address || '');
+                }
+                if (f === 'security') {
+                    return (pg.amenities && pg.amenities.some(a => /security|cctv|guard/i.test(a))) || (pg.tags && pg.tags.some(t => /security|cctv|guard/i.test(t)));
+                }
                 if (f === 'ac') {
                     return Boolean(pg.has_ac) || (pg.tags && pg.tags.some(t => t.toLowerCase().includes('ac'))) || (pg.amenities && pg.amenities.some(a => a.toLowerCase().includes('ac')));
                 }
@@ -900,6 +1144,12 @@
                 if (f === 'under8k') {
                     return (pg.raw_price && pg.raw_price <= 8000);
                 }
+                if (f === 'under15k') {
+                    return (pg.raw_price && pg.raw_price <= 15000);
+                }
+                if (f === 'under25k') {
+                    return (pg.raw_price && pg.raw_price <= 25000);
+                }
                 if (f === 'luxury') {
                     return (pg.raw_price && pg.raw_price >= 12000) || (pg.tags && pg.tags.some(t => t.toLowerCase().includes('luxury')));
                 }
@@ -927,7 +1177,17 @@
             });
 
             const headerEl = document.getElementById('listHeader');
-            if (headerEl) headerEl.textContent = filtered.length > 0 ? 'Nearby PGs' : 'No PGs Found';
+            if (headerEl) {
+                let defaultHeader = 'Nearby PGs';
+                if (currentSelectedPropertyType === 'flat-apartment') defaultHeader = 'Nearby Flats & Houses';
+                else if (currentSelectedPropertyType === 'commercial') defaultHeader = 'Nearby Commercial Spaces';
+                
+                headerEl.textContent = filtered.length > 0 ? defaultHeader : (
+                    currentSelectedPropertyType === 'flat-apartment' ? 'No Flats Found' : (
+                        currentSelectedPropertyType === 'commercial' ? 'No Commercial Spaces Found' : 'No PGs Found'
+                    )
+                );
+            }
             
             const badgeEl = document.getElementById('pgCountBadge');
             if (badgeEl) badgeEl.textContent = filtered.length;
@@ -935,7 +1195,10 @@
             container.innerHTML = '';
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-center"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3"><i class="fas fa-search text-gray-400 text-2xl"></i></div><h3 class="font-bold text-slate-900 mb-1">No PGs found</h3><p class="text-xs text-slate-500">Try changing filters or range radius</p></div>`;
+                let emptyTitle = currentSelectedPropertyType === 'flat-apartment' 
+                    ? 'No Flats & Houses found' 
+                    : (currentSelectedPropertyType === 'commercial' ? 'No Commercial Spaces found' : 'No PGs found');
+                container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-center"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3"><i class="fas fa-search text-gray-400 text-2xl"></i></div><h3 class="font-bold text-slate-900 mb-1">${emptyTitle}</h3><p class="text-xs text-slate-500">Try changing filters or range radius</p></div>`;
                 return;
             }
 
@@ -943,6 +1206,14 @@
                 const card = document.createElement('div');
                 card.className = 'pg-card bg-white border border-gray-100 rounded-2xl p-3 cursor-pointer flex gap-3';
                 card.id = `card-pg-${pg.id}`;
+
+                let typeBadge = '';
+                if (pg.is_flat) {
+                    typeBadge = `<span class="text-[9px] font-bold bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded border border-indigo-100"><i class="fas fa-building text-[8px] mr-0.5"></i> Flat</span>`;
+                } else if (pg.is_commercial) {
+                    typeBadge = `<span class="text-[9px] font-bold bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-100"><i class="fas fa-store text-[8px] mr-0.5"></i> Commercial</span>`;
+                }
+
                 card.innerHTML = `
                     <div class="relative flex-shrink-0">
                         <img src="${pg.image}" loading="lazy" decoding="async" class="w-24 h-24 rounded-xl object-cover bg-gray-100" alt="${pg.name}">
@@ -953,7 +1224,10 @@
                     </div>
                     <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                         <div>
-                            <h3 class="font-bold text-slate-900 text-sm leading-tight mb-1 truncate">${pg.name}</h3>
+                            <div class="flex items-center gap-1.5 mb-1">
+                                ${typeBadge}
+                                <h3 class="font-bold text-slate-900 text-sm leading-tight truncate flex-1">${pg.name}</h3>
+                            </div>
                             <div class="flex items-center gap-1 text-xs font-bold text-primary mb-1.5">
                                 <i class="fas fa-location-dot text-red-500 text-[10px]"></i>
                                 <span>${pg.distance} km away &middot; <span class="font-normal text-gray-500 text-[10px]">${pg.city}</span></span>
@@ -1319,6 +1593,41 @@
                 if (sb) sb.style.transform = 'translateY(85%)';
                 mobileSidebarOpen = false;
             }
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const typeParam = urlParams.get('type');
+                if (typeParam && (typeParam === 'flat-apartment' || typeParam === 'commercial' || typeParam === 'pg-hostel')) {
+                    currentSelectedPropertyType = typeParam;
+                }
+            } catch(e) {}
+
+            // Set up initial tab state & divider visibility
+            const tabPg = document.getElementById('locTab-pg-hostel');
+            const tabFlat = document.getElementById('locTab-flat-apartment');
+            const tabComm = document.getElementById('locTab-commercial');
+            const divider1 = document.getElementById('divider-pg-flat');
+            const divider2 = document.getElementById('divider-flat-comm');
+
+            [tabPg, tabFlat, tabComm].forEach(btn => {
+                if (btn) btn.classList.remove('active-loc-tab');
+            });
+
+            if (currentSelectedPropertyType === 'flat-apartment') {
+                if (tabFlat) tabFlat.classList.add('active-loc-tab');
+                if (divider1) divider1.style.opacity = '0';
+                if (divider2) divider2.style.opacity = '0';
+            } else if (currentSelectedPropertyType === 'commercial') {
+                if (tabComm) tabComm.classList.add('active-loc-tab');
+                if (divider1) divider1.style.opacity = '1';
+                if (divider2) divider2.style.opacity = '0';
+            } else {
+                currentSelectedPropertyType = 'pg-hostel';
+                if (tabPg) tabPg.classList.add('active-loc-tab');
+                if (divider1) divider1.style.opacity = '0';
+                if (divider2) divider2.style.opacity = '1';
+            }
+
+            renderSubFilterChips(currentSelectedPropertyType);
             initUserLocation();
         }
 

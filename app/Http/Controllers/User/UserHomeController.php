@@ -972,6 +972,11 @@ class UserHomeController extends Controller
                 ? round((float)$revAgg->avg_rating, 1) 
                 : ($p->rating ? number_format($p->rating, 1) : 'New');
 
+            $propTypeSlug = strtolower($p->propertyType?->slug ?? '');
+            $isFlat = in_array($propTypeSlug, ['flat', 'flat-apartment', 'apartment', 'house', 'villa', 'builder-floor', 'independent-house']);
+            $isCommercial = in_array($propTypeSlug, ['commercial', 'shop', 'office', 'retail', 'showroom', 'warehouse', 'commercial-space']);
+            $isPg = !$isFlat && !$isCommercial;
+
             return [
                 'id' => $p->id,
                 'name' => $p->name,
@@ -985,6 +990,11 @@ class UserHomeController extends Controller
                 'image' => $primaryImg,
                 'gender' => $p->gender_preference ?? 'boys',
                 'gender_label' => strtoupper($p->gender_preference === 'co-ed' ? 'UNISEX' : ($p->gender_preference ?: 'BOYS')),
+                'property_type_slug' => $propTypeSlug ?: ($isFlat ? 'flat-apartment' : ($isCommercial ? 'commercial' : 'pg-hostel')),
+                'property_type_name' => $p->propertyType?->name ?? ($isFlat ? 'Flat / House' : ($isCommercial ? 'Commercial' : 'PG / Hostel')),
+                'is_flat' => $isFlat,
+                'is_commercial' => $isCommercial,
+                'is_pg' => $isPg,
                 'location_text' => ($p->area ? $p->area->name . ', ' : '') . ($p->city->name ?? 'City Center'),
                 'address' => $p->address ?: (($p->area->name ?? '') . ', ' . ($p->city->name ?? 'Noida')),
                 'city' => $p->city->name ?? 'Noida',
@@ -1002,15 +1012,17 @@ class UserHomeController extends Controller
         });
 
         $cities = City::where('is_active', 1)->select('id', 'name', 'slug', 'latitude', 'longitude')->orderBy('name')->get();
+        $selectedType = $request->query('type', 'pg-hostel');
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'count' => $properties->count(),
+                'selected_type' => $selectedType,
                 'properties' => $properties
             ]);
         }
 
-        return view('user.location', compact('properties', 'cities'));
+        return view('user.location', compact('properties', 'cities', 'selectedType'));
     }
 }

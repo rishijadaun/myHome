@@ -391,9 +391,14 @@
                                     <h3 class="text-sm font-black text-gray-900 mt-1">{{ $occTitle }}</h3>
                                     <p class="text-[11px] text-gray-500 mt-0.5">{{ $occDesc }}</p>
                                 </div>
-                                <div class="mt-4 pt-3 {{ $isPopular ? 'border-t border-brand/20' : 'border-t border-gray-200' }}">
-                                    <span class="text-base font-extrabold {{ $isPopular ? 'text-brand-dark' : 'text-gray-900' }}">₹{{ number_format($rc->monthly_rent) }}</span>
-                                    <span class="text-[11px] text-gray-500">/mo</span>
+                                <div class="mt-4 pt-3 {{ $isPopular ? 'border-t border-brand/20' : 'border-t border-gray-200' }} flex items-center justify-between">
+                                    <div>
+                                        <span class="text-base font-extrabold {{ $isPopular ? 'text-brand-dark' : 'text-gray-900' }}">₹{{ number_format($rc->monthly_rent) }}</span>
+                                        <span class="text-[11px] text-gray-500">/mo</span>
+                                    </div>
+                                    <button type="button" onclick="openBookStayModal('{{ addslashes($rc->room_type_name) }}', {{ $rc->monthly_rent }})" class="px-3 py-1.5 {{ $isPopular ? 'bg-brand hover:bg-brand-dark text-white' : 'bg-white hover:bg-brand hover:text-white text-brand border border-brand/30' }} text-[11px] font-bold rounded-xl transition tap-effect shadow-2xs cursor-pointer">
+                                        Book Room
+                                    </button>
                                 </div>
                             </div>
                         @endforeach
@@ -825,9 +830,9 @@
 
                     <!-- Direct Book & Contact CTA -->
                     <div class="space-y-3">
-                        <a href="{{ route('user.bookings') }}" class="w-full bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md">
+                        <button type="button" onclick="openBookStayModal()" class="w-full bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md cursor-pointer">
                             <i class="fas fa-calendar-check"></i> Book Stay Online
-                        </a>
+                        </button>
 
                         <!-- <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I am interested in ' . $propName . ' (' . $propLocation . '). Please share room availability.') }}" target="_blank" class="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-xs">
                             <i class="fab fa-whatsapp text-lg text-emerald-600"></i> WhatsApp Host
@@ -1228,10 +1233,158 @@
             <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hi, I am interested in ' . $propName) }}" target="_blank" class="w-11 h-11 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-center text-emerald-600 text-lg tap-effect">
                 <i class="fab fa-whatsapp"></i>
             </a>
-            <a href="{{ route('user.bookings') }}" class="bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-2.5 px-5 rounded-2xl text-xs tap-effect shadow-md shadow-brand/30">
+            <button type="button" onclick="openBookStayModal()" class="bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-2.5 px-5 rounded-2xl text-xs tap-effect shadow-md shadow-brand/30 cursor-pointer">
                 Book Stay
-            </a>
+            </button>
         </div>
+    </div>
+</div>
+
+<!-- ================= BOOK STAY MODAL (AUTH USERS) ================= -->
+<div id="bookStayModal" class="fixed inset-0 z-[3000] hidden items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
+    <!-- Backdrop -->
+    <div onclick="closeBookStayModal()" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm transition-opacity"></div>
+
+    <!-- Modal Dialog (Wider max-w-3xl layout) -->
+    <div class="relative bg-white rounded-3xl shadow-2xl max-w-3xl w-full p-5 sm:p-7 md:p-8 z-10 border border-gray-100 animate-in fade-in zoom-in-95 duration-200 my-auto">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between mb-5 pb-3.5 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-lg font-bold flex-shrink-0">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg sm:text-xl font-black text-gray-900 leading-tight">Book Your Stay</h3>
+                    <p class="text-xs text-gray-500 flex items-center gap-1.5 mt-0.5">
+                        <i class="fas fa-shield-check text-emerald-500"></i>
+                        <span>Zero Advance Payment • Direct Host Review &amp; Confirmation</span>
+                    </p>
+                </div>
+            </div>
+            <button type="button" onclick="closeBookStayModal()" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer" title="Close">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+
+        <form id="bookStayForm" onsubmit="submitBookingRequest(event)">
+            @csrf
+            <input type="hidden" name="property_id" value="{{ $property->id ?? '' }}">
+            <input type="hidden" name="base_rent" id="bookingBaseRentInput" value="{{ $property->monthly_rent ?? 0 }}">
+            <input type="hidden" name="room_type_name" id="bookingRoomTypeInput" value="Standard Stay">
+            <input type="hidden" name="tenant_email" value="{{ auth()->user()?->email ?? '' }}">
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6">
+                <!-- Left Column: Booking Parameters & Tenant Info (7 cols) -->
+                <div class="md:col-span-7 space-y-4 text-xs">
+                    <!-- Room / Sharing Selection -->
+                    @if($roomConfigurations && $roomConfigurations->count() > 0)
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1.5">Select Sharing / Room Type <span class="text-rose-500">*</span></label>
+                            <div class="grid grid-cols-2 sm:grid-cols-{{ min(3, $roomConfigurations->count()) }} gap-2" id="bookingRoomTypeContainer">
+                                @foreach($roomConfigurations as $idx => $rc)
+                                    <label class="room-opt-card border-2 {{ $idx === 0 ? 'border-brand bg-brand-light/30' : 'border-gray-200 bg-white' }} rounded-xl p-2.5 cursor-pointer flex flex-col justify-between transition hover:border-brand">
+                                        <input type="radio" name="room_type_select" value="{{ $rc->room_type_name }}" data-rent="{{ $rc->monthly_rent }}" {{ $idx === 0 ? 'checked' : '' }} onchange="updateBookingRoom(this)" class="sr-only">
+                                        <div class="font-bold text-gray-900 text-xs truncate">{{ $rc->room_type_name }}</div>
+                                        <div class="text-brand font-black text-xs mt-1">₹{{ number_format($rc->monthly_rent) }}<span class="text-[9px] text-gray-400 font-normal">/mo</span></div>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Check-in Date & Duration -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1">Check-in Date <span class="text-rose-500">*</span></label>
+                            <input type="date" name="check_in_date" id="bookingCheckInDate" required min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d', strtotime('+1 day')) }}" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-semibold focus:ring-2 focus:ring-brand/50">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1">Stay Duration <span class="text-rose-500">*</span></label>
+                            <select name="duration_months" id="bookingDurationMonths" required onchange="calculateBookingEstimate()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-semibold focus:ring-2 focus:ring-brand/50 cursor-pointer">
+                                <option value="1">1 Month</option>
+                                <option value="3">3 Months</option>
+                                <option value="6">6 Months</option>
+                                <option value="11" selected>11 Months (Standard Agreement)</option>
+                                <option value="12">12 Months</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tenant Details (Auto filled) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-gray-600 mb-1">Your Full Name <span class="text-rose-500">*</span></label>
+                            <input type="text" name="tenant_name" id="bookingTenantName" required value="{{ auth()->user()?->name ?? '' }}" placeholder="Your Name" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium focus:ring-2 focus:ring-brand/50">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-gray-600 mb-1">Phone Number (10 Digits) <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-xs font-bold text-gray-400">+91</span>
+                                <input type="tel" name="tenant_phone" id="bookingTenantPhone" required maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" value="{{ auth()->user()?->phone ? substr(preg_replace('/[^0-9]/', '', auth()->user()->phone), -10) : '' }}" placeholder="9876543210" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-3 text-xs font-medium focus:ring-2 focus:ring-brand/50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Special Requests / Notes -->
+                    <div>
+                        <label class="block font-semibold text-gray-600 mb-1">Special Requests / Move-in Notes (Optional)</label>
+                        <textarea name="special_requests" id="bookingSpecialRequests" rows="2" placeholder="e.g. Preferred floor, early move-in time, 2-wheeler parking need..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs font-medium focus:ring-2 focus:ring-brand/50"></textarea>
+                    </div>
+                </div>
+
+                <!-- Right Column: Summary Card & Guarantee Box (5 cols) -->
+                <div class="md:col-span-5 space-y-3.5 flex flex-col justify-between">
+                    <!-- Property Summary Box -->
+                    <div class="p-3.5 bg-gray-50/90 rounded-2xl border border-gray-100 flex items-center gap-3">
+                        <img src="{{ $propImages->first()->image_url ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=120&q=80' }}" class="w-16 h-16 rounded-xl object-cover flex-shrink-0 shadow-xs">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-sm text-gray-900 truncate">{{ $propName }}</h4>
+                            <p class="text-[11px] text-gray-500 truncate flex items-center gap-1 mt-0.5">
+                                <i class="fas fa-map-marker-alt text-brand text-[10px]"></i> {{ $propLocation }}
+                            </p>
+                            <span class="text-[11px] font-bold text-brand mt-1 inline-block">Starting from ₹{{ $propRent }}/mo</span>
+                        </div>
+                    </div>
+
+                    <!-- Financial Summary Box -->
+                    <div class="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-100 space-y-2 text-xs">
+                        <h5 class="font-bold text-emerald-950 text-xs uppercase tracking-wider mb-1">Pricing Breakdown</h5>
+                        <div class="flex justify-between items-center text-gray-600">
+                            <span>Monthly Rent:</span>
+                            <span class="font-bold text-gray-900" id="summaryRentText">₹{{ number_format($property->monthly_rent ?: 5000) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-gray-600">
+                            <span>Security Deposit:</span>
+                            <span class="font-bold text-gray-900" id="summaryDepositText">₹{{ number_format($property->security_deposit ?: 0) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-gray-600">
+                            <span>StayNest Service Fee:</span>
+                            <span class="font-bold text-emerald-700">₹0 (FREE)</span>
+                        </div>
+                        <div class="border-t border-emerald-200/80 pt-2 flex justify-between items-center font-black text-sm text-brand-dark">
+                            <span>Payable at Move-in:</span>
+                            <span id="summaryTotalText">₹{{ number_format(($property->monthly_rent ?: 5000) + ($property->security_deposit ?: 0)) }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Zero Advance Payment Notice -->
+                    <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-[11px] text-amber-900 font-medium">
+                        <i class="fas fa-hand-holding-dollar text-amber-600 text-base mt-0.5 flex-shrink-0"></i>
+                        <span><strong>No payment required now!</strong> Your booking request is placed directly with the property owner. You pay only after approval and room check.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeBookStayModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold text-xs transition cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit" id="bookingSubmitBtn" class="px-7 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xs transition shadow-md shadow-brand/30 flex items-center gap-2 cursor-pointer">
+                    <i class="fas fa-paper-plane"></i> Submit Booking Request
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection
@@ -1679,10 +1832,181 @@
     // Close modals on Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
+            closeBookStayModal();
             closeShareModal();
             closeReportModal();
             closeReviewModal();
         }
     });
+
+    // ================= BOOKING MODAL LOGIC =================
+    function openBookStayModal(roomName = null, roomRent = null) {
+        const isAuth = {{ Auth::check() ? 'true' : 'false' }};
+        if (!isAuth) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Sign In Required',
+                    text: 'Please sign in or create an account on StayNest to book this stay.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4bb59d',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sign In Now',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('user.login') }}";
+                    }
+                });
+            } else {
+                if (confirm('Please sign in or create an account on StayNest to book this stay.')) {
+                    window.location.href = "{{ route('user.login') }}";
+                }
+            }
+            return;
+        }
+
+        if (roomName && roomRent) {
+            const rentInput = document.getElementById('bookingBaseRentInput');
+            const roomInput = document.getElementById('bookingRoomTypeInput');
+            if (rentInput) rentInput.value = roomRent;
+            if (roomInput) roomInput.value = roomName;
+            
+            const radios = document.querySelectorAll('input[name="room_type_select"]');
+            radios.forEach(r => {
+                if (r.value === roomName) {
+                    r.checked = true;
+                    updateBookingRoom(r);
+                }
+            });
+        }
+
+        calculateBookingEstimate();
+        const modal = document.getElementById('bookStayModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function closeBookStayModal() {
+        const modal = document.getElementById('bookStayModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    function updateBookingRoom(radio) {
+        const rent = parseFloat(radio.getAttribute('data-rent') || '{{ $property->monthly_rent ?? 0 }}');
+        const roomName = radio.value;
+        const rentInput = document.getElementById('bookingBaseRentInput');
+        const roomInput = document.getElementById('bookingRoomTypeInput');
+        if (rentInput) rentInput.value = rent;
+        if (roomInput) roomInput.value = roomName;
+
+        document.querySelectorAll('.room-opt-card').forEach(card => {
+            card.classList.remove('border-brand', 'bg-brand-light/30');
+            card.classList.add('border-gray-200', 'bg-white');
+        });
+        const parentCard = radio.closest('.room-opt-card');
+        if (parentCard) {
+            parentCard.classList.add('border-brand', 'bg-brand-light/30');
+            parentCard.classList.remove('border-gray-200', 'bg-white');
+        }
+
+        calculateBookingEstimate();
+    }
+
+    function calculateBookingEstimate() {
+        const rentInput = document.getElementById('bookingBaseRentInput');
+        const rent = parseFloat((rentInput && rentInput.value) ? rentInput.value : '{{ $property->monthly_rent ?? 0 }}');
+        const deposit = parseFloat('{{ $property->security_deposit ?? 0 }}');
+        const total = rent + deposit;
+
+        const rentEl = document.getElementById('summaryRentText');
+        const depEl = document.getElementById('summaryDepositText');
+        const totEl = document.getElementById('summaryTotalText');
+
+        if (rentEl) rentEl.textContent = '₹' + rent.toLocaleString('en-IN');
+        if (depEl) depEl.textContent = '₹' + deposit.toLocaleString('en-IN');
+        if (totEl) totEl.textContent = '₹' + total.toLocaleString('en-IN');
+    }
+
+    async function submitBookingRequest(event) {
+        event.preventDefault();
+        const form = document.getElementById('bookStayForm');
+        const btn = document.getElementById('bookingSubmitBtn');
+        const origBtnHtml = btn ? btn.innerHTML : 'Submit Booking Request';
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        }
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch("{{ route('user.bookings.store') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                closeBookStayModal();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Booking Request Sent! 🎉',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#4bb59d',
+                        confirmButtonText: 'View My Bookings'
+                    }).then(() => {
+                        window.location.href = data.redirect_url || "{{ route('user.bookings') }}";
+                    });
+                } else {
+                    alert(data.message || 'Booking Request Sent Successfully!');
+                    window.location.href = data.redirect_url || "{{ route('user.bookings') }}";
+                }
+            } else {
+                if (data.require_login) {
+                    window.location.href = "{{ route('user.login') }}";
+                } else {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Booking Error',
+                            text: data.message || 'Could not complete booking request. Please check your inputs.',
+                            icon: 'error',
+                            confirmButtonColor: '#4bb59d'
+                        });
+                    } else {
+                        alert(data.message || 'Could not complete booking request.');
+                    }
+                }
+            }
+        } catch (err) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Network Error',
+                    text: 'An unexpected error occurred while booking. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#4bb59d'
+                });
+            } else {
+                alert('An unexpected error occurred while booking. Please try again.');
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = origBtnHtml;
+            }
+        }
+    }
 </script>
 @endpush

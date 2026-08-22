@@ -1,268 +1,347 @@
 @extends('broker.layouts.app')
 
-@section('title', 'My Bookings')
+@section('title', 'Tenant Bookings - StayNest Broker Portal')
 
 @section('content')
 <!-- Header -->
 <header class="hidden lg:flex bg-white border-b border-gray-100 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Tenant Bookings</h1>
-        <p class="text-sm text-gray-500">48 total bookings • 5 pending verification & approval</p>
+        <p class="text-sm text-gray-500">{{ $totalCount }} total reservations • {{ $pendingCount }} pending owner confirmation</p>
     </div>
     <div class="flex items-center gap-3">
-        <button onclick="alert('Exporting booking CSV report...')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold tap-effect flex items-center gap-2 transition">
-            <i class="fas fa-file-export text-xs"></i> Export CSV
-        </button>
+        <a href="{{ route('broker.pgs') }}" class="bg-brand hover:bg-brand-dark text-white px-4 py-2.5 rounded-xl text-sm font-semibold tap-effect flex items-center gap-2 transition shadow-xs">
+            <i class="fas fa-plus text-xs"></i> Manage Properties
+        </a>
     </div>
 </header>
 
 <div class="p-4 md:p-8 space-y-6">
     <!-- Stats Row -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:border-brand/40 transition" onclick="filterByTab('ALL')">
-            <div class="text-2xl md:text-3xl font-bold text-gray-900">48</div>
+        <a href="{{ route('broker.bookings', ['status' => 'ALL']) }}" class="bg-white rounded-2xl p-5 border {{ ($activeTab ?? 'ALL') === 'ALL' ? 'border-brand ring-2 ring-brand/20' : 'border-gray-100' }} shadow-sm cursor-pointer hover:border-brand/40 transition">
+            <div class="text-2xl md:text-3xl font-bold text-gray-900">{{ $totalCount }}</div>
             <div class="text-xs text-gray-500 mt-1 font-medium">Total Bookings</div>
-        </div>
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:border-green-300 transition" onclick="filterByTab('CONFIRMED')">
-            <div class="text-2xl md:text-3xl font-bold text-green-600">38</div>
+        </a>
+        <a href="{{ route('broker.bookings', ['status' => 'CONFIRMED']) }}" class="bg-white rounded-2xl p-5 border {{ ($activeTab ?? '') === 'CONFIRMED' ? 'border-green-500 ring-2 ring-green-500/20' : 'border-gray-100' }} shadow-sm cursor-pointer hover:border-green-300 transition">
+            <div class="text-2xl md:text-3xl font-bold text-green-600">{{ $confirmedCount }}</div>
             <div class="text-xs text-gray-500 mt-1 font-medium">Confirmed & Active</div>
-        </div>
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:border-yellow-300 transition" onclick="filterByTab('PENDING')">
-            <div class="text-2xl md:text-3xl font-bold text-yellow-600">5</div>
+        </a>
+        <a href="{{ route('broker.bookings', ['status' => 'PENDING']) }}" class="bg-white rounded-2xl p-5 border {{ ($activeTab ?? '') === 'PENDING' ? 'border-yellow-500 ring-2 ring-yellow-500/20' : 'border-gray-100' }} shadow-sm cursor-pointer hover:border-yellow-300 transition">
+            <div class="text-2xl md:text-3xl font-bold text-yellow-600">{{ $pendingCount }}</div>
             <div class="text-xs text-gray-500 mt-1 font-medium">Pending Requests</div>
-        </div>
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:border-red-300 transition" onclick="filterByTab('CANCELLED')">
-            <div class="text-2xl md:text-3xl font-bold text-red-600">5</div>
+        </a>
+        <a href="{{ route('broker.bookings', ['status' => 'CANCELLED']) }}" class="bg-white rounded-2xl p-5 border {{ ($activeTab ?? '') === 'CANCELLED' ? 'border-red-500 ring-2 ring-red-500/20' : 'border-gray-100' }} shadow-sm cursor-pointer hover:border-red-300 transition">
+            <div class="text-2xl md:text-3xl font-bold text-red-600">{{ $cancelledCount }}</div>
             <div class="text-xs text-gray-500 mt-1 font-medium">Cancelled / Rejected</div>
-        </div>
+        </a>
     </div>
 
     <!-- Main Table Container -->
     <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
         <!-- Tabs & Search Header -->
         <div class="p-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex border-b md:border-b-0 border-gray-100 space-x-2 overflow-x-auto no-scrollbar" id="bookingTabContainer">
-                <button onclick="setTab(this, 'PENDING')" class="tab-btn px-5 py-2.5 text-sm font-semibold rounded-xl bg-brand-light text-brand border border-brand/20 transition whitespace-nowrap">
-                    Pending (5)
-                </button>
-                <button onclick="setTab(this, 'CONFIRMED')" class="tab-btn px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition whitespace-nowrap">
-                    Confirmed (38)
-                </button>
-                <button onclick="setTab(this, 'CANCELLED')" class="tab-btn px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition whitespace-nowrap">
-                    Cancelled (5)
-                </button>
-                <button onclick="setTab(this, 'ALL')" class="tab-btn px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition whitespace-nowrap">
-                    All (48)
-                </button>
+            <div class="flex border-b md:border-b-0 border-gray-100 space-x-2 overflow-x-auto no-scrollbar">
+                <a href="{{ route('broker.bookings', ['status' => 'PENDING']) }}" class="px-5 py-2.5 text-sm font-semibold rounded-xl transition whitespace-nowrap {{ ($activeTab ?? '') === 'PENDING' ? 'bg-brand text-white shadow-xs' : 'bg-gray-50 text-gray-700 hover:bg-gray-100' }}">
+                    Pending ({{ $pendingCount }})
+                </a>
+                <a href="{{ route('broker.bookings', ['status' => 'CONFIRMED']) }}" class="px-5 py-2.5 text-sm font-semibold rounded-xl transition whitespace-nowrap {{ ($activeTab ?? '') === 'CONFIRMED' ? 'bg-brand text-white shadow-xs' : 'bg-gray-50 text-gray-700 hover:bg-gray-100' }}">
+                    Confirmed ({{ $confirmedCount }})
+                </a>
+                <a href="{{ route('broker.bookings', ['status' => 'CANCELLED']) }}" class="px-5 py-2.5 text-sm font-semibold rounded-xl transition whitespace-nowrap {{ ($activeTab ?? '') === 'CANCELLED' ? 'bg-brand text-white shadow-xs' : 'bg-gray-50 text-gray-700 hover:bg-gray-100' }}">
+                    Cancelled ({{ $cancelledCount }})
+                </a>
+                <a href="{{ route('broker.bookings', ['status' => 'ALL']) }}" class="px-5 py-2.5 text-sm font-semibold rounded-xl transition whitespace-nowrap {{ ($activeTab ?? 'ALL') === 'ALL' ? 'bg-brand text-white shadow-xs' : 'bg-gray-50 text-gray-700 hover:bg-gray-100' }}">
+                    All ({{ $totalCount }})
+                </a>
             </div>
-            <div class="relative w-full md:w-72">
-                <i class="fas fa-search absolute left-3.5 top-3 text-gray-400 text-xs"></i>
-                <input id="bookingSearchInput" onkeyup="filterBookings()" type="text" placeholder="Search tenant, PG or ID..." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-xs focus:outline-none focus:ring-2 focus:ring-brand/50">
-            </div>
+
+            <!-- Search Form -->
+            <form method="GET" action="{{ route('broker.bookings') }}" class="relative w-full md:w-80 flex items-center">
+                <input type="hidden" name="status" value="{{ $activeTab ?? 'ALL' }}">
+                <i class="fas fa-search absolute left-3.5 text-gray-400 text-xs"></i>
+                <input name="search" value="{{ request('search') }}" type="text" placeholder="Search tenant, PG, or Booking ID..." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 pl-9 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-brand/50">
+                @if(request('search'))
+                    <a href="{{ route('broker.bookings', ['status' => $activeTab ?? 'ALL']) }}" class="absolute right-2.5 text-gray-400 hover:text-gray-600 text-xs">
+                        <i class="fas fa-times"></i>
+                    </a>
+                @endif
+            </form>
         </div>
 
         <!-- Desktop Table -->
         <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-left" id="bookingTable">
+            <table class="w-full text-left">
                 <thead class="bg-gray-50/80 border-b border-gray-100">
                     <tr>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Booking ID</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tenant</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">PG Name</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Room Type</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Property</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Plan &amp; Duration</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Check-in</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Amount</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100" id="bookingTableBody">
-                    <!-- Pending Row 1 -->
-                    <tr class="booking-row hover:bg-gray-50/70 transition bg-yellow-50/20" data-status="PENDING">
-                        <td class="px-6 py-4 text-sm font-mono font-bold text-brand booking-id">#BK-2045</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-brand text-white rounded-full flex items-center justify-center font-bold text-xs shadow-xs">RS</div>
-                                <div>
-                                    <div class="text-sm font-bold text-gray-900 tenant-name">Rahul Sharma</div>
-                                    <div class="text-xs text-gray-500">+91 98765 43210</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700 font-medium pg-title">Sunrise Premium PG</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Twin Sharing</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Aug 20, 2026</td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-900">₹17,000</td>
-                        <td class="px-6 py-4"><span class="status-badge bg-yellow-100 text-yellow-800 text-xs font-bold px-2.5 py-1 rounded-lg">PENDING</span></td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-1.5 action-buttons">
-                                <button onclick="approveBooking(this, 'Rahul Sharma', '#BK-2045')" class="w-8 h-8 rounded-lg bg-green-500 hover:bg-green-600 text-white flex items-center justify-center tap-effect shadow-xs" title="Approve"><i class="fas fa-check text-xs"></i></button>
-                                <button onclick="rejectBooking(this, 'Rahul Sharma', '#BK-2045')" class="w-8 h-8 rounded-lg bg-red-500 hover:bg-red-600 text-white flex items-center justify-center tap-effect shadow-xs" title="Reject"><i class="fas fa-times text-xs"></i></button>
-                                <button onclick="viewBookingDetails('#BK-2045', 'Rahul Sharma', '+91 98765 43210', 'Sunrise Premium PG', 'Twin Sharing', 'Aug 20, 2026', '₹17,000', 'PENDING')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect" title="View"><i class="fas fa-eye text-xs"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($bookings as $bk)
+                        @php
+                            $prop = $bk->property;
+                            $propName = $prop?->name ?? 'Your Property';
+                            $propImg = $prop?->display_image_url ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=100&q=80';
+                            $tenantName = $bk->effective_tenant_name;
+                            $tenantPhone = preg_replace('/[^0-9]/', '', $bk->effective_tenant_phone);
+                            if (strlen($tenantPhone) > 10) $tenantPhone = substr($tenantPhone, -10);
+                            $tenantEmail = $bk->tenant_email ?: ($bk->user?->email ?? 'N/A');
+                            $tenantInitial = strtoupper(substr($tenantName, 0, 2));
+                            $statusMeta = $bk->display_status;
+                            $isPending = ($bk->broker_approval === 'pending' && $bk->booking_status === 'pending');
+                        @endphp
+                        <tr class="hover:bg-gray-50/70 transition {{ $isPending ? 'bg-yellow-50/20' : '' }}">
+                            <!-- Booking ID -->
+                            <td class="px-6 py-4 text-sm font-mono font-bold text-brand">
+                                #{{ $bk->booking_id }}
+                                <span class="block text-[10px] font-normal text-gray-400 font-sans mt-0.5">{{ $bk->created_at ? $bk->created_at->diffForHumans() : '' }}</span>
+                            </td>
 
-                    <!-- Pending Row 2 -->
-                    <tr class="booking-row hover:bg-gray-50/70 transition bg-yellow-50/20" data-status="PENDING">
-                        <td class="px-6 py-4 text-sm font-mono font-bold text-brand booking-id">#BK-2046</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-xs">PP</div>
-                                <div>
-                                    <div class="text-sm font-bold text-gray-900 tenant-name">Priya Patel</div>
-                                    <div class="text-xs text-gray-500">+91 98765 11111</div>
+                            <!-- Tenant Info -->
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 bg-brand/10 text-brand font-black rounded-full flex items-center justify-center text-xs shadow-xs flex-shrink-0">
+                                        {{ $tenantInitial }}
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-gray-900">{{ $tenantName }}</div>
+                                        <div class="text-xs text-gray-500 flex items-center gap-1">
+                                            @if($tenantPhone)
+                                                <a href="tel:{{ $tenantPhone }}" class="hover:text-brand transition">+91 {{ $tenantPhone }}</a>
+                                            @else
+                                                <span>{{ $tenantEmail }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700 font-medium pg-title">Aura Women's Stay</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Single Private Room</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Aug 22, 2026</td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-900">₹9,999</td>
-                        <td class="px-6 py-4"><span class="status-badge bg-yellow-100 text-yellow-800 text-xs font-bold px-2.5 py-1 rounded-lg">PENDING</span></td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-1.5 action-buttons">
-                                <button onclick="approveBooking(this, 'Priya Patel', '#BK-2046')" class="w-8 h-8 rounded-lg bg-green-500 hover:bg-green-600 text-white flex items-center justify-center tap-effect shadow-xs" title="Approve"><i class="fas fa-check text-xs"></i></button>
-                                <button onclick="rejectBooking(this, 'Priya Patel', '#BK-2046')" class="w-8 h-8 rounded-lg bg-red-500 hover:bg-red-600 text-white flex items-center justify-center tap-effect shadow-xs" title="Reject"><i class="fas fa-times text-xs"></i></button>
-                                <button onclick="viewBookingDetails('#BK-2046', 'Priya Patel', '+91 98765 11111', 'Aura Women\'s Stay', 'Single Private Room', 'Aug 22, 2026', '₹9,999', 'PENDING')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect" title="View"><i class="fas fa-eye text-xs"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
 
-                    <!-- Confirmed Row 1 -->
-                    <tr class="booking-row hover:bg-gray-50/70 transition" data-status="CONFIRMED">
-                        <td class="px-6 py-4 text-sm font-mono font-bold text-brand booking-id">#BK-2044</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-xs">AK</div>
-                                <div>
-                                    <div class="text-sm font-bold text-gray-900 tenant-name">Amit Kumar</div>
-                                    <div class="text-xs text-gray-500">+91 98765 22222</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700 font-medium pg-title">Urban Nest Co-living</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Triple Sharing</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Aug 10, 2026</td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-900">₹12,500</td>
-                        <td class="px-6 py-4"><span class="status-badge bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-lg">CONFIRMED</span></td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-1.5 action-buttons">
-                                <button onclick="viewBookingDetails('#BK-2044', 'Amit Kumar', '+91 98765 22222', 'Urban Nest Co-living', 'Triple Sharing', 'Aug 10, 2026', '₹12,500', 'CONFIRMED')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect"><i class="fas fa-eye text-xs"></i></button>
-                                <a href="https://wa.me/919876522222" target="_blank" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 flex items-center justify-center tap-effect"><i class="fab fa-whatsapp text-xs"></i></a>
-                            </div>
-                        </td>
-                    </tr>
+                            <!-- Property -->
+                            <td class="px-6 py-4 text-sm text-gray-800 font-medium max-w-[200px]">
+                                <div class="truncate font-semibold">{{ $propName }}</div>
+                                <span class="text-xs text-gray-400 truncate block">{{ $prop?->city?->name ?? 'India' }}</span>
+                            </td>
 
-                    <!-- Confirmed Row 2 -->
-                    <tr class="booking-row hover:bg-gray-50/70 transition" data-status="CONFIRMED">
-                        <td class="px-6 py-4 text-sm font-mono font-bold text-brand booking-id">#BK-2043</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-teal-500 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-xs">SM</div>
-                                <div>
-                                    <div class="text-sm font-bold text-gray-900 tenant-name">Sneha Mishra</div>
-                                    <div class="text-xs text-gray-500">+91 98765 33333</div>
+                            <!-- Plan & Duration -->
+                            <td class="px-6 py-4 text-xs text-gray-600">
+                                <span class="font-bold text-gray-900 block">{{ $bk->room_type_name ?: 'Standard Stay' }}</span>
+                                <span class="text-gray-500">{{ $bk->duration_months ?: 11 }} Months</span>
+                            </td>
+
+                            <!-- Check-in Date -->
+                            <td class="px-6 py-4 text-sm text-gray-700 font-medium">
+                                {{ $bk->check_in_date ? $bk->check_in_date->format('M d, Y') : 'Immediate' }}
+                            </td>
+
+                            <!-- Amount -->
+                            <td class="px-6 py-4 text-sm font-black text-gray-900">
+                                ₹{{ number_format($bk->total_amount ?: ($bk->base_rent + $bk->security_deposit)) }}
+                                <span class="block text-[10px] font-normal text-gray-400">Rent: ₹{{ number_format($bk->base_rent) }}/mo</span>
+                            </td>
+
+                            <!-- Status Badge -->
+                            <td class="px-6 py-4">
+                                <span class="{{ $statusMeta['bg'] }} {{ $statusMeta['text'] }} text-xs font-bold px-2.5 py-1 rounded-lg">
+                                    {{ $statusMeta['label'] }}
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    @if($isPending)
+                                        <button onclick="approveBrokerBooking('{{ $bk->id }}', '{{ addslashes($tenantName) }}', '#{{ $bk->booking_id }}')" class="w-8 h-8 rounded-lg bg-green-500 hover:bg-green-600 text-white flex items-center justify-center tap-effect shadow-xs cursor-pointer" title="Accept & Confirm Booking">
+                                            <i class="fas fa-check text-xs"></i>
+                                        </button>
+                                        <button onclick="rejectBrokerBooking('{{ $bk->id }}', '{{ addslashes($tenantName) }}', '#{{ $bk->booking_id }}')" class="w-8 h-8 rounded-lg bg-red-500 hover:bg-red-600 text-white flex items-center justify-center tap-effect shadow-xs cursor-pointer" title="Decline Request">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                    @endif
+
+                                    @if($tenantPhone)
+                                        <a href="https://wa.me/91{{ $tenantPhone }}?text={{ urlencode('Hi ' . $tenantName . ', regarding your booking #' . $bk->booking_id . ' for ' . $propName . ' on StayNest.') }}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center tap-effect" title="WhatsApp Tenant">
+                                            <i class="fab fa-whatsapp text-sm"></i>
+                                        </a>
+                                    @endif
+
+                                    <button onclick="viewBrokerBookingModal({{ json_encode($bk) }}, '{{ addslashes($tenantName) }}', '{{ $tenantPhone }}', '{{ $tenantEmail }}', '{{ addslashes($propName) }}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect cursor-pointer" title="View Full Details">
+                                        <i class="fas fa-eye text-xs"></i>
+                                    </button>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700 font-medium pg-title">Aura Women's Stay</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Twin Sharing</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Aug 01, 2026</td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-900">₹8,000</td>
-                        <td class="px-6 py-4"><span class="status-badge bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-lg">CONFIRMED</span></td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-1.5 action-buttons">
-                                <button onclick="viewBookingDetails('#BK-2043', 'Sneha Mishra', '+91 98765 33333', 'Aura Women\'s Stay', 'Twin Sharing', 'Aug 01, 2026', '₹8,000', 'CONFIRMED')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center tap-effect"><i class="fas fa-eye text-xs"></i></button>
-                                <a href="https://wa.me/919876533333" target="_blank" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 flex items-center justify-center tap-effect"><i class="fab fa-whatsapp text-xs"></i></a>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="px-6 py-12 text-center text-gray-500 text-sm">
+                                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
+                                    <i class="fas fa-calendar-times text-lg"></i>
+                                </div>
+                                <p class="font-bold text-gray-700">No booking requests found</p>
+                                <p class="text-xs text-gray-400 mt-1">Tenant booking requests for your properties will appear here.</p>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
-        <!-- Mobile Cards List -->
-        <div class="md:hidden divide-y divide-gray-100" id="bookingMobileList">
-            <div class="p-4 bg-yellow-50/20 booking-card" data-status="PENDING">
-                <div class="flex justify-between items-start mb-2">
-                    <div class="text-xs font-mono font-bold text-brand booking-id">#BK-2045</div>
-                    <span class="status-badge bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded">PENDING</span>
-                </div>
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 bg-brand text-white rounded-full flex items-center justify-center font-bold text-sm">RS</div>
-                    <div>
-                        <div class="font-bold text-gray-900 text-sm tenant-name">Rahul Sharma</div>
-                        <div class="text-xs text-gray-500 pg-title">Sunrise Premium PG • Twin Sharing</div>
+        <!-- Mobile Card View -->
+        <div class="md:hidden divide-y divide-gray-100">
+            @forelse($bookings as $bk)
+                @php
+                    $prop = $bk->property;
+                    $propName = $prop?->name ?? 'Your Property';
+                    $tenantName = $bk->effective_tenant_name;
+                    $tenantPhone = preg_replace('/[^0-9]/', '', $bk->effective_tenant_phone);
+                    if (strlen($tenantPhone) > 10) $tenantPhone = substr($tenantPhone, -10);
+                    $tenantEmail = $bk->tenant_email ?: ($bk->user?->email ?? 'N/A');
+                    $statusMeta = $bk->display_status;
+                    $isPending = ($bk->broker_approval === 'pending' && $bk->booking_status === 'pending');
+                @endphp
+                <div class="p-4 space-y-3 {{ $isPending ? 'bg-yellow-50/20' : '' }}">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-brand">#{{ $bk->booking_id }}</span>
+                            <h4 class="font-bold text-gray-900 text-sm mt-0.5">{{ $tenantName }}</h4>
+                            <p class="text-xs text-gray-500">{{ $propName }}</p>
+                        </div>
+                        <span class="{{ $statusMeta['bg'] }} {{ $statusMeta['text'] }} text-[10px] font-bold px-2 py-0.5 rounded-md">
+                            {{ $statusMeta['label'] }}
+                        </span>
                     </div>
-                </div>
-                <div class="flex justify-between items-center mb-3 text-xs">
-                    <div><span class="text-gray-400">Check-in:</span> <span class="font-semibold text-gray-700">Aug 20, 2026</span></div>
-                    <div class="text-right"><span class="text-gray-400">Amount:</span> <span class="font-bold text-gray-900">₹17,000</span></div>
-                </div>
-                <div class="flex gap-2 pt-2 border-t border-gray-100">
-                    <button onclick="approveBooking(this, 'Rahul Sharma', '#BK-2045')" class="flex-1 bg-green-500 text-white text-xs font-semibold py-2 rounded-lg tap-effect"><i class="fas fa-check mr-1"></i> Approve</button>
-                    <button onclick="rejectBooking(this, 'Rahul Sharma', '#BK-2045')" class="flex-1 bg-red-500 text-white text-xs font-semibold py-2 rounded-lg tap-effect"><i class="fas fa-times mr-1"></i> Reject</button>
-                </div>
-            </div>
 
-            <div class="p-4 bg-yellow-50/20 booking-card" data-status="PENDING">
-                <div class="flex justify-between items-start mb-2">
-                    <div class="text-xs font-mono font-bold text-brand booking-id">#BK-2046</div>
-                    <span class="status-badge bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded">PENDING</span>
-                </div>
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold text-sm">PP</div>
-                    <div>
-                        <div class="font-bold text-gray-900 text-sm tenant-name">Priya Patel</div>
-                        <div class="text-xs text-gray-500 pg-title">Aura Women's Stay • Single Room</div>
+                    <div class="grid grid-cols-2 gap-2 text-xs bg-gray-50 p-2.5 rounded-xl">
+                        <div>
+                            <span class="text-gray-400 text-[10px] uppercase font-bold block">Check-in</span>
+                            <span class="font-bold text-gray-800">{{ $bk->check_in_date ? $bk->check_in_date->format('M d, Y') : 'Immediate' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 text-[10px] uppercase font-bold block">Total Amount</span>
+                            <span class="font-black text-brand">₹{{ number_format($bk->total_amount ?: ($bk->base_rent + $bk->security_deposit)) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1 gap-2">
+                        @if($tenantPhone)
+                            <a href="https://wa.me/91{{ $tenantPhone }}" target="_blank" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg flex items-center gap-1">
+                                <i class="fab fa-whatsapp"></i> Chat
+                            </a>
+                        @endif
+
+                        <div class="flex items-center gap-1.5 ml-auto">
+                            @if($isPending)
+                                <button onclick="approveBrokerBooking('{{ $bk->id }}', '{{ addslashes($tenantName) }}', '#{{ $bk->booking_id }}')" class="px-3 py-1.5 bg-green-500 text-white text-xs font-bold rounded-lg shadow-xs cursor-pointer">
+                                    Accept
+                                </button>
+                                <button onclick="rejectBrokerBooking('{{ $bk->id }}', '{{ addslashes($tenantName) }}', '#{{ $bk->booking_id }}')" class="px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg shadow-xs cursor-pointer">
+                                    Decline
+                                </button>
+                            @endif
+                            <button onclick="viewBrokerBookingModal({{ json_encode($bk) }}, '{{ addslashes($tenantName) }}', '{{ $tenantPhone }}', '{{ $tenantEmail }}', '{{ addslashes($propName) }}')" class="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg cursor-pointer">
+                                Details
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="flex justify-between items-center mb-3 text-xs">
-                    <div><span class="text-gray-400">Check-in:</span> <span class="font-semibold text-gray-700">Aug 22, 2026</span></div>
-                    <div class="text-right"><span class="text-gray-400">Amount:</span> <span class="font-bold text-gray-900">₹9,999</span></div>
+            @empty
+                <div class="p-8 text-center text-gray-500 text-xs">
+                    No booking requests found.
                 </div>
-                <div class="flex gap-2 pt-2 border-t border-gray-100">
-                    <button onclick="approveBooking(this, 'Priya Patel', '#BK-2046')" class="flex-1 bg-green-500 text-white text-xs font-semibold py-2 rounded-lg tap-effect"><i class="fas fa-check mr-1"></i> Approve</button>
-                    <button onclick="rejectBooking(this, 'Priya Patel', '#BK-2046')" class="flex-1 bg-red-500 text-white text-xs font-semibold py-2 rounded-lg tap-effect"><i class="fas fa-times mr-1"></i> Reject</button>
-                </div>
-            </div>
+            @endforelse
         </div>
+
+        <!-- Pagination -->
+        @if($bookings->hasPages())
+            <div class="p-4 border-t border-gray-100">
+                {{ $bookings->links() }}
+            </div>
+        @endif
     </div>
 </div>
 
-<!-- Booking Details Modal -->
-<div id="bookingDetailsModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden">
-        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-brand-light text-brand flex items-center justify-center font-bold"><i class="fas fa-receipt text-sm"></i></div>
-                <h3 class="text-lg font-bold text-gray-900">Booking Summary</h3>
+<!-- ================= BROKER VIEW BOOKING MODAL ================= -->
+<div id="brokerBookingModal" class="fixed inset-0 z-[3000] hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div onclick="closeBrokerBookingModal()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 z-10 border border-gray-100 animate-in fade-in zoom-in-95 duration-200 my-8">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+            <div>
+                <h3 class="text-lg font-black text-gray-900" id="bModalId">Booking Information</h3>
+                <p class="text-xs text-gray-500">Tenant request and reservation details</p>
             </div>
-            <button onclick="closeModal('bookingDetailsModal')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center tap-effect hover:bg-gray-200">
-                <i class="fas fa-times text-gray-500 text-xs"></i>
+            <button onclick="closeBrokerBookingModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer">
+                <i class="fas fa-times text-xs"></i>
             </button>
         </div>
-        <div class="p-6 space-y-4 text-sm">
-            <div class="flex justify-between items-center bg-gray-50 p-3.5 rounded-xl">
-                <span class="text-gray-500">Booking Reference</span>
-                <span id="modalBkId" class="font-mono font-bold text-brand">#BK-2045</span>
+
+        <div class="space-y-4 text-xs">
+            <!-- Tenant Card -->
+            <div class="p-3.5 bg-brand-light/30 rounded-2xl border border-brand/20 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] text-brand uppercase font-bold block">Tenant</span>
+                    <h4 class="text-sm font-black text-gray-900" id="bModalTenantName"></h4>
+                    <p class="text-gray-600" id="bModalTenantPhone"></p>
+                    <p class="text-gray-500" id="bModalTenantEmail"></p>
+                </div>
+                <a id="bModalWhatsappBtn" href="#" target="_blank" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition flex items-center gap-1.5 shadow-xs">
+                    <i class="fab fa-whatsapp"></i> Chat Tenant
+                </a>
             </div>
-            <div class="space-y-2">
-                <div class="flex justify-between"><span class="text-gray-500">Tenant Name</span><span id="modalTenant" class="font-bold text-gray-900">Rahul Sharma</span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Phone</span><span id="modalPhone" class="font-medium text-gray-700">+91 98765 43210</span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Property</span><span id="modalPg" class="font-semibold text-gray-900">Sunrise Premium PG</span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Room Type</span><span id="modalRoom" class="text-gray-700">Twin Sharing</span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Move-in Date</span><span id="modalCheckin" class="font-medium text-gray-900">Aug 20, 2026</span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Status</span><span id="modalStatus" class="font-bold text-yellow-600">PENDING</span></div>
+
+            <!-- Booking Specs -->
+            <div class="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                <div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase block mb-0.5">Property</span>
+                    <span class="font-bold text-gray-900 text-xs" id="bModalPropName"></span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase block mb-0.5">Room Plan</span>
+                    <span class="font-bold text-gray-900 text-xs" id="bModalRoomPlan"></span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase block mb-0.5">Check-in Date</span>
+                    <span class="font-bold text-gray-900 text-xs" id="bModalCheckIn"></span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase block mb-0.5">Duration</span>
+                    <span class="font-bold text-gray-900 text-xs" id="bModalDuration"></span>
+                </div>
             </div>
-            <div class="pt-3 border-t border-gray-100 flex justify-between items-center">
-                <span class="font-semibold text-gray-900">Total Booking Paid</span>
-                <span id="modalAmount" class="text-xl font-bold text-brand">₹17,000</span>
+
+            <!-- Financials -->
+            <div class="p-3 bg-gray-50 rounded-2xl border border-gray-100 space-y-1.5">
+                <div class="flex justify-between text-gray-600">
+                    <span>Monthly Rent:</span>
+                    <span class="font-bold text-gray-900" id="bModalRent"></span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                    <span>Security Deposit:</span>
+                    <span class="font-bold text-gray-900" id="bModalDeposit"></span>
+                </div>
+                <div class="border-t border-gray-200 pt-1.5 flex justify-between font-black text-sm text-gray-900">
+                    <span>Total Amount:</span>
+                    <span class="text-brand font-black" id="bModalTotal"></span>
+                </div>
+            </div>
+
+            <!-- Special Requests -->
+            <div id="bModalSpecialBox" class="p-3 bg-amber-50 rounded-2xl border border-amber-100 hidden">
+                <span class="text-[10px] text-amber-800 font-bold uppercase block mb-0.5">Tenant Special Requests / Notes</span>
+                <p class="text-gray-700" id="bModalSpecialText"></p>
             </div>
         </div>
-        <div class="p-4 bg-gray-50 border-t border-gray-100 flex gap-2">
-            <button onclick="closeModal('bookingDetailsModal')" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2.5 rounded-xl tap-effect">Close</button>
+
+        <div class="mt-6 pt-3 border-t border-gray-100 flex items-center justify-end gap-2.5">
+            <button onclick="closeBrokerBookingModal()" class="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-xl transition cursor-pointer">
+                Close
+            </button>
         </div>
     </div>
 </div>
@@ -270,95 +349,161 @@
 
 @push('scripts')
 <script>
-    let currentFilter = 'PENDING';
-
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-    function setTab(btn, status) {
-        document.querySelectorAll('.tab-btn').forEach(b => {
-            b.classList.remove('bg-brand-light', 'text-brand', 'border', 'border-brand/20', 'font-semibold');
-            b.classList.add('text-gray-600', 'font-medium');
+    async function approveBrokerBooking(bookingId, tenantName, bookingCode) {
+        const result = await Swal.fire({
+            title: `Accept Booking ${bookingCode}?`,
+            text: `Do you want to confirm the stay for ${tenantName}? This will notify the tenant.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, Accept Booking',
+            cancelButtonText: 'Cancel'
         });
-        btn.classList.add('bg-brand-light', 'text-brand', 'border', 'border-brand/20', 'font-semibold');
-        btn.classList.remove('text-gray-600', 'font-medium');
-        currentFilter = status;
-        filterBookings();
-    }
 
-    function filterByTab(status) {
-        const tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(t => {
-            if (t.textContent.toUpperCase().includes(status)) {
-                setTab(t, status);
-            }
-        });
-    }
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/broker/bookings/${bookingId}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
 
-    function filterBookings() {
-        const search = document.getElementById('bookingSearchInput').value.toLowerCase();
-        document.querySelectorAll('.booking-row, .booking-card').forEach(el => {
-            const id = el.querySelector('.booking-id').textContent.toLowerCase();
-            const tenant = el.querySelector('.tenant-name').textContent.toLowerCase();
-            const pg = el.querySelector('.pg-title').textContent.toLowerCase();
-            const status = el.getAttribute('data-status');
-
-            const matchTab = (currentFilter === 'ALL') || (status === currentFilter);
-            const matchSearch = id.includes(search) || tenant.includes(search) || pg.includes(search);
-
-            if (matchTab && matchSearch) {
-                el.style.display = '';
-            } else {
-                el.style.display = 'none';
-            }
-        });
-    }
-
-    // Default trigger filter to show pending
-    filterBookings();
-
-    function approveBooking(btn, name, id) {
-        if (confirm(`Approve booking ${id} for ${name}?`)) {
-            const row = btn.closest('.booking-row') || btn.closest('.booking-card');
-            if (row) {
-                row.setAttribute('data-status', 'CONFIRMED');
-                const badge = row.querySelector('.status-badge');
-                if (badge) {
-                    badge.className = 'status-badge bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-lg';
-                    badge.textContent = 'CONFIRMED';
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Booking Accepted! 🎉',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#4bb59d'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message || 'Could not approve booking.',
+                        icon: 'error',
+                        confirmButtonColor: '#4bb59d'
+                    });
                 }
-                filterBookings();
-                alert(`Booking ${id} approved successfully!`);
+            } catch (err) {
+                Swal.fire({
+                    title: 'Network Error',
+                    text: 'An error occurred while updating booking status.',
+                    icon: 'error',
+                    confirmButtonColor: '#4bb59d'
+                });
             }
         }
     }
 
-    function rejectBooking(btn, name, id) {
-        if (confirm(`Reject booking ${id} for ${name}?`)) {
-            const row = btn.closest('.booking-row') || btn.closest('.booking-card');
-            if (row) {
-                row.setAttribute('data-status', 'CANCELLED');
-                const badge = row.querySelector('.status-badge');
-                if (badge) {
-                    badge.className = 'status-badge bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-lg';
-                    badge.textContent = 'CANCELLED';
+    async function rejectBrokerBooking(bookingId, tenantName, bookingCode) {
+        const { value: reason } = await Swal.fire({
+            title: `Decline Booking ${bookingCode}?`,
+            text: `Please state the reason for declining ${tenantName}'s booking request:`,
+            icon: 'warning',
+            input: 'text',
+            inputValue: 'No beds/rooms currently available for requested dates.',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Decline Request',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (reason !== undefined) {
+            try {
+                const response = await fetch(`/broker/bookings/${bookingId}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ reason: reason || 'Declined due to unavailability.' })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Booking Declined',
+                        text: data.message,
+                        icon: 'info',
+                        confirmButtonColor: '#4bb59d'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message || 'Could not decline booking.',
+                        icon: 'error',
+                        confirmButtonColor: '#4bb59d'
+                    });
                 }
-                filterBookings();
-                alert(`Booking ${id} rejected.`);
+            } catch (err) {
+                Swal.fire({
+                    title: 'Network Error',
+                    text: 'An error occurred while communicating with the server.',
+                    icon: 'error',
+                    confirmButtonColor: '#4bb59d'
+                });
             }
         }
     }
 
-    function viewBookingDetails(id, name, phone, pg, room, checkin, amount, status) {
-        document.getElementById('modalBkId').textContent = id;
-        document.getElementById('modalTenant').textContent = name;
-        document.getElementById('modalPhone').textContent = phone;
-        document.getElementById('modalPg').textContent = pg;
-        document.getElementById('modalRoom').textContent = room;
-        document.getElementById('modalCheckin').textContent = checkin;
-        document.getElementById('modalAmount').textContent = amount;
-        document.getElementById('modalStatus').textContent = status;
-        openModal('bookingDetailsModal');
+    function viewBrokerBookingModal(bk, tenantName, tenantPhone, tenantEmail, propName) {
+        document.getElementById('bModalId').textContent = `Booking #${bk.booking_id}`;
+        document.getElementById('bModalTenantName').textContent = tenantName;
+        document.getElementById('bModalTenantPhone').textContent = tenantPhone ? `+91 ${tenantPhone}` : 'No phone provided';
+        document.getElementById('bModalTenantEmail').textContent = tenantEmail;
+        document.getElementById('bModalPropName').textContent = propName;
+        document.getElementById('bModalRoomPlan').textContent = bk.room_type_name || 'Standard Stay';
+        document.getElementById('bModalCheckIn').textContent = bk.check_in_date ? new Date(bk.check_in_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Immediate';
+        document.getElementById('bModalDuration').textContent = (bk.duration_months || 11) + ' Months';
+        document.getElementById('bModalRent').textContent = '₹' + Number(bk.base_rent).toLocaleString('en-IN') + '/mo';
+        document.getElementById('bModalDeposit').textContent = '₹' + Number(bk.security_deposit || 0).toLocaleString('en-IN');
+        document.getElementById('bModalTotal').textContent = '₹' + Number(bk.total_amount || (Number(bk.base_rent) + Number(bk.security_deposit || 0))).toLocaleString('en-IN');
+
+        if (tenantPhone) {
+            document.getElementById('bModalWhatsappBtn').href = `https://wa.me/91${tenantPhone}?text=${encodeURIComponent('Hi ' + tenantName + ', regarding booking #' + bk.booking_id + ' for ' + propName)}`;
+            document.getElementById('bModalWhatsappBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('bModalWhatsappBtn').classList.add('hidden');
+        }
+
+        const specialBox = document.getElementById('bModalSpecialBox');
+        const specialText = document.getElementById('bModalSpecialText');
+        if (bk.special_requests) {
+            specialText.textContent = bk.special_requests;
+            specialBox.classList.remove('hidden');
+        } else {
+            specialBox.classList.add('hidden');
+        }
+
+        const modal = document.getElementById('brokerBookingModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
+
+    function closeBrokerBookingModal() {
+        const modal = document.getElementById('brokerBookingModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeBrokerBookingModal();
+        }
+    });
 </script>
 @endpush

@@ -44,9 +44,16 @@
                 <a href="{{ route('user.saved') }}" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center tap-effect shadow-xs" title="Saved">
                     <i class="fas fa-heart text-sm"></i>
                 </a>
-                <a href="{{ route('user.bookings') }}" class="w-10 h-10 rounded-full bg-brand-light text-brand flex items-center justify-center tap-effect shadow-xs relative" title="Bookings">
-                    <i class="fas fa-bell text-sm"></i>
-                    <span class="absolute -top-1 -right-1 bg-brand text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">2</span>
+                <a href="{{ route('user.bookings') }}" class="w-10 h-10 rounded-full bg-brand-light text-brand flex items-center justify-center tap-effect shadow-xs relative" title="My Bookings">
+                    <i class="fas fa-calendar-check text-sm"></i>
+                    @auth
+                        @php
+                            $userActiveBkCount = \App\Models\Booking::where('user_id', auth()->id())->where('booking_status', '!=', 'cancelled')->where('broker_approval', '!=', 'rejected')->count();
+                        @endphp
+                        @if($userActiveBkCount > 0)
+                            <span class="absolute -top-1 -right-1 bg-brand text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">{{ $userActiveBkCount }}</span>
+                        @endif
+                    @endauth
                 </a>
                 
                 <!-- Dynamic Auth Header Item for Mobile -->
@@ -94,8 +101,15 @@
                     <i class="fas fa-heart text-red-500"></i>
                 </a>
                 <a href="{{ route('user.bookings') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition relative" title="My Bookings">
-                    <i class="fas fa-bell"></i>
-                    <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    <i class="fas fa-calendar-check text-gray-600"></i>
+                    @auth
+                        @php
+                            $userActiveBkCount = $userActiveBkCount ?? \App\Models\Booking::where('user_id', auth()->id())->where('booking_status', '!=', 'cancelled')->where('broker_approval', '!=', 'rejected')->count();
+                        @endphp
+                        @if($userActiveBkCount > 0)
+                            <span class="absolute -top-1 -right-1 bg-brand text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">{{ $userActiveBkCount }}</span>
+                        @endif
+                    @endauth
                 </a>
 
                 <!-- Dynamic Auth Buttons in Desktop Header -->

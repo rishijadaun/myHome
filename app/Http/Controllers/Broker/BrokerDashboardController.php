@@ -208,7 +208,7 @@ class BrokerDashboardController extends Controller
             Notification::create([
                 'id' => (string) Str::uuid(),
                 'user_id' => $booking->user_id,
-                'user_type' => 'tenant',
+                'user_type' => 'user',
                 'title' => 'Booking Approved! 🎉',
                 'message' => "Your reservation for {$booking->property?->name} has been approved by the broker.",
                 'type' => 'booking_approved',
@@ -247,7 +247,7 @@ class BrokerDashboardController extends Controller
             Notification::create([
                 'id' => (string) Str::uuid(),
                 'user_id' => $booking->user_id,
-                'user_type' => 'tenant',
+                'user_type' => 'user',
                 'title' => 'Booking Request Update',
                 'message' => "Your booking request for {$booking->property?->name} could not be confirmed.",
                 'type' => 'booking_rejected',

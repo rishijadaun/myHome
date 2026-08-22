@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminRelationshipManagerController;
 use App\Http\Controllers\Admin\AdminContactController;
 use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminBookingController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Guest Admin Routes
@@ -95,7 +96,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
         Route::post('/settings/profile', [AdminSettingController::class, 'updateProfile'])->name('settings.profile');
 
-        Route::view('/bookings', 'admin.bookings')->name('bookings');
+        // System Bookings Management Routes
+        Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings');
+        Route::get('/bookings/export', [AdminBookingController::class, 'export'])->name('bookings.export');
+        Route::post('/bookings/{id}/approve', [AdminBookingController::class, 'approve'])->name('bookings.approve');
+        Route::post('/bookings/{id}/reject', [AdminBookingController::class, 'reject'])->name('bookings.reject');
     });
 });
 
@@ -103,6 +108,7 @@ use App\Http\Controllers\Broker\BrokerAuthController;
 use App\Http\Controllers\Broker\BrokerDashboardController;
 use App\Http\Controllers\Broker\BrokerProfileController;
 use App\Http\Controllers\Broker\BrokerPropertyController;
+use App\Http\Controllers\Broker\BrokerBookingController;
 
 Route::prefix('broker')->name('broker.')->group(function () {
     // Guest Broker Routes
@@ -117,8 +123,8 @@ Route::prefix('broker')->name('broker.')->group(function () {
         Route::get('/dashboard/chart-data', [BrokerDashboardController::class, 'getChartData'])->name('dashboard.chart');
         
         // 1-Click Quick Actions
-        Route::post('/bookings/{id}/approve', [BrokerDashboardController::class, 'approveBooking'])->name('bookings.approve');
-        Route::post('/bookings/{id}/reject', [BrokerDashboardController::class, 'rejectBooking'])->name('bookings.reject');
+        Route::post('/bookings/{id}/approve', [BrokerBookingController::class, 'approve'])->name('bookings.approve');
+        Route::post('/bookings/{id}/reject', [BrokerBookingController::class, 'reject'])->name('bookings.reject');
 
         // Dynamic PG Property Management
         Route::get('/pgs', [BrokerPropertyController::class, 'index'])->name('pgs');
@@ -128,7 +134,8 @@ Route::prefix('broker')->name('broker.')->group(function () {
         Route::post('/pgs/{id}/toggle-status', [BrokerPropertyController::class, 'toggleStatus'])->name('pgs.toggle-status');
         Route::delete('/pgs/{id}', [BrokerPropertyController::class, 'destroy'])->name('pgs.destroy');
 
-        Route::view('/bookings', 'broker.bookings')->name('bookings');
+        // Property Owner Bookings
+        Route::get('/bookings', [BrokerBookingController::class, 'index'])->name('bookings');
         Route::view('/tenants', 'broker.tenants')->name('tenants');
         Route::view('/earnings', 'broker.earnings')->name('earnings');
         Route::view('/reviews', 'broker.reviews')->name('reviews');
@@ -145,6 +152,8 @@ Route::prefix('broker')->name('broker.')->group(function () {
     });
 });
 
+use App\Http\Controllers\User\UserBookingController;
+
 Route::get('/location', [UserHomeController::class, 'location'])->name('user.location');
 
 // Public User Routes
@@ -152,7 +161,9 @@ Route::name('user.')->group(function () {
     Route::view('/saved', 'user.saved')->name('saved');
     Route::view('/list-property', 'user.list-property')->name('list-property');
     Route::view('/list_property', 'user.list-property');
-    Route::view('/bookings', 'user.bookings')->name('bookings');
+    Route::get('/bookings', [UserBookingController::class, 'index'])->name('bookings');
+    Route::post('/bookings', [UserBookingController::class, 'store'])->name('bookings.store');
+    Route::post('/bookings/{id}/cancel', [UserBookingController::class, 'cancel'])->name('bookings.cancel');
     Route::view('/login', 'user.login')->name('login');
     Route::match(['get', 'post'], '/logout', function () {
         \Illuminate\Support\Facades\Auth::logout();

@@ -69,23 +69,23 @@
 
         <!-- Quick Category Selector Bar -->
         <div class="bg-gray-100/90 px-3 py-2 border-b border-gray-200/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-shrink-0">
+            <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-[11px] font-bold bg-white text-purple-700 hover:text-purple-900 hover:border-purple-400 px-2.5 py-1 rounded-lg border border-purple-200 shadow-xs whitespace-nowrap tap-effect">
+                ✨ Listing Types
+            </button>
+            <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-[11px] font-bold bg-white text-emerald-700 hover:text-emerald-900 hover:border-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-200 shadow-xs whitespace-nowrap tap-effect">
+                🏠 PG &amp; Hostels
+            </button>
+            <button type="button" onclick="askAiPrompt('Show me Flats & Houses')" class="text-[11px] font-bold bg-white text-blue-700 hover:text-blue-900 hover:border-blue-400 px-2.5 py-1 rounded-lg border border-blue-200 shadow-xs whitespace-nowrap tap-effect">
+                🏢 Flats &amp; Houses
+            </button>
+            <button type="button" onclick="askAiPrompt('Show me Commercial spaces')" class="text-[11px] font-bold bg-white text-indigo-700 hover:text-indigo-900 hover:border-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-200 shadow-xs whitespace-nowrap tap-effect">
+                🏪 Commercial
+            </button>
             <button type="button" onclick="askAiPrompt('Noida sector 62 me boys PG 8k ke andar AC food ke saath')" class="text-[11px] font-bold bg-white text-gray-700 hover:text-brand hover:border-brand px-2.5 py-1 rounded-lg border border-gray-200 shadow-xs whitespace-nowrap tap-effect">
-                👨 Boys Noida Sec 62 &lt; 8k
+                👨 Boys Noida &lt; 8k
             </button>
             <button type="button" onclick="askAiPrompt('Girls PG with AC in Bangalore Koramangala under 10k')" class="text-[11px] font-bold bg-white text-gray-700 hover:text-brand hover:border-brand px-2.5 py-1 rounded-lg border border-gray-200 shadow-xs whitespace-nowrap tap-effect">
                 👩 Girls Bangalore AC
-            </button>
-            <button type="button" onclick="askAiPrompt('Co-Ed unisex coliving stays in Delhi with Gym & WiFi')" class="text-[11px] font-bold bg-white text-gray-700 hover:text-brand hover:border-brand px-2.5 py-1 rounded-lg border border-gray-200 shadow-xs whitespace-nowrap tap-effect">
-                👥 Co-Living Delhi
-            </button>
-            <button type="button" onclick="askAiPrompt('Single room chahiye attached washroom ke saath')" class="text-[11px] font-bold bg-white text-gray-700 hover:text-brand hover:border-brand px-2.5 py-1 rounded-lg border border-gray-200 shadow-xs whitespace-nowrap tap-effect">
-                🚪 Single Room Attached Bath
-            </button>
-            <button type="button" onclick="askAiPrompt('Orai ya Jhansi me saste room with wifi')" class="text-[11px] font-bold bg-white text-gray-700 hover:text-brand hover:border-brand px-2.5 py-1 rounded-lg border border-gray-200 shadow-xs whitespace-nowrap tap-effect">
-                📍 Orai &amp; Jhansi Stays
-            </button>
-            <button type="button" onclick="askAiPrompt('How does Zero Brokerage work on StayNest?')" class="text-[11px] font-bold bg-white text-gray-700 hover:text-brand hover:border-brand px-2.5 py-1 rounded-lg border border-gray-200 shadow-xs whitespace-nowrap tap-effect">
-                🛡️ Zero Brokerage
             </button>
         </div>
 
@@ -99,12 +99,20 @@
                 </div>
                 <div class="bg-white p-4 rounded-2xl rounded-tl-sm border border-gray-100 shadow-xs text-xs text-gray-800 space-y-2.5">
                     <p class="font-bold text-gray-900 text-sm">Hello! I am your StayNest AI Concierge 👋</p>
-                    <p class="leading-relaxed text-gray-700">Tell me in English, Hindi, or Hinglish what you're looking for! For example: <em>"Noida sector 62 me boys PG 8k ke andar AC food ke saath"</em></p>
+                    <p class="leading-relaxed text-gray-700">Tell me what you're looking for or explore our <strong>3 verified listing types</strong> in the database: <strong>PG &amp; Hostels</strong>, <strong>Flats &amp; Houses</strong>, and <strong>Commercial Spaces</strong>.</p>
                     <div class="pt-1 flex flex-wrap gap-1.5 text-[10px]">
-                        <span class="bg-pink-50 text-pink-700 font-bold px-2.5 py-1 rounded-lg border border-pink-200/60">👩 Girls PGs</span>
-                        <span class="bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-lg border border-blue-200/60">👨 Boys PGs</span>
-                        <span class="bg-purple-50 text-purple-700 font-bold px-2.5 py-1 rounded-lg border border-purple-200/60">👥 Co-Ed / Unisex</span>
-                        <span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-lg border border-emerald-200/60">🛡️ 100% Zero Brokerage</span>
+                        <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="bg-emerald-50 text-emerald-800 font-bold px-2.5 py-1 rounded-lg border border-emerald-200/80 hover:bg-emerald-100 transition tap-effect">
+                            🏠 PG &amp; Hostels
+                        </button>
+                        <button type="button" onclick="askAiPrompt('Show me Flats & Houses')" class="bg-blue-50 text-blue-800 font-bold px-2.5 py-1 rounded-lg border border-blue-200/80 hover:bg-blue-100 transition tap-effect">
+                            🏢 Flats &amp; Houses
+                        </button>
+                        <button type="button" onclick="askAiPrompt('Show me Commercial spaces')" class="bg-purple-50 text-purple-800 font-bold px-2.5 py-1 rounded-lg border border-purple-200/80 hover:bg-purple-100 transition tap-effect">
+                            🏪 Commercial
+                        </button>
+                        <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="bg-indigo-50 text-indigo-800 font-bold px-2.5 py-1 rounded-lg border border-indigo-200/80 hover:bg-indigo-100 transition tap-effect">
+                            ✨ All Listing Types
+                        </button>
                     </div>
                 </div>
             </div>
@@ -112,20 +120,20 @@
             <!-- Popular Prompt Pills -->
             <div id="aiQuickChips" class="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
                 <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                    <i class="fas fa-bolt text-yellow-500"></i> Try Asking Natural Queries
+                    <i class="fas fa-bolt text-yellow-500"></i> Explore Listing Types &amp; Queries
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                    <button type="button" onclick="askAiPrompt('Noida sector 62 me boys PG 8k ke andar AC food ke saath')" class="text-left bg-gray-50 hover:bg-brand-light hover:text-brand p-2.5 rounded-xl border border-gray-200/80 text-[11px] font-semibold text-gray-700 transition">
-                        📍 Boys PG Noida Sec 62 &lt; ₹8K
+                    <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-left bg-purple-50/60 hover:bg-purple-100 hover:text-purple-900 p-2.5 rounded-xl border border-purple-200/70 text-[11px] font-bold text-purple-800 transition">
+                        ✨ Listing Types in Database
                     </button>
-                    <button type="button" onclick="askAiPrompt('girls pg in Bangalore with AC under 10k')" class="text-left bg-gray-50 hover:bg-brand-light hover:text-brand p-2.5 rounded-xl border border-gray-200/80 text-[11px] font-semibold text-gray-700 transition">
-                        📍 Girls PG Bangalore with AC
+                    <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-left bg-emerald-50/60 hover:bg-emerald-100 hover:text-emerald-900 p-2.5 rounded-xl border border-emerald-200/70 text-[11px] font-bold text-emerald-800 transition">
+                        🏠 PG &amp; Hostels (9+ Stays)
                     </button>
-                    <button type="button" onclick="askAiPrompt('sec 62 me ladko ke liye 8 hazar ke andar AC wala PG chahiye jisme khana bhi mile')" class="text-left bg-gray-50 hover:bg-brand-light hover:text-brand p-2.5 rounded-xl border border-gray-200/80 text-[11px] font-semibold text-gray-700 transition">
-                        🏢 Ladko ka PG with AC &amp; Food
+                    <button type="button" onclick="askAiPrompt('Show me Flats & Houses')" class="text-left bg-blue-50/60 hover:bg-blue-100 hover:text-blue-900 p-2.5 rounded-xl border border-blue-200/70 text-[11px] font-bold text-blue-800 transition">
+                        🏢 Flats &amp; Houses (1+ Properties)
                     </button>
-                    <button type="button" onclick="askAiPrompt('single room chahiye attached washroom ke saath')" class="text-left bg-gray-50 hover:bg-brand-light hover:text-brand p-2.5 rounded-xl border border-gray-200/80 text-[11px] font-semibold text-gray-700 transition">
-                        🚪 Single Room + Attached Bath
+                    <button type="button" onclick="askAiPrompt('Show me Commercial spaces')" class="text-left bg-indigo-50/60 hover:bg-indigo-100 hover:text-indigo-900 p-2.5 rounded-xl border border-indigo-200/70 text-[11px] font-bold text-indigo-800 transition">
+                        🏪 Commercial Spaces (2+ Spaces)
                     </button>
                 </div>
             </div>
@@ -371,6 +379,7 @@ function removeFilterChip(chipKey, amenityVal) {
             currentAiFilters.amenities = currentAiFilters.amenities.filter(a => a !== amName);
         }
     } else {
+        if (chipKey === 'property_type' || chipKey === 'listing_types') currentAiFilters.property_type = null;
         if (chipKey === 'gender') currentAiFilters.gender = null;
         if (chipKey === 'location' || chipKey === 'city') { currentAiFilters.city = null; currentAiFilters.area = null; }
         if (chipKey === 'area') currentAiFilters.area = null;
@@ -401,9 +410,97 @@ function renderAiResponse(data) {
         `;
     }
 
-    // Build Horizontal Multi-Card Slider HTML or Full Property Detail Card or No Record Found Card
+    // Build Content HTML based on response_type
     let contentHtml = '';
-    if (data.response_type === 'property_detail' && data.property) {
+    if (data.response_type === 'listing_types_overview' && data.listing_types) {
+        contentHtml = `
+            <div class="mt-3 space-y-2.5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    ${data.listing_types.map(t => `
+                        <div class="bg-white rounded-2xl p-3 border border-gray-200 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+                            <div class="text-center pb-2">
+                                <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-gray-50 flex items-center justify-center text-xl shadow-2xs ${t.type_key === 'pg_hostel' ? 'text-emerald-600 bg-emerald-50/70 border border-emerald-200/60' : (t.type_key === 'flat_house' ? 'text-blue-600 bg-blue-50/70 border border-blue-200/60' : 'text-purple-600 bg-purple-50/70 border border-purple-200/60')}">
+                                    <i class="fas fa-${t.icon}"></i>
+                                </div>
+                                <h4 class="font-extrabold text-xs text-gray-900 leading-tight">${t.title}</h4>
+                                <span class="text-[10px] font-bold text-gray-500 block mt-0.5">${t.badge}</span>
+                            </div>
+                            <div class="pt-2 border-t border-gray-100 space-y-1.5">
+                                <span class="text-[10px] font-bold block text-center ${t.type_key === 'pg_hostel' ? 'text-emerald-700' : (t.type_key === 'flat_house' ? 'text-blue-700' : 'text-purple-700')}">
+                                    ${t.price_range}
+                                </span>
+                                <button type="button" onclick="askAiPrompt('${t.explore_prompt}')" class="w-full ${t.type_key === 'pg_hostel' ? 'bg-emerald-600 hover:bg-emerald-700' : (t.type_key === 'flat_house' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-purple-600 hover:bg-purple-700')} text-white font-bold text-[10px] py-1.5 px-2 rounded-xl transition shadow-xs text-center tap-effect flex items-center justify-center gap-1">
+                                    <span>Explore</span> <i class="fas fa-arrow-right text-[8px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    } else if (data.response_type === 'listing_type_detail' && data.listing_type_info) {
+        const info = data.listing_type_info;
+        contentHtml = `
+            <div class="mt-3 space-y-3">
+                <div class="p-3.5 bg-gradient-to-br ${info.type_key === 'pg_hostel' ? 'from-emerald-50 to-teal-50/50 border-emerald-200' : (info.type_key === 'flat_house' ? 'from-blue-50 to-indigo-50/50 border-blue-200' : 'from-purple-50 to-violet-50/50 border-purple-200')} rounded-2xl border shadow-xs">
+                    <div class="flex items-center gap-2.5 mb-2">
+                        <div class="w-9 h-9 rounded-xl ${info.type_key === 'pg_hostel' ? 'bg-emerald-600' : (info.type_key === 'flat_house' ? 'bg-blue-600' : 'bg-purple-600')} text-white flex items-center justify-center text-base shadow-xs">
+                            <i class="fas fa-${info.icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-sm text-gray-900">${info.title}</h4>
+                            <span class="text-[10px] font-bold text-gray-600">${info.total_available} Active Listings in DB • ${info.price_range}</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 text-[11px] text-gray-700">
+                        <div class="bg-white/80 p-2 rounded-xl border border-gray-100">
+                            <p class="font-bold text-gray-900 mb-1">✨ Inclusions &amp; Amenities:</p>
+                            <ul class="space-y-0.5 text-[10px] text-gray-700">
+                                ${(info.features || []).map(f => `<li>${f}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <p class="text-[10px] text-gray-600"><strong>👥 Best For:</strong> ${info.best_for}</p>
+                    </div>
+                </div>
+
+                ${data.properties && data.properties.length ? `
+                    <div>
+                        <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span><i class="fas fa-building text-brand mr-1"></i> Available ${info.title} (${data.properties.length})</span>
+                            <a href="{{ route('user.search') }}?q=${encodeURIComponent(info.title)}" class="text-brand font-bold hover:underline">View All &rarr;</a>
+                        </p>
+                        <div class="ai-chat-slider">
+                            ${data.properties.map(p => `
+                                <div class="ai-slider-card flex flex-col justify-between">
+                                    <div>
+                                        <div class="relative h-28 overflow-hidden bg-gray-100">
+                                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                                            <span class="absolute top-2 left-2 ${p.tag_meta?.solid_badge || 'bg-emerald-500 text-white'} text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                                                ${p.tag_meta?.label || 'Verified'}
+                                            </span>
+                                            <span class="absolute bottom-1.5 right-2 bg-black/75 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                                                ⭐ ${p.rating}
+                                            </span>
+                                        </div>
+                                        <div class="p-2.5">
+                                            <p class="font-bold text-xs text-gray-900 truncate leading-tight mb-0.5">${p.name}</p>
+                                            <p class="text-[11px] text-gray-500 truncate mb-1.5">
+                                                <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> ${p.location}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="p-2.5 pt-1.5 border-t border-gray-100 flex items-center justify-between gap-1.5">
+                                        <span class="text-xs font-black text-gray-900">${p.formatted_price}</span>
+                                        <a href="${p.detail_url}" class="bg-brand hover:bg-brand-dark text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition shadow-xs no-underline">View</a>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    } else if (data.response_type === 'property_detail' && data.property) {
         const p = data.property;
         contentHtml = `
             <div class="mt-3 bg-gradient-to-br from-white via-purple-50/30 to-indigo-50/20 rounded-2xl border border-purple-100 shadow-sm overflow-hidden p-3.5 space-y-3">

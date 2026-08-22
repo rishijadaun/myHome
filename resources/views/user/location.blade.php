@@ -209,15 +209,16 @@
         .btn-view-property:hover { opacity: 0.9; transform: translateY(-1px); }
 
         /* Radius Slider */
-        input[type="range"] {
+        #radiusRange {
             -webkit-appearance: none;
             appearance: none;
             height: 6px;
-            background: #e2e8f0;
             border-radius: 3px;
             outline: none;
+            background: linear-gradient(to right, #1a1a7f 0%, #1a1a7f 2%, #e2e8f0 2%, #e2e8f0 100%);
+            transition: background 0.15s;
         }
-        input[type="range"]::-webkit-slider-thumb {
+        #radiusRange::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 18px;
@@ -226,7 +227,16 @@
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(26,26,127,0.35);
+        }
+        #radiusRange::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #1a1a7f;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(26,26,127,0.35);
         }
         
         /* Layout overrides for map full height */
@@ -284,8 +294,8 @@
             <!-- Radius Slider -->
             <div class="flex items-center gap-2 bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 shrink-0">
                 <i class="fas fa-sliders text-primary text-xs"></i>
-                <label class="text-xs font-bold text-primary whitespace-nowrap">Range: <span id="radiusLabel">10</span> km</label>
-                <input type="range" id="radiusRange" min="1" max="50" value="10" oninput="updateRangeRadius(this.value)" class="w-20">
+                <label class="text-xs font-bold text-primary whitespace-nowrap">Range: <span id="radiusLabel">1</span> km</label>
+                <input type="range" id="radiusRange" min="1" max="50" value="1" oninput="updateRangeRadius(this.value)" class="w-20">
             </div>
 
             <button onclick="focusIndiaMap()" class="bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-xl px-3 py-1.5 flex items-center gap-2 transition-all tap-effect shrink-0">
@@ -490,7 +500,7 @@
         let cachedIndiaGeoData = null;
         let desktopSidebarVisible = true;
         let mobileSidebarOpen = false;
-        let currentSearchRadiusKm = 10;
+        let currentSearchRadiusKm = 1;
 
         // Haversine formula for real distance calculation
         function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -1330,7 +1340,12 @@
         function updateRangeRadius(newKm) {
             currentSearchRadiusKm = parseInt(newKm, 10);
             document.getElementById('radiusLabel').innerText = currentSearchRadiusKm;
-            document.getElementById('radiusRange').value = currentSearchRadiusKm;
+            // Update slider track fill
+            const slider = document.getElementById('radiusRange');
+            if (slider) {
+                const pct = ((currentSearchRadiusKm - 1) / (50 - 1)) * 100;
+                slider.style.background = `linear-gradient(to right, #1a1a7f 0%, #1a1a7f ${pct}%, #e2e8f0 ${pct}%, #e2e8f0 100%)`;
+            }
 
             if (userLocation) {
                 highlightUserRadius(userLocation[0], userLocation[1], currentSearchRadiusKm);

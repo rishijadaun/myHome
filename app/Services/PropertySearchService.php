@@ -720,7 +720,8 @@ class PropertySearchService
                     'amenities' => $amenities,
                     'rules' => $rules,
                     'match_score' => 100,
-                    'detail_url' => route('user.detail', $property->id),
+                    'slug' => $property->slug ?: \Illuminate\Support\Str::slug($property->name),
+                    'detail_url' => route('user.detail', ['slug' => $property->slug ?: \Illuminate\Support\Str::slug($property->name)]),
                     'latitude' => (float) ($property->latitude ?? 28.6280),
                     'longitude' => (float) ($property->longitude ?? 77.3649),
                 ]

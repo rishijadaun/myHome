@@ -163,7 +163,8 @@ class AdminReportController extends Controller
                     'status' => $property->status,
                     'verification_status' => $property->verification_status,
                     'is_active' => (bool) $property->is_active,
-                    'detail_url' => route('user.detail', $property->id),
+                    'slug' => $property->slug ?: \Illuminate\Support\Str::slug($property->name),
+                    'detail_url' => route('user.detail', ['slug' => $property->slug ?: \Illuminate\Support\Str::slug($property->name)]),
                     'broker' => $property->broker ? [
                         'name' => $property->broker->profile->first_name ?? $property->broker->name,
                         'email' => $property->broker->email,

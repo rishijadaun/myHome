@@ -29,6 +29,34 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
 <style>
+    /* ===================== PROPERTY TYPE SELECTOR CARDS (HOME PAGE MATCHING DESIGN) ===================== */
+    .property-type-card {
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .property-type-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px -2px rgba(0,0,0,0.06);
+    }
+    .property-type-card.active-pg {
+        border-color: #1fa37a !important;
+        border-width: 2px !important;
+        background-color: #eefaf6 !important;
+        box-shadow: 0 4px 14px -2px rgba(31, 163, 122, 0.18) !important;
+    }
+    .property-type-card.active-flat {
+        border-color: #4f46e5 !important;
+        border-width: 2px !important;
+        background-color: #eff4ff !important;
+        box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.18) !important;
+    }
+    .property-type-card.active-commercial {
+        border-color: #ea580c !important;
+        border-width: 2px !important;
+        background-color: #fff9ed !important;
+        box-shadow: 0 4px 14px -2px rgba(234, 88, 12, 0.18) !important;
+    }
     .type-pill.active {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: #ffffff;
@@ -214,37 +242,98 @@
                                 <!-- <span class="bg-brand/10 text-brand text-xs font-bold px-3 py-1 rounded-full">Dynamic Filter</span> -->
                             </div>
 
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="listingTypeContainer">
+                            <div class="grid grid-cols-3 gap-2.5 sm:gap-4 max-w-3xl" id="listingTypeContainer">
+                                <!-- Card 1: PG & Hostels (Default Selected) -->
                                 <label class="cursor-pointer">
                                     <input type="radio" name="listing_type" value="pg-hostel" class="hidden" checked onchange="handleTypeChange('pg-hostel')">
-                                    <div class="type-pill active border-2 border-gray-200 rounded-2xl p-4 text-center transition-all hover:border-brand/40">
-                                        <i class="fas fa-bed text-xl mb-2 block"></i>
-                                        <div class="font-bold text-xs sm:text-sm">PG / Hostel</div>
-                                        <div class="text-[10px] opacity-80 mt-0.5">Students & Working</div>
+                                    <div id="card-type-pg-hostel" class="property-type-card active-pg rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                                        <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
+                                            <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <!-- Left taller green building -->
+                                                <rect x="11" y="14" width="22" height="42" rx="3" fill="#4bb59d" stroke="#134e48" stroke-width="2"/>
+                                                <rect x="15.5" y="19" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                                                <rect x="24" y="19" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                                                <rect x="15.5" y="28" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                                                <rect x="24" y="28" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                                                <rect x="15.5" y="37" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                                                <rect x="24" y="37" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
+                                                <rect x="19" y="47" width="6" height="9" rx="1" fill="#134e48"/>
+                                                <!-- Right building with pitched roof -->
+                                                <path d="M30 25L45 15L54 25V56H30V25Z" fill="#ffffff" stroke="#134e48" stroke-width="2" stroke-linejoin="round"/>
+                                                <path d="M28 25L45 13L56 25" stroke="#134e48" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                                                <path d="M30 25L45 15L54 25" fill="#34d399"/>
+                                                <rect x="36" y="29" width="5" height="6" rx="1" fill="#a7f3d0" stroke="#134e48" stroke-width="1.2"/>
+                                                <rect x="45" y="29" width="5" height="6" rx="1" fill="#a7f3d0" stroke="#134e48" stroke-width="1.2"/>
+                                                <rect x="40" y="42" width="7" height="14" rx="1" fill="#4bb59d" stroke="#134e48" stroke-width="1.3"/>
+                                                <circle cx="8" cy="51" r="3.5" fill="#10b981"/>
+                                                <circle cx="56" cy="49" r="4" fill="#10b981"/>
+                                                <line x1="6" y1="56" x2="58" y2="56" stroke="#134e48" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </div>
+                                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">PG &amp; Hostels</p>
+                                        
                                     </div>
                                 </label>
-                                <!-- <label class="cursor-pointer">
-                                    <input type="radio" name="listing_type" value="co-living" class="hidden" onchange="handleTypeChange('co-living')">
-                                    <div class="type-pill border-2 border-gray-200 rounded-2xl p-4 text-center transition-all hover:border-brand/40">
-                                        <i class="fas fa-users text-xl mb-2 block"></i>
-                                        <div class="font-bold text-xs sm:text-sm">Co-Living</div>
-                                        <div class="text-[10px] opacity-80 mt-0.5">Managed Stays</div>
-                                    </div>
-                                </label> -->
+
+                                <!-- Card 2: Flats & Houses -->
                                 <label class="cursor-pointer">
                                     <input type="radio" name="listing_type" value="flat-apartment" class="hidden" onchange="handleTypeChange('flat-apartment')">
-                                    <div class="type-pill border-2 border-gray-200 rounded-2xl p-4 text-center transition-all hover:border-brand/40">
-                                        <i class="fas fa-building text-xl mb-2 block"></i>
-                                        <div class="font-bold text-xs sm:text-sm">Flat / House</div>
-                                        <div class="text-[10px] opacity-80 mt-0.5">1/2/3 BHK Rentals</div>
+                                    <div id="card-type-flat-apartment" class="property-type-card rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                                        <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
+                                            <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <!-- Left tall building -->
+                                                <rect x="13" y="12" width="22" height="44" rx="3" fill="#ffffff" stroke="#1e1b4b" stroke-width="2"/>
+                                                <rect x="17.5" y="16.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="25.5" y="16.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="17.5" y="24" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="25.5" y="24" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="17.5" y="31.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="25.5" y="31.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="17.5" y="39" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="25.5" y="39" width="5" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="21" y="48.5" width="6" height="7.5" rx="1" fill="#312e81"/>
+                                                <!-- Right building -->
+                                                <rect x="33" y="22" width="18" height="34" rx="2" fill="#e0e7ff" stroke="#1e1b4b" stroke-width="2"/>
+                                                <rect x="37" y="26.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="43.5" y="26.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="37" y="34" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="43.5" y="34" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="37" y="41.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                                                <rect x="43.5" y="41.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
+                                                <circle cx="9" cy="50" r="3.5" fill="#34d399"/>
+                                                <circle cx="55" cy="48" r="4" fill="#34d399"/>
+                                                <line x1="7" y1="56" x2="57" y2="56" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </div>
+                                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Flats &amp; Houses</p>
+                                      
                                     </div>
                                 </label>
+
+                                <!-- Card 3: Commercial -->
                                 <label class="cursor-pointer">
                                     <input type="radio" name="listing_type" value="commercial" class="hidden" onchange="handleTypeChange('commercial')">
-                                    <div class="type-pill border-2 border-gray-200 rounded-2xl p-4 text-center transition-all hover:border-brand/40">
-                                        <i class="fas fa-store text-xl mb-2 block"></i>
-                                        <div class="font-bold text-xs sm:text-sm">Commercial</div>
-                                        <div class="text-[10px] opacity-80 mt-0.5">Shops / Office</div>
+                                    <div id="card-type-commercial" class="property-type-card rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                                        <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
+                                            <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect x="11" y="22" width="42" height="34" rx="2" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+                                                <rect x="9" y="16" width="46" height="7" rx="2" fill="#1e3a8a" stroke="#1e293b" stroke-width="1.8"/>
+                                                <path d="M10 23L13 32H51L54 23H10Z" fill="#3b82f6" stroke="#1e293b" stroke-width="1.8" stroke-linejoin="round"/>
+                                                <path d="M19 23L18 32M28 23L27 32M37 23L37 32M46 23L47 32" stroke="#ffffff" stroke-width="2"/>
+                                                <path d="M13 32Q15.5 35 18 32Q20.5 35 23 32Q25.5 35 28 32Q30.5 35 33 32Q35.5 35 38 32Q40.5 35 43 32Q45.5 35 48 32Q50.5 35 51 32" fill="#60a5fa" stroke="#1e293b" stroke-width="1.5"/>
+                                                <rect x="16" y="37" width="10" height="12" rx="1" fill="#dbeafe" stroke="#1e293b" stroke-width="1.2"/>
+                                                <line x1="21" y1="37" x2="21" y2="49" stroke="#93c5fd" stroke-width="1"/>
+                                                <rect x="29" y="36" width="10" height="20" rx="1" fill="#1d4ed8" stroke="#1e293b" stroke-width="1.2"/>
+                                                <rect x="31" y="38" width="6" height="9" fill="#bfdbfe"/>
+                                                <circle cx="37" cy="48" r="0.9" fill="#ffffff"/>
+                                                <rect x="42" y="37" width="8" height="12" rx="1" fill="#dbeafe" stroke="#1e293b" stroke-width="1.2"/>
+                                                <circle cx="7" cy="50" r="3" fill="#22c55e"/>
+                                                <circle cx="57" cy="50" r="3" fill="#22c55e"/>
+                                                <line x1="5" y1="56" x2="59" y2="56" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </div>
+                                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Commercial</p>
+                                     
                                     </div>
                                 </label>
                             </div>
@@ -2147,10 +2236,22 @@
     }
 
     function handleTypeChange(type) {
-        document.querySelectorAll('.type-pill').forEach(pill => pill.classList.remove('active'));
+        document.querySelectorAll('.property-type-card').forEach(card => {
+            card.classList.remove('active-pg', 'active-flat', 'active-commercial');
+        });
         const checkedRadio = document.querySelector(`input[name="listing_type"][value="${type}"]`);
         if (checkedRadio) {
-            checkedRadio.closest('label').querySelector('.type-pill').classList.add('active');
+            checkedRadio.checked = true;
+            const card = checkedRadio.closest('label')?.querySelector('.property-type-card');
+            if (card) {
+                if (type === 'pg-hostel' || type === 'co-living') {
+                    card.classList.add('active-pg');
+                } else if (type === 'flat-apartment') {
+                    card.classList.add('active-flat');
+                } else if (type === 'commercial') {
+                    card.classList.add('active-commercial');
+                }
+            }
         }
 
         const pgGender = document.getElementById('pgGenderField');

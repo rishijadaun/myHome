@@ -222,7 +222,7 @@
                                                 @endif
                                             </div>
                                             <div class="min-w-0">
-                                                <a href="{{ route('user.detail', $property->id) }}" target="_blank" class="font-bold text-gray-900 hover:text-brand truncate block leading-tight text-xs" title="{{ $property->name }}">
+                                                <a href="{{ route('user.detail', ['slug' => $property->slug ?: \Illuminate\Support\Str::slug($property->name)]) }}" target="_blank" class="font-bold text-gray-900 hover:text-brand truncate block leading-tight text-xs" title="{{ $property->name }}">
                                                     {{ $property->name }} <i class="fas fa-external-link-alt text-[9px] text-gray-400"></i>
                                                 </a>
                                                 <p class="text-[11px] text-gray-500 truncate mt-0.5">

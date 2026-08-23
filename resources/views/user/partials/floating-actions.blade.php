@@ -523,8 +523,8 @@ function renderAiResponse(data) {
                             ${data.properties.map(p => `
                                 <div class="ai-slider-card flex flex-col justify-between">
                                     <div>
-                                        <div class="relative h-28 overflow-hidden bg-gray-100">
-                                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                                        <a href="${p.detail_url}" class="block relative h-28 overflow-hidden bg-gray-100 group">
+                                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                                             <span class="absolute top-2 left-2 ${p.tag_meta?.solid_badge || 'bg-orange-500 text-white'} text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                                                 ${p.tag || p.tag_meta?.label || 'Trending'}
                                             </span>
@@ -534,10 +534,10 @@ function renderAiResponse(data) {
                                             <span class="absolute bottom-1.5 right-2 bg-black/75 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
                                                 ⭐ ${p.rating}
                                             </span>
-                                        </div>
+                                        </a>
                                         <div class="p-2.5">
                                             <div class="flex items-center justify-between gap-1 mb-1">
-                                                <p class="font-bold text-xs text-gray-900 truncate leading-tight">${p.name}</p>
+                                                <a href="${p.detail_url}" class="font-bold text-xs text-gray-900 hover:text-brand truncate leading-tight block no-underline">${p.name}</a>
                                                 <span class="${p.gender_class} text-[8px] font-extrabold px-1.5 py-0.5 rounded flex-shrink-0">${p.gender}</span>
                                             </div>
                                             <p class="text-[11px] text-gray-500 truncate mb-1.5">
@@ -625,17 +625,17 @@ function renderAiResponse(data) {
                             ${data.properties.map(p => `
                                 <div class="ai-slider-card flex flex-col justify-between">
                                     <div>
-                                        <div class="relative h-28 overflow-hidden bg-gray-100">
-                                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                                        <a href="${p.detail_url}" class="block relative h-28 overflow-hidden bg-gray-100 group">
+                                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                                             <span class="absolute top-2 left-2 ${p.tag_meta?.solid_badge || 'bg-emerald-500 text-white'} text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                                                 ${p.tag_meta?.label || 'Verified'}
                                             </span>
                                             <span class="absolute bottom-1.5 right-2 bg-black/75 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
                                                 ⭐ ${p.rating}
                                             </span>
-                                        </div>
+                                        </a>
                                         <div class="p-2.5">
-                                            <p class="font-bold text-xs text-gray-900 truncate leading-tight mb-0.5">${p.name}</p>
+                                            <a href="${p.detail_url}" class="font-bold text-xs text-gray-900 hover:text-brand truncate leading-tight block mb-0.5 no-underline">${p.name}</a>
                                             <p class="text-[11px] text-gray-500 truncate mb-1.5">
                                                 <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> ${p.location}
                                             </p>
@@ -762,8 +762,8 @@ function renderAiResponse(data) {
                     ${data.properties.map(p => `
                         <div class="ai-slider-card flex flex-col justify-between">
                             <div>
-                                <div class="relative h-28 overflow-hidden bg-gray-100">
-                                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                                <a href="${p.detail_url}" class="block relative h-28 overflow-hidden bg-gray-100 group">
+                                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                                     <span class="absolute top-2 left-2 ${p.tag_meta?.solid_badge || 'bg-emerald-500 text-white'} text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                                         ${p.tag_meta?.label || 'Verified'}
                                     </span>
@@ -774,10 +774,10 @@ function renderAiResponse(data) {
                                     <span class="absolute bottom-1.5 right-2 bg-black/75 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
                                         ⭐ ${p.rating}
                                     </span>
-                                </div>
+                                </a>
                                 <div class="p-2.5">
                                     <div class="flex items-center justify-between gap-1 mb-1">
-                                        <p class="font-bold text-xs text-gray-900 truncate leading-tight">${p.name}</p>
+                                        <a href="${p.detail_url}" class="font-bold text-xs text-gray-900 hover:text-brand truncate leading-tight block no-underline">${p.name}</a>
                                         <span class="${p.gender_class} text-[8px] font-extrabold px-1.5 py-0.5 rounded flex-shrink-0">${p.gender}</span>
                                     </div>
                                     <p class="text-[11px] text-gray-500 truncate mb-1.5">

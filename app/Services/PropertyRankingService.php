@@ -39,10 +39,12 @@ class PropertyRankingService
 
             $monthlyRent = (int) ($property->monthly_rent ?? 6500);
 
+            $propSlug = $property->slug ?: \Illuminate\Support\Str::slug($property->name);
+
             $ranked[] = [
                 'id' => $property->id,
                 'name' => $property->name,
-                'slug' => $property->slug ?? $property->id,
+                'slug' => $propSlug,
                 'image' => $property->display_image_url,
                 'rating' => (float) ($property->dynamic_rating > 0 ? $property->dynamic_rating : ($property->rating ?? 0)),
                 'total_reviews' => (int) $property->dynamic_reviews_count,
@@ -66,7 +68,7 @@ class PropertyRankingService
                 'amenities' => array_slice($amenitiesList, 0, 4),
                 'match_score' => $analysis['score'],
                 'match_breakdown' => $analysis['breakdown'],
-                'detail_url' => route('user.detail', $property->id),
+                'detail_url' => route('user.detail', ['slug' => $propSlug]),
                 'latitude' => (float) ($property->latitude ?? 28.6280),
                 'longitude' => (float) ($property->longitude ?? 77.3649),
             ];

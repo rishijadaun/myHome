@@ -19,8 +19,11 @@
     $propNoticePeriod = (int) ($property->notice_period_days ?? 30);
     $propMaintenance = (float) ($property->maintenance_charges ?? 0);
     $roomConfigurations = $property ? $property->room_configurations : collect();
-    $isCommercial = strtolower($property->propertyType?->slug ?? '') === 'commercial' || ($property->gender_preference === 'not_applicable');
-    $isFlat = in_array(strtolower($property->propertyType?->slug ?? ''), ['flat', 'flat-apartment', 'apartment', 'house', 'villa']) || in_array(strtolower($property->gender_preference ?? ''), ['all', 'any']);
+    $typeSlug = strtolower($property->propertyType?->slug ?? '');
+    $genderPref = strtolower($property->gender_preference ?? '');
+    $isCommercial = in_array($typeSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space']) || ($genderPref === 'not_applicable');
+    $isFlat = !$isCommercial && (in_array($typeSlug, ['flat', 'flat-apartment', 'apartment', 'house', 'villa']) || in_array($genderPref, ['all', 'any']));
+    $isPg = !$isCommercial && !$isFlat;
     
     if ($isCommercial) {
         $propSeoTitle = $propName . ' - Commercial Space in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
@@ -259,19 +262,27 @@
             <a href="#sec-overview" data-target="sec-overview" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-bold text-brand border-b-2 border-brand transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Overview</span>
             </a>
-            @if($roomConfigurations && $roomConfigurations->count() > 0)
+            @if($isPg && $roomConfigurations && $roomConfigurations->count() > 0)
                 <a href="#sec-pricing" data-target="sec-pricing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                     <span>Room &amp; Pricing</span>
                 </a>
+            @elseif($isCommercial)
+                <a href="#sec-pricing" data-target="sec-pricing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                    <span>Commercial Lease</span>
+                </a>
+            @elseif($isFlat)
+                <a href="#sec-pricing" data-target="sec-pricing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                    <span>Rental Details</span>
+                </a>
             @endif
             <a href="#sec-amenities" data-target="sec-amenities" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>Amenities</span>
+                <span>{{ $isCommercial ? 'Features & Facilities' : ($isFlat ? 'Flat Amenities' : 'Amenities') }}</span>
             </a>
             <a href="#sec-location" data-target="sec-location" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Location</span>
             </a>
             <a href="#sec-rules" data-target="sec-rules" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>Rules &amp; More</span>
+                <span>{{ $isCommercial ? 'Lease Terms' : ($isFlat ? 'Society Guidelines' : 'Rules & More') }}</span>
             </a>
             <a href="#sec-reviews" data-target="sec-reviews" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Reviews</span>
@@ -351,7 +362,7 @@
                         <i class="fas fa-info-circle text-brand"></i> {{ $isCommercial ? 'About this Commercial Space' : ($isFlat ? 'About this Flat / House' : 'About this Stay') }}
                     </h2>
                     <p class="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                        {{ $property->description ?? ($propName . ' offers premium, fully furnished student and professional accommodation. Located in a prime area with 24/7 security, high-speed WiFi, hygienic meals, and daily housekeeping.') }}
+                        {{ $property->description ?? ($propName . ' offers premium, ' . ($isCommercial ? 'commercial office/retail space.' : ($isFlat ? 'independent apartment/house rental.' : 'student and professional accommodation.')) . ' Located in a prime area with 24/7 security, high-speed connectivity, and verified amenities.') }}
                     </p>
                     
                     @if($property && $property->landmark)
@@ -363,16 +374,116 @@
                 </div>
             </div>
 
-            <!-- 2. ROOM SHARING & PRICING SECTION -->
-            @if($roomConfigurations && $roomConfigurations->count() > 0)
+            <!-- 2. PRICING & SPACE CONFIGURATION SECTION -->
+            @if($isCommercial)
+                <!-- Commercial Space Lease & Pricing Details -->
+                <div id="sec-pricing" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-store text-amber-600"></i> Commercial Space Lease &amp; Pricing
+                        </h2>
+                        <span class="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-xl">
+                            100% Zero Brokerage
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                        <div class="p-4 rounded-2xl border-2 border-amber-500/40 bg-amber-50/40 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">Monthly Lease Rent</span>
+                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mt-1">₹{{ $propRent }}<span class="text-xs font-normal text-gray-500">/mo</span></h3>
+                                <p class="text-[11px] text-gray-600 mt-0.5">Prime commercial unit with direct owner lease terms</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-amber-200 flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-amber-700">0% Commission</span>
+                                <button type="button" onclick="openBookStayModal('Full Commercial Space', {{ (int)str_replace(',', '', $propRent) }})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold rounded-xl transition tap-effect shadow-xs cursor-pointer">
+                                    Book Space
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Security Deposit</span>
+                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mt-1">₹{{ $propDeposit }}</h3>
+                                <p class="text-[11px] text-gray-500 mt-0.5">100% refundable commercial lease deposit</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-600">
+                                <span>Lock-in / Notice:</span>
+                                <span class="font-bold text-gray-900">{{ $propNoticePeriod }} Days</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Maintenance &amp; Facilities</span>
+                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mt-1">{{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . '/mo' : 'Included in Rent' }}</h3>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Common building upkeep &amp; facilities</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-600">
+                                <span>Occupancy:</span>
+                                <span class="font-bold text-emerald-600 flex items-center gap-1"><i class="fas fa-check-circle text-[10px]"></i> Ready to Move</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @elseif($isFlat)
+                <!-- Flat & House Rental & Pricing Details -->
+                <div id="sec-pricing" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-building text-indigo-600"></i> Flat &amp; House Rental Details
+                        </h2>
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-xl">
+                            Full House Rental • Zero Brokerage
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                        <div class="p-4 rounded-2xl border-2 border-indigo-500/40 bg-indigo-50/40 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-indigo-800 uppercase tracking-wider">Full Unit Monthly Rent</span>
+                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mt-1">₹{{ $propRent }}<span class="text-xs font-normal text-gray-500">/mo</span></h3>
+                                <p class="text-[11px] text-gray-600 mt-0.5">Complete private flat/house for family or working group</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-indigo-200 flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-indigo-700">Zero Commission</span>
+                                <button type="button" onclick="openBookStayModal('Full Flat / House', {{ (int)str_replace(',', '', $propRent) }})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-xl transition tap-effect shadow-xs cursor-pointer">
+                                    Book Flat
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Security Deposit</span>
+                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mt-1">₹{{ $propDeposit }}</h3>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Refundable deposit as per landlord agreement</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-600">
+                                <span>Notice Period:</span>
+                                <span class="font-bold text-gray-900">{{ $propNoticePeriod }} Days</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Maintenance Charges</span>
+                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mt-1">{{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . '/mo' : 'Zero Maintenance' }}</h3>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Society upkeep, lifts, water &amp; 24/7 security</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-600">
+                                <span>Occupancy:</span>
+                                <span class="font-bold text-emerald-600 flex items-center gap-1"><i class="fas fa-check-circle text-[10px]"></i> Ready to Occupy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @elseif($isPg && $roomConfigurations && $roomConfigurations->count() > 0)
+                <!-- PG & Hostel Room Sharing & Pricing -->
                 <div id="sec-pricing" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
                     <div class="flex items-center justify-between gap-3 mb-4">
                         <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
                             <i class="fas fa-door-open text-brand"></i> Room Sharing &amp; Pricing
                         </h2>
-                        <!-- <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-lg">
-                            {{ $roomConfigurations->count() }} {{ Str::plural('Option', $roomConfigurations->count()) }} Available
-                        </span> -->
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-{{ min(3, max(1, $roomConfigurations->count())) }} gap-3.5">
                         @foreach($roomConfigurations as $rc)
@@ -844,8 +955,9 @@
                                 </a>
                             </div>
                         @else
-                            <button type="button" onclick="openBookStayModal()" class="w-full bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md cursor-pointer">
-                                <i class="fas fa-calendar-check"></i> Book Stay Online
+                            <button type="button" onclick="openBookStayModal('{{ $isCommercial ? 'Full Commercial Space' : ($isFlat ? 'Full Flat / House' : 'Standard Stay') }}', {{ (int)str_replace(',', '', $propRent) }})" class="w-full bg-gradient-to-r {{ $isCommercial ? 'from-amber-600 to-amber-700 shadow-amber-500/30' : ($isFlat ? 'from-indigo-600 to-indigo-700 shadow-indigo-500/30' : 'from-brand to-brand-dark shadow-brand/30') }} hover:shadow-lg text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md cursor-pointer">
+                                <i class="fas {{ $isCommercial ? 'fa-store' : ($isFlat ? 'fa-building' : 'fa-calendar-check') }}"></i> 
+                                {{ $isCommercial ? 'Book Commercial Space' : ($isFlat ? 'Book Flat / House Online' : 'Book Stay Online') }}
                             </button>
                         @endif
 
@@ -1255,15 +1367,15 @@
                     <i class="fas fa-check-circle"></i> View Booking
                 </a>
             @else
-                <button type="button" onclick="openBookStayModal()" class="bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-2.5 px-5 rounded-2xl text-xs tap-effect shadow-md shadow-brand/30 cursor-pointer">
-                    Book Stay
+                <button type="button" onclick="openBookStayModal('{{ $isCommercial ? 'Full Commercial Space' : ($isFlat ? 'Full Flat / House' : 'Standard Stay') }}', {{ (int)str_replace(',', '', $propRent) }})" class="bg-gradient-to-r {{ $isCommercial ? 'from-amber-600 to-amber-700 shadow-amber-500/30' : ($isFlat ? 'from-indigo-600 to-indigo-700 shadow-indigo-500/30' : 'from-brand to-brand-dark shadow-brand/30') }} text-white font-bold py-2.5 px-5 rounded-2xl text-xs tap-effect shadow-md cursor-pointer">
+                    {{ $isCommercial ? 'Book Space' : ($isFlat ? 'Book Flat' : 'Book Stay') }}
                 </button>
             @endif
         </div>
     </div>
 </div>
 
-<!-- ================= BOOK STAY MODAL (AUTH USERS) ================= -->
+<!-- ================= BOOK STAY / SPACE MODAL (AUTH USERS) ================= -->
 <div id="bookStayModal" class="fixed inset-0 z-[3000] hidden items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
     <!-- Backdrop -->
     <div onclick="closeBookStayModal()" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm transition-opacity"></div>
@@ -1273,14 +1385,16 @@
         <!-- Modal Header -->
         <div class="flex items-center justify-between mb-5 pb-3.5 border-b border-gray-100">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-lg font-bold flex-shrink-0">
-                    <i class="fas fa-calendar-check"></i>
+                <div class="w-11 h-11 rounded-2xl {{ $isCommercial ? 'bg-amber-50 text-amber-600' : ($isFlat ? 'bg-indigo-50 text-indigo-600' : 'bg-brand/10 text-brand') }} flex items-center justify-center text-lg font-bold flex-shrink-0">
+                    <i class="fas {{ $isCommercial ? 'fa-store' : ($isFlat ? 'fa-building' : 'fa-calendar-check') }}"></i>
                 </div>
                 <div>
-                    <h3 class="text-lg sm:text-xl font-black text-gray-900 leading-tight">Book Your Stay</h3>
+                    <h3 class="text-lg sm:text-xl font-black text-gray-900 leading-tight">
+                        {{ $isCommercial ? 'Book Commercial Space' : ($isFlat ? 'Book Flat / House Online' : 'Book Your Stay') }}
+                    </h3>
                     <p class="text-xs text-gray-500 flex items-center gap-1.5 mt-0.5">
                         <i class="fas fa-shield-check text-emerald-500"></i>
-                        <span>Zero Advance Payment • Direct Host Review &amp; Confirmation</span>
+                        <span>Zero Advance Payment • Direct {{ $isCommercial ? 'Owner' : ($isFlat ? 'Landlord' : 'Host') }} Review &amp; Confirmation</span>
                     </p>
                 </div>
             </div>
@@ -1293,14 +1407,46 @@
             @csrf
             <input type="hidden" name="property_id" value="{{ $property->id ?? '' }}">
             <input type="hidden" name="base_rent" id="bookingBaseRentInput" value="{{ $property->monthly_rent ?? 0 }}">
-            <input type="hidden" name="room_type_name" id="bookingRoomTypeInput" value="Standard Stay">
+            <input type="hidden" name="room_type_name" id="bookingRoomTypeInput" value="{{ $isCommercial ? 'Full Commercial Space' : ($isFlat ? 'Full Flat / House' : 'Standard Stay') }}">
             <input type="hidden" name="tenant_email" value="{{ auth()->user()?->email ?? '' }}">
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6">
                 <!-- Left Column: Booking Parameters & Tenant Info (7 cols) -->
                 <div class="md:col-span-7 space-y-4 text-xs">
-                    <!-- Room / Sharing Selection -->
-                    @if($roomConfigurations && $roomConfigurations->count() > 0)
+                    <!-- Room / Unit Selection -->
+                    @if($isCommercial)
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1.5">Selected Commercial Unit</label>
+                            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-xs">
+                                        <i class="fas fa-store"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-bold text-gray-900 text-xs block">Full Commercial Space</span>
+                                        <span class="text-[10px] text-amber-800">Prime Business Unit • Zero Commission</span>
+                                    </div>
+                                </div>
+                                <span class="font-black text-amber-900 text-xs">₹{{ $propRent }}/mo</span>
+                            </div>
+                        </div>
+                    @elseif($isFlat)
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1.5">Selected Flat / House Unit</label>
+                            <div class="p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-bold text-gray-900 text-xs block">Full Private Flat / House</span>
+                                        <span class="text-[10px] text-indigo-800">Independent Living • Zero Brokerage</span>
+                                    </div>
+                                </div>
+                                <span class="font-black text-indigo-900 text-xs">₹{{ $propRent }}/mo</span>
+                            </div>
+                        </div>
+                    @elseif($isPg && $roomConfigurations && $roomConfigurations->count() > 0)
                         <div>
                             <label class="block font-bold text-gray-700 mb-1.5">Select Sharing / Room Type <span class="text-rose-500">*</span></label>
                             <div class="grid grid-cols-2 sm:grid-cols-{{ min(3, $roomConfigurations->count()) }} gap-2" id="bookingRoomTypeContainer">

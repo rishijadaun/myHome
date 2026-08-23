@@ -38,7 +38,7 @@ class AdminUserController extends Controller
         })->count();
 
         // 2. Query Builder
-        $query = User::with(['profile', 'roles', 'bookings', 'properties']);
+        $query = User::with(['profile', 'roles'])->withCount(['bookings', 'properties']);
 
         // Search Filter
         if ($request->filled('search')) {

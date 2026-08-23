@@ -21,12 +21,15 @@ class UserHomeController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Single-pass query for approved listings
+        // 1. Single-pass query for approved listings with aggregated review metrics to eliminate N+1 queries
         $allApproved = Property::where('status', 'active')
             ->where('verification_status', 'verified')
             ->where('is_active', 1)
             ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType'])
+            ->withCount(['approvedReviews as approved_reviews_count'])
+            ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating')
             ->latest('created_at')
+            ->take(150)
             ->get();
 
         // 2. Classify by Property Type

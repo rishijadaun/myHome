@@ -89,7 +89,12 @@ class BrokerBookingController extends Controller
                   ->orWhere('tenant_name', 'LIKE', "%{$search}%")
                   ->orWhere('tenant_phone', 'LIKE', "%{$search}%")
                   ->orWhere('tenant_email', 'LIKE', "%{$search}%")
-                  ->orWhereHas('user', fn($uq) => $uq->where('name', 'LIKE', "%{$search}%")->orWhere('phone', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%"))
+                  ->orWhereHas('user.profile', function ($pq) use ($search) {
+                      $pq->where('first_name', 'LIKE', "%{$search}%")
+                        ->orWhere('last_name', 'LIKE', "%{$search}%")
+                        ->orWhere('full_name', 'LIKE', "%{$search}%");
+                  })
+                  ->orWhereHas('user', fn($uq) => $uq->where('phone', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%"))
                   ->orWhereHas('property', fn($pq) => $pq->where('name', 'LIKE', "%{$search}%"));
             });
         }

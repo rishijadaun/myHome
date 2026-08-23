@@ -568,9 +568,13 @@ class AdminPropertyController extends Controller
             $query->where(function ($q) use ($searchQuery) {
                 $q->where('title', 'like', "%{$searchQuery}%")
                   ->orWhere('comment', 'like', "%{$searchQuery}%")
+                  ->orWhereHas('user.profile', function ($pq) use ($searchQuery) {
+                      $pq->where('first_name', 'like', "%{$searchQuery}%")
+                         ->orWhere('last_name', 'like', "%{$searchQuery}%")
+                         ->orWhere('full_name', 'like', "%{$searchQuery}%");
+                  })
                   ->orWhereHas('user', function ($uq) use ($searchQuery) {
-                      $uq->where('name', 'like', "%{$searchQuery}%")
-                         ->orWhere('email', 'like', "%{$searchQuery}%")
+                      $uq->where('email', 'like', "%{$searchQuery}%")
                          ->orWhere('phone', 'like', "%{$searchQuery}%");
                   })
                   ->orWhereHas('property', function ($pq) use ($searchQuery) {

@@ -49,6 +49,8 @@ class PropertySearchService
         // 2. Query ONLY active & admin-verified database properties
         $query = Property::query()
             ->with(['city', 'area', 'images', 'primaryImage', 'amenities', 'rules', 'propertyType'])
+            ->withCount(['approvedReviews as approved_reviews_count'])
+            ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating')
             ->where('status', 'active')
             ->where('verification_status', 'verified')
             ->where('is_active', 1)
@@ -405,6 +407,8 @@ class PropertySearchService
         // 1. Fetch top trending, featured, recommended, or highest-rated verified properties
         $trendingProperties = Property::query()
             ->with(['city', 'area', 'images', 'primaryImage', 'amenities', 'rules', 'propertyType'])
+            ->withCount(['approvedReviews as approved_reviews_count'])
+            ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating')
             ->where('status', 'active')
             ->where('verification_status', 'verified')
             ->where('is_active', 1)
@@ -425,6 +429,8 @@ class PropertySearchService
         if ($trendingProperties->isEmpty()) {
             $trendingProperties = Property::query()
                 ->with(['city', 'area', 'images', 'primaryImage', 'amenities', 'rules', 'propertyType'])
+                ->withCount(['approvedReviews as approved_reviews_count'])
+                ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating')
                 ->where('status', 'active')
                 ->where('verification_status', 'verified')
                 ->where('is_active', 1)

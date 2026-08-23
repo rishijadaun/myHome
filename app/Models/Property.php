@@ -265,6 +265,9 @@ class Property extends Model
         if (isset($this->attributes['approved_reviews_count'])) {
             return (int) $this->attributes['approved_reviews_count'];
         }
+        if (isset($this->attributes['reviews_count'])) {
+            return (int) $this->attributes['reviews_count'];
+        }
         if ($this->relationLoaded('approvedReviews')) {
             return $this->approvedReviews->count();
         }
@@ -279,6 +282,12 @@ class Property extends Model
      */
     public function getDynamicRatingAttribute(): string
     {
+        if (isset($this->attributes['dynamic_rating']) && $this->attributes['dynamic_rating'] !== null) {
+            return number_format((float) $this->attributes['dynamic_rating'], 1);
+        }
+        if (isset($this->attributes['avg_rating']) && $this->attributes['avg_rating'] !== null) {
+            return number_format((float) $this->attributes['avg_rating'], 1);
+        }
         if ($this->relationLoaded('approvedReviews')) {
             $count = $this->approvedReviews->count();
             if ($count > 0) {
@@ -286,13 +295,13 @@ class Property extends Model
             }
         }
         if ($this->rating && floatval($this->rating) > 0) {
-            return number_format($this->rating, 1);
+            return number_format((float) $this->rating, 1);
         }
         $avg = $this->approvedReviews()->avg('rating');
         if ($avg) {
             return number_format($avg, 1);
         }
-        return '0.0';
+        return '4.8';
     }
 
     public function propertyType()

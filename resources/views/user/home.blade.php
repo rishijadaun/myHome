@@ -1997,54 +1997,97 @@
 
     {{-- ============================= 7. EXPLORE TOP CITIES ============================= --}}
     <section class="mt-8 sm:mt-10">
+    {{-- ============================= 7. TOP CITIES (SWIPER SLIDER DESKTOP & MOBILE) ============================= --}}
+    <section class="mt-8 sm:mt-10 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center mb-4 sm:mb-5">
                 <div>
                     <h2 class="section-title">Top Cities</h2>
                     <p class="text-xs text-gray-500 mt-0.5">Explore verified stays and properties across India</p>
                 </div>
-                <a href="{{ route('user.search') }}{{ $selectedType && $selectedType !== 'pg-hostel' ? '?type=' . $selectedType : '' }}" id="allCitiesHeaderLink" class="text-xs font-bold text-brand flex items-center gap-1.5 bg-brand-light hover:bg-brand/15 px-3.5 py-1.5 rounded-full tap-ripple transition">
-                    All Cities <i class="fas fa-arrow-right text-[10px]"></i>
-                </a>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4" id="topCitiesGrid">
-                @forelse ($topCities as $c)
-                    @php
-                        $citySearchUrl = route('user.search') . '?city=' . urlencode($c->name) . ($selectedType && $selectedType !== 'pg-hostel' ? '&type=' . $selectedType : '');
-                    @endphp
-                    <a href="{{ $citySearchUrl }}" data-city-name="{{ $c->name }}" class="city-card-link relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square tap-ripple group shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
-                        <img src="{{ $c->display_image_url }}" alt="{{ $c->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
-                        <div class="absolute bottom-3 left-3 sm:bottom-3.5 sm:left-3.5 text-left text-white pr-2">
-                            <p class="font-black text-sm sm:text-base leading-tight drop-shadow-md tracking-tight">{{ $c->name }}</p>
-                            <p class="text-[10px] text-gray-200 font-medium opacity-90 drop-shadow-sm">{{ $c->properties_count > 0 ? $c->properties_count . ' verified stays' : 'Explore stays' }}</p>
-                        </div>
+                <div class="flex items-center gap-2">
+                    <!-- Swiper Navigation Arrows (Desktop & Tablet) -->
+                    <div class="hidden sm:flex items-center gap-1.5 mr-1">
+                        <button type="button" class="topCitiesPrevBtn w-8 h-8 rounded-full border border-gray-200 bg-white hover:bg-brand hover:text-white text-gray-600 flex items-center justify-center text-xs transition shadow-xs tap-ripple cursor-pointer" title="Previous Cities">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="topCitiesNextBtn w-8 h-8 rounded-full border border-gray-200 bg-white hover:bg-brand hover:text-white text-gray-600 flex items-center justify-center text-xs transition shadow-xs tap-ripple cursor-pointer" title="Next Cities">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <a href="{{ route('user.search') }}{{ $selectedType && $selectedType !== 'pg-hostel' ? '?type=' . $selectedType : '' }}" id="allCitiesHeaderLink" class="text-xs font-bold text-brand flex items-center gap-1.5 bg-brand-light hover:bg-brand/15 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                        All Cities <i class="fas fa-arrow-right text-[10px]"></i>
                     </a>
-                @empty
-                    @php
-                        $fallbackCities = [
-                            ['name' => 'Delhi NCR', 'img' => 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=600&q=80', 'stays' => '2,800+'],
-                            ['name' => 'Bangalore', 'img' => 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&w=600&q=80', 'stays' => '3,400+'],
-                            ['name' => 'Noida', 'img' => 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=600&q=80', 'stays' => '1,200+'],
-                            ['name' => 'Mumbai', 'img' => 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=600&q=80', 'stays' => '1,900+'],
-                            ['name' => 'Gurugram', 'img' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80', 'stays' => '1,500+'],
-                            ['name' => 'Pune', 'img' => 'https://images.unsplash.com/photo-1627894483216-2138af692e32?auto=format&fit=crop&w=600&q=80', 'stays' => '950+'],
-                        ];
-                    @endphp
-                    @foreach ($fallbackCities as $fc)
+                </div>
+            </div>
+
+            <!-- Top Cities Swiper Slider -->
+            <div class="swiper topCitiesSwiper overflow-hidden !py-1">
+                <div class="swiper-wrapper">
+                    @forelse ($topCities as $c)
                         @php
-                            $fallbackSearchUrl = route('user.search') . '?city=' . urlencode($fc['name']) . ($selectedType && $selectedType !== 'pg-hostel' ? '&type=' . $selectedType : '');
+                            $citySearchUrl = route('user.search') . '?city=' . urlencode($c->name) . ($selectedType && $selectedType !== 'pg-hostel' ? '&type=' . $selectedType : '');
                         @endphp
-                        <a href="{{ $fallbackSearchUrl }}" data-city-name="{{ $fc['name'] }}" class="city-card-link relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square tap-ripple group shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
-                            <img src="{{ $fc['img'] }}" alt="{{ $fc['name'] }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
-                            <div class="absolute bottom-3 left-3 sm:bottom-3.5 sm:left-3.5 text-left text-white pr-2">
-                                <p class="font-black text-sm sm:text-base leading-tight drop-shadow-md tracking-tight">{{ $fc['name'] }}</p>
-                                <p class="text-[10px] text-gray-200 font-medium opacity-90 drop-shadow-sm">{{ $fc['stays'] }} verified stays</p>
+                        <div class="swiper-slide !h-auto">
+                            <a href="{{ $citySearchUrl }}" data-city-name="{{ $c->name }}" class="city-card-link group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[3/4] sm:aspect-[3/4.2] min-h-[190px] sm:min-h-[230px] tap-ripple shadow-sm hover:shadow-2xl hover:shadow-brand/25 border border-gray-100 hover:border-brand/40 hover:-translate-y-1.5 transition-all duration-300 flex items-center justify-center p-3 sm:p-4 text-center w-full">
+                                <!-- Background Image -->
+                                <img src="{{ $c->display_image_url }}" alt="{{ $c->name }}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80';" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                                
+                                <!-- Multi-stop Gradient Vignette for Center Text Legibility -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-slate-950/60 group-hover:via-slate-950/50 transition-colors duration-300"></div>
+
+                                <!-- Top Floating Arrow Indicator -->
+                                <div class="absolute top-3 right-3 z-10">
+                                    <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center text-[10px] sm:text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300 shadow-sm">
+                                        <i class="fas fa-arrow-up-right text-[10px]"></i>
+                                    </span>
+                                </div>
+
+                                <!-- Centered City Name -->
+                                <div class="relative z-10 text-center text-white px-2">
+                                    <p class="font-black text-base sm:text-lg md:text-xl text-white leading-tight drop-shadow-lg tracking-tight">{{ $c->name }}</p>
+                                </div>
+                            </a>
+                        </div>
+                    @empty
+                        @php
+                            $fallbackCities = [
+                                ['name' => 'Delhi NCR', 'img' => 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Bangalore', 'img' => 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Noida', 'img' => 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Mumbai', 'img' => 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Gurugram', 'img' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Hyderabad', 'img' => 'https://images.unsplash.com/photo-1576487248805-cf45f6bcc67f?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Ahmedabad', 'img' => 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Pune', 'img' => 'https://images.unsplash.com/photo-1627894483216-2138af692e32?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Lucknow', 'img' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Ghaziabad', 'img' => 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Jaipur', 'img' => 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Kolkata', 'img' => 'https://images.unsplash.com/photo-1558431382-27e303142255?auto=format&fit=crop&w=800&q=80'],
+                            ];
+                        @endphp
+                        @foreach ($fallbackCities as $fc)
+                            @php
+                                $fallbackSearchUrl = route('user.search') . '?city=' . urlencode($fc['name']) . ($selectedType && $selectedType !== 'pg-hostel' ? '&type=' . $selectedType : '');
+                            @endphp
+                            <div class="swiper-slide !h-auto">
+                                <a href="{{ $fallbackSearchUrl }}" data-city-name="{{ $fc['name'] }}" class="city-card-link group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[3/4] sm:aspect-[3/4.2] min-h-[190px] sm:min-h-[230px] tap-ripple shadow-sm hover:shadow-2xl hover:shadow-brand/25 border border-gray-100 hover:border-brand/40 hover:-translate-y-1.5 transition-all duration-300 flex items-center justify-center p-3 sm:p-4 text-center w-full">
+                                    <img src="{{ $fc['img'] }}" alt="{{ $fc['name'] }}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-slate-950/60"></div>
+                                    <div class="absolute top-3 right-3 z-10">
+                                        <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center text-[10px] sm:text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300 shadow-sm">
+                                            <i class="fas fa-arrow-up-right text-[10px]"></i>
+                                        </span>
+                                    </div>
+                                    <div class="relative z-10 text-center text-white px-2">
+                                        <p class="font-black text-base sm:text-lg md:text-xl text-white leading-tight drop-shadow-lg tracking-tight">{{ $fc['name'] }}</p>
+                                    </div>
+                                </a>
                             </div>
-                        </a>
-                    @endforeach
-                @endforelse
+                        @endforeach
+                    @endforelse
+                </div>
             </div>
         </div>
     </section>
@@ -2165,6 +2208,46 @@ document.addEventListener('DOMContentLoaded', function() {
         autoplay: { delay: 4500, disableOnInteraction: false },
         pagination: { el: '.promoSwiper .swiper-pagination', clickable: true, dynamicBullets: true },
         navigation: { nextEl: '.promoSwiper .swiper-button-next', prevEl: '.promoSwiper .swiper-button-prev' },
+    });
+
+    // 1b. Top Cities — Autoplay slider with mobile app feel and desktop controls
+    window.topCitiesSwiperInstance = new Swiper('.topCitiesSwiper', {
+        slidesPerView: 2.3,
+        spaceBetween: 12,
+        loop: true,
+        grabCursor: true,
+        speed: 700,
+        autoplay: {
+            delay: 2600,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+        },
+        navigation: {
+            nextEl: '.topCitiesNextBtn',
+            prevEl: '.topCitiesPrevBtn',
+        },
+        breakpoints: {
+            480: {
+                slidesPerView: 2.8,
+                spaceBetween: 12,
+            },
+            640: {
+                slidesPerView: 3.5,
+                spaceBetween: 14,
+            },
+            768: {
+                slidesPerView: 4.2,
+                spaceBetween: 16,
+            },
+            1024: {
+                slidesPerView: 5.2,
+                spaceBetween: 16,
+            },
+            1280: {
+                slidesPerView: 6,
+                spaceBetween: 16,
+            },
+        },
     });
 
     // 2. Mobile 2-Column Horizontal Sliders (Near Me & Recommended)
@@ -2567,6 +2650,9 @@ function switchPropertyType(type, triggerScroll = false) {
 
     // Refresh Swipers to ensure smooth rendering on container toggle
     setTimeout(() => {
+        if (window.topCitiesSwiperInstance && typeof window.topCitiesSwiperInstance.update === 'function') {
+            window.topCitiesSwiperInstance.update();
+        }
         if (window.nearMeSwiperInstance && typeof window.nearMeSwiperInstance.update === 'function') {
             window.nearMeSwiperInstance.update();
         }

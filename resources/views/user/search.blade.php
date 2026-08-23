@@ -104,7 +104,9 @@
             <input type="hidden" name="city" id="hiddenCityInput" value="{{ $selectedCity ?? '' }}">
             <input type="hidden" name="gender" id="hiddenGenderInput" value="{{ $selectedGender ?? '' }}">
             <input type="hidden" name="budget" id="hiddenBudgetInput" value="{{ $budget ?? '' }}">
-            <input type="hidden" name="sort" id="hiddenSortInput" value="{{ $sort ?? 'recommended' }}">
+            <input type="hidden" name="sort" id="hiddenSortInput" value="{{ $sort ?? 'distance-asc' }}">
+            <input type="hidden" name="lat" id="hiddenLatInput" value="{{ request('lat') ?? session('user_lat') ?? '' }}">
+            <input type="hidden" name="lng" id="hiddenLngInput" value="{{ request('lng') ?? session('user_lng') ?? '' }}">
             @if(!empty($selectedPropertyType)) <input type="hidden" name="type" id="hiddenTypeInput" value="{{ $selectedPropertyType }}"> @endif
             @if(!empty($filterAC)) <input type="hidden" name="ac" value="1"> @endif
             @if(!empty($filterFood)) <input type="hidden" name="food" value="1"> @endif
@@ -227,11 +229,11 @@
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-2">Sorting</label>
                     <select id="desktopSortFilter" onchange="applyDesktopFilterChange()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all appearance-none cursor-pointer">
-                        <option value="recommended" {{ ($sort ?? '') === 'recommended' && !request('near_me') ? 'selected' : '' }}>StayNest Recommended</option>
-                        <option value="distance-asc" {{ ($sort ?? '') === 'distance-asc' || request('near_me') ? 'selected' : '' }}>Distance: Low to High</option>
-                        <option value="price-asc" {{ ($sort ?? '') === 'price-asc' ? 'selected' : '' }}>Price: Low to High</option>
-                        <option value="price-desc" {{ ($sort ?? '') === 'price-desc' ? 'selected' : '' }}>Price: High to Low</option>
-                        <option value="rating" {{ ($sort ?? '') === 'rating' ? 'selected' : '' }}>Top Rated</option>
+                        <option value="distance-asc" {{ ($sort ?? 'distance-asc') === 'distance-asc' || request('near_me') ? 'selected' : '' }}>📍 Distance: Low to High (Default)</option>
+                        <option value="recommended" {{ ($sort ?? '') === 'recommended' && !request('near_me') ? 'selected' : '' }}>✨ StayNest Recommended</option>
+                        <option value="price-asc" {{ ($sort ?? '') === 'price-asc' ? 'selected' : '' }}>💰 Price: Low to High</option>
+                        <option value="price-desc" {{ ($sort ?? '') === 'price-desc' ? 'selected' : '' }}>💎 Price: High to Low</option>
+                        <option value="rating" {{ ($sort ?? '') === 'rating' ? 'selected' : '' }}>⭐ Top Rated</option>
                     </select>
                 </div>
             </div>
@@ -281,11 +283,11 @@
             <div class="flex items-center gap-1.5">
                 <span class="text-xs sm:text-sm text-gray-500 font-medium"><i class="fas fa-sort-amount-down text-brand mr-1"></i> Sort:</span>
                 <select id="sortBySelect" onchange="handleSortDropdownChange(this.value)" class="bg-white border border-gray-200 rounded-xl py-1.5 px-2 text-xs sm:text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand/50 cursor-pointer shadow-sm">
-                    <option value="recommended" {{ ($sort ?? '') === 'recommended' && !request('near_me') ? 'selected' : '' }}>Recommended</option>
-                    <option value="distance-asc" {{ ($sort ?? '') === 'distance-asc' || request('near_me') ? 'selected' : '' }}>Distance: Low to High</option>
-                    <option value="price-asc" {{ ($sort ?? '') === 'price-asc' ? 'selected' : '' }}>Price: Low to High</option>
-                    <option value="price-desc" {{ ($sort ?? '') === 'price-desc' ? 'selected' : '' }}>Price: High to Low</option>
-                    <option value="rating" {{ ($sort ?? '') === 'rating' ? 'selected' : '' }}>Top Rated</option>
+                    <option value="distance-asc" {{ ($sort ?? 'distance-asc') === 'distance-asc' || request('near_me') ? 'selected' : '' }}>📍 Distance: Low to High (Default)</option>
+                    <option value="recommended" {{ ($sort ?? '') === 'recommended' && !request('near_me') ? 'selected' : '' }}>✨ Recommended</option>
+                    <option value="price-asc" {{ ($sort ?? '') === 'price-asc' ? 'selected' : '' }}>💰 Price: Low to High</option>
+                    <option value="price-desc" {{ ($sort ?? '') === 'price-desc' ? 'selected' : '' }}>💎 Price: High to Low</option>
+                    <option value="rating" {{ ($sort ?? '') === 'rating' ? 'selected' : '' }}>⭐ Top Rated</option>
                 </select>
             </div>
         </div>
@@ -469,9 +471,9 @@
                         <p class="text-gray-500 text-[10px] sm:text-xs mb-1 flex items-center gap-1 prop-loc truncate">
                             <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ $locationText }}
                         </p>
-                        <p class="text-blue-600 font-semibold text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 pg-search-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
-                            <i class="fas fa-location-dot text-[9px] sm:text-[10px]"></i>
-                            <span class="dist-text">Calculating...</span>
+                        <p class="text-emerald-700 font-bold text-[10px] sm:text-xs mb-1.5 flex items-center gap-1 pg-search-distance-badge" data-lat="{{ $pg->map_latitude }}" data-lng="{{ $pg->map_longitude }}">
+                            <i class="fas fa-location-dot text-[9px] sm:text-[10px] text-emerald-600"></i>
+                            <span class="dist-text font-bold text-emerald-700">{{ $pg->distance_label ?? 'Nearby' }}</span>
                         </p>
 
                         <!-- Match Breakdown Micro-tags (if matched) -->
@@ -861,7 +863,14 @@
         try {
             localStorage.setItem('staynest_user_lat', userLat);
             localStorage.setItem('staynest_user_lng', userLng);
+            document.cookie = "staynest_user_lat=" + userLat + "; path=/; max-age=" + (30 * 86400);
+            document.cookie = "staynest_user_lng=" + userLng + "; path=/; max-age=" + (30 * 86400);
         } catch (e) {}
+
+        const latInp = document.getElementById('hiddenLatInput');
+        const lngInp = document.getElementById('hiddenLngInput');
+        if (latInp) latInp.value = userLat;
+        if (lngInp) lngInp.value = userLng;
 
         const cards = document.querySelectorAll('#searchGrid .property-card');
         if (!cards.length) return;
@@ -885,10 +894,11 @@
             }
         });
 
-        // Check if current sort order is distance-asc or near_me
-        const currentSort = '{{ $sort ?? "" }}';
+        // Check if current sort order is distance-asc or default (no sort param in URL)
+        const currentSort = '{{ $sort ?? "distance-asc" }}';
         const urlParams = new URLSearchParams(window.location.search);
-        const isDistanceSort = currentSort === 'distance-asc' || urlParams.get('sort') === 'distance-asc' || urlParams.get('near_me') === '1';
+        const explicitSort = urlParams.get('sort');
+        const isDistanceSort = !explicitSort || explicitSort === 'distance-asc' || explicitSort === 'distance' || currentSort === 'distance-asc' || urlParams.get('near_me') === '1';
 
         if (isDistanceSort && cardItems.length > 0) {
             const grid = document.getElementById('searchGrid');

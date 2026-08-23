@@ -106,11 +106,19 @@ class UserHomeController extends Controller
             $selectedType = 'pg-hostel';
         }
 
-        // 7. Top Cities with active property count (cached for ultra-fast TTFB)
-        $topCities = \Illuminate\Support\Facades\Cache::remember('home_top_cities_v2', 300, function () {
+        // 7. Top Cities with dynamic active property count (12 cities for slider carousel)
+        $cacheKey = 'home_top_cities_v5_' . $selectedType;
+        $topCities = \Illuminate\Support\Facades\Cache::remember($cacheKey, 120, function () use ($selectedType) {
             $rawCities = City::where('is_active', 1)
-                ->withCount(['properties' => function ($q) {
+                ->withCount(['properties' => function ($q) use ($selectedType) {
                     $q->where('status', 'active')->where('verification_status', 'verified')->where('is_active', 1);
+                    if ($selectedType === 'flat-apartment') {
+                        $q->whereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['flat', 'flat-apartment', 'apartment', 'house', 'villa']));
+                    } elseif ($selectedType === 'commercial') {
+                        $q->whereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['commercial', 'shop', 'office', 'retail', 'commercial-space']));
+                    } elseif ($selectedType === 'pg-hostel') {
+                        $q->whereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['pg-hostel', 'co-living', 'hostel']));
+                    }
                 }])
                 ->orderByDesc('properties_count')
                 ->orderByDesc('is_metro')
@@ -125,7 +133,7 @@ class UserHomeController extends Controller
                 }
                 $seenCityNames[] = $normalized;
                 return true;
-            })->take(6);
+            })->take(12);
         });
 
         return view('user.home', compact(
@@ -313,7 +321,7 @@ class UserHomeController extends Controller
         $explicitBudget = trim($request->query('budget') ?? '');
         $minPrice = $request->query('min_price');
         $maxPrice = $request->query('max_price');
-        $sort = $request->query('sort', 'recommended');
+        $sort = $request->query('sort', 'distance-asc');
 
         // Checkbox states (if explicitly passed in request, override parsed intent)
         $reqHasAC = $request->has('ac');
@@ -480,24 +488,52 @@ class UserHomeController extends Controller
             $properties = collect();
         }
 
-        // 6. Manual Sort override if requested
-        if ($sort === 'distance-asc' || $request->has('near_me')) {
-            $userLat = (float)($request->query('lat') ?? 28.6280);
-            $userLng = (float)($request->query('lng') ?? 77.3649);
-            $properties = $properties->sortBy(function ($p) use ($userLat, $userLng) {
-                $pLat = (float)($p->map_latitude ?? 28.6280);
-                $pLng = (float)($p->map_longitude ?? 77.3649);
+        // 6. Calculate GPS Haversine distance for each property from user's current location
+        $sessionLat = $request->hasSession() ? $request->session()->get('user_lat') : null;
+        $sessionLng = $request->hasSession() ? $request->session()->get('user_lng') : null;
+        $reqUserLat = $request->query('lat') ?? $request->query('latitude') ?? $sessionLat ?? $request->cookie('staynest_user_lat');
+        $reqUserLng = $request->query('lng') ?? $request->query('longitude') ?? $sessionLng ?? $request->cookie('staynest_user_lng');
+
+        // Fallback default coordinates (Noida/NCR coordinates: 28.6280, 77.3649)
+        $userLat = (float)($reqUserLat ?: 28.6280);
+        $userLng = (float)($reqUserLng ?: 77.3649);
+
+        // Store in session if passed and session available
+        if ($reqUserLat && $reqUserLng && $request->hasSession()) {
+            $request->session()->put('user_lat', $userLat);
+            $request->session()->put('user_lng', $userLng);
+        }
+
+        // Attach live calculated distance to each property
+        $properties->each(function ($p) use ($userLat, $userLng) {
+            $pLat = (float)($p->map_latitude ?? $p->latitude ?? 0);
+            $pLng = (float)($p->map_longitude ?? $p->longitude ?? 0);
+            if ($pLat != 0 && $pLng != 0) {
                 $dLat = deg2rad($pLat - $userLat);
                 $dLon = deg2rad($pLng - $userLng);
                 $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($userLat)) * cos(deg2rad($pLat)) * sin($dLon / 2) * sin($dLon / 2);
-                return 6371 * (2 * atan2(sqrt($a), sqrt(1 - $a)));
-            })->values();
+                $distKm = 6371 * (2 * atan2(sqrt($a), sqrt(1 - $a)));
+                $p->calculated_distance = round($distKm, 2);
+                $p->distance_label = $distKm < 1 ? max(100, round($distKm * 1000)) . ' m away' : round($distKm, 1) . ' km away';
+            } else {
+                $p->calculated_distance = 99999;
+                $p->distance_label = 'Nearby';
+            }
+        });
+
+        // 6. Sort results: Default is distance-asc (Low Distance to High Distance)
+        if ($sort === 'distance-asc' || $sort === 'distance' || empty($sort) || $request->has('near_me')) {
+            $properties = $properties->sortBy('calculated_distance')->values();
         } elseif ($sort === 'price-asc') {
             $properties = $properties->sortBy('monthly_rent')->values();
         } elseif ($sort === 'price-desc') {
             $properties = $properties->sortByDesc('monthly_rent')->values();
         } elseif ($sort === 'rating') {
             $properties = $properties->sortByDesc('rating')->values();
+        } elseif ($sort === 'recommended') {
+            // keep AI ranking
+        } else {
+            $properties = $properties->sortBy('calculated_distance')->values();
         }
 
         // 7. Distinct Active Cities for Dropdowns and Mobile Drawer

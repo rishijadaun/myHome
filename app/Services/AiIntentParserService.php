@@ -247,18 +247,24 @@ class AiIntentParserService
             $propertyType = 'flat_house';
         }
 
+        // 6B. Trending Searches & Hot Trends Inquiry Intent
+        $isTrendingInquiry = false;
+        if (preg_match('/\b(trends?|trending|trending\s*searches|top\s*trends?|hot\s*searches|popular\s*searches|what(?:\'s|s|\s+is)\s*trending|trending\s*now|kya\s*trending\s*hai|sabse\s*jyada\s*search|viral\s*stays?|trending\s*(?:pgs?|hostels?|flats?|properties|stays)|hot\s*(?:deals?|stays?|properties)|top\s*searches|top\s*searched|hot\s*queries|top\s*queries)\b/iu', $text)) {
+            $isTrendingInquiry = true;
+        }
+
         // 7. Property Detail Inquiry Intent & Target Property Extraction
         $isDetailQuery = false;
         $targetPropertyName = null;
 
         // Matches queries like: "tell me more about Royal PG", "give full details of Royal PG", "show detail of Stanza", "details about X", "X details", "X ki detail", "X ke baare me"
-        if (!$specificListingTypeDetail && !$isListingTypesInquiry) {
+        if (!$specificListingTypeDetail && !$isListingTypesInquiry && !$isTrendingInquiry) {
             if (preg_match('/\b(?:tell\s+me\s+more\s+about|give\s+(?:full\s+)?details?\s+(?:of|about|for)|show\s+(?:more\s+)?details?\s+(?:of|about|for)|details?\s+(?:of|about|for)|more\s+(?:info|details?)\s+(?:on|about|of)|all\s+details?\s+of)\s+([a-z0-9\s\-_.,\']+)/iu', $message, $detailMatch)) {
                 $isDetailQuery = true;
                 $targetPropertyName = trim($detailMatch[1]);
             } elseif (preg_match('/\b([a-z0-9\s\-_.,\']+?)\s+(?:details?|full\s+detail|full\s+info|ki\s+details?|ke\s+baare\s+me|kaisa\s+hai|kaise\s+hai|ke\s+details)\b/iu', $message, $detailMatch2)) {
                 $candidate = trim($detailMatch2[1]);
-                if (!preg_match('/^(?:pg|hostel|flat|house|commercial|listing\s*types?|properties)$/i', $candidate)) {
+                if (!preg_match('/^(?:pg|hostel|flat|house|commercial|listing\s*types?|properties|trends?|trending)$/i', $candidate)) {
                     $isDetailQuery = true;
                     $targetPropertyName = $candidate;
                 }
@@ -291,7 +297,7 @@ class AiIntentParserService
 
         // 9. Keywords / Residual Tokens
         // Remove common stop words and extracted tokens to find residual property names or specific traits
-        $stopWordsRegex = '/\b(pg|pgs|hostel|hostels|stay|stays|room|rooms|rent|coliving|flat|flats|apartment|apartments|house|houses|commercial|space|spaces|office|offices|shop|shops|residency|accommodation|dorm|sharing|find|show|search|explore|view|tell|all|verified|available|listing|types|property|properties|chahiye|dekho|list|me|mein|ke|ki|ka|hai|ho|andar|paas|saath|bhi|wala|wali|with|and|or|in|at|near|the|for|under|below|rs|inr|rupees|hazar|thousand|approx|upto|boys|boy|male|men|ladka|ladko|girls|girl|female|women|ladies|ladkiyo|ladki|coed|unisex|ac|food|khana|meals|wifi|internet|gym|sec|sector|\d+k?)\b/iu';
+        $stopWordsRegex = '/\b(pg|pgs|hostel|hostels|stay|stays|room|rooms|rent|coliving|flat|flats|apartment|apartments|house|houses|commercial|space|spaces|office|offices|shop|shops|residency|accommodation|dorm|sharing|find|show|search|explore|view|tell|all|verified|available|listing|types|property|properties|trends?|trending|chahiye|dekho|list|me|mein|ke|ki|ka|hai|ho|andar|paas|saath|bhi|wala|wali|with|and|or|in|at|near|the|for|under|below|rs|inr|rupees|hazar|thousand|approx|upto|boys|boy|male|men|ladka|ladko|girls|girl|female|women|ladies|ladkiyo|ladki|coed|unisex|ac|food|khana|meals|wifi|internet|gym|sec|sector|\d+k?)\b/iu';
         $cleanedKeywords = trim(preg_replace('/\s+/', ' ', preg_replace($stopWordsRegex, ' ', $text)));
         $keywords = !empty($cleanedKeywords) ? array_values(array_filter(explode(' ', $cleanedKeywords), fn($w) => mb_strlen($w) >= 3)) : [];
 
@@ -316,6 +322,7 @@ class AiIntentParserService
             'raw_query' => $message,
             'is_detail_query' => $isDetailQuery,
             'is_listing_types_inquiry' => $isListingTypesInquiry,
+            'is_trending_inquiry' => $isTrendingInquiry,
             'specific_listing_type_detail' => $specificListingTypeDetail,
             'property_type' => $propertyType,
             'target_property_name' => $targetPropertyName,
@@ -328,7 +335,7 @@ class AiIntentParserService
             'amenities' => array_values(array_unique($amenities)),
             'room_type' => $roomType,
             'keywords' => $keywords,
-            'has_stay_intent' => $isListingTypesInquiry || !empty($specificListingTypeDetail) || !empty($propertyType) || $isDetailQuery || !empty($propertyName) || !empty($gender) || !empty($city) || !empty($area) || !empty($maxBudget) || !empty($amenities) || !empty($roomType) || preg_match('/\b(pg|hostel|stay|stays|room|rooms|rent|coliving|flat|residency|accommodation|dorm|sharing|find|show|search|chahiye|dekho|list)\b/iu', $text)
+            'has_stay_intent' => $isListingTypesInquiry || $isTrendingInquiry || !empty($specificListingTypeDetail) || !empty($propertyType) || $isDetailQuery || !empty($propertyName) || !empty($gender) || !empty($city) || !empty($area) || !empty($maxBudget) || !empty($amenities) || !empty($roomType) || preg_match('/\b(pg|hostel|stay|stays|room|rooms|rent|coliving|flat|residency|accommodation|dorm|sharing|find|show|search|chahiye|dekho|list|trends?|trending)\b/iu', $text)
         ];
     }
 }

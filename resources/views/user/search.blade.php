@@ -84,7 +84,7 @@
                        id="searchInput" 
                        name="q" 
                        value="{{ $searchQuery ?? '' }}" 
-                       placeholder="Search in English / Hinglish (e.g. 'Noida sec 62 boys PG 8k AC food' or 'Girls PG Bangalore')..." 
+                       placeholder="Search  (e.g. 'Noida sec 62 boys PG 8k AC food' or 'Girls PG Bangalore')..." 
                        class="w-full bg-white border border-gray-200 rounded-2xl py-3 pl-10 sm:pl-11 pr-16 sm:pr-20 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50 shadow-sm transition"
                        autocomplete="off">
                 

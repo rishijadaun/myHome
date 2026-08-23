@@ -69,8 +69,11 @@
 
         <!-- Quick Category Selector Bar -->
         <div class="bg-gray-100/90 px-3 py-2 border-b border-gray-200/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-shrink-0">
+            <!-- <button type="button" onclick="askAiPrompt('Show me trending searches')" class="text-[11px] font-black bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white px-3 py-1 rounded-lg shadow-xs whitespace-nowrap tap-effect flex items-center gap-1">
+                <i class="fas fa-fire text-yellow-300 animate-pulse"></i> 🔥 Trending Searches
+            </button> -->
             <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-[11px] font-bold bg-white text-purple-700 hover:text-purple-900 hover:border-purple-400 px-2.5 py-1 rounded-lg border border-purple-200 shadow-xs whitespace-nowrap tap-effect">
-                ✨ Listing Types
+                ✨ Explore All
             </button>
             <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-[11px] font-bold bg-white text-emerald-700 hover:text-emerald-900 hover:border-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-200 shadow-xs whitespace-nowrap tap-effect">
                 🏠 PG &amp; Hostels
@@ -99,8 +102,11 @@
                 </div>
                 <div class="bg-white p-4 rounded-2xl rounded-tl-sm border border-gray-100 shadow-xs text-xs text-gray-800 space-y-2.5">
                     <p class="font-bold text-gray-900 text-sm">Hello! I am your StayNest AI Concierge 👋</p>
-                    <p class="leading-relaxed text-gray-700">Tell me what you're looking for or explore our <strong>3 verified listing types</strong> in the database: <strong>PG &amp; Hostels</strong>, <strong>Flats &amp; Houses</strong>, and <strong>Commercial Spaces</strong>.</p>
+                    <!-- <p class="leading-relaxed text-gray-700">Tell me in English or Hindi what you're looking for, or explore our <strong>verified listing types &amp; live trending searches</strong> across India:</p> -->
                     <div class="pt-1 flex flex-wrap gap-1.5 text-[10px]">
+                        <button type="button" onclick="askAiPrompt('Show me trending searches')" class="bg-gradient-to-r from-orange-50 to-rose-50 text-orange-700 font-extrabold px-2.5 py-1 rounded-lg border border-orange-200/80 hover:bg-orange-100 transition tap-effect flex items-center gap-1">
+                            <i class="fas fa-fire text-orange-500"></i> 🔥 Trending Searches
+                        </button>
                         <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="bg-emerald-50 text-emerald-800 font-bold px-2.5 py-1 rounded-lg border border-emerald-200/80 hover:bg-emerald-100 transition tap-effect">
                             🏠 PG &amp; Hostels
                         </button>
@@ -110,31 +116,58 @@
                         <button type="button" onclick="askAiPrompt('Show me Commercial spaces')" class="bg-purple-50 text-purple-800 font-bold px-2.5 py-1 rounded-lg border border-purple-200/80 hover:bg-purple-100 transition tap-effect">
                             🏪 Commercial
                         </button>
-                        <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="bg-indigo-50 text-indigo-800 font-bold px-2.5 py-1 rounded-lg border border-indigo-200/80 hover:bg-indigo-100 transition tap-effect">
-                            ✨ All Listing Types
-                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Popular Prompt Pills -->
-            <div id="aiQuickChips" class="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
-                <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                    <i class="fas fa-bolt text-yellow-500"></i> Explore Listing Types &amp; Queries
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                    <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-left bg-purple-50/60 hover:bg-purple-100 hover:text-purple-900 p-2.5 rounded-xl border border-purple-200/70 text-[11px] font-bold text-purple-800 transition">
-                        ✨ Listing Types in Database
-                    </button>
-                    <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-left bg-emerald-50/60 hover:bg-emerald-100 hover:text-emerald-900 p-2.5 rounded-xl border border-emerald-200/70 text-[11px] font-bold text-emerald-800 transition">
-                        🏠 PG &amp; Hostels (9+ Stays)
-                    </button>
-                    <button type="button" onclick="askAiPrompt('Show me Flats & Houses')" class="text-left bg-blue-50/60 hover:bg-blue-100 hover:text-blue-900 p-2.5 rounded-xl border border-blue-200/70 text-[11px] font-bold text-blue-800 transition">
-                        🏢 Flats &amp; Houses (1+ Properties)
-                    </button>
-                    <button type="button" onclick="askAiPrompt('Show me Commercial spaces')" class="text-left bg-indigo-50/60 hover:bg-indigo-100 hover:text-indigo-900 p-2.5 rounded-xl border border-indigo-200/70 text-[11px] font-bold text-indigo-800 transition">
-                        🏪 Commercial Spaces (2+ Spaces)
-                    </button>
+            <!-- Explore Listing Types & Trending Searches Hub -->
+            <div id="aiQuickChips" class="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs space-y-3">
+                <!-- 1. Explore Listing Types -->
+                <!-- <div>
+                    <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                        <span class="flex items-center gap-1"><i class="fas fa-layer-group text-purple-600"></i> Explore Listing Types</span>
+                        <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-[10px] font-bold text-purple-600 hover:underline">All Types &rarr;</button>
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                        <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-left bg-emerald-50/60 hover:bg-emerald-100 hover:text-emerald-900 p-2 rounded-xl border border-emerald-200/70 text-[11px] font-bold text-emerald-800 transition flex items-center justify-between">
+                            <span>🏠 PG &amp; Hostels</span>
+                            <span class="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">9+ Stays</span>
+                        </button>
+                        <button type="button" onclick="askAiPrompt('Show me Flats & Houses')" class="text-left bg-blue-50/60 hover:bg-blue-100 hover:text-blue-900 p-2 rounded-xl border border-blue-200/70 text-[11px] font-bold text-blue-800 transition flex items-center justify-between">
+                            <span>🏢 Flats &amp; Houses</span>
+                            <span class="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Villas &amp; Flats</span>
+                        </button>
+                        <button type="button" onclick="askAiPrompt('Show me Commercial spaces')" class="text-left bg-purple-50/60 hover:bg-purple-100 hover:text-purple-900 p-2 rounded-xl border border-purple-200/70 text-[11px] font-bold text-purple-800 transition flex items-center justify-between">
+                            <span>🏪 Commercial</span>
+                            <span class="text-[9px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">Offices &amp; Shops</span>
+                        </button>
+                    </div>
+                </div> -->
+
+                <!-- 2. Trending Searches & Hot Queries -->
+                <div class="pt-2 border-t border-gray-100">
+                    <p class="text-[10px] font-extrabold text-orange-600 uppercase tracking-wider mb-2 flex items-center justify-between">
+                        <span class="flex items-center gap-1"><i class="fas fa-fire text-orange-500 animate-pulse"></i> 🔥 Live Trending Searches &amp; Queries</span>
+                        <button type="button" onclick="askAiPrompt('Show me trending searches')" class="text-[10px] font-bold text-orange-600 hover:underline">Explore Trends &rarr;</button>
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        <button type="button" onclick="askAiPrompt('Noida sector 62 me boys PG 8k ke andar AC food ke saath')" class="text-left bg-orange-50/40 hover:bg-orange-100/70 hover:text-orange-950 p-2 rounded-xl border border-orange-200/60 text-[11px] font-medium text-gray-800 transition flex items-center justify-between gap-1 group">
+                            <span class="truncate"><i class="fas fa-bolt text-orange-500 text-xs mr-1"></i> Boys PG Noida Sec 62 &lt; 8k</span>
+                            <span class="text-[8px] font-black bg-orange-500 text-white px-1.5 py-0.5 rounded">#1 TREND</span>
+                        </button>
+                        <button type="button" onclick="askAiPrompt('Girls PG with AC in Bangalore Koramangala under 10k')" class="text-left bg-pink-50/40 hover:bg-pink-100/70 hover:text-pink-950 p-2 rounded-xl border border-pink-200/60 text-[11px] font-medium text-gray-800 transition flex items-center justify-between gap-1 group">
+                            <span class="truncate"><i class="fas fa-sparkles text-pink-500 text-xs mr-1"></i> Girls AC Bangalore &lt; 10k</span>
+                            <span class="text-[8px] font-black bg-pink-500 text-white px-1.5 py-0.5 rounded">⚡ HOT</span>
+                        </button>
+                        <button type="button" onclick="askAiPrompt('single room chahiye attached washroom ke saath zero deposit')" class="text-left bg-purple-50/40 hover:bg-purple-100/70 hover:text-purple-950 p-2 rounded-xl border border-purple-200/60 text-[11px] font-medium text-gray-800 transition flex items-center justify-between gap-1 group">
+                            <span class="truncate"><i class="fas fa-door-open text-purple-500 text-xs mr-1"></i> Single Room + Attached Bath</span>
+                            <span class="text-[8px] font-black bg-purple-600 text-white px-1.5 py-0.5 rounded">0 DEPOSIT</span>
+                        </button>
+                        <button type="button" onclick="askAiPrompt('2 BHK furnished flat near metro station zero brokerage')" class="text-left bg-blue-50/40 hover:bg-blue-100/70 hover:text-blue-950 p-2 rounded-xl border border-blue-200/60 text-[11px] font-medium text-gray-800 transition flex items-center justify-between gap-1 group">
+                            <span class="truncate"><i class="fas fa-train-subway text-blue-500 text-xs mr-1"></i> 2 BHK Furnished Near Metro</span>
+                            <span class="text-[8px] font-black bg-blue-600 text-white px-1.5 py-0.5 rounded">FLAT</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -253,32 +286,67 @@ function clearAiChat() {
             </div>
             <div class="bg-white p-4 rounded-2xl rounded-tl-sm border border-gray-100 shadow-xs text-xs text-gray-800 space-y-2.5">
                 <p class="font-bold text-gray-900 text-sm">Hello! I am your StayNest AI Concierge 👋</p>
-                <p class="leading-relaxed text-gray-700">Tell me in English, Hindi, or Hinglish what you're looking for! For example: <em>"Noida sector 62 me boys PG 8k ke andar AC food ke saath"</em></p>
+                <p class="leading-relaxed text-gray-700">Tell me in English or Hindi what you're looking for, or explore our <strong>verified listing types &amp; live trending searches</strong> across India:</p>
                 <div class="pt-1 flex flex-wrap gap-1.5 text-[10px]">
-                    <span class="bg-pink-50 text-pink-700 font-bold px-2.5 py-1 rounded-lg border border-pink-200/60">👩 Girls PGs</span>
-                    <span class="bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-lg border border-blue-200/60">👨 Boys PGs</span>
-                    <span class="bg-purple-50 text-purple-700 font-bold px-2.5 py-1 rounded-lg border border-purple-200/60">👥 Co-Ed / Unisex</span>
-                    <span class="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-lg border border-emerald-200/60">🛡️ 100% Zero Brokerage</span>
+                    <button type="button" onclick="askAiPrompt('Show me trending searches')" class="bg-gradient-to-r from-orange-50 to-rose-50 text-orange-700 font-extrabold px-2.5 py-1 rounded-lg border border-orange-200/80 hover:bg-orange-100 transition tap-effect flex items-center gap-1">
+                        <i class="fas fa-fire text-orange-500"></i> 🔥 Trending Searches
+                    </button>
+                    <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="bg-emerald-50 text-emerald-800 font-bold px-2.5 py-1 rounded-lg border border-emerald-200/80 hover:bg-emerald-100 transition tap-effect">
+                        🏠 PG &amp; Hostels
+                    </button>
+                    <button type="button" onclick="askAiPrompt('Show me Flats & Houses')" class="bg-blue-50 text-blue-800 font-bold px-2.5 py-1 rounded-lg border border-blue-200/80 hover:bg-blue-100 transition tap-effect">
+                        🏢 Flats &amp; Houses
+                    </button>
+                    <button type="button" onclick="askAiPrompt('Show me Commercial spaces')" class="bg-purple-50 text-purple-800 font-bold px-2.5 py-1 rounded-lg border border-purple-200/80 hover:bg-purple-100 transition tap-effect">
+                        🏪 Commercial
+                    </button>
                 </div>
             </div>
         </div>
-        <div id="aiQuickChips" class="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
-            <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                <i class="fas fa-bolt text-yellow-500"></i> Try Asking Natural Queries
-            </p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                <button type="button" onclick="askAiPrompt('Noida sector 62 me boys PG 8k ke andar AC food ke saath')" class="text-left bg-gray-50 hover:bg-brand-light hover:text-brand p-2.5 rounded-xl border border-gray-200/80 text-[11px] font-semibold text-gray-700 transition">
-                    📍 Boys PG Noida Sec 62 &lt; ₹8K
-                </button>
-                <button type="button" onclick="askAiPrompt('girls pg in Bangalore with AC under 10k')" class="text-left bg-gray-50 hover:bg-brand-light hover:text-brand p-2.5 rounded-xl border border-gray-200/80 text-[11px] font-semibold text-gray-700 transition">
-                    📍 Girls PG Bangalore with AC
-                </button>
-                <button type="button" onclick="askAiPrompt('sec 62 me ladko ke liye 8 hazar ke andar AC wala PG chahiye jisme khana bhi mile')" class="text-left bg-gray-50 hover:bg-brand-light hover:text-brand p-2.5 rounded-xl border border-gray-200/80 text-[11px] font-semibold text-gray-700 transition">
-                    🏢 Ladko ka PG with AC &amp; Food
-                </button>
-                <button type="button" onclick="askAiPrompt('single room chahiye attached washroom ke saath')" class="text-left bg-gray-50 hover:bg-brand-light hover:text-brand p-2.5 rounded-xl border border-gray-200/80 text-[11px] font-semibold text-gray-700 transition">
-                    🚪 Single Room + Attached Bath
-                </button>
+        <div id="aiQuickChips" class="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs space-y-3">
+            <div>
+                <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                    <span class="flex items-center gap-1"><i class="fas fa-layer-group text-purple-600"></i> Explore Listing Types</span>
+                    <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-[10px] font-bold text-purple-600 hover:underline">All Types &rarr;</button>
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                    <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-left bg-emerald-50/60 hover:bg-emerald-100 hover:text-emerald-900 p-2 rounded-xl border border-emerald-200/70 text-[11px] font-bold text-emerald-800 transition flex items-center justify-between">
+                        <span>🏠 PG &amp; Hostels</span>
+                        <span class="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">9+ Stays</span>
+                    </button>
+                    <button type="button" onclick="askAiPrompt('Show me Flats & Houses')" class="text-left bg-blue-50/60 hover:bg-blue-100 hover:text-blue-900 p-2 rounded-xl border border-blue-200/70 text-[11px] font-bold text-blue-800 transition flex items-center justify-between">
+                        <span>🏢 Flats &amp; Houses</span>
+                        <span class="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Villas &amp; Flats</span>
+                    </button>
+                    <button type="button" onclick="askAiPrompt('Show me Commercial spaces')" class="text-left bg-purple-50/60 hover:bg-purple-100 hover:text-purple-900 p-2 rounded-xl border border-purple-200/70 text-[11px] font-bold text-purple-800 transition flex items-center justify-between">
+                        <span>🏪 Commercial</span>
+                        <span class="text-[9px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">Offices &amp; Shops</span>
+                    </button>
+                </div>
+            </div>
+            <div class="pt-2 border-t border-gray-100">
+                <p class="text-[10px] font-extrabold text-orange-600 uppercase tracking-wider mb-2 flex items-center justify-between">
+                    <span class="flex items-center gap-1"><i class="fas fa-fire text-orange-500 animate-pulse"></i> 🔥 Live Trending Searches &amp; Queries</span>
+                    <button type="button" onclick="askAiPrompt('Show me trending searches')" class="text-[10px] font-bold text-orange-600 hover:underline">Explore Trends &rarr;</button>
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    <button type="button" onclick="askAiPrompt('Noida sector 62 me boys PG 8k ke andar AC food ke saath')" class="text-left bg-orange-50/40 hover:bg-orange-100/70 hover:text-orange-950 p-2 rounded-xl border border-orange-200/60 text-[11px] font-medium text-gray-800 transition flex items-center justify-between gap-1 group">
+                        <span class="truncate"><i class="fas fa-bolt text-orange-500 text-xs mr-1"></i> Boys PG Noida Sec 62 &lt; 8k</span>
+                        <span class="text-[8px] font-black bg-orange-500 text-white px-1.5 py-0.5 rounded">#1 TREND</span>
+                    </button>
+                    <button type="button" onclick="askAiPrompt('Girls PG with AC in Bangalore Koramangala under 10k')" class="text-left bg-pink-50/40 hover:bg-pink-100/70 hover:text-pink-950 p-2 rounded-xl border border-pink-200/60 text-[11px] font-medium text-gray-800 transition flex items-center justify-between gap-1 group">
+                        <span class="truncate"><i class="fas fa-sparkles text-pink-500 text-xs mr-1"></i> Girls AC Bangalore &lt; 10k</span>
+                        <span class="text-[8px] font-black bg-pink-500 text-white px-1.5 py-0.5 rounded">⚡ HOT</span>
+                    </button>
+                    <button type="button" onclick="askAiPrompt('single room chahiye attached washroom ke saath zero deposit')" class="text-left bg-purple-50/40 hover:bg-purple-100/70 hover:text-purple-950 p-2 rounded-xl border border-purple-200/60 text-[11px] font-medium text-gray-800 transition flex items-center justify-between gap-1 group">
+                        <span class="truncate"><i class="fas fa-door-open text-purple-500 text-xs mr-1"></i> Single Room + Attached Bath</span>
+                        <span class="text-[8px] font-black bg-purple-600 text-white px-1.5 py-0.5 rounded">0 DEPOSIT</span>
+                    </button>
+                    <button type="button" onclick="askAiPrompt('2 BHK furnished flat near metro station zero brokerage')" class="text-left bg-blue-50/40 hover:bg-blue-100/70 hover:text-blue-950 p-2 rounded-xl border border-blue-200/60 text-[11px] font-medium text-gray-800 transition flex items-center justify-between gap-1 group">
+                        <span class="truncate"><i class="fas fa-train-subway text-blue-500 text-xs mr-1"></i> 2 BHK Furnished Near Metro</span>
+                        <span class="text-[8px] font-black bg-blue-600 text-white px-1.5 py-0.5 rounded">FLAT</span>
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -412,7 +480,91 @@ function renderAiResponse(data) {
 
     // Build Content HTML based on response_type
     let contentHtml = '';
-    if (data.response_type === 'listing_types_overview' && data.listing_types) {
+    if (data.response_type === 'trending_overview' && data.trending_categories) {
+        contentHtml = `
+            <div class="mt-3 space-y-3">
+                <!-- Trending Hub Header Card -->
+                <div class="p-3 bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-rose-500/10 border border-orange-200/80 rounded-2xl">
+                   
+
+                <!-- Trending Categories & Search Pills -->
+                <div class="space-y-2.5">
+                    ${data.trending_categories.map(cat => `
+                        <div class="bg-white p-3 rounded-2xl border border-gray-200/80 shadow-2xs">
+                            <p class="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                <i class="fas fa-${cat.category_icon || 'fire'} text-${cat.color || 'orange'}-500"></i> ${cat.category_name}
+                            </p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                ${cat.queries.map(q => `
+                                    <button type="button" onclick="askAiPrompt('${q.prompt.replace(/'/g, "\\'")}')" class="text-left bg-gray-50/80 hover:bg-orange-50/70 hover:border-orange-200 p-2 rounded-xl border border-gray-100 transition tap-effect flex items-start justify-between gap-1.5 group">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-[11px] font-bold text-gray-800 group-hover:text-orange-700 truncate leading-tight">
+                                                <i class="fas fa-${q.icon || 'bolt'} text-xs mr-1 text-gray-400 group-hover:text-orange-500"></i>${q.title}
+                                            </p>
+                                        </div>
+                                        <span class="${q.badge_color || 'bg-orange-500 text-white'} text-[8px] font-black px-1.5 py-0.5 rounded-md flex-shrink-0">
+                                            ${q.badge}
+                                        </span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- Trending Verified Properties in Database -->
+                ${data.properties && data.properties.length ? `
+                    <div class="pt-1">
+                        <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span><i class="fas fa-fire text-orange-500 mr-1"></i> Highly Trending  (${data.properties.length})</span>
+                            <a href="{{ route('user.search') }}?q=Trending" class="text-brand font-bold hover:underline">View All &rarr;</a>
+                        </p>
+                        <div class="ai-chat-slider">
+                            ${data.properties.map(p => `
+                                <div class="ai-slider-card flex flex-col justify-between">
+                                    <div>
+                                        <div class="relative h-28 overflow-hidden bg-gray-100">
+                                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                                            <span class="absolute top-2 left-2 ${p.tag_meta?.solid_badge || 'bg-orange-500 text-white'} text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                                                ${p.tag || p.tag_meta?.label || 'Trending'}
+                                            </span>
+                                            <span class="absolute top-2 right-2 bg-emerald-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                                                <i class="fas fa-bolt text-yellow-300 text-[8px]"></i> ${p.match_score}% Match
+                                            </span>
+                                            <span class="absolute bottom-1.5 right-2 bg-black/75 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                                                ⭐ ${p.rating}
+                                            </span>
+                                        </div>
+                                        <div class="p-2.5">
+                                            <div class="flex items-center justify-between gap-1 mb-1">
+                                                <p class="font-bold text-xs text-gray-900 truncate leading-tight">${p.name}</p>
+                                                <span class="${p.gender_class} text-[8px] font-extrabold px-1.5 py-0.5 rounded flex-shrink-0">${p.gender}</span>
+                                            </div>
+                                            <p class="text-[11px] text-gray-500 truncate mb-1.5">
+                                                <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> ${p.location}
+                                            </p>
+                                            <div class="flex flex-wrap gap-1 mb-1">
+                                                ${(p.amenities || []).slice(0, 2).map(a => `<span class="text-[9px] bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded text-gray-600">${a}</span>`).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-2.5 pt-1.5 border-t border-gray-100 flex items-center justify-between gap-1.5">
+                                        <span class="text-xs font-black text-gray-900">${p.formatted_price}</span>
+                                        <div class="flex items-center gap-1">
+                                            <button type="button" onclick="askAiPrompt('Give full details of ${p.name.replace(/'/g, "\\'")}')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 text-[10px] font-bold px-2 py-1.5 rounded-xl transition flex items-center gap-1" title="Get full details in chat">
+                                                <i class="fas fa-circle-info"></i> Detail
+                                            </button>
+                                            <a href="${p.detail_url}" class="bg-brand hover:bg-brand-dark text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition shadow-xs no-underline">View</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    } else if (data.response_type === 'listing_types_overview' && data.listing_types) {
         contentHtml = `
             <div class="mt-3 space-y-2.5">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">

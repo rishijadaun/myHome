@@ -31,6 +31,11 @@ class PropertySearchService
             return $this->getListingTypeDetails($intent['specific_listing_type_detail'], $intent);
         }
 
+        // Check if user is asking for Trending Searches / Stays
+        if (!empty($intent['is_trending_inquiry'])) {
+            return $this->getTrendingOverview($intent);
+        }
+
         // Check if user is asking about general Listing Types / Categories on StayNest
         if (!empty($intent['is_listing_types_inquiry'])) {
             return $this->getListingTypesOverview($intent);
@@ -387,6 +392,155 @@ class PropertySearchService
                     'total_available' => $count
                 ],
                 'total_matches' => $count,
+                'properties' => $rankedProperties,
+            ]
+        ];
+    }
+
+    /**
+     * Provide Trending Searches & Curated Popular Hot Queries and Verified Properties.
+     */
+    public function getTrendingOverview(array $intent = []): array
+    {
+        // 1. Fetch top trending, featured, recommended, or highest-rated verified properties
+        $trendingProperties = Property::query()
+            ->with(['city', 'area', 'images', 'primaryImage', 'amenities', 'rules', 'propertyType'])
+            ->where('status', 'active')
+            ->where('verification_status', 'verified')
+            ->where('is_active', 1)
+            ->whereNull('deleted_at')
+            ->where(function ($q) {
+                $q->where('tag', 'Trending')
+                  ->orWhere('tag', 'Popular')
+                  ->orWhere('tag', 'Guest Favourite')
+                  ->orWhere('tag', 'Top rated')
+                  ->orWhere('is_recommended', 1)
+                  ->orWhere('featured', 1);
+            })
+            ->orderByDesc('rating')
+            ->orderByDesc('total_reviews')
+            ->limit(12)
+            ->get();
+
+        if ($trendingProperties->isEmpty()) {
+            $trendingProperties = Property::query()
+                ->with(['city', 'area', 'images', 'primaryImage', 'amenities', 'rules', 'propertyType'])
+                ->where('status', 'active')
+                ->where('verification_status', 'verified')
+                ->where('is_active', 1)
+                ->whereNull('deleted_at')
+                ->orderByDesc('rating')
+                ->limit(12)
+                ->get();
+        }
+
+        $rankedProperties = $this->rankingService->rank($trendingProperties, $intent);
+
+        $trendingSearchCategories = [
+            [
+                'category_name' => '🔥 Top Trending Searches Right Now',
+                'category_icon' => 'fire',
+                'color' => 'orange',
+                'queries' => [
+                    [
+                        'title' => 'Noida Sector 62 Boys PG < ₹8k AC + Food',
+                        'prompt' => 'Noida sector 62 me boys PG 8k ke andar AC food ke saath',
+                        'badge' => '#1 Trending',
+                        'icon' => 'bolt',
+                        'badge_color' => 'bg-orange-500 text-white'
+                    ],
+                    [
+                        'title' => 'Girls AC PG in Bangalore Koramangala < ₹10k',
+                        'prompt' => 'Girls PG with AC in Bangalore Koramangala under 10k',
+                        'badge' => '⚡ High Demand',
+                        'icon' => 'sparkles',
+                        'badge_color' => 'bg-pink-500 text-white'
+                    ],
+                    [
+                        'title' => 'Single Room + Attached Washroom (Zero Deposit)',
+                        'prompt' => 'single room chahiye attached washroom ke saath zero deposit',
+                        'badge' => '🎯 Most Saved',
+                        'icon' => 'door-open',
+                        'badge_color' => 'bg-purple-600 text-white'
+                    ],
+                    [
+                        'title' => '2 BHK Fully Furnished Flat Near Metro',
+                        'prompt' => '2 BHK furnished flat near metro station zero brokerage',
+                        'badge' => '🏢 Family / Coliving',
+                        'icon' => 'building',
+                        'badge_color' => 'bg-blue-600 text-white'
+                    ],
+                ]
+            ],
+            [
+                'category_name' => '🚀 Hot Tech & Student Hubs',
+                'category_icon' => 'graduation-cap',
+                'color' => 'emerald',
+                'queries' => [
+                    [
+                        'title' => 'Boys PG near Knowledge Park Greater Noida',
+                        'prompt' => 'Boys PG near Knowledge Park with wifi and meals',
+                        'badge' => '🎓 Students',
+                        'icon' => 'user-graduate',
+                        'badge_color' => 'bg-emerald-600 text-white'
+                    ],
+                    [
+                        'title' => 'Co-ed / Unisex Stays in Pune Hinjewadi IT Park',
+                        'prompt' => 'Co-ed stays in Pune Hinjewadi IT park with high speed wifi',
+                        'badge' => '💻 IT Techies',
+                        'icon' => 'laptop-code',
+                        'badge_color' => 'bg-indigo-600 text-white'
+                    ],
+                    [
+                        'title' => 'Budget Friendly Stays Under ₹6,000 / month',
+                        'prompt' => 'budget PG under 6000 with food and wifi',
+                        'badge' => '💰 Value Pick',
+                        'icon' => 'tags',
+                        'badge_color' => 'bg-teal-600 text-white'
+                    ],
+                ]
+            ],
+            [
+                'category_name' => '🏪 Commercial & Office Spaces',
+                'category_icon' => 'shop',
+                'color' => 'amber',
+                'queries' => [
+                    [
+                        'title' => 'Ready-to-Move Commercial Office Cabins',
+                        'prompt' => 'Commercial office space ready to move with parking',
+                        'badge' => '💼 Business Hub',
+                        'icon' => 'briefcase',
+                        'badge_color' => 'bg-amber-600 text-white'
+                    ],
+                    [
+                        'title' => 'Ground Floor Retail Shop / Showroom Space',
+                        'prompt' => 'Ground floor retail shop main road commercial space',
+                        'badge' => '🛍️ High Footfall',
+                        'icon' => 'store',
+                        'badge_color' => 'bg-rose-600 text-white'
+                    ],
+                ]
+            ]
+        ];
+
+        $summaryMessage = "Here are today's **🔥 Top Trending Searches & Verified Stays** on StayNest! Tap any trending query below to see live verified matches:";
+
+        return [
+            'success' => true,
+            'data' => [
+                'response_type' => 'trending_overview',
+                'message' => $summaryMessage,
+                'intent' => $intent,
+                'active_filters' => [
+                    [
+                        'key' => 'trending',
+                        'label' => '🔥 Live Trending Searches',
+                        'value' => 'trending',
+                        'icon' => 'fire'
+                    ]
+                ],
+                'trending_categories' => $trendingSearchCategories,
+                'total_matches' => count($rankedProperties),
                 'properties' => $rankedProperties,
             ]
         ];

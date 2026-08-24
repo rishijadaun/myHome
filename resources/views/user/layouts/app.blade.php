@@ -115,7 +115,42 @@
         .ios-tab-bar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-top: 0.5px solid rgba(0, 0, 0, 0.08); box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.05); }
         .center-action-btn { background: linear-gradient(135deg, #4bb59d 0%, #3a9a85 100%); box-shadow: 0 4px 16px rgba(75, 181, 157, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.9); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .center-action-btn:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(75, 181, 157, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.9); }
-        @media (max-width: 768px) { body { overflow-y: auto; -webkit-overflow-scrolling: touch; } }
+        
+        /* Mobile Input Auto-Zoom Prevent (iOS Safari Fix) */
+        @media screen and (max-width: 767px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Native App Skeleton Shimmer */
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, #f0f3f6 25%, #e2e8f0 37%, #f0f3f6 63%);
+            background-size: 400% 100%;
+            animation: shimmer 1.4s ease infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+
+        /* Native App Horizontal Scroll Snap */
+        .app-scroll-snap {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .app-scroll-snap > * {
+            scroll-snap-align: start;
+        }
+
+        @media (max-width: 768px) { 
+            body { 
+                overflow-y: auto; 
+                -webkit-overflow-scrolling: touch; 
+                overscroll-behavior-y: contain;
+            } 
+        }
     </style>
     
     @stack('styles')
@@ -137,10 +172,119 @@
         @include('user.partials.footer')
         @include('user.partials.floating-actions')
         @include('user.partials.wishlist-helper')
+
+        <!-- PWA Native App Install Toast / Banner (Mobile Only) -->
+        <div id="pwaInstallBanner" class="fixed bottom-20 left-4 right-4 z-[9999] hidden md:hidden">
+            <div class="bg-gray-900/95 backdrop-blur-xl border border-white/15 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-3 transform transition-all duration-300">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center text-white text-lg font-bold shadow-md flex-shrink-0">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold leading-tight">Install StayNest App</h4>
+                        <p class="text-[11px] text-gray-300">Fast, zero-brokerage PG search on your phone</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button id="pwaInstallBtn" type="button" class="bg-brand hover:bg-brand-dark text-white font-bold text-xs px-3.5 py-2 rounded-xl tap-effect shadow-md">
+                        Install
+                    </button>
+                    <button onclick="dismissPwaBanner()" type="button" class="text-gray-400 hover:text-white p-1 tap-effect" aria-label="Close">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     @endif
     
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Native App Helpers: Haptic Touch, Native Share & PWA Service Worker -->
+    <script>
+        // 1. Global Haptic Vibration Feedback Helper
+        window.triggerHaptic = function(ms = 12) {
+            if ('vibrate' in navigator) {
+                try { navigator.vibrate(ms); } catch(e){}
+            }
+        };
+
+        // Attach Haptic touch listener on interactive elements
+        document.addEventListener('touchstart', function(e) {
+            const target = e.target.closest('.tap-effect, .center-action-btn, button, a, input, select');
+            if (target) {
+                window.triggerHaptic(10);
+            }
+        }, { passive: true });
+
+        // 2. Global Native Web Share Sheet Helper
+        window.nativeShare = function(title, text, url) {
+            window.triggerHaptic(15);
+            const shareUrl = url || window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: title || 'StayNest - Verified PG & Co-Living',
+                    text: text || 'Check out this verified PG stay on StayNest with zero brokerage!',
+                    url: shareUrl
+                }).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Link copied to clipboard!',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                    }
+                });
+            }
+        };
+
+        // 3. PWA Service Worker Registration & App Install Prompt
+        let deferredPrompt = null;
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const dismissed = localStorage.getItem('staynest_pwa_dismissed');
+            if (!dismissed && window.innerWidth < 768) {
+                const banner = document.getElementById('pwaInstallBanner');
+                if (banner) banner.classList.remove('hidden');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const installBtn = document.getElementById('pwaInstallBtn');
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    window.triggerHaptic(20);
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        deferredPrompt = null;
+                        dismissPwaBanner();
+                    }
+                });
+            }
+        });
+
+        window.dismissPwaBanner = function() {
+            window.triggerHaptic(10);
+            const banner = document.getElementById('pwaInstallBanner');
+            if (banner) banner.classList.add('hidden');
+            localStorage.setItem('staynest_pwa_dismissed', 'true');
+        };
+    </script>
+
     @stack('scripts')
 </body>
 </html>

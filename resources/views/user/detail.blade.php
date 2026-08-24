@@ -2488,5 +2488,15 @@
             }
         }
     }
+
+    function openShareModal() {
+        if (typeof window.nativeShare === 'function') {
+            window.nativeShare(
+                '{{ addslashes($propName) }} - StayNest',
+                'Check out {{ addslashes($propName) }} in {{ addslashes($propLocation) }} starting at ₹{{ $propRent }}/mo on StayNest with zero brokerage!',
+                '{{ url()->current() }}'
+            );
+        }
+    }
 </script>
 @endpush

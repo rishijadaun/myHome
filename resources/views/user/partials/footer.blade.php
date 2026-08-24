@@ -16,29 +16,29 @@
         }
     }
 @endphp
-<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-safe shadow-lg">
-    <div class="grid grid-cols-5 h-16">
-        <a href="{{ route('user.home') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-home text-xl {{ request()->routeIs('user.home') ? 'text-brand' : 'text-gray-400' }}"></i>
-            <span class="text-[10px] font-medium {{ request()->routeIs('user.home') ? 'text-brand font-semibold' : 'text-gray-500' }}">Home</span>
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 z-50 pb-safe shadow-lg">
+    <div class="grid grid-cols-5 h-16 max-w-lg mx-auto">
+        <a href="{{ route('user.home') }}" class="flex flex-col items-center justify-center gap-1 tap-effect px-0.5">
+            <i class="fas fa-home text-lg sm:text-xl {{ request()->routeIs('user.home') ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[9px] sm:text-[10px] font-medium truncate {{ request()->routeIs('user.home') ? 'text-brand font-bold' : 'text-gray-500' }}">Home</span>
         </a>
-        <a href="{{ route('user.search') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-search text-xl {{ request()->routeIs('user.search') ? 'text-brand' : 'text-gray-400' }}"></i>
-            <span class="text-[10px] font-medium {{ request()->routeIs('user.search') ? 'text-brand font-semibold' : 'text-gray-500' }}">Search</span>
+        <a href="{{ route('user.search') }}" class="flex flex-col items-center justify-center gap-1 tap-effect px-0.5">
+            <i class="fas fa-search text-lg sm:text-xl {{ request()->routeIs('user.search') ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[9px] sm:text-[10px] font-medium truncate {{ request()->routeIs('user.search') ? 'text-brand font-bold' : 'text-gray-500' }}">Search</span>
         </a>
-        <a href="{{ route('user.location') }}" class="flex flex-col items-center justify-center gap-1 tap-effect -translate-y-4">
-            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center text-white shadow-lg shadow-brand/40">
-                <i class="fas fa-map-marker-alt text-xl text-white"></i>
+        <a href="{{ route('user.location') }}" class="flex flex-col items-center justify-center gap-0.5 tap-effect -translate-y-3.5 px-0.5">
+            <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center text-white shadow-lg shadow-brand/40 border-2 border-white">
+                <i class="fas fa-map-marker-alt text-lg sm:text-xl text-white"></i>
             </div>
-            <span class="text-[10px] font-medium text-gray-500 -mt-1">Map</span>
+            <span class="text-[9px] sm:text-[10px] font-medium text-gray-500">Map</span>
         </a>
-        <a href="{{ route('user.saved') }}" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-heart text-xl {{ request()->routeIs('user.saved') ? 'text-brand' : 'text-gray-400' }}"></i>
-            <span class="text-[10px] font-medium {{ request()->routeIs('user.saved') ? 'text-brand font-semibold' : 'text-gray-500' }}">Saved</span>
+        <a href="{{ route('user.saved') }}" class="flex flex-col items-center justify-center gap-1 tap-effect px-0.5">
+            <i class="fas fa-heart text-lg sm:text-xl {{ request()->routeIs('user.saved') ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[9px] sm:text-[10px] font-medium truncate {{ request()->routeIs('user.saved') ? 'text-brand font-bold' : 'text-gray-500' }}">Saved</span>
         </a>
-        <a href="{{ $bottomNavProfileUrl }}" id="bottomNavProfileLink" class="flex flex-col items-center justify-center gap-1 tap-effect">
-            <i class="fas fa-user text-xl {{ (request()->routeIs('user.profile') || request()->is('profile')) ? 'text-brand' : 'text-gray-400' }}"></i>
-            <span class="text-[10px] font-medium {{ (request()->routeIs('user.profile') || request()->is('profile')) ? 'text-brand font-semibold' : 'text-gray-500' }}">{{ $bottomNavProfileLabel }}</span>
+        <a href="{{ $bottomNavProfileUrl }}" id="bottomNavProfileLink" class="flex flex-col items-center justify-center gap-1 tap-effect px-0.5">
+            <i class="fas fa-user text-lg sm:text-xl {{ (request()->routeIs('user.profile') || request()->is('profile')) ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span class="text-[9px] sm:text-[10px] font-medium truncate {{ (request()->routeIs('user.profile') || request()->is('profile')) ? 'text-brand font-bold' : 'text-gray-500' }}">{{ $bottomNavProfileLabel }}</span>
         </a>
     </div>
 </nav>

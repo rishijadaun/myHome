@@ -98,10 +98,31 @@
         }
     </script>
     @vite(['resources/css/map.css', 'resources/js/app.js'])
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        @media screen and (max-width: 767px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+    </style>
     @stack('styles')
 </head>
 <body class="bg-gray-50 text-slate-800 font-sans antialiased h-screen flex flex-col overflow-hidden">
     @yield('content')
+    <script>
+        window.triggerHaptic = function(ms = 12) {
+            if ('vibrate' in navigator) {
+                try { navigator.vibrate(ms); } catch(e){}
+            }
+        };
+        document.addEventListener('touchstart', function(e) {
+            const target = e.target.closest('.tap-effect, .chip-active, button, a, input');
+            if (target) {
+                window.triggerHaptic(10);
+            }
+        }, { passive: true });
+    </script>
     @stack('scripts')
 </body>
 </html>

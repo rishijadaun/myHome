@@ -278,8 +278,8 @@
             <div class="swiper detailSwiper h-full w-full">
                 <div class="swiper-wrapper h-full">
                     @foreach($propImages as $img)
-                        <div class="swiper-slide h-full w-full bg-slate-950 flex items-center justify-center">
-                            <img src="{{ $img->image_url }}" alt="{{ $propName }}" class="w-full h-full object-cover object-center">
+                        <div class="swiper-slide h-full w-full bg-slate-950 flex items-center justify-center skeleton-shimmer">
+                            <img src="{{ $img->image_url }}" alt="{{ $propName }}" class="w-full h-full object-cover object-center" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                         </div>
                     @endforeach
                 </div>
@@ -1143,8 +1143,8 @@
                             <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm card-lift flex flex-col justify-between h-full group">
                                 <div>
                                     <!-- Card Image -->
-                                    <div class="relative aspect-[4/3] overflow-hidden">
-                                        <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 skeleton-shimmer">
+                                        <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                         <div class="absolute top-2 left-2 {{ $simTag['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
                                             <i class="fas fa-{{ $simTag['icon'] }}"></i> {{ $simTag['label'] }}
                                         </div>
@@ -1152,17 +1152,17 @@
                                             <i class="fas fa-star text-yellow-400 text-[9px]"></i> {{ $sim->rating ? number_format($sim->rating, 1) : '4.8' }}
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- Card Body -->
-                                    <div class="p-2.5">
-                                        <div class="flex justify-between items-start mb-1 gap-1">
-                                            <h3 class="font-bold text-xs text-gray-900 group-hover:text-brand transition truncate">{{ $sim->name }}</h3>
-                                            <span class="{{ $simGender['class'] }} text-[8px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $simGender['label'] }}</span>
-                                        </div>
-                                        <p class="text-gray-500 text-[10px] mb-1 flex items-center gap-1 truncate">
-                                            <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ ($sim->area ? $sim->area->name . ', ' : '') . ($sim->city ? $sim->city->name : '') }}
-                                        </p>
+                                <!-- Card Body -->
+                                <div class="p-2.5">
+                                    <div class="flex justify-between items-start mb-1 gap-1">
+                                        <h3 class="font-bold text-xs text-gray-900 group-hover:text-brand transition truncate">{{ $sim->name }}</h3>
+                                        <span class="{{ $simGender['class'] }} text-[8px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $simGender['label'] }}</span>
                                     </div>
+                                    <p class="text-gray-500 text-[10px] mb-1 flex items-center gap-1 truncate">
+                                        <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ ($sim->area ? $sim->area->name . ', ' : '') . ($sim->city ? $sim->city->name : '') }}
+                                    </p>
                                 </div>
 
                                 <!-- Card Footer -->
@@ -1190,8 +1190,8 @@
                     <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm card-lift flex flex-col justify-between group">
                         <div>
                             <!-- Card Image -->
-                            <div class="relative aspect-[4/3] overflow-hidden">
-                                <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 skeleton-shimmer">
+                                <img src="{{ $sim->display_image_url }}" alt="{{ $sim->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                 <div class="absolute top-2.5 left-2.5 {{ $simTag['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-sm">
                                     <i class="fas fa-{{ $simTag['icon'] }}"></i> {{ $simTag['label'] }}
                                 </div>

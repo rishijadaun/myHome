@@ -555,6 +555,29 @@
         </div>
     </section>
 
+    <!-- Home Property Switch Skeleton Shimmer Placeholder (Spacefind Style) -->
+    <div id="homeSwitchSkeleton" class="hidden mt-8 sm:mt-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-in fade-in duration-200">
+        <div class="mb-4 flex justify-between items-center">
+            <div class="space-y-2">
+                <div class="h-6 w-48 bg-gray-200 rounded-lg skeleton-shimmer"></div>
+                <div class="h-3 w-64 bg-gray-100 rounded-md skeleton-shimmer"></div>
+            </div>
+            <div class="h-7 w-20 bg-gray-100 rounded-full skeleton-shimmer"></div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-6">
+            @for($i = 0; $i < 4; $i++)
+            <div class="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div class="h-28 sm:h-44 w-full skeleton-shimmer"></div>
+                <div class="p-2.5 sm:p-4 space-y-2">
+                    <div class="h-4 w-3/4 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                    <div class="h-3 w-1/2 bg-gray-100 rounded-md skeleton-shimmer"></div>
+                    <div class="h-5 w-20 bg-gray-200 rounded-md skeleton-shimmer pt-1"></div>
+                </div>
+            </div>
+            @endfor
+        </div>
+    </div>
+
     {{-- ============================= PG / HOSTEL VIEW CONTAINER (DEFAULT PRIORITY) ============================= --}}
     <div id="pgViewContainer" class="{{ $selectedType === 'pg-hostel' ? '' : 'hidden' }}">
 
@@ -2604,10 +2627,15 @@ function switchPropertyType(type, triggerScroll = false) {
     const pgContainer = document.getElementById('pgViewContainer');
     const flatContainer = document.getElementById('flatViewContainer');
     const commercialContainer = document.getElementById('commercialViewContainer');
+    const skeleton = document.getElementById('homeSwitchSkeleton');
 
     const cardPg = document.getElementById('card-type-pg-hostel');
     const cardFlat = document.getElementById('card-type-flat-apartment');
     const cardCommercial = document.getElementById('card-type-commercial');
+
+    if (typeof window.triggerHaptic === 'function') {
+        window.triggerHaptic(10);
+    }
 
     // Reset all cards
     [cardPg, cardFlat, cardCommercial].forEach(c => {
@@ -2615,32 +2643,33 @@ function switchPropertyType(type, triggerScroll = false) {
         c.classList.remove('active-pg', 'active-flat', 'active-commercial');
     });
 
-    // Hide all containers
+    // Hide all containers & show skeleton shimmer
     [pgContainer, flatContainer, commercialContainer].forEach(cnt => {
         if (cnt) cnt.classList.add('hidden');
     });
+    if (skeleton) skeleton.classList.remove('hidden');
 
+    let targetContainer = pgContainer;
     if (type === 'flat-apartment') {
         if (cardFlat) cardFlat.classList.add('active-flat');
-        if (flatContainer) {
-            flatContainer.classList.remove('hidden');
-            flatContainer.classList.add('view-container-fade');
-        }
+        targetContainer = flatContainer;
     } else if (type === 'commercial') {
         if (cardCommercial) cardCommercial.classList.add('active-commercial');
-        if (commercialContainer) {
-            commercialContainer.classList.remove('hidden');
-            commercialContainer.classList.add('view-container-fade');
-        }
+        targetContainer = commercialContainer;
     } else {
         // Default PG / Hostel
         type = 'pg-hostel';
         if (cardPg) cardPg.classList.add('active-pg');
-        if (pgContainer) {
-            pgContainer.classList.remove('hidden');
-            pgContainer.classList.add('view-container-fade');
-        }
+        targetContainer = pgContainer;
     }
+
+    setTimeout(() => {
+        if (skeleton) skeleton.classList.add('hidden');
+        if (targetContainer) {
+            targetContainer.classList.remove('hidden');
+            targetContainer.classList.add('view-container-fade');
+        }
+    }, 120);
 
     // Update URL query param without full reload
     try {

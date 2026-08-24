@@ -477,6 +477,36 @@
         </div>
     </div>
 
+    <!-- ================= SKELETON SHIMMER PLACEHOLDER GRID (Shown during search/filtering) ================= -->
+    <div id="searchSkeletonGrid" class="hidden grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 md:gap-6 w-full">
+        @for($i = 0; $i < 8; $i++)
+        <div class="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col justify-between w-full">
+            <div class="relative h-32 sm:h-44 md:h-52 w-full skeleton-shimmer">
+                <div class="absolute top-2 left-2 w-14 sm:w-20 h-4 sm:h-5 bg-white/50 rounded-md sm:rounded-xl"></div>
+                <div class="absolute top-2 right-2 w-6 sm:w-8 h-6 sm:h-8 bg-white/50 rounded-full"></div>
+            </div>
+            <div class="p-2.5 sm:p-4 flex flex-col justify-between flex-1 space-y-2.5">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="h-3 sm:h-3.5 w-16 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                        <div class="h-3 sm:h-3.5 w-10 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                    </div>
+                    <div class="h-4 sm:h-5 w-3/4 bg-gray-200 rounded-lg skeleton-shimmer"></div>
+                    <div class="h-3 w-1/2 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                    <div class="flex gap-1.5 pt-1">
+                        <div class="h-3.5 w-12 bg-gray-100 rounded skeleton-shimmer"></div>
+                        <div class="h-3.5 w-14 bg-gray-100 rounded skeleton-shimmer"></div>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
+                    <div class="h-5 sm:h-6 w-16 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                    <div class="h-4 sm:h-5 w-14 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                </div>
+            </div>
+        </div>
+        @endfor
+    </div>
+
     <!-- ================= FULL WIDTH PROPERTY GRID (2-COLUMNS IN MOBILE, 3-4 COLUMNS IN DESKTOP) ================= -->
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 md:gap-6 w-full" id="searchGrid">
         
@@ -672,8 +702,30 @@
     let drawerGender = '{{ strtoupper($selectedGender ?? '') }}';
     let drawerBudget = '{{ addslashes($budget ?? '') }}';
 
+    // ================= SKELETON SHIMMER LOADER =================
+    window.showSearchSkeleton = function() {
+        const grid = document.getElementById('searchGrid');
+        const skeleton = document.getElementById('searchSkeletonGrid');
+        const loadMore = document.getElementById('loadMoreContainer');
+        if (grid && skeleton) {
+            grid.classList.add('hidden');
+            skeleton.classList.remove('hidden');
+            if (loadMore) loadMore.classList.add('hidden');
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('mainSearchForm');
+        if (form) {
+            form.addEventListener('submit', () => {
+                window.showSearchSkeleton();
+            });
+        }
+    });
+
     // ================= MAIN SEARCH FORM SUBMISSION =================
     function handleMainSearchSubmit(e) {
+        window.showSearchSkeleton();
         // Form submits normally via GET to /search?q=...
     }
 

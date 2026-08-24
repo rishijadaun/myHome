@@ -767,6 +767,34 @@
             return null;
         }
 
+        function renderLocationSkeleton() {
+            const container = document.getElementById('pgListContainer');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="space-y-3">
+                    ${[1, 2, 3, 4].map(() => `
+                        <div class="bg-white border border-gray-100 rounded-2xl p-3 flex gap-3">
+                            <div class="w-24 h-24 rounded-xl skeleton-shimmer flex-shrink-0"></div>
+                            <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5 space-y-2">
+                                <div class="space-y-1.5">
+                                    <div class="h-4 w-3/4 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                                    <div class="h-3 w-1/2 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                                    <div class="flex gap-1">
+                                        <div class="h-3 w-10 bg-gray-100 rounded skeleton-shimmer"></div>
+                                        <div class="h-3 w-12 bg-gray-100 rounded skeleton-shimmer"></div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center pt-1 border-t border-gray-50">
+                                    <div class="h-5 w-14 bg-gray-200 rounded skeleton-shimmer"></div>
+                                    <div class="h-6 w-20 bg-brand/20 rounded-lg skeleton-shimmer"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         async function performAISmartSearch() {
             const input = document.getElementById('mapSearchInput');
             const query = input.value.trim();
@@ -774,6 +802,8 @@
                 resetAISearch();
                 return;
             }
+
+            renderLocationSkeleton();
 
             const ai = parseAIQuery(query);
             aiParsedResult = ai;

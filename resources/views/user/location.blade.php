@@ -110,15 +110,29 @@
             top: 8px;
         }
 
-        /* Bottom Sheet */
-        #sidebar { transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
-        @media (min-width: 768px) {
-            #sidebar { transform: none !important; width: 420px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* Android/iOS Interactive Bottom Sheet Drawer */
+        #sidebar { 
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), height 0.35s cubic-bezier(0.32, 0.72, 0, 1); 
+            will-change: transform;
         }
-        @media (max-width: 767px) { #sidebar { width: 100% !important; } }
+        @media (min-width: 768px) {
+            #sidebar { 
+                transform: none !important; 
+                width: 420px; 
+                height: 100% !important;
+                transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            }
+        }
+        @media (max-width: 767px) { 
+            #sidebar { 
+                width: 100% !important; 
+                height: 88vh;
+                box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.22);
+            } 
+        }
 
-        .drag-handle { width: 36px; height: 4px; background: #e2e8f0; border-radius: 2px; }
-        .drag-handle:active { background: #94a3b8; }
+        .drag-handle { width: 44px; height: 5px; background: #cbd5e1; border-radius: 3px; }
+        .drag-handle:active { background: #64748b; }
 
         .chip-active { background: #4bb59d !important; color: white !important; border-color: #4bb59d !important; }
 
@@ -311,16 +325,31 @@
     <!-- Map & Sidebar Workspace -->
     <div class="flex flex-1 overflow-hidden relative w-full h-[70vh] md:h-auto min-h-[500px]" id="mainContainer">
         
-        <!-- Sidebar / Bottom Sheet -->
-        <aside id="sidebar" class="bg-white md:border-r border-gray-100 flex flex-col z-[500] flex-shrink-0 md:relative fixed bottom-0 left-0 h-[65vh] md:h-full shadow-sheet md:shadow-none rounded-t-3xl md:rounded-none overflow-hidden w-full md:w-[420px]">
-            <div class="md:hidden flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing" onclick="toggleMobileSidebar()">
-                <div class="drag-handle"></div>
+        <!-- Sidebar / Android App Drawer Bottom Sheet -->
+        <aside id="sidebar" class="bg-white md:border-r border-gray-100 flex flex-col z-[500] flex-shrink-0 md:relative fixed bottom-0 left-0 h-[88vh] md:h-full shadow-2xl md:shadow-none rounded-t-[28px] md:rounded-none overflow-hidden w-full md:w-[420px]">
+            <!-- Interactive Drag Header for Mobile -->
+            <div class="md:hidden flex flex-col items-center pt-2.5 pb-2.5 px-4 bg-white border-b border-gray-100 cursor-pointer select-none" id="drawerDragArea" onclick="toggleMobileSidebar()">
+                <div class="drag-handle mb-2"></div>
+                <div class="w-full flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-xs font-black text-slate-900" id="drawerTitle">Nearby Stays</span>
+                        <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-brand/10 text-brand" id="drawerCountPill">0 found</span>
+                    </div>
+                    <button type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-slate-800 text-[11px] font-bold tap-effect border border-gray-200">
+                        <span id="mobileToggleText">Show List</span>
+                        <i id="mobileToggleIcon" class="fas fa-chevron-up text-[9px] transition-transform duration-200"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="px-5 pb-3 flex-shrink-0 bg-white border-b border-gray-100 space-y-2.5">
-                <!-- User Current Address -->
-                <div class="bg-gradient-to-r from-red-50 to-orange-50 border border-red-100 rounded-xl p-3 mt-2 md:mt-0 shadow-xs">
-                    <div class="flex items-start gap-2.5">
+                <!-- User Current Address (Auto-hides after 1 minute) -->
+                <div id="userCurrentAddressCard" class="bg-gradient-to-r from-red-50 to-orange-50 border border-red-100 rounded-xl p-3 mt-2 md:mt-0 shadow-xs relative transition-all duration-500 overflow-hidden">
+                    <button type="button" onclick="hideUserAddressCard()" class="absolute top-2 right-2 text-gray-400 hover:text-red-600 p-1 text-[11px] tap-effect transition" title="Dismiss">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="flex items-start gap-2.5 pr-4">
                         <div onclick="goToMyLocation()" class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white flex-shrink-0 shadow-xs cursor-pointer hover:bg-red-600 transition" title="Center map on your location">
                             <i class="fas fa-location-crosshairs text-sm animate-pulse"></i>
                         </div>
@@ -468,11 +497,11 @@
                 </button>
             </div>
 
-            <!-- MOBILE Toggle Button -->
-            <div class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-[600]">
-                <button onclick="toggleMobileSidebar()" class="bg-slate-900 text-white px-5 py-3 rounded-full shadow-2xl font-bold text-sm flex items-center gap-2 tap-effect" id="mobileToggleBtn">
-                    <i class="fas fa-chevron-up" id="mobileToggleIcon"></i>
-                    <span id="mobileToggleText">Show List</span>
+            <!-- MOBILE Floating Map View Toggle / Center Controls -->
+            <div id="mobileFloatingListBtn" class="md:hidden absolute bottom-20 left-1/2 -translate-x-1/2 z-[450] transition-all duration-300">
+                <button type="button" onclick="toggleMobileSidebar(true)" class="bg-slate-900/95 backdrop-blur-md hover:bg-black text-white text-xs font-black px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 border border-white/20 tap-effect">
+                    <i class="fas fa-list-ul text-brand text-sm"></i>
+                    <span>Browse Stays (<strong id="floatingPgCount" class="text-brand font-black">0</strong>)</span>
                 </button>
             </div>
         </main>
@@ -1202,6 +1231,17 @@
             const badgeEl = document.getElementById('pgCountBadge');
             if (badgeEl) badgeEl.textContent = filtered.length;
 
+            const floatingCount = document.getElementById('floatingPgCount');
+            if (floatingCount) floatingCount.textContent = filtered.length;
+
+            const drawerCountPill = document.getElementById('drawerCountPill');
+            if (drawerCountPill) drawerCountPill.textContent = `${filtered.length} found`;
+
+            const drawerTitle = document.getElementById('drawerTitle');
+            if (drawerTitle) {
+                drawerTitle.textContent = currentSelectedPropertyType === 'flat-apartment' ? 'Nearby Flats' : (currentSelectedPropertyType === 'commercial' ? 'Nearby Commercial' : 'Nearby PGs');
+            }
+
             container.innerHTML = '';
 
             if (filtered.length === 0) {
@@ -1570,22 +1610,68 @@
             setTimeout(() => { map.invalidateSize(); }, 350);
         }
 
-        function toggleMobileSidebar() {
+        function toggleMobileSidebar(forceState = null) {
             const sidebar = document.getElementById('sidebar');
             const btnText = document.getElementById('mobileToggleText');
             const btnIcon = document.getElementById('mobileToggleIcon');
-            mobileSidebarOpen = !mobileSidebarOpen;
+            const floatingBtn = document.getElementById('mobileFloatingListBtn');
+
+            if (forceState !== null) {
+                mobileSidebarOpen = forceState;
+            } else {
+                mobileSidebarOpen = !mobileSidebarOpen;
+            }
+
+            if (typeof window.triggerHaptic === 'function') {
+                window.triggerHaptic(15);
+            }
+
+            if (!sidebar) return;
+
             if (mobileSidebarOpen) {
                 sidebar.style.transform = 'translateY(0)';
-                btnText.textContent = 'Hide List';
-                btnIcon.classList.remove('fa-chevron-up');
-                btnIcon.classList.add('fa-chevron-down');
+                if (btnText) btnText.textContent = 'Hide List';
+                if (btnIcon) {
+                    btnIcon.classList.remove('fa-chevron-up');
+                    btnIcon.classList.add('fa-chevron-down');
+                }
+                if (floatingBtn) {
+                    floatingBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-6');
+                }
             } else {
-                sidebar.style.transform = 'translateY(85%)';
-                btnText.textContent = 'Show List';
-                btnIcon.classList.remove('fa-chevron-down');
-                btnIcon.classList.add('fa-chevron-up');
+                sidebar.style.transform = 'translateY(calc(100% - 68px))';
+                if (btnText) btnText.textContent = 'Show List';
+                if (btnIcon) {
+                    btnIcon.classList.remove('fa-chevron-down');
+                    btnIcon.classList.add('fa-chevron-up');
+                }
+                if (floatingBtn) {
+                    floatingBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-6');
+                }
             }
+        }
+
+        // Touch Drag Gestures for Mobile Bottom Drawer
+        function initDrawerTouchGestures() {
+            const dragArea = document.getElementById('drawerDragArea');
+            if (!dragArea) return;
+
+            let touchStartY = 0;
+            dragArea.addEventListener('touchstart', (e) => {
+                touchStartY = e.changedTouches[0].clientY;
+            }, { passive: true });
+
+            dragArea.addEventListener('touchend', (e) => {
+                const touchEndY = e.changedTouches[0].clientY;
+                const diff = touchStartY - touchEndY;
+                if (diff > 30 && !mobileSidebarOpen) {
+                    // Swiped UP -> Expand
+                    toggleMobileSidebar(true);
+                } else if (diff < -30 && mobileSidebarOpen) {
+                    // Swiped DOWN -> Collapse
+                    toggleMobileSidebar(false);
+                }
+            }, { passive: true });
         }
 
         let lastWidth = window.innerWidth;
@@ -1595,24 +1681,76 @@
             const isMobile = currentWidth < 768;
             if (wasMobile !== isMobile) {
                 const sidebar = document.getElementById('sidebar');
-                if (isMobile) { sidebar.style.width = ''; if (!mobileSidebarOpen) sidebar.style.transform = 'translateY(85%)'; }
+                if (isMobile) { 
+                    sidebar.style.width = ''; 
+                    if (!mobileSidebarOpen) sidebar.style.transform = 'translateY(calc(100% - 68px))'; 
+                }
                 else { sidebar.style.transform = ''; setTimeout(() => { map.invalidateSize(); }, 350); }
             }
             lastWidth = currentWidth;
         });
 
+        // ---------------- AUTO HIDE VERIFIED ADDRESS CARD AFTER 1 MINUTE ----------------
+        let addressCardTimer = null;
+        function startAddressCardAutoHide() {
+            if (addressCardTimer) clearTimeout(addressCardTimer);
+            addressCardTimer = setTimeout(() => {
+                hideUserAddressCard();
+            }, 60000); // 60,000 ms = 1 minute
+        }
+
+        function hideUserAddressCard() {
+            const card = document.getElementById('userCurrentAddressCard');
+            if (card && !card.classList.contains('hidden')) {
+                if (typeof window.triggerHaptic === 'function') {
+                    window.triggerHaptic(8);
+                }
+                card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                card.style.opacity = '0';
+                card.style.maxHeight = card.scrollHeight + 'px';
+                requestAnimationFrame(() => {
+                    card.style.maxHeight = '0px';
+                    card.style.paddingTop = '0px';
+                    card.style.paddingBottom = '0px';
+                    card.style.marginTop = '0px';
+                    card.style.marginBottom = '0px';
+                    card.style.borderWidth = '0px';
+                });
+                setTimeout(() => {
+                    card.classList.add('hidden');
+                }, 550);
+            }
+        }
+
         function startLocationApp() {
             initMap();
+            initDrawerTouchGestures();
+            startAddressCardAutoHide();
             if (window.innerWidth < 768) {
                 const sb = document.getElementById('sidebar');
-                if (sb) sb.style.transform = 'translateY(85%)';
+                if (sb) sb.style.transform = 'translateY(calc(100% - 68px))';
                 mobileSidebarOpen = false;
             }
+
+            let incomingQuery = '';
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const typeParam = urlParams.get('type');
                 if (typeParam && (typeParam === 'flat-apartment' || typeParam === 'commercial' || typeParam === 'pg-hostel')) {
                     currentSelectedPropertyType = typeParam;
+                }
+
+                const qParam = urlParams.get('q') || urlParams.get('search');
+                const cityParam = urlParams.get('city');
+                const areaParam = urlParams.get('area');
+                const genderParam = urlParams.get('gender');
+
+                if (qParam) {
+                    incomingQuery = qParam;
+                } else if (cityParam || areaParam) {
+                    incomingQuery = `${genderParam ? genderParam + ' ' : ''}PG in ${areaParam ? areaParam + ' ' : ''}${cityParam || ''}`.trim();
+                } else if (genderParam) {
+                    incomingQuery = `${genderParam} PG`;
                 }
             } catch(e) {}
 
@@ -1644,6 +1782,17 @@
 
             renderSubFilterChips(currentSelectedPropertyType);
             initUserLocation();
+
+            // Auto-trigger search if query passed from Search Page
+            if (incomingQuery) {
+                const searchInp = document.getElementById('mapSearchInput');
+                if (searchInp) {
+                    searchInp.value = incomingQuery;
+                }
+                setTimeout(() => {
+                    performAISmartSearch();
+                }, 350);
+            }
         }
 
         if (document.readyState === 'loading') {

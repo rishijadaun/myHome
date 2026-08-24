@@ -201,6 +201,13 @@
                 </span>
             </button>
 
+            <!-- Search on Map Button -->
+            <a href="{{ route('user.location', request()->query()) }}" id="searchOnMapBtn" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 h-11 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-brand text-white rounded-2xl text-xs sm:text-sm font-bold tap-effect shadow-md shadow-brand/25 flex-shrink-0 transition no-underline" title="View search results on interactive Map">
+                <i class="fas fa-map-location-dot text-sm"></i>
+                <span class="hidden sm:inline">Search on Map</span>
+                <span class="sm:hidden">Map</span>
+            </a>
+
             <!-- Reset Filter Button (Desktop) -->
             <a href="{{ route('user.search') }}" id="desktopQuickResetBtn" class="{{ $activeBadgeCount > 0 || !empty($searchQuery) ? 'flex' : 'hidden' }} md:flex items-center gap-1.5 px-4 h-11 border border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-2xl font-semibold transition tap-effect text-sm flex-shrink-0 no-underline">
                 <i class="fas fa-undo-alt text-xs"></i> Reset
@@ -647,6 +654,14 @@
             <span id="loadMoreLabel">Load More Properties</span>
             <span class="bg-brand-light text-brand text-[11px] font-extrabold px-2.5 py-0.5 rounded-full" id="remainingCountBadge">{{ $properties->count() - 12 }} more</span>
         </button>
+    </div>
+
+    <!-- Mobile Floating "Search on Map" Action Button (Airbnb Style) -->
+    <div class="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-[40]">
+        <a href="{{ route('user.location', request()->query()) }}" class="bg-gray-900/95 backdrop-blur-xl text-white px-5 py-2.5 rounded-full shadow-2xl font-black text-xs flex items-center gap-2 border border-white/20 tap-effect hover:scale-105 transition no-underline">
+            <i class="fas fa-map-marked-alt text-brand"></i>
+            <span>Search on Map</span>
+        </a>
     </div>
 </div>
 @endsection

@@ -6,16 +6,14 @@
 @section('meta_image', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')
 @section('canonical', route('user.list-property'))
 
-@push('styles')
-
-<!-- Schema.org JSON-LD Structured Data -->
+@push('schema')
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "RealEstateListing",
   "name": "StayNest Property & PG Listing Service",
   "description": "Platform for landlords and PG owners to list paying guest accommodations, flats, and co-living spaces with zero brokerage.",
-  "url": "{{ url('/list-property') }}",
+  "url": "{{ route('user.list-property') }}",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -24,7 +22,9 @@
   }
 }
 </script>
+@endpush
 
+@push('styles')
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
@@ -1015,7 +1015,7 @@
 
                     <div class="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 mb-5">
                         <div class="relative aspect-video bg-gray-200">
-                            <img id="previewImage" src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover">
+                            <img id="previewImage" src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Property listing preview" class="w-full h-full object-cover">
                             <span id="previewTypeBadge" class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
                                 PG / Hostel
                             </span>

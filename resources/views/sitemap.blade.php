@@ -25,6 +25,18 @@
     </url>
     @endforeach
 
+    {{-- Locality / Area Landing Pages --}}
+    @if(!empty($areaPages))
+    @foreach ($areaPages as $page)
+    <url>
+        <loc>{{ $page['url'] }}</loc>
+        <lastmod>{{ $page['lastmod'] }}</lastmod>
+        <changefreq>{{ $page['changefreq'] }}</changefreq>
+        <priority>{{ $page['priority'] }}</priority>
+    </url>
+    @endforeach
+    @endif
+
     {{-- Dynamic Active Verified Property Pages --}}
     @foreach ($propertyPages as $page)
     <url>
@@ -34,11 +46,12 @@
         <priority>{{ $page['priority'] }}</priority>
         @if(!empty($page['image']))
         <image:image>
-            <image:loc>{{ $page['image'] }}</image:loc>
-            <image:title>{{ $page['title'] ?? 'Verified Property on StayNest' }}</image:title>
+            <image:loc>{{ htmlspecialchars($page['image'], ENT_XML1, 'UTF-8') }}</image:loc>
+            <image:title>{{ htmlspecialchars($page['title'] ?? 'Verified Property on StayNest', ENT_XML1, 'UTF-8') }}</image:title>
         </image:image>
         @endif
     </url>
     @endforeach
 
 </urlset>
+

@@ -1,6 +1,7 @@
 @extends('user.layouts.app')
 
 @section('title', '404 - Page Not Found | StayNest')
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <div class="flex-1 flex items-center justify-center pt-20 md:pt-10 pb-20 px-4 md:px-6">

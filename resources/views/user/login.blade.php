@@ -1,6 +1,7 @@
 @extends('user.layouts.app')
 
 @section('title', 'Login & Sign Up - StayNest')
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 flex flex-col justify-center">

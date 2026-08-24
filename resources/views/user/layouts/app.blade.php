@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Favicon -->
+    <!-- Favicon & Web Manifest -->
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
 
     <!-- SEO Meta Tags -->
     <title>@yield('title', 'StayNest - Best Paying Guest & Co-Living PG Discovery Network in India')</title>
@@ -16,6 +17,11 @@
     <meta name="robots" content="@yield('robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1')">
     <link rel="canonical" href="@yield('canonical', url()->current())">
     <meta name="author" content="StayNest Technologies">
+    <meta name="geo.region" content="IN">
+    <meta name="geo.placename" content="India">
+    <meta name="rating" content="general">
+    <meta name="distribution" content="global">
+    <meta name="revisit-after" content="2 days">
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:locale" content="en_IN">
@@ -25,6 +31,10 @@
     <meta property="og:url" content="@yield('canonical', url()->current())">
     <meta property="og:site_name" content="StayNest">
     <meta property="og:image" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta property="og:image:secure_url" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
     <meta property="og:image:alt" content="StayNest - Verified PG & Co-Living Spaces">
 
     <!-- Twitter Card -->
@@ -33,6 +43,8 @@
     <meta name="twitter:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on StayNest.')">
     <meta name="twitter:image" content="@yield('meta_image', asset('images/favicon.png'))">
     <meta name="twitter:site" content="@StayNestIndia">
+    <meta name="twitter:creator" content="@StayNestIndia">
+
 
     <!-- Mobile Theme Color -->
     <meta name="theme-color" content="#4bb59d">

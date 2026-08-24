@@ -12,14 +12,19 @@ Allow: /privacy
 Allow: /images/
 Allow: /build/
 
-# Disallow administrative and private portals
+# Disallow administrative, broker, and internal private routes
 Disallow: /admin/
 Disallow: /admin
 Disallow: /broker/
 Disallow: /broker
 Disallow: /api/
 Disallow: /profile
+Disallow: /bookings
+Disallow: /saved
+Disallow: /login
+Disallow: /logout
+Disallow: /ai/
 
-# Sitemap
-Sitemap: http://127.0.0.1:8000/sitemap.xml
+# XML Sitemap
 Sitemap: https://staynest.com/sitemap.xml
+

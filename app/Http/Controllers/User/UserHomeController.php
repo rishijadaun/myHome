@@ -229,13 +229,17 @@ class UserHomeController extends Controller
                 ->latest()
                 ->get();
 
-            // Check if authenticated user has a pending review
+            // Check if authenticated user has any existing review for this property (pending, approved, etc.)
+            $userReview = null;
+            $userPendingReview = null;
             if (Auth::check()) {
-                $userPendingReview = Review::where('property_id', $property->id)
+                $userReview = Review::where('property_id', $property->id)
                     ->where('user_id', Auth::id())
-                    ->where('status', 'pending')
                     ->latest()
                     ->first();
+                if ($userReview && $userReview->status === 'pending') {
+                    $userPendingReview = $userReview;
+                }
             }
         }
 
@@ -261,6 +265,7 @@ class UserHomeController extends Controller
             'property',
             'similarProperties',
             'approvedReviews',
+            'userReview',
             'userPendingReview',
             'avgRating',
             'totalReviewsCount',
@@ -294,9 +299,10 @@ class UserHomeController extends Controller
         ];
 
         // 2. Read explicit URL parameters
-        $explicitCity = trim($request->query('city') ?? '');
-        $rawGenderParam = trim($request->query('gender') ?? '');
-        $rawTypeParam = strtolower(trim($request->query('property_type') ?? $request->query('type') ?? ''));
+        $explicitCity = trim($request->input('city') ?? $request->query('city') ?? '');
+        $explicitArea = trim($request->input('area') ?? $request->query('area') ?? '');
+        $rawGenderParam = trim($request->input('gender') ?? $request->query('gender') ?? '');
+        $rawTypeParam = strtolower(trim($request->input('property_type') ?? $request->query('property_type') ?? $request->input('type') ?? $request->query('type') ?? ''));
         
         $explicitGender = '';
         $selectedPropertyType = '';
@@ -318,10 +324,10 @@ class UserHomeController extends Controller
             $selectedPropertyType = 'commercial';
         }
 
-        $explicitBudget = trim($request->query('budget') ?? '');
-        $minPrice = $request->query('min_price');
-        $maxPrice = $request->query('max_price');
-        $sort = $request->query('sort', 'distance-asc');
+        $explicitBudget = trim($request->input('budget') ?? $request->query('budget') ?? '');
+        $minPrice = $request->input('min_price') ?? $request->query('min_price');
+        $maxPrice = $request->input('max_price') ?? $request->query('max_price');
+        $sort = $request->input('sort') ?? $request->query('sort', 'distance-asc');
 
         // Checkbox states (if explicitly passed in request, override parsed intent)
         $reqHasAC = $request->has('ac');
@@ -336,7 +342,7 @@ class UserHomeController extends Controller
 
         // 3. Resolve effective filter values (combining explicit URL params & parsed intent)
         $selectedCity = $explicitCity !== '' ? $explicitCity : ($intent['city'] ?? '');
-        $selectedArea = $intent['area'] ?? '';
+        $selectedArea = $explicitArea !== '' ? $explicitArea : ($intent['area'] ?? '');
         
         $selectedGender = '';
         if ($explicitGender !== '') {
@@ -856,30 +862,54 @@ class UserHomeController extends Controller
             return redirect()->back()->with('error', 'Review contains restricted content: ' . $reason);
         }
 
-        $review = Review::create([
-            'id' => (string) \Illuminate\Support\Str::uuid(),
-            'property_id' => $property->id,
-            'user_id' => $user->id,
-            'rating' => $validated['rating'],
-            'title' => $validated['title'] ?: 'Verified Resident Review',
-            'comment' => $validated['comment'],
-            'status' => 'pending',
-            'is_verified' => 1,
-            'is_active' => 1,
-        ]);
+        // Check if user already submitted a review for this property (Only 1 review allowed per user per listing)
+        $existingReview = Review::where('property_id', $property->id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        $isEdit = false;
+        if ($existingReview) {
+            // Update existing review and reset status to pending for admin re-approval
+            $existingReview->update([
+                'rating' => $validated['rating'],
+                'title' => $validated['title'] ?: 'Verified Resident Review',
+                'comment' => $validated['comment'],
+                'status' => 'pending', // Re-verify on edit
+                'is_verified' => 1,
+                'is_active' => 1,
+            ]);
+            $review = $existingReview;
+            $isEdit = true;
+        } else {
+            // Create brand new single review
+            $review = Review::create([
+                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'property_id' => $property->id,
+                'user_id' => $user->id,
+                'rating' => $validated['rating'],
+                'title' => $validated['title'] ?: 'Verified Resident Review',
+                'comment' => $validated['comment'],
+                'status' => 'pending',
+                'is_verified' => 1,
+                'is_active' => 1,
+            ]);
+        }
 
         // Notify Admins
         try {
             $admins = User::whereHas('roles', fn($q) => $q->whereIn('slug', ['super_admin', 'admin']))->get();
+            $actionVerb = $isEdit ? 'updated their review' : 'submitted a new review';
+            $notifTitle = $isEdit ? 'Review Updated (Pending Approval) ✏️' : 'New Review Pending Approval ⭐';
+            
             foreach ($admins as $admin) {
                 Notification::create([
                     'id' => (string) \Illuminate\Support\Str::uuid(),
                     'user_id' => $admin->id,
                     'user_type' => 'admin',
-                    'title' => 'New Review Pending Approval ⭐',
-                    'message' => 'User "' . (Auth::user()->name ?? 'User') . "\" submitted a {$validated['rating']}★ review for \"{$property->name}\".",
+                    'title' => $notifTitle,
+                    'message' => 'User "' . ($user->name ?? 'User') . "\" {$actionVerb} ({$validated['rating']}★) for \"{$property->name}\".",
                     'type' => 'property_review_pending',
-                    'data' => json_encode(['property_id' => $property->id, 'review_id' => $review->id]),
+                    'data' => json_encode(['property_id' => $property->id, 'review_id' => $review->id, 'is_edit' => $isEdit]),
                     'is_read' => false,
                 ]);
             }
@@ -887,15 +917,20 @@ class UserHomeController extends Controller
             // Ignore notification failure
         }
 
+        $message = $isEdit
+            ? 'Thank you! Your review has been updated and is pending moderation. It will be published once approved by admin.'
+            : 'Thank you! Your review has been submitted and is pending moderation. It will be published once approved by admin.';
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Thank you! Your review has been submitted and is pending moderation. It will be published once approved by admin.',
+                'is_edit' => $isEdit,
+                'message' => $message,
                 'review' => $review
             ]);
         }
 
-        return back()->with('success', 'Thank you! Your review has been submitted and is pending moderation. It will be published once approved by admin.');
+        return back()->with('success', $message);
     }
 
     /**
@@ -1103,5 +1138,26 @@ class UserHomeController extends Controller
         }
 
         return view('user.location', compact('properties', 'cities', 'selectedType'));
+    }
+
+    /**
+     * Display Dynamic SEO Programmatic City and Area Landing Page.
+     */
+    public function seoSearch(
+        Request $request,
+        string $city,
+        ?string $area = null,
+        ?\App\Services\AiIntentParserService $intentParser = null,
+        ?\App\Services\PropertyRankingService $rankingService = null
+    ) {
+        $intentParser = $intentParser ?? app(\App\Services\AiIntentParserService::class);
+        $rankingService = $rankingService ?? app(\App\Services\PropertyRankingService::class);
+
+        $request->merge([
+            'city' => strtolower($city),
+            'area' => $area ? strtolower($area) : null,
+        ]);
+
+        return $this->search($request, $intentParser, $rankingService);
     }
 }

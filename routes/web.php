@@ -209,6 +209,9 @@ Route::name('user.')->group(function () {
     Route::post('/ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search'])->name('ai.search');
 });
 
+// Clean Programmatic SEO Landing Pages (e.g., /pg-in-noida, /pg-in-bangalore/koramangala)
+Route::get('/pg-in-{city}/{area?}', [UserHomeController::class, 'seoSearch'])->name('user.seo.city-area');
+
 // Dynamic XML Sitemap for SEO
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap', [\App\Http\Controllers\SitemapController::class, 'index']);

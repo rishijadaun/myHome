@@ -1,6 +1,7 @@
 @extends('user.layouts.app')
 
 @section('title', 'Saved Properties - StayNest')
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <div class="min-h-screen bg-gray-50/70 pb-24 md:pb-12 pt-6 md:pt-8 px-4 sm:px-6 lg:px-8">

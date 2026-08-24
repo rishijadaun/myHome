@@ -3,6 +3,7 @@
 @section('title', 'My Bookings - India\'s Trusted Zero Brokerage PG Network | StayNest')
 @section('meta_description', 'View and manage your PG and co-living stay reservations on StayNest with direct property owner confirmation and official receipts.')
 @section('canonical', route('user.bookings'))
+@section('robots', 'noindex, nofollow')
 
 @push('styles')
 <style>

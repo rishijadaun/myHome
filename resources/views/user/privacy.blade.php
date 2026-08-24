@@ -1,8 +1,10 @@
 @extends('user.layouts.app')
 
-@section('title', 'Privacy Policy - StayNest')
+@section('title', 'Privacy Policy - Zero Brokerage PG Network | StayNest')
 @section('meta_description', 'Learn how StayNest protects your personal data, contact information, accommodation preferences, and KYC verification records.')
-@section('robots', 'noindex, follow')
+@section('meta_keywords', 'StayNest privacy policy, data security, student PG privacy, tenant KYC protection')
+@section('canonical', route('user.privacy'))
+@section('robots', 'index, follow, max-snippet:-1, max-image-preview:large')
 
 @push('schema')
 <script type="application/ld+json">

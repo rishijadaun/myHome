@@ -54,17 +54,18 @@
                     </div>
                     <span class="font-bold text-2xl text-white tracking-tight">Stay<span class="text-brand">Nest</span></span>
                 </div>
-                <p class="text-sm text-gray-400 mb-4 max-w-md">Making PG and co-living simple, safe, and comfortable for students and working professionals across India with zero brokerage.</p>
+                <p class="text-sm text-gray-400 mb-4 max-w-md">India's leading zero-brokerage paying guest (PG) and co-living discovery network. 100% verified rooms for students and working professionals.</p>
                 <div class="flex gap-3">
-                    <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-facebook-f text-sm"></i></a>
-                    <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-twitter text-sm"></i></a>
-                    <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-instagram text-sm"></i></a>
+                    <a href="https://facebook.com/staynest" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-facebook-f text-sm"></i></a>
+                    <a href="https://twitter.com/staynest" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-twitter text-sm"></i></a>
+                    <a href="https://instagram.com/staynest" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-brand flex items-center justify-center transition tap-effect"><i class="fab fa-instagram text-sm"></i></a>
                 </div>
             </div>
             <div>
-                <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Company</h4>
+                <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Quick Links</h4>
                 <ul class="space-y-2.5 text-sm">
-                    <li><a href="{{ route('user.about') }}" class="hover:text-brand transition">About Us</a></li>
+                    <li><a href="{{ route('user.home') }}" class="hover:text-brand transition">Home</a></li>
+                    <li><a href="{{ route('user.search') }}" class="hover:text-brand transition">Search PGs</a></li>
                     <li><a href="{{ route('user.pricing') }}" class="hover:text-brand transition">Pricing Plans</a></li>
                     <li><a href="{{ route('user.list-property') }}" class="hover:text-brand transition">List Property</a></li>
                     <li><a href="{{ route('user.contact') }}" class="hover:text-brand transition">Contact Us</a></li>
@@ -96,15 +97,15 @@
             </div>
         </div>
         <div class="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
-            <p class="text-xs text-gray-500">&copy; {{ date('Y') }} StayNest Technologies Pvt. Ltd. All rights reserved.</p>
+            <p class="text-xs text-gray-500">&copy; {{ date('Y') }} StayNest. All rights reserved.</p>
             <div class="flex items-center gap-4 text-xs text-gray-500">
                 <a href="{{ route('user.terms') }}" class="hover:text-brand transition">Terms</a>
                 <span>•</span>
                 <a href="{{ route('user.privacy') }}" class="hover:text-brand transition">Privacy</a>
                 <span>•</span>
-                <a href="{{ route('user.contact') }}" class="hover:text-brand transition">Contact Us</a>
+                <a href="{{ route('user.contact') }}" class="hover:text-brand transition">Contact</a>
                 <span>•</span>
-                <span>Made with <i class="fas fa-heart text-red-500"></i> in India</span>
+                <a href="{{ route('sitemap') }}" class="hover:text-brand transition">Sitemap</a>
             </div>
         </div>
     </div>

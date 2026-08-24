@@ -37,7 +37,7 @@
       "@id": "{{ route('user.home') }}/#website",
       "url": "{{ route('user.home') }}",
       "name": "StayNest",
-      "description": "Find verified PGs and co-living spaces with zero brokerage across India.",
+      "description": "Find verified PGs, flats, and co-living spaces with zero brokerage across India.",
       "publisher": {
         "@id": "{{ route('user.home') }}/#organization"
       },
@@ -46,6 +46,36 @@
         "target": "{{ route('user.search') }}?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{ route('user.home') }}/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does StayNest verify properties?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Every PG, Flat, and Commercial Space undergoes on-site physical verification, landlord checks, biometric security assessment, and hygiene inspections before receiving the Verified badge."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there any brokerage fee on StayNest?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. StayNest operates on a 100% Zero Brokerage model. You connect directly with verified property owners and managers with zero hidden fees."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What amenities are typically included?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Accommodations include high-speed optical fiber WiFi, daily housekeeping, 3-tier security with CCTV, air conditioning, power backup, and hygienic North & South Indian meal options."
+          }
+        }
+      ]
     }
   ]
 }
@@ -256,9 +286,9 @@
                                                     <i class="fas fa-shield-halved text-brand text-[10px]"></i> 100% Verified
                                                 </span>
                                             </div>
-                                            <h3 class="text-xl sm:text-3xl md:text-4xl font-black leading-tight mb-1.5 text-white">
-                                                Save up to <span style="color:#7eebd4">₹15,000</span> on Zero Brokerage
-                                            </h3>
+                                            <h1 class="text-xl sm:text-3xl md:text-4xl font-black leading-tight mb-1.5 text-white">
+                                                Find Verified PGs & Co-Living in India <span style="color:#7eebd4">| Zero Brokerage</span>
+                                            </h1>
                                             <p class="text-xs sm:text-sm text-white/70 mb-3 max-w-md line-clamp-2">Book directly with verified owners — WiFi, 3 Meals & 24/7 Security included.</p>
                                             <div class="flex flex-wrap gap-2.5">
                                                 <a href="{{ route('user.search') }}" class="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm tap-ripple transition shadow-lg shadow-brand/30">
@@ -2128,7 +2158,7 @@
             <div class="bg-gray-900 rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
                 <div>
                     <p class="text-xs font-bold text-brand uppercase tracking-widest mb-1.5">For Property Owners</p>
-                    <h1 class="text-xl sm:text-3xl font-extrabold text-white mb-2 leading-tight">List your PG and fill<br class="sm:hidden"> beds faster</h1>
+                    <h2 class="text-xl sm:text-3xl font-extrabold text-white mb-2 leading-tight">List your PG and fill<br class="sm:hidden"> beds faster</h2>
                     <p class="text-xs sm:text-sm text-gray-400 max-w-lg">Reach 50,000+ students & working professionals searching for verified accommodations every month.</p>
                 </div>
                 <div class="flex items-center gap-3 flex-shrink-0">

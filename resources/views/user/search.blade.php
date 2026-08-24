@@ -1,10 +1,17 @@
 @extends('user.layouts.app')
 @php
     $searchCity = request('city');
+    $searchArea = request('area');
     $searchQ = request('q') ?? request('search');
     $searchGender = request('gender');
+    $searchType = request('type') ?? request('property_type');
+    $hasDeepFilters = request()->hasAny(['budget', 'min_price', 'max_price', 'ac', 'food', 'wifi', 'security', 'q', 'search', 'sort', 'lat', 'lng']);
     
-    if ($searchCity) {
+    // Dynamic SEO Titles and Descriptions
+    if ($searchArea && $searchCity) {
+        $seoSearchTitle = 'PG in ' . ucfirst($searchArea) . ', ' . ucfirst($searchCity) . ' - Best Boys, Girls & Co-Living | StayNest';
+        $seoSearchDesc = 'Explore 100% verified PGs and co-living stays in ' . ucfirst($searchArea) . ', ' . ucfirst($searchCity) . ' starting from ₹5,000/mo. Zero brokerage, WiFi, meals & biometric security.';
+    } elseif ($searchCity) {
         $seoSearchTitle = 'PG in ' . ucfirst($searchCity) . ' - Best Boys, Girls & Luxury Co-Living Stays | StayNest';
         $seoSearchDesc = 'Explore verified PGs and hostels in ' . ucfirst($searchCity) . ' starting from ₹5,000/mo. Zero brokerage, free WiFi, daily meals & biometric security. Compare rooms on StayNest.';
     } elseif ($searchQ) {
@@ -17,28 +24,79 @@
         $seoSearchTitle = 'Find PG Near You - 1,200+ Verified Boys, Girls & Co-Living Stays | StayNest';
         $seoSearchDesc = 'Discover 1,200+ verified PGs, luxury hostels, and co-living spaces across Bangalore, Noida, Delhi, Mumbai, Pune, and Gurgaon. Zero brokerage, instant booking on StayNest.';
     }
-    $seoSearchKeywords = 'PG in ' . ($searchCity ?: 'India') . ', paying guest, boys PG, girls PG, co-living spaces, luxury hostels, StayNest';
+    
+    $seoSearchKeywords = 'PG in ' . ($searchArea ? $searchArea . ' ' : '') . ($searchCity ?: 'India') . ', paying guest, boys PG, girls PG, co-living spaces, luxury hostels, StayNest';
+    $canonicalUrl = $searchCity ? route('user.search', array_filter(['city' => strtolower($searchCity), 'area' => strtolower($searchArea ?? '')])) : route('user.search');
 @endphp
 
 @section('title', $seoSearchTitle)
 @section('meta_description', $seoSearchDesc)
 @section('meta_keywords', $seoSearchKeywords)
-@section('canonical', url()->current())
+@section('canonical', $canonicalUrl)
+@if($hasDeepFilters && !empty($searchQ))
+    @section('robots', 'noindex, follow')
+@else
+    @section('robots', 'index, follow, max-snippet:-1, max-image-preview:large')
+@endif
 
 @push('schema')
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "SearchResultsPage",
-  "name": "{{ addslashes($seoSearchTitle) }}",
-  "description": "{{ addslashes($seoSearchDesc) }}",
-  "url": "{{ url()->current() }}",
-  "mainEntity": {
-    "@type": "ItemList",
-    "name": "Verified Paying Guest Accommodations",
-    "itemListOrder": "https://schema.org/ItemListOrderDescending",
-    "numberOfItems": 20
-  }
+  "@graph": [
+    {
+      "@type": "SearchResultsPage",
+      "@id": "{{ $canonicalUrl }}#webpage",
+      "url": "{{ $canonicalUrl }}",
+      "name": "{{ addslashes($seoSearchTitle) }}",
+      "description": "{{ addslashes($seoSearchDesc) }}",
+      "isPartOf": {
+        "@type": "WebSite",
+        "@id": "{{ route('user.home') }}#website",
+        "name": "StayNest",
+        "url": "{{ route('user.home') }}"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "{{ $canonicalUrl }}#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "{{ route('user.home') }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Search PGs",
+          "item": "{{ route('user.search') }}"
+        }@if(!empty($searchCity)),
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "PG in {{ ucfirst($searchCity) }}",
+          "item": "{{ route('user.search', ['city' => strtolower($searchCity)]) }}"
+        }@endif
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "name": "{{ addslashes($seoSearchTitle) }}",
+      "numberOfItems": {{ min(20, $properties->count()) }},
+      "itemListElement": [
+        @foreach($properties->take(10) as $idx => $p)
+        {
+          "@type": "ListItem",
+          "position": {{ $idx + 1 }},
+          "url": "{{ route('user.detail', ['slug' => $p->slug ?: $p->id]) }}",
+          "name": "{{ addslashes($p->name) }}"
+        }@if(!$loop->last),@endif
+        @endforeach
+      ]
+    }
+  ]
 }
 </script>
 @endpush
@@ -73,6 +131,24 @@
 
 @section('content')
 <div class="pt-16 md:pt-8 pb-24 md:pb-16 w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6">
+
+    <!-- Breadcrumb Navigation for SEO & Desktop UX -->
+    <nav aria-label="Breadcrumb" class="hidden md:flex mb-3.5 text-xs text-gray-500 items-center gap-1.5 flex-wrap px-1">
+        <a href="{{ route('user.home') }}" class="hover:text-brand transition flex items-center gap-1 text-gray-600 font-medium"><i class="fas fa-home text-[11px]"></i> Home</a>
+        <i class="fas fa-chevron-right text-[8px] text-gray-400"></i>
+        <a href="{{ route('user.search') }}" class="hover:text-brand transition text-gray-600 font-medium">Verified PGs</a>
+        @if(!empty($selectedCity))
+            <i class="fas fa-chevron-right text-[8px] text-gray-400"></i>
+            <a href="{{ route('user.search', ['city' => strtolower($selectedCity)]) }}" class="hover:text-brand transition font-medium text-gray-700">{{ ucfirst($selectedCity) }}</a>
+        @endif
+        @if(!empty($selectedArea))
+            <i class="fas fa-chevron-right text-[8px] text-gray-400"></i>
+            <span class="font-bold text-brand">{{ ucfirst($selectedArea) }}</span>
+        @elseif(!empty($selectedGender))
+            <i class="fas fa-chevron-right text-[8px] text-gray-400"></i>
+            <span class="font-bold text-brand">{{ ucfirst(strtolower($selectedGender)) }}</span>
+        @endif
+    </nav>
 
     <!-- ================= UNIFIED TOP SEARCH & FILTER TOGGLE HEADER ================= -->
     <div class="mb-4 sm:mb-5">

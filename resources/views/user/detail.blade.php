@@ -49,39 +49,111 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "LodgingBusiness",
-  "name": "{{ $propName }}",
-  "image": "{{ $propSeoImage }}",
-  "url": "{{ $propCanonical }}",
-  "telephone": "+91{{ $cleanPhone }}",
-  "priceRange": "₹{{ $propRent }} - ₹{{ $propDeposit }}",
-  "description": "{{ addslashes(strip_tags($property->description ?? $propSeoDesc)) }}",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "{{ addslashes($property->address ?: ($property->area->name ?? '')) }}",
-    "addressLocality": "{{ addslashes($property->area->name ?? '') }}",
-    "addressRegion": "{{ addslashes($property->city->name ?? 'Delhi NCR') }}",
-    "postalCode": "{{ $property->pincode ?? '201301' }}",
-    "addressCountry": "IN"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": "{{ $property->latitude ?? '28.6280' }}",
-    "longitude": "{{ $property->longitude ?? '77.3649' }}"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "{{ $propRating }}",
-    "reviewCount": "{{ max(1, (int)$propReviews) }}",
-    "bestRating": "5",
-    "worstRating": "1"
-  },
-  "makesOffer": {
-    "@type": "Offer",
-    "price": "{{ (int)str_replace(',', '', $propRent) }}",
-    "priceCurrency": "INR",
-    "availability": "https://schema.org/InStock"
-  }
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "@id": "{{ $propCanonical }}#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "{{ route('user.home') }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Search",
+          "item": "{{ route('user.search') }}"
+        }@if($property && $property->city),
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "PG in {{ $property->city->name }}",
+          "item": "{{ route('user.search', ['city' => strtolower($property->city->name)]) }}"
+        }@endif @if($property && $property->area),
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "{{ $property->area->name }}",
+          "item": "{{ route('user.search', ['city' => strtolower($property->city->name ?? ''), 'area' => strtolower($property->area->slug ?: $property->area->name)]) }}"
+        }@endif,
+        {
+          "@type": "ListItem",
+          "position": {{ ($property && $property->city ? 1 : 0) + ($property && $property->area ? 1 : 0) + 3 }},
+          "name": "{{ addslashes($propName) }}",
+          "item": "{{ $propCanonical }}"
+        }
+      ]
+    },
+    {
+      "@type": "LodgingBusiness",
+      "@id": "{{ $propCanonical }}#property",
+      "name": "{{ $propName }}",
+      "image": "{{ $propSeoImage }}",
+      "url": "{{ $propCanonical }}",
+      "telephone": "+91{{ $cleanPhone }}",
+      "priceRange": "₹{{ $propRent }} - ₹{{ $propDeposit }}",
+      "description": "{{ addslashes(strip_tags($property->description ?? $propSeoDesc)) }}",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "{{ addslashes($property->address ?: ($property->area->name ?? '')) }}",
+        "addressLocality": "{{ addslashes($property->area->name ?? '') }}",
+        "addressRegion": "{{ addslashes($property->city->name ?? 'Delhi NCR') }}",
+        "postalCode": "{{ $property->pincode ?? '201301' }}",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "{{ $property->latitude ?? '28.6280' }}",
+        "longitude": "{{ $property->longitude ?? '77.3649' }}"
+      },
+      @if($propReviews > 0)
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ $propRating }}",
+        "reviewCount": "{{ max(1, (int)$propReviews) }}",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      @endif
+      @if(isset($approvedReviews) && $approvedReviews->count() > 0)
+      "review": [
+        @foreach($approvedReviews->take(5) as $r)
+        {
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "{{ $r->rating }}",
+            "bestRating": "5"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "{{ addslashes($r->user->name ?? 'Verified Tenant') }}"
+          },
+          "datePublished": "{{ ($r->created_at ?? now())->format('Y-m-d') }}",
+          "reviewBody": "{{ addslashes(strip_tags($r->comment ?? 'Great stay and verified amenities.')) }}"
+        }@if(!$loop->last),@endif
+        @endforeach
+      ],
+      @endif
+      "amenityFeature": [
+        @foreach($property->amenities ?? [] as $amenity)
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "{{ addslashes($amenity->name) }}",
+          "value": true
+        }@if(!$loop->last),@endif
+        @endforeach
+      ],
+      "makesOffer": {
+        "@type": "Offer",
+        "price": "{{ (int)str_replace(',', '', $propRent) }}",
+        "priceCurrency": "INR",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+  ]
 }
 </script>
 @endpush
@@ -173,6 +245,10 @@
             @if($property && $property->city)
                 <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
                 <a href="{{ route('user.search', ['city' => $property->city->name]) }}" class="hover:text-brand transition">{{ $property->city->name }}</a>
+            @endif
+            @if($property && $property->area)
+                <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
+                <a href="{{ route('user.search', ['city' => $property->city->name ?? '', 'area' => $property->area->slug ?: $property->area->name]) }}" class="hover:text-brand transition">{{ $property->area->name }}</a>
             @endif
             <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
             <span class="text-gray-900 font-semibold truncate max-w-[200px] sm:max-w-xs">{{ $propName }}</span>
@@ -767,9 +843,15 @@
                         <p class="text-xs text-gray-500 mt-0.5">Authentic feedback from verified guests &amp; residents</p>
                     </div>
 
-                    <button type="button" onclick="openReviewModal()" id="reviewTriggerBtn" class="px-4 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-2xl text-xs font-bold transition tap-effect shadow-md shadow-brand/20 flex items-center gap-2">
-                        <i class="fas fa-pen"></i> Write a Review
-                    </button>
+                    @if(isset($userReview) && $userReview)
+                        <button type="button" onclick="openReviewModal()" id="reviewTriggerBtn" class="px-4 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-2xl text-xs font-bold transition tap-effect shadow-md shadow-brand/20 flex items-center gap-2">
+                            <i class="fas fa-edit"></i> Edit Your Review
+                        </button>
+                    @else
+                        <button type="button" onclick="openReviewModal()" id="reviewTriggerBtn" class="px-4 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-2xl text-xs font-bold transition tap-effect shadow-md shadow-brand/20 flex items-center gap-2">
+                            <i class="fas fa-pen"></i> Write a Review
+                        </button>
+                    @endif
                 </div>
 
                 <!-- Rating Score Summary Box -->
@@ -820,16 +902,34 @@
                     </div>
                 </div>
 
-                <!-- User Pending Review Banner -->
-                @if(isset($userPendingReview) && $userPendingReview)
-                    <div class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 text-sm">
-                            <i class="fas fa-clock"></i>
+                <!-- User's Existing Review Card (Pending or Approved) -->
+                @if(isset($userReview) && $userReview)
+                    <div class="mb-6 p-4 sm:p-5 rounded-2xl {{ $userReview->status === 'approved' ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900' : 'bg-amber-50/80 border-amber-200 text-amber-900' }} border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-xl {{ $userReview->status === 'approved' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600' }} flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-xs">
+                                <i class="fas {{ $userReview->status === 'approved' ? 'fa-check-circle' : 'fa-clock' }}"></i>
+                            </div>
+                            <div class="text-xs space-y-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <p class="font-bold {{ $userReview->status === 'approved' ? 'text-emerald-900' : 'text-amber-900' }}">
+                                        {{ $userReview->status === 'approved' ? 'Your Published Review' : 'Your Review (Pending Moderation)' }}
+                                    </p>
+                                    <span class="{{ $userReview->status === 'approved' ? 'bg-emerald-200/80 text-emerald-900' : 'bg-amber-200/80 text-amber-900' }} font-bold px-2 py-0.5 rounded-md text-[10px] flex items-center gap-1">
+                                        <i class="fas fa-star text-yellow-500"></i> {{ $userReview->rating }} ★
+                                    </span>
+                                </div>
+                                @if($userReview->title && $userReview->title !== 'Verified Resident Review')
+                                    <p class="font-bold text-gray-900 text-xs">{{ $userReview->title }}</p>
+                                @endif
+                                <p class="{{ $userReview->status === 'approved' ? 'text-emerald-800' : 'text-amber-800' }}">"{{ $userReview->comment }}"</p>
+                                <p class="text-[10px] {{ $userReview->status === 'approved' ? 'text-emerald-600' : 'text-amber-600' }}">
+                                    {{ $userReview->status === 'approved' ? 'Published live on ' . ($userReview->updated_at ? $userReview->updated_at->format('M d, Y') : 'Recently') : 'Your review will be visible publicly once approved by our moderation team.' }}
+                                </p>
+                            </div>
                         </div>
-                        <div class="text-xs">
-                            <p class="font-bold text-amber-900">Your review is currently pending moderation</p>
-                            <p class="text-amber-700 mt-0.5">You submitted a <strong>{{ $userPendingReview->rating }}★</strong> review: "{{ Str::limit($userPendingReview->comment, 80) }}". It will be published live once approved by our team.</p>
-                        </div>
+                        <button type="button" onclick="openReviewModal()" class="self-start sm:self-auto px-3.5 py-2 {{ $userReview->status === 'approved' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-amber-600 hover:bg-amber-700' }} text-white text-xs font-bold rounded-xl transition tap-effect flex items-center gap-1.5 shadow-xs whitespace-nowrap">
+                            <i class="fas fa-edit"></i> Edit Review
+                        </button>
                     </div>
                 @endif
 
@@ -1205,7 +1305,7 @@
     </div>
 </div>
 
-<!-- ================= WRITE REVIEW MODAL (AUTH USERS) ================= -->
+<!-- ================= WRITE / EDIT REVIEW MODAL (AUTH USERS) ================= -->
 <div id="writeReviewModal" class="fixed inset-0 z-[3000] hidden items-center justify-center p-4">
     <!-- Backdrop -->
     <div onclick="closeReviewModal()" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
@@ -1218,8 +1318,12 @@
                     <i class="fas fa-star"></i>
                 </div>
                 <div>
-                    <h3 class="text-base sm:text-lg font-black text-gray-900">Write a Review</h3>
-                    <p class="text-[11px] text-gray-500">Your review will be published after admin approval</p>
+                    <h3 class="text-base sm:text-lg font-black text-gray-900">
+                        {{ isset($userReview) && $userReview ? 'Edit Your Review' : 'Write a Review' }}
+                    </h3>
+                    <p class="text-[11px] text-gray-500">
+                        {{ isset($userReview) && $userReview ? 'Update your review rating and feedback for this listing' : 'Only 1 review allowed per listing. Changes go live after admin approval.' }}
+                    </p>
                 </div>
             </div>
             <button onclick="closeReviewModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition">
@@ -1230,7 +1334,7 @@
         <form id="reviewForm" onsubmit="submitReview(event)">
             @csrf
             <input type="hidden" name="property_id" value="{{ $property->id ?? '' }}">
-            <input type="hidden" name="rating" id="reviewRatingInput" value="5">
+            <input type="hidden" name="rating" id="reviewRatingInput" value="{{ $userReview->rating ?? 5 }}">
 
             <div class="space-y-4">
                 <!-- Star Rating Selector -->
@@ -1244,27 +1348,29 @@
                                 </button>
                             @endfor
                         </div>
-                        <span id="ratingLabel" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl ml-2">5 - Excellent</span>
+                        <span id="ratingLabel" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl ml-2">
+                            {{ ($userReview->rating ?? 5) == 5 ? '5 - Excellent' : (($userReview->rating ?? 5) == 4 ? '4 - Very Good' : (($userReview->rating ?? 5) == 3 ? '3 - Good' : (($userReview->rating ?? 5) == 2 ? '2 - Fair' : '1 - Poor'))) }}
+                        </span>
                     </div>
                 </div>
 
                 <!-- Review Title -->
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1.5">Review Title (Optional)</label>
-                    <input type="text" name="title" id="reviewTitle" placeholder="e.g. Great amenities and clean rooms!" oninput="validateBookingText(this)" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50">
+                    <input type="text" name="title" id="reviewTitle" value="{{ $userReview && $userReview->title !== 'Verified Resident Review' ? $userReview->title : '' }}" placeholder="e.g. Great amenities and clean rooms!" oninput="validateBookingText(this)" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50">
                     <div id="reviewTitleError" class="text-[10px] text-rose-600 font-semibold mt-1 hidden"></div>
                 </div>
 
                 <!-- Review Comments -->
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1.5">Your Experience & Feedback <span class="text-rose-500">*</span></label>
-                    <textarea name="comment" id="reviewComment" rows="4" required placeholder="Tell us about the food quality, WiFi speed, cleanliness, host behavior and room comfort..." oninput="validateBookingText(this)" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50"></textarea>
+                    <textarea name="comment" id="reviewComment" rows="4" required placeholder="Tell us about the food quality, WiFi speed, cleanliness, host behavior and room comfort..." oninput="validateBookingText(this)" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50">{{ $userReview->comment ?? '' }}</textarea>
                     <div id="reviewCommentError" class="text-[10px] text-rose-600 font-semibold mt-1 hidden"></div>
                 </div>
 
                 <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center gap-2.5 text-[11px] text-blue-700">
                     <i class="fas fa-shield-alt text-blue-500 text-xs"></i>
-                    <span>Reviews are moderated by our team to maintain authentic, quality experiences.</span>
+                    <span>Only 1 verified review allowed per listing. You can update your review anytime.</span>
                 </div>
             </div>
 
@@ -1274,7 +1380,8 @@
                     Cancel
                 </button>
                 <button type="submit" id="reviewSubmitBtn" class="px-6 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xs transition shadow-md shadow-brand/30 flex items-center gap-1.5">
-                    <i class="fas fa-paper-plane"></i> Submit Review
+                    <i class="fas {{ isset($userReview) && $userReview ? 'fa-save' : 'fa-paper-plane' }}"></i> 
+                    {{ isset($userReview) && $userReview ? 'Update Review' : 'Submit Review' }}
                 </button>
             </div>
         </form>
@@ -1765,14 +1872,36 @@
     }
 
     function openReviewModal() {
-        if (!isUserAuthenticated()) {
-            window.location.href = "{{ route('user.login') }}";
+        @if(!Auth::check())
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Login Required',
+                    text: 'Please log in to submit or edit your review for this listing.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4bb59d',
+                    confirmButtonText: 'Log In Now',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('user.login') }}?redirect=" + encodeURIComponent(window.location.href);
+                    }
+                });
+            } else {
+                if (confirm('Please log in to submit or edit your review. Go to login page?')) {
+                    window.location.href = "{{ route('user.login') }}?redirect=" + encodeURIComponent(window.location.href);
+                }
+            }
             return;
-        }
+        @endif
+
         const modal = document.getElementById('writeReviewModal');
         if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            // Set initial rating based on existing review or default 5
+            const currentRating = parseInt("{{ $userReview->rating ?? 5 }}") || 5;
+            setRating(currentRating);
         }
     }
 

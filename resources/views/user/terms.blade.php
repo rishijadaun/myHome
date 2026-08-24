@@ -1,8 +1,10 @@
 @extends('user.layouts.app')
 
-@section('title', 'Terms of Service - StayNest')
+@section('title', 'Terms & Conditions of Service - Zero Brokerage PG Network | StayNest')
 @section('meta_description', 'Read StayNest Terms and Conditions, platform usage policies, verified PG listing rules, tenant safety guidelines and cancellation policies.')
-@section('robots', 'noindex, follow')
+@section('meta_keywords', 'StayNest terms of service, tenant agreement, PG booking policies, host cancellation policy')
+@section('canonical', route('user.terms'))
+@section('robots', 'index, follow, max-snippet:-1, max-image-preview:large')
 
 @push('schema')
 <script type="application/ld+json">

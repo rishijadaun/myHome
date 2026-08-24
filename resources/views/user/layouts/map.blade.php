@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Favicon -->
+    <!-- Favicon & Web Manifest -->
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
 
     <!-- SEO Meta Tags -->
     <title>@yield('title', 'Explore PGs Near You on Interactive Map | StayNest')</title>
@@ -25,6 +26,10 @@
     <meta property="og:url" content="@yield('canonical', url()->current())">
     <meta property="og:site_name" content="StayNest">
     <meta property="og:image" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta property="og:image:secure_url" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">

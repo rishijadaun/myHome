@@ -1,11 +1,9 @@
 // StayNest Progressive Web App (PWA) Service Worker
-const CACHE_NAME = 'staynest-pwa-v1';
+const CACHE_NAME = 'staynest-pwa-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
-  '/images/favicon.png',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  '/images/favicon.png'
 ];
 
 // Install Event - Pre-cache core shell
@@ -36,8 +34,9 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event - Network First with Cache Fallback for dynamic pages
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
+  // Only handle HTTP & HTTPS GET requests (ignore chrome-extension://, moz-extension://, data:, blob:)
   if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith('http://') && !event.request.url.startsWith('https://')) return;
 
   const url = new URL(event.request.url);
 
@@ -52,14 +51,16 @@ self.addEventListener('fetch', (event) => {
       caches.match(event.request).then((cachedResponse) => {
         if (cachedResponse) return cachedResponse;
         return fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
+              try {
+                cache.put(event.request, responseClone);
+              } catch(e) {}
             });
           }
           return networkResponse;
-        });
+        }).catch(() => cachedResponse);
       })
     );
     return;
@@ -69,10 +70,12 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
+            try {
+              cache.put(event.request, responseClone);
+            } catch(e) {}
           });
         }
         return networkResponse;

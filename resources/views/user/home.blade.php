@@ -156,6 +156,56 @@
         border-radius: 6px !important;
     }
 
+    /* Promo Banner Navigation Buttons */
+    .promoSwiper .swiper-button-prev,
+    .promoSwiper .swiper-button-next {
+        width: 40px !important;
+        height: 40px !important;
+        background: rgba(255, 255, 255, 0.92) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        border-radius: 50% !important;
+        color: #0f172a !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.7) !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        margin-top: 0 !important;
+    }
+    .promoSwiper .swiper-button-prev {
+        left: 14px !important;
+    }
+    .promoSwiper .swiper-button-next {
+        right: 14px !important;
+    }
+    @media (min-width: 1024px) {
+        .promoSwiper .swiper-button-prev {
+            left: 18px !important;
+        }
+        .promoSwiper .swiper-button-next {
+            right: 18px !important;
+        }
+    }
+    .promoSwiper .swiper-button-prev:hover,
+    .promoSwiper .swiper-button-next:hover {
+        background: #ffffff !important;
+        color: #4bb59d !important;
+        transform: translateY(-50%) scale(1.08) !important;
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35) !important;
+    }
+    .promoSwiper .swiper-button-prev::after,
+    .promoSwiper .swiper-button-next::after {
+        font-size: 13px !important;
+        font-weight: 900 !important;
+    }
+    @media (max-width: 639px) {
+        .promoSwiper .swiper-button-prev,
+        .promoSwiper .swiper-button-next {
+            display: none !important;
+        }
+    }
+
     /* Section heading typography */
     .section-title {
         font-size: 1.125rem;
@@ -269,7 +319,7 @@
 
                         {{-- Slide 1: Zero Brokerage --}}
                         <div class="swiper-slide !h-auto">
-                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:p-8 md:p-10" style="background:#0a2e24">
+                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#0a2e24">
                                 <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
                                      alt="Zero Brokerage" class="absolute inset-0 w-full h-full object-cover opacity-40">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(10,46,36,0.97) 0%,rgba(26,107,85,0.75) 50%,rgba(0,0,0,0.35) 100%)"></div>
@@ -299,7 +349,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0">
+                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0 mr-0 sm:mr-4 md:mr-6">
                                             <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-2.5 text-center min-w-[120px]">
                                                 <p class="text-xl sm:text-2xl font-black text-white">50K+</p>
                                                 <p class="text-[10px] sm:text-[11px] text-white/70 font-medium">Happy Students</p>
@@ -316,7 +366,7 @@
 
                         {{-- Slide 2: Co-Living --}}
                         <div class="swiper-slide !h-auto">
-                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:p-8 md:p-10" style="background:#0f0a2a">
+                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#0f0a2a">
                                 <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
                                      alt="Co-Living" class="absolute inset-0 w-full h-full object-cover opacity-35">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(15,10,42,0.97) 0%,rgba(49,46,129,0.75) 50%,rgba(0,0,0,0.3) 100%)"></div>
@@ -343,7 +393,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0">
+                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0 mr-0 sm:mr-4 md:mr-6">
                                             <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-2.5 text-center min-w-[120px]">
                                                 <p class="text-xl sm:text-2xl font-black text-white">200+</p>
                                                 <p class="text-[10px] sm:text-[11px] text-white/70 font-medium">Co-Living Spaces</p>
@@ -360,7 +410,7 @@
 
                         {{-- Slide 3: Girls Special --}}
                         <div class="swiper-slide !h-auto">
-                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:p-8 md:p-10" style="background:#1a0a00">
+                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#1a0a00">
                                 <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
                                      alt="Girls PG" class="absolute inset-0 w-full h-full object-cover opacity-40">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(26,10,0,0.97) 0%,rgba(154,58,0,0.65) 50%,rgba(0,0,0,0.3) 100%)"></div>
@@ -387,7 +437,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0">
+                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0 mr-0 sm:mr-4 md:mr-6">
                                             <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-2.5 text-center min-w-[120px]">
                                                 <p class="text-xl sm:text-2xl font-black text-white">500+</p>
                                                 <p class="text-[10px] sm:text-[11px] text-white/70 font-medium">Girls PGs Listed</p>
@@ -404,7 +454,7 @@
 
                         {{-- Slide 4: Boys PG Special --}}
                         <div class="swiper-slide !h-auto">
-                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:p-8 md:p-10" style="background:#071b38">
+                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#071b38">
                                 <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
                                      alt="Boys PG" class="absolute inset-0 w-full h-full object-cover opacity-35">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(7,27,56,0.97) 0%,rgba(30,64,175,0.75) 50%,rgba(15,23,42,0.3) 100%)"></div>
@@ -431,7 +481,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0">
+                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0 mr-0 sm:mr-4 md:mr-6">
                                             <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-2.5 text-center min-w-[120px]">
                                                 <p class="text-xl sm:text-2xl font-black text-white">800+</p>
                                                 <p class="text-[10px] sm:text-[11px] text-white/70 font-medium">Boys PGs Listed</p>

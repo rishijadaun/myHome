@@ -253,12 +253,14 @@
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const dismissed = localStorage.getItem('staynest_pwa_dismissed');
-            if (!dismissed && window.innerWidth < 768) {
-                const banner = document.getElementById('pwaInstallBanner');
-                if (banner) banner.classList.remove('hidden');
+            if (window.innerWidth < 768) {
+                e.preventDefault();
+                deferredPrompt = e;
+                const dismissed = localStorage.getItem('staynest_pwa_dismissed');
+                if (!dismissed) {
+                    const banner = document.getElementById('pwaInstallBanner');
+                    if (banner) banner.classList.remove('hidden');
+                }
             }
         });
 

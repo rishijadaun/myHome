@@ -26,7 +26,13 @@
     }
     
     $seoSearchKeywords = 'PG in ' . ($searchArea ? $searchArea . ' ' : '') . ($searchCity ?: 'India') . ', paying guest, boys PG, girls PG, co-living spaces, luxury hostels, StayNest';
-    $canonicalUrl = $searchCity ? route('user.search', array_filter(['city' => strtolower($searchCity), 'area' => strtolower($searchArea ?? '')])) : route('user.search');
+    if ($searchCity) {
+        $canonicalUrl = $searchArea 
+            ? route('user.seo.city-area', ['city' => strtolower($searchCity), 'area' => strtolower($searchArea)])
+            : route('user.seo.city-area', ['city' => strtolower($searchCity)]);
+    } else {
+        $canonicalUrl = route('user.search');
+    }
 @endphp
 
 @section('title', $seoSearchTitle)
@@ -77,7 +83,13 @@
           "@type": "ListItem",
           "position": 3,
           "name": "PG in {{ ucfirst($searchCity) }}",
-          "item": "{{ route('user.search', ['city' => strtolower($searchCity)]) }}"
+          "item": "{{ route('user.seo.city-area', ['city' => strtolower($searchCity)]) }}"
+        }@endif @if(!empty($searchArea)),
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "{{ ucfirst($searchArea) }}",
+          "item": "{{ route('user.seo.city-area', ['city' => strtolower($searchCity), 'area' => strtolower($searchArea)]) }}"
         }@endif
       ]
     },
@@ -139,7 +151,7 @@
         <a href="{{ route('user.search') }}" class="hover:text-brand transition text-gray-600 font-medium">Verified PGs</a>
         @if(!empty($selectedCity))
             <i class="fas fa-chevron-right text-[8px] text-gray-400"></i>
-            <a href="{{ route('user.search', ['city' => strtolower($selectedCity)]) }}" class="hover:text-brand transition font-medium text-gray-700">{{ ucfirst($selectedCity) }}</a>
+            <a href="{{ route('user.seo.city-area', ['city' => strtolower($selectedCity)]) }}" class="hover:text-brand transition font-medium text-gray-700">{{ ucfirst($selectedCity) }}</a>
         @endif
         @if(!empty($selectedArea))
             <i class="fas fa-chevron-right text-[8px] text-gray-400"></i>
@@ -507,6 +519,18 @@
         @endfor
     </div>
 
+    <!-- Search Results Header with Semantic H1 for SEO -->
+    <div class="mb-3.5 sm:mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+        <div>
+            <h1 class="text-base sm:text-xl md:text-2xl font-black text-gray-900 tracking-tight">
+                {{ $seoSearchTitle }}
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5">
+                Showing <span class="font-bold text-gray-800">{{ $properties->count() }}</span> verified properties &bull; Zero Brokerage Direct Host Booking
+            </p>
+        </div>
+    </div>
+
     <!-- ================= FULL WIDTH PROPERTY GRID (2-COLUMNS IN MOBILE, 3-4 COLUMNS IN DESKTOP) ================= -->
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 md:gap-6 w-full" id="searchGrid">
         
@@ -544,7 +568,7 @@
                 data-security="{{ $hasSecurity ? 'true' : 'false' }}">
                 <div>
                     <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full bg-gray-100">
-                        <img src="{{ $displayImg }}" alt="{{ $pg->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        <img src="{{ $displayImg }}" alt="{{ $pg->name }} - Verified Stay in {{ $locationText }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async">
                         
                         <!-- Verified Solid Tag -->
                         <div class="absolute top-2 left-2 sm:top-3 sm:left-3 {{ $tagMeta['solid_badge'] }} text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">

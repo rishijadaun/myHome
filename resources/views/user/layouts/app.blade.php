@@ -30,8 +30,8 @@
     <meta property="og:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on StayNest.')">
     <meta property="og:url" content="@yield('canonical', url()->current())">
     <meta property="og:site_name" content="StayNest">
-    <meta property="og:image" content="@yield('meta_image', asset('images/favicon.png'))">
-    <meta property="og:image:secure_url" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta property="og:image" content="@yield('meta_image', asset('images/app-banner.png'))">
+    <meta property="og:image:secure_url" content="@yield('meta_image', asset('images/app-banner.png'))">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/png">
@@ -41,7 +41,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'StayNest - Find Your Perfect PG')">
     <meta name="twitter:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on StayNest.')">
-    <meta name="twitter:image" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta name="twitter:image" content="@yield('meta_image', asset('images/app-banner.png'))">
     <meta name="twitter:site" content="@StayNestIndia">
     <meta name="twitter:creator" content="@StayNestIndia">
 

@@ -1,25 +1,176 @@
 @extends('user.layouts.app')
 
-@section('title', 'List Your PG Free - Reach 50,000+ Tenants with Zero Brokerage | StayNest')
-@section('meta_description', 'List your PG, Hostel, Flat or Co-Living space for rent on StayNest for FREE. Reach 50,000+ verified students and working professionals with 0% brokerage.')
-@section('meta_keywords', 'list PG online, list property for rent, PG owner registration, zero brokerage property listing, list hostel, list flat, StayNest landlord')
+@php
+    $currentPath = trim(request()->path(), '/');
+
+    if ($currentPath === 'add-pg') {
+        $pageHeading = 'Add PG Free Online';
+        $pageHighlight = 'with Zero Brokerage';
+        $pageTitle = 'Add PG Free - Post Your PG Online with Zero Brokerage | StayNest';
+        $pageDesc = 'Add your PG or hostel on StayNest for FREE. Reach 50,000+ verified students and working professionals with zero brokerage fees. 24h fast verification.';
+        $pageKeywords = 'add PG free, add PG online, post PG free, PG owner registration, zero brokerage PG listing, list hostel free, StayNest';
+        $defaultTypeSlug = 'pg-hostel';
+    } elseif ($currentPath === 'list-pg-free') {
+        $pageHeading = 'List PG Free Online';
+        $pageHighlight = 'Zero Brokerage Host Listing';
+        $pageTitle = 'List PG Free - Post Paying Guest & Hostel with Zero Brokerage | StayNest';
+        $pageDesc = 'List your paying guest accommodation, hostel, or co-living stay on StayNest for free. Get direct phone and WhatsApp inquiries from verified tenants.';
+        $pageKeywords = 'list PG free, list PG online, post PG free, free PG listing, list hostel free, StayNest PG listing';
+        $defaultTypeSlug = 'pg-hostel';
+    } elseif ($currentPath === 'post-your-property' || $currentPath === 'list-your-property') {
+        $pageHeading = 'List Your Property Free';
+        $pageHighlight = 'Direct Landlord Listing';
+        $pageTitle = 'List Your Property Free - Post PG, Flat & Commercial Space | StayNest';
+        $pageDesc = 'Post your property online for free on StayNest. List PGs, residential flats, builder floors, and commercial shops with 0% brokerage forever.';
+        $pageKeywords = 'list your property, list your property free, post your property online, landlord property listing, zero brokerage property listing';
+        $defaultTypeSlug = 'pg-hostel';
+    } elseif ($currentPath === 'post-property' || $currentPath === 'post-property-free') {
+        $pageHeading = 'Post Property Free';
+        $pageHighlight = 'Reach 50,000+ Verified Tenants';
+        $pageTitle = 'Post Property Free - List PG, Flat & Commercial Space Online | StayNest';
+        $pageDesc = 'Post your rental property online for free. Connect directly with students, IT professionals, and families looking for rent with zero middleman commissions.';
+        $pageKeywords = 'post property free, post property online, free rental property post, landlord registration, StayNest property listing';
+        $defaultTypeSlug = 'pg-hostel';
+    } elseif ($currentPath === 'add-property') {
+        $pageHeading = 'Add Property Online Free';
+        $pageHighlight = 'Zero Brokerage Direct Listing';
+        $pageTitle = 'Add Property Free - Post PG, Flat & Commercial Space Online | StayNest';
+        $pageDesc = 'Add your property to India\'s fastest growing verified rental discovery network. Zero listing fees, verified leads, instant 24h approval.';
+        $pageKeywords = 'add property free, add property online, post property for rent, zero brokerage listing, StayNest';
+        $defaultTypeSlug = 'pg-hostel';
+    } elseif ($currentPath === 'post-flat') {
+        $pageHeading = 'Post Flat & Apartment Free';
+        $pageHighlight = 'For Rent with Zero Brokerage';
+        $pageTitle = 'Post Flat Free - Rent 1BHK, 2BHK, 3BHK & Villas Online | StayNest';
+        $pageDesc = 'Post your residential flat, apartment, villa, or builder floor for rent on StayNest with zero brokerage. Reach families and working bachelors directly.';
+        $pageKeywords = 'post flat free, list flat for rent, rent apartment online, 1BHK flat for rent, 2BHK flat for rent, zero brokerage flat listing';
+        $defaultTypeSlug = 'flat-apartment';
+    } else {
+        $pageHeading = 'List Your Property & PG';
+        $pageHighlight = 'on StayNest Free';
+        $pageTitle = 'List Your Property Free - Post PG, Hostel, Flat & Commercial Space Online | Zero Brokerage | StayNest';
+        $pageDesc = 'List PG, Hostel, Flat & Commercial property for rent on StayNest for FREE. Post property online, reach 50,000+ verified tenants with 0% brokerage. Instant direct tenant calls & 24h verification.';
+        $pageKeywords = 'list PG free, list your property, post your property, post property free, add PG online, post flat for rent, list hostel free, post commercial space, zero brokerage property listing, StayNest landlord registration, add property free India, PG owner registration';
+        $defaultTypeSlug = 'pg-hostel';
+    }
+@endphp
+
+@section('title', $pageTitle)
+@section('meta_description', $pageDesc)
+@section('meta_keywords', $pageKeywords)
 @section('meta_image', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')
-@section('canonical', route('user.list-property'))
+@section('canonical', url()->current())
 
 @push('schema')
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "RealEstateListing",
-  "name": "StayNest Property & PG Listing Service",
-  "description": "Platform for landlords and PG owners to list paying guest accommodations, flats, and co-living spaces with zero brokerage.",
-  "url": "{{ route('user.list-property') }}",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "INR",
-    "description": "Free property listing with instant admin verification"
-  }
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "{{ route('user.list-property') }}#service",
+      "name": "StayNest Zero Brokerage Property Listing Service",
+      "serviceType": "Real Estate Rental & PG Listing Service",
+      "description": "Free platform for property owners, landlords, and PG managers to post paying guest accommodations, hostels, flats, and commercial properties with zero brokerage fees.",
+      "provider": {
+        "@type": "Organization",
+        "name": "StayNest",
+        "url": "{{ route('user.home') }}",
+        "logo": "{{ asset('images/favicon.png') }}"
+      },
+      "areaServed": "IN",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR",
+        "availability": "https://schema.org/InStock",
+        "description": "100% Free Property & PG Listing with Instant Verification"
+      }
+    },
+    {
+      "@type": "HowTo",
+      "@id": "{{ route('user.list-property') }}#howto",
+      "name": "How to List Your PG or Property on StayNest in 3 Steps",
+      "description": "Quick guide on posting your PG, flat, or commercial space online with zero brokerage.",
+      "totalTime": "PT3M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Select Property Type & Location",
+          "text": "Choose PG/Hostel, Flat/Apartment, or Commercial Space and pin your exact GPS location."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Set Rent, Room Sharing & Amenities",
+          "text": "Specify monthly rent, security deposit, food options, WiFi, AC, and house rules."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Upload Photos & Submit",
+          "text": "Add real property photos and submit for 24-hour verification to receive direct tenant calls."
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{ route('user.list-property') }}#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is it really 100% free to list a PG or property on StayNest?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Listing your PG, hostel, flat, or commercial space on StayNest is completely free with zero listing fees and zero broker commissions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How quickly will my property listing be verified?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Our dedicated verification team reviews and activates listings within 24 hours of submission."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I get direct contact details of tenants?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Verified students and professionals will directly call and message you via phone and WhatsApp with zero intermediaries."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I post flats, apartments, and commercial offices too?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely. StayNest supports PGs, co-living hostels, 1BHK, 2BHK, 3BHK flats, independent houses, and commercial retail or office spaces."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "{{ route('user.list-property') }}#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "{{ route('user.home') }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "List Your Property Free",
+          "item": "{{ route('user.list-property') }}"
+        }
+      ]
+    }
+  ]
 }
 </script>
 @endpush
@@ -147,10 +298,10 @@
                     </span>
                 </div>
                 <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
-                    List Your Property & PG on <span class="text-brand-light">StayNest</span>
+                    {{ $pageHeading }} <span class="text-brand-light">{{ $pageHighlight }}</span>
                 </h1>
                 <p class="text-sm sm:text-base text-gray-300 mb-6">
-                    Reach over 50,000+ verified students and working professionals. Currently optimized for PGs & Hostels with full support for Flats, Apartments, and Commercial listings.
+                    {{ $pageDesc }}
                 </p>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10 text-xs sm:text-sm">
                     <div class="flex items-center gap-2">
@@ -236,8 +387,8 @@
                         <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
                             <div class="flex items-center justify-between mb-4">
                                 <div>
-                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900">Select Listing Type *</h2>
-                                    <p class="text-xs sm:text-sm text-gray-500">Pick what you are listing. Fields adapt automatically.</p>
+                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900">Select Property  Type *</h2>
+                                    <p class="text-xs sm:text-sm text-gray-500">Pick what you are listing. Get rent on your Property.</p>
                                 </div>
                                 <!-- <span class="bg-brand/10 text-brand text-xs font-bold px-3 py-1 rounded-full">Dynamic Filter</span> -->
                             </div>
@@ -1238,6 +1389,206 @@
             </button>
         </div>
     </div>
+</div>
+
+<!-- ======================= LANDLORD SEO AUTHORITY & VALUE PROPOSITION SECTIONS ======================= -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 space-y-16 pb-12">
+    
+    <!-- 1. Key Benefits for Property Owners -->
+    <section class="bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm">
+        <div class="text-center max-w-3xl mx-auto mb-10">
+            <span class="bg-brand-light text-brand text-xs font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider">Owner & Landlord Benefits</span>
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-gray-900 mt-3 tracking-tight">Why Post Your Property on <span class="gradient-text">StayNest</span>?</h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-2">Connect directly with 50,000+ verified students and working professionals looking for immediate move-in.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="p-5 rounded-2xl bg-gray-50/80 border border-gray-100 hover:border-brand/30 transition hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-4">
+                    <i class="fas fa-hand-holding-dollar"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 text-base mb-1.5">100% Free • Zero Brokerage</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">No hidden fees, no commission on monthly rent, and no middleman cuts. Keep 100% of your rental income.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-gray-50/80 border border-gray-100 hover:border-brand/30 transition hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-4">
+                    <i class="fas fa-phone-volume"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 text-base mb-1.5">Direct Tenant Calls &amp; WhatsApp</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">Interested tenants connect directly with you via phone call or WhatsApp message for instant booking inquiries.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-gray-50/80 border border-gray-100 hover:border-brand/30 transition hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-4">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 text-base mb-1.5">Verified In 24 Hours</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">Our automated review and audit team approves your listing within 24 hours to award your property the trust-boosting Verified Badge.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-gray-50/80 border border-gray-100 hover:border-brand/30 transition hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4">
+                    <i class="fas fa-map-location-dot"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 text-base mb-1.5">Hyperlocal GPS Map Ranking</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">Your property appears in locality and landmark searches near nearby colleges, tech parks, and metro stations.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-gray-50/80 border border-gray-100 hover:border-brand/30 transition hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-4">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 text-base mb-1.5">Verified Quality Tenants</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">Get inquiries from verified college students, software engineers, and corporate employees with reliable KYC records.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-gray-50/80 border border-gray-100 hover:border-brand/30 transition hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-xl mb-4">
+                    <i class="fas fa-gauge-high"></i>
+                </div>
+                <h3 class="font-bold text-gray-900 text-base mb-1.5">Dedicated Owner Portal</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">Manage multiple rooms, track tenant inquiries, update monthly rents, and handle lease renewals from one dashboard.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. How to List in 3 Steps -->
+    <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 rounded-3xl p-6 sm:p-10 text-white shadow-xl">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <span class="bg-brand/20 text-brand-light text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Fast &amp; Simple</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold mt-3">How to Post Your Property in 3 Easy Steps</h2>
+            <p class="text-xs sm:text-sm text-gray-400 mt-1.5">Complete the quick 3-minute form above and go live in 24 hours.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-center backdrop-blur-sm relative">
+                <div class="w-12 h-12 rounded-2xl bg-brand flex items-center justify-center text-white font-extrabold text-lg mx-auto mb-4 shadow-lg shadow-brand/30">1</div>
+                <h3 class="text-base font-bold mb-2">Select Type &amp; Pin GPS</h3>
+                <p class="text-xs text-gray-400 leading-relaxed">Choose whether you are listing a PG/Hostel, Flat, or Commercial space. Use 1-click GPS detection to auto-fill your exact address.</p>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-center backdrop-blur-sm relative">
+                <div class="w-12 h-12 rounded-2xl bg-brand flex items-center justify-center text-white font-extrabold text-lg mx-auto mb-4 shadow-lg shadow-brand/30">2</div>
+                <h3 class="text-base font-bold mb-2">Set Pricing &amp; Amenities</h3>
+                <p class="text-xs text-gray-400 leading-relaxed">Specify monthly rent, security deposit, room sharing configs (Single, Double, Triple), meal inclusions, WiFi, and house rules.</p>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-center backdrop-blur-sm relative">
+                <div class="w-12 h-12 rounded-2xl bg-brand flex items-center justify-center text-white font-extrabold text-lg mx-auto mb-4 shadow-lg shadow-brand/30">3</div>
+                <h3 class="text-base font-bold mb-2">Upload Photos &amp; Go Live</h3>
+                <p class="text-xs text-gray-400 leading-relaxed">Add real photos of the rooms and building. Once verified by our team, your listing starts receiving direct tenant calls.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. What You Can List on StayNest -->
+    <section class="bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm">
+        <div class="text-center max-w-2xl mx-auto mb-8">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Property Types You Can List for Free</h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1.5">We cater to all rental accommodation categories across top Indian cities.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="border border-emerald-100 bg-emerald-50/40 rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold"><i class="fas fa-bed"></i></div>
+                    <div>
+                        <h3 class="font-extrabold text-gray-900 text-base">PGs &amp; Co-Living Hostels</h3>
+                        <p class="text-[11px] text-emerald-700 font-semibold">Boys, Girls &amp; Unisex Stays</p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 leading-relaxed mb-3">List single private rooms, double sharing, triple sharing with 3 meals, high-speed WiFi, daily housekeeping &amp; CCTV security.</p>
+                <span class="text-xs font-bold text-emerald-700 flex items-center gap-1"><i class="fas fa-check"></i> Zero Brokerage Guaranteed</span>
+            </div>
+
+            <div class="border border-indigo-100 bg-indigo-50/40 rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold"><i class="fas fa-building"></i></div>
+                    <div>
+                        <h3 class="font-extrabold text-gray-900 text-base">Flats &amp; Apartments</h3>
+                        <p class="text-[11px] text-indigo-700 font-semibold">1BHK, 2BHK, 3BHK &amp; Villas</p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 leading-relaxed mb-3">List fully-furnished, semi-furnished, or unfurnished residential flats, builder floors, and independent houses directly to families &amp; bachelors.</p>
+                <span class="text-xs font-bold text-indigo-700 flex items-center gap-1"><i class="fas fa-check"></i> Direct Landlord Agreement</span>
+            </div>
+
+            <div class="border border-amber-100 bg-amber-50/40 rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center font-bold"><i class="fas fa-store"></i></div>
+                    <div>
+                        <h3 class="font-extrabold text-gray-900 text-base">Commercial Spaces</h3>
+                        <p class="text-[11px] text-amber-700 font-semibold">Shops, Offices &amp; Coworking</p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 leading-relaxed mb-3">Post commercial retail shops, office spaces, showrooms, clinic setups, and shared office desks to reach verified business owners.</p>
+                <span class="text-xs font-bold text-amber-700 flex items-center gap-1"><i class="fas fa-check"></i> Fast Verified Leads</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Landlord Frequently Asked Questions -->
+    <section class="bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm">
+        <div class="text-center max-w-2xl mx-auto mb-8">
+            <span class="bg-brand-light text-brand text-xs font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider">Got Questions?</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2.5">Landlord &amp; PG Owner FAQs</h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Everything you need to know about listing your property on StayNest.</p>
+        </div>
+
+        <div class="max-w-3xl mx-auto space-y-4 text-xs sm:text-sm">
+            <details class="group bg-gray-50 rounded-2xl p-4 sm:p-5 border border-gray-200/80 transition" open>
+                <summary class="font-bold text-gray-900 cursor-pointer flex items-center justify-between gap-2 list-none">
+                    <span>How much does it cost to list my PG or property on StayNest?</span>
+                    <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                </summary>
+                <p class="text-gray-600 mt-3 leading-relaxed">It is <strong>100% FREE</strong> to list your PG, hostel, flat, or commercial space on StayNest. We do not charge any listing registration fees or take any commissions from your rental bookings.</p>
+            </details>
+
+            <details class="group bg-gray-50 rounded-2xl p-4 sm:p-5 border border-gray-200/80 transition">
+                <summary class="font-bold text-gray-900 cursor-pointer flex items-center justify-between gap-2 list-none">
+                    <span>How quickly will my listing be verified and visible to tenants?</span>
+                    <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                </summary>
+                <p class="text-gray-600 mt-3 leading-relaxed">Our moderation team reviews listings within <strong>24 hours</strong>. Once verified, your property receives the green Verified badge and becomes instantly discoverable on search results and interactive GPS maps.</p>
+            </details>
+
+            <details class="group bg-gray-50 rounded-2xl p-4 sm:p-5 border border-gray-200/80 transition">
+                <summary class="font-bold text-gray-900 cursor-pointer flex items-center justify-between gap-2 list-none">
+                    <span>How do tenants contact me?</span>
+                    <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                </summary>
+                <p class="text-gray-600 mt-3 leading-relaxed">Tenants view your listing and can directly call you or message you on WhatsApp using your verified phone number. There are zero intermediaries involved.</p>
+            </details>
+
+            <details class="group bg-gray-50 rounded-2xl p-4 sm:p-5 border border-gray-200/80 transition">
+                <summary class="font-bold text-gray-900 cursor-pointer flex items-center justify-between gap-2 list-none">
+                    <span>Can I list multiple properties or full hostel blocks?</span>
+                    <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                </summary>
+                <p class="text-gray-600 mt-3 leading-relaxed">Yes! You can list as many properties and room sharing combinations as you manage. Property managers and brokers can also register for our dedicated <strong>Broker Portal</strong> to bulk-manage unlimited listings.</p>
+            </details>
+        </div>
+    </section>
+
+    <!-- 5. Top Cities Where Owners List PGs -->
+    <section class="bg-gray-50 rounded-3xl p-6 sm:p-8 border border-gray-200/80 text-center">
+        <h2 class="text-lg sm:text-xl font-black text-gray-900 mb-2">List Your PG Across Top Tech &amp; Education Hubs in India</h2>
+        <p class="text-xs text-gray-500 mb-5 max-w-xl mx-auto">Get high occupancy and zero vacancy by listing in your city today.</p>
+        <div class="flex flex-wrap items-center justify-center gap-2 text-xs">
+            <a href="{{ route('user.seo.city-area', ['city' => 'bangalore']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Bangalore</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'noida']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Noida</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'gurgaon']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Gurgaon</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'delhi']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Delhi</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'greater-noida']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Greater Noida</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'hyderabad']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Hyderabad</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'pune']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Pune</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'mumbai']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Mumbai</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'ghaziabad']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Ghaziabad</a>
+            <a href="{{ route('user.seo.city-area', ['city' => 'lucknow']) }}" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-1.5 rounded-xl font-semibold shadow-2xs transition">Post PG in Lucknow</a>
+        </div>
+    </section>
+
 </div>
 @endsection
 

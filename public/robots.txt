@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 Allow: /search
+Allow: /pg-in-
+Allow: /location
 Allow: /detail/
 Allow: /pg-details
 Allow: /about-us
@@ -9,6 +11,7 @@ Allow: /list-property
 Allow: /pricing
 Allow: /terms
 Allow: /privacy
+Allow: /sitemap.xml
 Allow: /images/
 Allow: /build/
 

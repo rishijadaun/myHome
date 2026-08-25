@@ -18,12 +18,74 @@
     $availBeds = $property->available_beds ?? min(4, $totalBeds);
     $propNoticePeriod = (int) ($property->notice_period_days ?? 30);
     $propMaintenance = (float) ($property->maintenance_charges ?? 0);
-    $roomConfigurations = $property ? $property->room_configurations : collect();
+    $roomConfigurations = $property ? ($property->room_configurations ?? collect()) : collect();
+    $userReview = $userReview ?? null;
+    $existingBooking = $existingBooking ?? null;
     $typeSlug = strtolower($property->propertyType?->slug ?? '');
     $genderPref = strtolower($property->gender_preference ?? '');
     $isCommercial = in_array($typeSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space']) || ($genderPref === 'not_applicable');
     $isFlat = !$isCommercial && (in_array($typeSlug, ['flat', 'flat-apartment', 'apartment', 'house', 'villa']) || in_array($genderPref, ['all', 'any']));
     $isPg = !$isCommercial && !$isFlat;
+
+    // Extract or format Apartment/Flat and Commercial configurations
+    $propDescFull = ($property->description ?? '') . ' ' . ($property->name ?? '');
+    
+    // Flat Configuration
+    $flatBhk = '2 BHK';
+    if (preg_match('/\b(1|2|3|4|5)\s*BHK\b/i', $propDescFull, $mBhk)) {
+        $flatBhk = strtoupper(trim($mBhk[0]));
+    } elseif (stripos($propDescFull, 'studio') !== false || stripos($propDescFull, '1 RK') !== false) {
+        $flatBhk = '1 RK / Studio';
+    } elseif (stripos($propDescFull, 'villa') !== false) {
+        $flatBhk = '3 BHK Luxury Villa';
+    }
+
+    $flatFurnishing = 'Semi Furnished';
+    if (preg_match('/\b(semi[\s-]*furnished)\b/i', $propDescFull)) {
+        $flatFurnishing = 'Semi Furnished';
+    } elseif (preg_match('/\b(fully[\s-]*furnished|fully\s+furnished)\b/i', $propDescFull)) {
+        $flatFurnishing = 'Fully Furnished';
+    } elseif (preg_match('/\b(unfurnished|raw|bare[\s-]*shell)\b/i', $propDescFull)) {
+        $flatFurnishing = 'Unfurnished';
+    } elseif (preg_match('/\b(furnished)\b/i', $propDescFull)) {
+        $flatFurnishing = 'Furnished';
+    }
+
+    $flatCarpetArea = '1,100 sq ft';
+    if (preg_match('/(\d{3,5})\s*(?:sq\s*ft|sqft|sq\.ft)/i', $propDescFull, $mArea)) {
+        $flatCarpetArea = number_format((int)$mArea[1]) . ' sq ft';
+    } else {
+        if (str_contains($flatBhk, '1 BHK') || str_contains($flatBhk, '1 RK')) $flatCarpetArea = '650 sq ft';
+        elseif (str_contains($flatBhk, '2 BHK')) $flatCarpetArea = '1,100 sq ft';
+        elseif (str_contains($flatBhk, '3 BHK')) $flatCarpetArea = '1,550 sq ft';
+        elseif (str_contains($flatBhk, '4') || str_contains($flatBhk, '5')) $flatCarpetArea = '2,200 sq ft';
+    }
+
+    $flatBaths = str_contains($flatBhk, '1 BHK') || str_contains($flatBhk, '1 RK') ? '1' : (str_contains($flatBhk, '3 BHK') ? '3' : '2');
+
+    // Commercial Configuration
+    $commercialType = 'Commercial Office / Retail Space';
+    if (stripos($propDescFull, 'shop') !== false || stripos($propDescFull, 'retail') !== false) {
+        $commercialType = 'Retail Commercial Shop';
+    } elseif (stripos($propDescFull, 'showroom') !== false) {
+        $commercialType = 'Commercial Showroom';
+    } elseif (stripos($propDescFull, 'coworking') !== false || stripos($propDescFull, 'desk') !== false) {
+        $commercialType = 'Co-Working Shared Office';
+    } elseif (stripos($propDescFull, 'office') !== false) {
+        $commercialType = 'Commercial Office Space';
+    }
+
+    $commercialFurnishing = 'Furnished Office Space';
+    if (stripos($propDescFull, 'bare shell') !== false || stripos($propDescFull, 'raw') !== false) {
+        $commercialFurnishing = 'Bare Shell';
+    } elseif (stripos($propDescFull, 'warm shell') !== false) {
+        $commercialFurnishing = 'Warm Shell (Ready Ceiling & AC)';
+    }
+
+    $commercialArea = '1,500 sq ft';
+    if (preg_match('/(\d{3,5})\s*(?:sq\s*ft|sqft|sq\.ft)/i', $propDescFull, $mCArea)) {
+        $commercialArea = number_format((int)$mCArea[1]) . ' sq ft';
+    }
     
     if ($isCommercial) {
         $propSeoTitle = $propName . ' - Commercial Space in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
@@ -70,13 +132,13 @@
           "@type": "ListItem",
           "position": 3,
           "name": "PG in {{ $property->city->name }}",
-          "item": "{{ route('user.search', ['city' => strtolower($property->city->name)]) }}"
+          "item": "{{ route('user.seo.city-area', ['city' => strtolower($property->city->slug ?: $property->city->name)]) }}"
         }@endif @if($property && $property->area),
         {
           "@type": "ListItem",
           "position": 4,
           "name": "{{ $property->area->name }}",
-          "item": "{{ route('user.search', ['city' => strtolower($property->city->name ?? ''), 'area' => strtolower($property->area->slug ?: $property->area->name)]) }}"
+          "item": "{{ route('user.seo.city-area', ['city' => strtolower($property->city->slug ?: $property->city->name), 'area' => strtolower($property->area->slug ?: $property->area->name)]) }}"
         }@endif,
         {
           "@type": "ListItem",
@@ -238,21 +300,21 @@
 
     <!-- Breadcrumb & Top Actions -->
     <div class="flex flex-wrap items-center justify-between gap-2 py-3 mb-3 text-xs sm:text-sm">
-        <div class="flex items-center gap-1.5 text-gray-500 flex-wrap">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-gray-500 flex-wrap">
             <a href="{{ route('user.home') }}" class="hover:text-brand transition flex items-center gap-1"><i class="fas fa-home text-xs"></i> Home</a>
             <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
             <a href="{{ route('user.search') }}" class="hover:text-brand transition">Search</a>
             @if($property && $property->city)
                 <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
-                <a href="{{ route('user.search', ['city' => $property->city->name]) }}" class="hover:text-brand transition">{{ $property->city->name }}</a>
+                <a href="{{ route('user.seo.city-area', ['city' => strtolower($property->city->slug ?: $property->city->name)]) }}" class="hover:text-brand transition">{{ $property->city->name }}</a>
             @endif
             @if($property && $property->area)
                 <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
-                <a href="{{ route('user.search', ['city' => $property->city->name ?? '', 'area' => $property->area->slug ?: $property->area->name]) }}" class="hover:text-brand transition">{{ $property->area->name }}</a>
+                <a href="{{ route('user.seo.city-area', ['city' => strtolower($property->city->slug ?: $property->city->name), 'area' => strtolower($property->area->slug ?: $property->area->name)]) }}" class="hover:text-brand transition">{{ $property->area->name }}</a>
             @endif
             <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
-            <span class="text-gray-900 font-semibold truncate max-w-[200px] sm:max-w-xs">{{ $propName }}</span>
-        </div>
+            <span class="text-gray-900 font-semibold truncate max-w-[200px] sm:max-w-xs" aria-current="page">{{ $propName }}</span>
+        </nav>
 
         <div class="flex items-center gap-2">
             <!-- Share Button -->
@@ -277,9 +339,9 @@
         <div class="relative rounded-3xl overflow-hidden shadow-lg border border-gray-100 bg-slate-950 h-72 sm:h-96 md:h-[420px]">
             <div class="swiper detailSwiper h-full w-full">
                 <div class="swiper-wrapper h-full">
-                    @foreach($propImages as $img)
+                    @foreach($propImages as $idx => $img)
                         <div class="swiper-slide h-full w-full bg-slate-950 flex items-center justify-center skeleton-shimmer">
-                            <img src="{{ $img->image_url }}" alt="{{ $propName }}" class="w-full h-full object-cover object-center" onload="this.parentElement.classList.remove('skeleton-shimmer')">
+                            <img src="{{ $img->image_url }}" alt="{{ $propName }} - Verified Stay in {{ $property->area->name ?? '' }}, {{ $property->city->name ?? 'India' }} (Photo {{ $idx + 1 }})" loading="{{ $idx === 0 ? 'eager' : 'lazy' }}" decoding="async" class="w-full h-full object-cover object-center" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                         </div>
                     @endforeach
                 </div>
@@ -325,7 +387,7 @@
             <div class="flex items-center gap-2 sm:gap-3 mt-3.5 overflow-x-auto no-scrollbar py-1">
                 @foreach($propImages as $idx => $tImg)
                     <button type="button" onclick="goToSlide({{ $idx }})" data-thumb-idx="{{ $idx }}" class="thumb-btn flex-shrink-0 w-20 sm:w-24 md:w-28 aspect-[4/3] rounded-2xl overflow-hidden border-2 {{ $idx === 0 ? 'border-brand ring-2 ring-brand/30 shadow-md opacity-100 scale-102' : 'border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-400' }} cursor-pointer transition-all duration-200 group">
-                        <img src="{{ $tImg->image_url }}" alt="{{ $propName }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <img src="{{ $tImg->image_url }}" alt="{{ $propName }} thumbnail {{ $idx + 1 }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     </button>
                 @endforeach
             </div>
@@ -448,6 +510,120 @@
                         </div>
                     @endif
                 </div>
+
+                @if($isFlat)
+                    <!-- 🏡 Apartment / Flat Configuration (Displayed when listing is not PG) -->
+                    <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
+                        <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="fas fa-home text-brand text-lg"></i> Apartment / Flat Configuration
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
+                            <!-- BHK Type -->
+                            <div class="p-3.5 sm:p-4 rounded-2xl bg-gray-50 border border-gray-200/80 flex flex-col justify-between">
+                                <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">BHK Type</span>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold shrink-0"><i class="fas fa-door-open"></i></div>
+                                    <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $flatBhk }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Furnishing -->
+                            <div class="p-3.5 sm:p-4 rounded-2xl bg-gray-50 border border-gray-200/80 flex flex-col justify-between">
+                                <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">Furnishing</span>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold shrink-0"><i class="fas fa-couch"></i></div>
+                                    <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $flatFurnishing }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Carpet Area -->
+                            <div class="p-3.5 sm:p-4 rounded-2xl bg-gray-50 border border-gray-200/80 flex flex-col justify-between">
+                                <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">Carpet Area (sq ft)</span>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold shrink-0"><i class="fas fa-ruler-combined"></i></div>
+                                    <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $flatCarpetArea }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Flat Key Specifications -->
+                        <!-- <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-gray-100 text-xs">
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-bath text-indigo-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">{{ $flatBaths }}</strong> Bathrooms</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-sun text-amber-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">East</strong> Facing</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-square-parking text-blue-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">Covered</strong> Parking</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-faucet-drip text-cyan-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">24h</strong> Water</span>
+                            </div>
+                        </div> -->
+                    </div>
+                @elseif($isCommercial)
+                    <!-- 🏬 Commercial Space Configuration -->
+                    <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
+                        <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="fas fa-store text-amber-600 text-lg"></i> Commercial Space Configuration
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
+                            <!-- Space Category -->
+                            <div class="p-3.5 sm:p-4 rounded-2xl bg-gray-50 border border-gray-200/80 flex flex-col justify-between">
+                                <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">Space Category</span>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold shrink-0"><i class="fas fa-briefcase"></i></div>
+                                    <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $commercialType }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Furnishing Status -->
+                            <div class="p-3.5 sm:p-4 rounded-2xl bg-gray-50 border border-gray-200/80 flex flex-col justify-between">
+                                <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">Furnishing Status</span>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold shrink-0"><i class="fas fa-couch"></i></div>
+                                    <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $commercialFurnishing }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Usable Carpet Area -->
+                            <div class="p-3.5 sm:p-4 rounded-2xl bg-gray-50 border border-gray-200/80 flex flex-col justify-between">
+                                <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">Carpet Area (sq ft)</span>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold shrink-0"><i class="fas fa-ruler-combined"></i></div>
+                                    <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $commercialArea }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Commercial Specs -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-gray-100 text-xs">
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-car text-gray-400"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">Reserved</strong> Parking</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-bolt text-amber-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">100%</strong> Backup</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-elevator text-blue-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">Passenger</strong> Lifts</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-shield-halved text-emerald-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">24/7</strong> Security</span>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- 2. PRICING & SPACE CONFIGURATION SECTION -->

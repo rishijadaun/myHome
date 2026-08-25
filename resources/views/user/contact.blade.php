@@ -331,7 +331,7 @@
                     <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
                 </h4>
                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                    You can click on the "List PG Free" button in the navigation header or go to the List Property page. It takes less than 3 minutes to submit your property details.
+                    You can click on the "Post Property Free" button in the navigation header or go to the List Property page. It takes less than 3 minutes to submit your property details.
                 </p>
             </div>
         </div>

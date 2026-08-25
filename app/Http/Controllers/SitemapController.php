@@ -14,7 +14,7 @@ class SitemapController extends Controller
      */
     public function index(): Response
     {
-        $xmlContent = \Illuminate\Support\Facades\Cache::remember('staynest_seo_sitemap_xml_v4', 1800, function () {
+        $xmlContent = \Illuminate\Support\Facades\Cache::remember('staynest_seo_sitemap_xml_v5', 1800, function () {
             // 1. Static high-priority pages
             $staticPages = [
                 [
@@ -98,11 +98,11 @@ class SitemapController extends Controller
             $genders = ['boys', 'girls', 'co-ed'];
 
             foreach ($cities as $city) {
-                $citySlug = strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $city->name)));
+                $citySlug = strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $city->slug ?: $city->name)));
                 
-                // City Base
+                // Clean Programmatic City URL (e.g. /pg-in-noida)
                 $cityPages[] = [
-                    'url' => route('user.search', ['city' => $citySlug]),
+                    'url' => route('user.seo.city-area', ['city' => $citySlug]),
                     'lastmod' => now()->toAtomString(),
                     'changefreq' => 'daily',
                     'priority' => '0.85'
@@ -129,20 +129,19 @@ class SitemapController extends Controller
                 }
             }
 
-            // 3. Popular Locality / Area Landing Pages
+            // 3. Popular Locality / Area Landing Pages (e.g. /pg-in-noida/sector-62)
             $areas = Area::where('is_active', 1)->with('city')->get();
             $areaPages = [];
             foreach ($areas as $area) {
-                $cityName = $area->city ? strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $area->city->name))) : '';
+                $cityName = $area->city ? strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $area->city->slug ?: $area->city->name))) : '';
                 $areaSlug = strtolower(trim($area->slug ?: $area->name));
                 
-                $params = ['area' => $areaSlug];
-                if ($cityName) {
-                    $params['city'] = $cityName;
-                }
+                $areaUrl = $cityName 
+                    ? route('user.seo.city-area', ['city' => $cityName, 'area' => $areaSlug])
+                    : route('user.search', ['area' => $areaSlug]);
                 
                 $areaPages[] = [
-                    'url' => route('user.search', $params),
+                    'url' => $areaUrl,
                     'lastmod' => now()->toAtomString(),
                     'changefreq' => 'weekly',
                     'priority' => '0.80'

@@ -365,15 +365,23 @@ class UserHomeController extends Controller
             $query->where(function($q) {
                 $q->whereHas('propertyType', function($ptq) {
                     $ptq->whereIn('slug', ['pg-hostel', 'co-living', 'pg', 'hostel', 'coliving']);
-                })->orWhereNull('property_type_id');
+                })->orWhere(function($subQ) {
+                    $subQ->whereNull('property_type_id')
+                         ->whereDoesntHave('propertyType', function($ptq) {
+                             $ptq->whereIn('slug', [
+                                 'flat', 'flat-apartment', 'apartment', 'house', 'villa', 'builder-floor', 'independent-house',
+                                 'commercial', 'shop', 'office', 'retail', 'showroom', 'warehouse', 'commercial-space'
+                             ]);
+                         });
+                });
             });
         } elseif ($selectedPropertyType === 'flat-apartment') {
             $query->whereHas('propertyType', function($ptq) {
-                $ptq->whereIn('slug', ['flat', 'flat-apartment', 'apartment', 'house', 'villa']);
+                $ptq->whereIn('slug', ['flat', 'flat-apartment', 'apartment', 'house', 'villa', 'builder-floor', 'independent-house']);
             });
         } elseif ($selectedPropertyType === 'commercial') {
             $query->whereHas('propertyType', function($ptq) {
-                $ptq->whereIn('slug', ['commercial', 'shop', 'office', 'retail', 'commercial-space']);
+                $ptq->whereIn('slug', ['commercial', 'shop', 'office', 'retail', 'showroom', 'warehouse', 'commercial-space']);
             });
         }
 
@@ -1156,6 +1164,8 @@ class UserHomeController extends Controller
         $request->merge([
             'city' => strtolower($city),
             'area' => $area ? strtolower($area) : null,
+            'type' => 'pg-hostel',
+            'property_type' => 'pg-hostel',
         ]);
 
         return $this->search($request, $intentParser, $rankingService);

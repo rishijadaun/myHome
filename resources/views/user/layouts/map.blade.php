@@ -25,8 +25,8 @@
     <meta property="og:description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, hostels, and co-living spaces on an interactive GPS map with zero brokerage.')">
     <meta property="og:url" content="@yield('canonical', url()->current())">
     <meta property="og:site_name" content="StayNest">
-    <meta property="og:image" content="@yield('meta_image', asset('images/favicon.png'))">
-    <meta property="og:image:secure_url" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta property="og:image" content="@yield('meta_image', asset('images/app-banner.png'))">
+    <meta property="og:image:secure_url" content="@yield('meta_image', asset('images/app-banner.png'))">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/png">
@@ -35,7 +35,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'Explore PGs Near You on Interactive Map | StayNest')">
     <meta name="twitter:description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, hostels, and co-living spaces on an interactive GPS map with zero brokerage.')">
-    <meta name="twitter:image" content="@yield('meta_image', asset('images/favicon.png'))">
+    <meta name="twitter:image" content="@yield('meta_image', asset('images/app-banner.png'))">
     <meta name="twitter:site" content="@StayNestIndia">
 
     <!-- Mobile Theme Color -->

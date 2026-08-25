@@ -345,7 +345,7 @@
                                                     <i class="fas fa-search"></i> Explore Stays
                                                 </a>
                                                 <a href="{{ route('user.list-property') }}" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm tap-ripple transition">
-                                                    List PG Free
+                                                    Post Property Free
                                                 </a>
                                             </div>
                                         </div>
@@ -2130,12 +2130,15 @@
                 <div class="swiper-wrapper">
                     @forelse ($topCities as $c)
                         @php
-                            $citySearchUrl = route('user.search') . '?city=' . urlencode($c->name) . ($selectedType && $selectedType !== 'pg-hostel' ? '&type=' . $selectedType : '');
+                            $citySlug = strtolower($c->slug ?: \Illuminate\Support\Str::slug($c->name));
+                            $citySearchUrl = ($selectedType === 'pg-hostel' || empty($selectedType))
+                                ? route('user.seo.city-area', ['city' => $citySlug])
+                                : route('user.search') . '?city=' . urlencode($c->name) . ($selectedType ? '&type=' . $selectedType : '');
                         @endphp
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $citySearchUrl }}" data-city-name="{{ $c->name }}" class="city-card-link group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[3/4] sm:aspect-[3/4.2] min-h-[190px] sm:min-h-[230px] tap-ripple shadow-sm hover:shadow-2xl hover:shadow-brand/25 border border-gray-100 hover:border-brand/40 hover:-translate-y-1.5 transition-all duration-300 flex items-center justify-center p-3 sm:p-4 text-center w-full">
                                 <!-- Background Image -->
-                                <img src="{{ $c->display_image_url }}" alt="{{ $c->name }}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80';" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                                <img src="{{ $c->display_image_url }}" alt="{{ $c->name }} - Verified PGs & Stays" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80';" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
                                 
                                 <!-- Multi-stop Gradient Vignette for Center Text Legibility -->
                                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-slate-950/60 group-hover:via-slate-950/50 transition-colors duration-300"></div>
@@ -2156,27 +2159,29 @@
                     @empty
                         @php
                             $fallbackCities = [
-                                ['name' => 'Delhi NCR', 'img' => 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Bangalore', 'img' => 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Noida', 'img' => 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Mumbai', 'img' => 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Gurugram', 'img' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Hyderabad', 'img' => 'https://images.unsplash.com/photo-1576487248805-cf45f6bcc67f?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Ahmedabad', 'img' => 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Pune', 'img' => 'https://images.unsplash.com/photo-1627894483216-2138af692e32?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Lucknow', 'img' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Ghaziabad', 'img' => 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Jaipur', 'img' => 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=800&q=80'],
-                                ['name' => 'Kolkata', 'img' => 'https://images.unsplash.com/photo-1558431382-27e303142255?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Delhi NCR', 'slug' => 'delhi', 'img' => 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Bangalore', 'slug' => 'bangalore', 'img' => 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Noida', 'slug' => 'noida', 'img' => 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Mumbai', 'slug' => 'mumbai', 'img' => 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Gurugram', 'slug' => 'gurgaon', 'img' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Hyderabad', 'slug' => 'hyderabad', 'img' => 'https://images.unsplash.com/photo-1576487248805-cf45f6bcc67f?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Ahmedabad', 'slug' => 'ahmedabad', 'img' => 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Pune', 'slug' => 'pune', 'img' => 'https://images.unsplash.com/photo-1627894483216-2138af692e32?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Lucknow', 'slug' => 'lucknow', 'img' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Ghaziabad', 'slug' => 'ghaziabad', 'img' => 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Jaipur', 'slug' => 'jaipur', 'img' => 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=800&q=80'],
+                                ['name' => 'Kolkata', 'slug' => 'kolkata', 'img' => 'https://images.unsplash.com/photo-1558431382-27e303142255?auto=format&fit=crop&w=800&q=80'],
                             ];
                         @endphp
                         @foreach ($fallbackCities as $fc)
                             @php
-                                $fallbackSearchUrl = route('user.search') . '?city=' . urlencode($fc['name']) . ($selectedType && $selectedType !== 'pg-hostel' ? '&type=' . $selectedType : '');
+                                $fallbackSearchUrl = ($selectedType === 'pg-hostel' || empty($selectedType))
+                                    ? route('user.seo.city-area', ['city' => $fc['slug']])
+                                    : route('user.search') . '?city=' . urlencode($fc['name']) . ($selectedType ? '&type=' . $selectedType : '');
                             @endphp
                             <div class="swiper-slide !h-auto">
                                 <a href="{{ $fallbackSearchUrl }}" data-city-name="{{ $fc['name'] }}" class="city-card-link group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[3/4] sm:aspect-[3/4.2] min-h-[190px] sm:min-h-[230px] tap-ripple shadow-sm hover:shadow-2xl hover:shadow-brand/25 border border-gray-100 hover:border-brand/40 hover:-translate-y-1.5 transition-all duration-300 flex items-center justify-center p-3 sm:p-4 text-center w-full">
-                                    <img src="{{ $fc['img'] }}" alt="{{ $fc['name'] }}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                                    <img src="{{ $fc['img'] }}" alt="{{ $fc['name'] }} - Verified PGs & Stays" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
                                     <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-slate-950/60"></div>
                                     <div class="absolute top-3 right-3 z-10">
                                         <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center text-[10px] sm:text-xs opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300 shadow-sm">

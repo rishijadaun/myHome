@@ -163,6 +163,14 @@ Route::name('user.')->group(function () {
     Route::view('/saved', 'user.saved')->name('saved');
     Route::view('/list-property', 'user.list-property')->name('list-property');
     Route::view('/list_property', 'user.list-property');
+    Route::view('/list-pg-free', 'user.list-property')->name('list-pg-free');
+    Route::view('/post-your-property', 'user.list-property')->name('post-your-property');
+    Route::view('/post-property', 'user.list-property')->name('post-property');
+    Route::view('/post-property-free', 'user.list-property');
+    Route::view('/list-your-property', 'user.list-property');
+    Route::view('/add-pg', 'user.list-property');
+    Route::view('/add-property', 'user.list-property');
+    Route::view('/post-flat', 'user.list-property');
     Route::get('/bookings', [UserBookingController::class, 'index'])->name('bookings');
     Route::post('/bookings', [UserBookingController::class, 'store'])->name('bookings.store');
     Route::post('/bookings/{id}/cancel', [UserBookingController::class, 'cancel'])->name('bookings.cancel');

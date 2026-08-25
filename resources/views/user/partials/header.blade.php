@@ -132,7 +132,10 @@
                         </button>
                     @else
                         <div id="clientGuestState" class="flex items-center gap-2">
-                            <a href="{{ route('user.login') }}" class="px-5 py-2.5 text-gray-700 font-medium hover:text-brand transition text-sm">Log In</a>
+                            <a href="{{ route('user.login') }}" class="px-4 py-2 rounded-xl bg-gray-100/90 hover:bg-brand/10 text-gray-900 hover:text-brand font-bold transition tap-effect text-sm border border-gray-200 hover:border-brand/40 flex items-center gap-1.5 shadow-2xs">
+                                <i class="fas fa-right-to-bracket text-xs text-brand"></i>
+                                <span>Log In</span>
+                            </a>
                         </div>
                         <div id="clientAuthState" class="hidden flex items-center gap-2">
                             <a href="{{ route('user.profile') }}" id="clientProfileLink" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-brand-light text-gray-800 hover:text-brand transition text-sm font-semibold border border-transparent hover:border-brand/20">
@@ -152,8 +155,9 @@
                     @endauth
                 </div>
 
-                <a href="{{ route('user.list-property') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-6 py-2.5 rounded-xl font-semibold transition tap-effect text-sm">
-                    List PG Free
+                <a href="{{ route('user.list-property') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-5 py-2.5 rounded-xl font-bold transition tap-effect text-sm flex items-center gap-1.5 shadow-sm">
+                    <i class="fas fa-plus-circle text-xs"></i>
+                    <span>Post Property Free</span>
                 </a>
             </div>
         </div>

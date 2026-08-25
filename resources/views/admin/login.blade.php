@@ -14,48 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        (function(){
-            var _w = console.warn;
-            console.warn = function(){
-                if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
-                _w.apply(console, arguments);
-            };
-        })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            DEFAULT: '#4bb59d',
-                            light: '#e6f7f3',
-                            dark: '#3a9a85',
-                            50: '#f0fdf9',
-                            100: '#ccf0e8',
-                            600: '#3a9a85',
-                            700: '#2c7a69',
-                        }
-                    },
-                    animation: {
-                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        shake: {
-                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .tap-effect { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .tap-effect:active { transform: scale(0.97); }

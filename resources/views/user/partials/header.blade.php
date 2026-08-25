@@ -26,7 +26,27 @@
 @endphp
 
 <!-- Mobile App Header -->
-<header class="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+<header class="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100" id="mobileMainHeader">
+
+    <!-- Mobile Top Smart App Download Banner (Dismissible for 30 Days / 1 Month) -->
+    <div id="topAppDownloadBanner" class="hidden bg-gradient-to-r from-slate-900 via-gray-900 to-slate-950 text-white px-3.5 py-2 border-b border-white/10 items-center justify-between gap-2 transition-all duration-300 relative z-50">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <button type="button" onclick="dismissTopAppBanner(event)" class="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 text-gray-300 hover:text-white flex items-center justify-center text-[11px] flex-shrink-0 transition-transform cursor-pointer" title="Close for 1 month" aria-label="Close download banner">
+                <i class="fas fa-times"></i>
+            </button>
+            <img src="{{ asset('images/favicon.png') }}" alt="StayNest App" class="w-8 h-8 rounded-xl shadow-xs flex-shrink-0 object-cover border border-white/15">
+            <div class="min-w-0">
+                <div class="flex items-center gap-1.5 leading-tight">
+                    <span class="text-xs font-black text-white tracking-tight truncate">StayNest App</span>
+                    <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1 py-0.2 rounded font-bold">FREE</span>
+                </div>
+                <p class="text-[10px] text-gray-300 truncate">⭐ 4.8 • Fast PG & Flat Discovery</p>
+            </div>
+        </div>
+        <button type="button" onclick="installPwaApp()" class="flex-shrink-0 bg-brand hover:bg-brand-dark active:scale-95 text-white text-[11px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-md shadow-brand/30 transition-transform flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-arrow-down-to-bracket text-[10px]"></i> GET
+        </button>
+    </div>
 
     <div class="px-4 py-3">
         <div class="flex items-center justify-between">
@@ -86,7 +106,7 @@
                 </a>
                 <nav class="flex space-x-8">
                     <a href="{{ route('user.home') }}" class="{{ request()->routeIs('user.home') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Home</a>
-                    <a href="{{ route('user.search') }}" class="{{ request()->routeIs('user.search') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Find PG</a>
+                    <a href="{{ route('user.search') }}" class="{{ request()->routeIs('user.search') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Find Property</a>
                     <!-- <a href="{{ route('user.list-property') }}" class="{{ request()->routeIs('user.list-property') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">List Property</a> -->
                     <!-- <a href="{{ route('user.pricing') }}" class="{{ request()->routeIs('user.pricing') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Pricing</a> -->
                     <a href="{{ route('user.about') }}" class="{{ request()->routeIs('user.about*') || request()->is('about*') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">About Us</a>
@@ -94,7 +114,7 @@
                 </nav>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('user.search') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition" title="Search PGs">
+                <a href="{{ route('user.search') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition" title="Search Properties faster">
                     <i class="fas fa-search"></i>
                 </a>
                 <a href="{{ route('user.saved') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition" title="Saved Properties">
@@ -233,4 +253,67 @@
         localStorage.removeItem('staynest_user');
         window.location.href = "{{ route('user.logout') }}";
     }
+
+    // Top Smart App Download Banner Logic (30 Days / 1 Month Dismissible)
+    function checkTopAppBanner() {
+        const banner = document.getElementById('topAppDownloadBanner');
+        if (!banner) return;
+        
+        const dismissedUntil = localStorage.getItem('staynest_top_app_banner_dismissed_until');
+        if (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)) {
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
+            adjustMainPadding(false);
+            return;
+        }
+
+        if (window.innerWidth < 768) {
+            banner.classList.remove('hidden');
+            banner.classList.add('flex');
+            adjustMainPadding(true);
+        } else {
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
+            adjustMainPadding(false);
+        }
+    }
+
+    function dismissTopAppBanner(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const banner = document.getElementById('topAppDownloadBanner');
+        if (banner) {
+            banner.style.maxHeight = banner.offsetHeight + 'px';
+            banner.style.transition = 'max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease';
+            banner.style.overflow = 'hidden';
+            banner.style.opacity = '0';
+            banner.style.maxHeight = '0px';
+            banner.style.paddingTop = '0px';
+            banner.style.paddingBottom = '0px';
+            setTimeout(() => {
+                banner.classList.add('hidden');
+                banner.classList.remove('flex');
+                adjustMainPadding(false);
+            }, 300);
+        }
+        // 30 Days (1 Month) expiration timestamp in milliseconds
+        const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+        localStorage.setItem('staynest_top_app_banner_dismissed_until', (Date.now() + thirtyDaysMs).toString());
+    }
+
+    function adjustMainPadding(isBannerVisible) {
+        const main = document.querySelector('main');
+        if (main && !window.location.pathname.includes('/login')) {
+            if (window.innerWidth < 768) {
+                main.style.paddingTop = isBannerVisible ? '112px' : '65px';
+            } else {
+                main.style.paddingTop = '0px';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', checkTopAppBanner);
+    window.addEventListener('resize', checkTopAppBanner);
 </script>

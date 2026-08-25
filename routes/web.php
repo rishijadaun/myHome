@@ -217,8 +217,11 @@ Route::name('user.')->group(function () {
     Route::post('/ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search'])->name('ai.search');
 });
 
-// Clean Programmatic SEO Landing Pages (e.g., /pg-in-noida, /pg-in-bangalore/koramangala)
+// Clean Programmatic SEO Landing Pages
 Route::get('/pg-in-{city}/{area?}', [UserHomeController::class, 'seoSearch'])->name('user.seo.city-area');
+Route::get('/flats-in-{city}/{area?}', [UserHomeController::class, 'seoFlatSearch'])->name('user.seo.flats');
+Route::get('/commercial-in-{city}/{area?}', [UserHomeController::class, 'seoCommercialSearch'])->name('user.seo.commercial');
+Route::get('/properties-for-sale-in-{city}/{area?}', [UserHomeController::class, 'seoSaleSearch'])->name('user.seo.sale');
 
 // Dynamic XML Sitemap for SEO
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');

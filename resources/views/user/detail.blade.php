@@ -22,44 +22,63 @@
     $userReview = $userReview ?? null;
     $existingBooking = $existingBooking ?? null;
     $typeSlug = strtolower($property->propertyType?->slug ?? '');
+    $propCat = strtolower($property->property_category ?? '');
     $genderPref = strtolower($property->gender_preference ?? '');
-    $isCommercial = in_array($typeSlug, ['commercial', 'shop', 'office', 'retail', 'commercial-space']) || ($genderPref === 'not_applicable');
-    $isFlat = !$isCommercial && (in_array($typeSlug, ['flat', 'flat-apartment', 'apartment', 'house', 'villa']) || in_array($genderPref, ['all', 'any']));
-    $isPg = !$isCommercial && !$isFlat;
+    $isSale = (bool) ($property->is_sale ?? false) || (($property->ad_type ?? '') === 'sale');
+    $isCommercial = $propCat === 'commercial' || str_contains($typeSlug, 'commercial') || str_contains($typeSlug, 'office') || str_contains($typeSlug, 'shop') || str_contains($typeSlug, 'warehouse') || ($genderPref === 'not_applicable');
+    $isPlot = $propCat === 'land-plot' || str_contains($typeSlug, 'plot') || str_contains($typeSlug, 'land');
+    $isFlat = !$isCommercial && !$isPlot && (str_contains($typeSlug, 'flat') || str_contains($typeSlug, 'apartment') || str_contains($typeSlug, 'house') || str_contains($typeSlug, 'villa') || str_contains($typeSlug, 'builder') || in_array($genderPref, ['all', 'any']));
+    $isPg = !$isCommercial && !$isPlot && !$isFlat;
+
+    $salePriceDisplay = $property->display_price_formatted ?? ('₹' . number_format($property->expected_price ?: $property->monthly_rent));
+    $propExpectedPrice = (float)($property->expected_price ?: $property->monthly_rent);
+    $propTokenBooking = $property->booking_token_amount ? '₹' . number_format($property->booking_token_amount) : '₹1,00,000';
+    $propOwnership = $property->ownership_type ?: 'Freehold (Clear Title)';
+    $propPossession = $property->possession_status ?: 'Ready to Move';
 
     // Extract or format Apartment/Flat and Commercial configurations
     $propDescFull = ($property->description ?? '') . ' ' . ($property->name ?? '');
     
     // Flat Configuration
-    $flatBhk = '2 BHK';
-    if (preg_match('/\b(1|2|3|4|5)\s*BHK\b/i', $propDescFull, $mBhk)) {
-        $flatBhk = strtoupper(trim($mBhk[0]));
-    } elseif (stripos($propDescFull, 'studio') !== false || stripos($propDescFull, '1 RK') !== false) {
-        $flatBhk = '1 RK / Studio';
-    } elseif (stripos($propDescFull, 'villa') !== false) {
-        $flatBhk = '3 BHK Luxury Villa';
+    $flatBhk = $property->bhk_type ?: '2 BHK';
+    if (empty($property->bhk_type)) {
+        if (preg_match('/\b(1|2|3|4|5)\s*BHK\b/i', $propDescFull, $mBhk)) {
+            $flatBhk = strtoupper(trim($mBhk[0]));
+        } elseif (stripos($propDescFull, 'studio') !== false || stripos($propDescFull, '1 RK') !== false) {
+            $flatBhk = '1 RK / Studio';
+        } elseif (stripos($propDescFull, 'villa') !== false) {
+            $flatBhk = '3 BHK Luxury Villa';
+        }
     }
 
-    $flatFurnishing = 'Semi Furnished';
-    if (preg_match('/\b(semi[\s-]*furnished)\b/i', $propDescFull)) {
-        $flatFurnishing = 'Semi Furnished';
-    } elseif (preg_match('/\b(fully[\s-]*furnished|fully\s+furnished)\b/i', $propDescFull)) {
-        $flatFurnishing = 'Fully Furnished';
-    } elseif (preg_match('/\b(unfurnished|raw|bare[\s-]*shell)\b/i', $propDescFull)) {
-        $flatFurnishing = 'Unfurnished';
-    } elseif (preg_match('/\b(furnished)\b/i', $propDescFull)) {
-        $flatFurnishing = 'Furnished';
+    $flatFurnishing = $property->furnishing_status ?: 'Semi Furnished';
+    if (empty($property->furnishing_status)) {
+        if (preg_match('/\b(semi[\s-]*furnished)\b/i', $propDescFull)) {
+            $flatFurnishing = 'Semi Furnished';
+        } elseif (preg_match('/\b(fully[\s-]*furnished|fully\s+furnished)\b/i', $propDescFull)) {
+            $flatFurnishing = 'Fully Furnished';
+        } elseif (preg_match('/\b(unfurnished|raw|bare[\s-]*shell)\b/i', $propDescFull)) {
+            $flatFurnishing = 'Unfurnished';
+        } elseif (preg_match('/\b(furnished)\b/i', $propDescFull)) {
+            $flatFurnishing = 'Furnished';
+        }
     }
 
-    $flatCarpetArea = '1,100 sq ft';
-    if (preg_match('/(\d{3,5})\s*(?:sq\s*ft|sqft|sq\.ft)/i', $propDescFull, $mArea)) {
-        $flatCarpetArea = number_format((int)$mArea[1]) . ' sq ft';
-    } else {
-        if (str_contains($flatBhk, '1 BHK') || str_contains($flatBhk, '1 RK')) $flatCarpetArea = '650 sq ft';
-        elseif (str_contains($flatBhk, '2 BHK')) $flatCarpetArea = '1,100 sq ft';
-        elseif (str_contains($flatBhk, '3 BHK')) $flatCarpetArea = '1,550 sq ft';
-        elseif (str_contains($flatBhk, '4') || str_contains($flatBhk, '5')) $flatCarpetArea = '2,200 sq ft';
+    $flatCarpetArea = $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' sq ft' : '1,100 sq ft';
+    if (empty($property->carpet_area_sqft)) {
+        if (preg_match('/(\d{3,5})\s*(?:sq\s*ft|sqft|sq\.ft)/i', $propDescFull, $mArea)) {
+            $flatCarpetArea = number_format((int)$mArea[1]) . ' sq ft';
+        } else {
+            if (str_contains($flatBhk, '1 BHK') || str_contains($flatBhk, '1 RK')) $flatCarpetArea = '650 sq ft';
+            elseif (str_contains($flatBhk, '2 BHK')) $flatCarpetArea = '1,100 sq ft';
+            elseif (str_contains($flatBhk, '3 BHK')) $flatCarpetArea = '1,550 sq ft';
+            elseif (str_contains($flatBhk, '4') || str_contains($flatBhk, '5')) $flatCarpetArea = '2,200 sq ft';
+        }
     }
+
+    $propCarpetArea = $flatCarpetArea;
+    $rawSqft = max(100, (int)str_replace([',', ' sq ft'], '', $flatCarpetArea));
+    $propRatePerSqft = $property->price_per_sqft ?: ('₹' . number_format(round($propExpectedPrice / $rawSqft)) . '/sq ft');
 
     $flatBaths = str_contains($flatBhk, '1 BHK') || str_contains($flatBhk, '1 RK') ? '1' : (str_contains($flatBhk, '3 BHK') ? '3' : '2');
 
@@ -87,15 +106,23 @@
         $commercialArea = number_format((int)$mCArea[1]) . ' sq ft';
     }
     
-    if ($isCommercial) {
+    if ($isSale) {
+        $propSeoTitle = $propName . ' - Property For Sale in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ' . $salePriceDisplay . ' | StayNest';
+        $propSeoDesc = 'Buy ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ' . $salePriceDisplay . ', ' . $propRating . '★ rating. Clear title, verified legal documentation & site visit.';
+        $propSeoKeywords = $propName . ', Property For Sale in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', Buy Property, StayNest';
+    } elseif ($isCommercial) {
         $propSeoTitle = $propName . ' - Commercial Space in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
+        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
+        $propSeoKeywords = $propName . ', Commercial Space in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', StayNest';
     } elseif ($isFlat) {
         $propSeoTitle = $propName . ' - Flat & House Rental in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
+        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
+        $propSeoKeywords = $propName . ', Flat for Rent in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', StayNest';
     } else {
         $propSeoTitle = $propName . ' - ' . ucfirst($property->gender_preference ?? 'Co-living') . ' PG in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
+        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
+        $propSeoKeywords = $propName . ', PG in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', StayNest';
     }
-    $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
-    $propSeoKeywords = $propName . ', ' . ($isCommercial ? 'Commercial Space' : ($isFlat ? 'Flat for Rent' : 'PG')) . ' in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', StayNest';
     $propSeoImage = $property->display_image_url ?? ($propImages->first()->image_url ?? asset('images/favicon.png'));
     $propCanonical = route('user.detail', ['slug' => $property->slug ?: $property->id]);
 @endphp
@@ -149,13 +176,13 @@
       ]
     },
     {
-      "@type": "LodgingBusiness",
+      "@type": "{{ $isSale ? 'RealEstateListing' : ($isCommercial ? 'CommercialProperty' : ($isFlat ? 'Apartment' : 'LodgingBusiness')) }}",
       "@id": "{{ $propCanonical }}#property",
-      "name": "{{ $propName }}",
+      "name": "{{ addslashes($propName) }}",
       "image": "{{ $propSeoImage }}",
       "url": "{{ $propCanonical }}",
       "telephone": "+91{{ $cleanPhone }}",
-      "priceRange": "₹{{ $propRent }} - ₹{{ $propDeposit }}",
+      "priceRange": "{{ $isSale ? $salePriceDisplay : '₹' . $propRent . ' - ₹' . $propDeposit }}",
       "description": "{{ addslashes(strip_tags($property->description ?? $propSeoDesc)) }}",
       "address": {
         "@type": "PostalAddress",
@@ -210,9 +237,15 @@
       ],
       "makesOffer": {
         "@type": "Offer",
-        "price": "{{ (int)str_replace(',', '', $propRent) }}",
+        "price": "{{ $isSale ? (float)($property->expected_price ?: $property->monthly_rent) : (float)$property->monthly_rent }}",
         "priceCurrency": "INR",
-        "availability": "https://schema.org/InStock"
+        "availability": "https://schema.org/InStock",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "{{ $isSale ? (float)($property->expected_price ?: $property->monthly_rent) : (float)$property->monthly_rent }}",
+          "priceCurrency": "INR",
+          "unitText": "{{ $isSale ? 'TOTAL' : 'MONTH' }}"
+        }
       }
     }
   ]
@@ -361,7 +394,11 @@
                 <span class="{{ $propTagMeta['solid_badge'] }} text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md">
                     <i class="fas fa-{{ $propTagMeta['icon'] }} text-[11px]"></i> {{ $propTagMeta['label'] }}
                 </span>
-                @if($isCommercial)
+                @if($isSale)
+                    <span class="bg-amber-500 text-white text-xs font-black px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wide flex items-center gap-1">
+                        <i class="fas fa-tags text-[11px]"></i> FOR SALE
+                    </span>
+                @elseif($isCommercial)
                     <span class="bg-amber-50 text-amber-800 bg-white/95 backdrop-blur text-xs font-black px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wide">
                         <i class="fas fa-store mr-1 text-amber-600"></i> COMMERCIAL
                     </span>
@@ -400,7 +437,11 @@
             <a href="#sec-overview" data-target="sec-overview" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-bold text-brand border-b-2 border-brand transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>Overview</span>
             </a>
-            @if($isPg && $roomConfigurations && $roomConfigurations->count() > 0)
+            @if($isSale)
+                <a href="#sec-pricing" data-target="sec-pricing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                    <span>Valuation &amp; Price</span>
+                </a>
+            @elseif($isPg && $roomConfigurations && $roomConfigurations->count() > 0)
                 <a href="#sec-pricing" data-target="sec-pricing" class="detail-nav-tab py-3.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-900 border-b-2 border-transparent transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                     <span>Room &amp; Pricing</span>
                 </a>
@@ -441,6 +482,21 @@
 
             <!-- 1. OVERVIEW SECTION -->
             <div id="sec-overview" class="space-y-6 scroll-mt-36 md:scroll-mt-40">
+                @if($isPg && !$isSale && ($availBeds === 0 || ($property && $property->is_fully_booked)))
+                    <div class="bg-gradient-to-r from-rose-500 to-amber-600 text-white rounded-3xl p-4 sm:p-5 flex items-center justify-between shadow-md">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl flex-shrink-0">
+                                <i class="fas fa-bed-pulse"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-sm sm:text-base leading-tight">100% Fully Booked / No Vacancy Available</h3>
+                                <p class="text-xs text-white/90 mt-0.5">All beds and rooms in this property are currently occupied. You can still contact the owner to enquire about future openings.</p>
+                            </div>
+                        </div>
+                        <span class="hidden sm:inline-flex bg-white/20 border border-white/30 text-white text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider">Sold Out</span>
+                    </div>
+                @endif
+
                 <!-- Title, Badges & Header Info -->
                 <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
                     <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
@@ -463,7 +519,20 @@
 
                     <!-- Bed / Space Availability & Features Pill Row -->
                     <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
-                        @if($isCommercial)
+                        @if($isSale)
+                            <span class="inline-flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-300">
+                                <i class="fas fa-tags text-amber-600"></i> Valuation: {{ $salePriceDisplay }}
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
+                                <i class="fas fa-calculator text-blue-600"></i> Rate: {{ $propRatePerSqft }}
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <i class="fas fa-file-contract text-emerald-600"></i> {{ $propOwnership }}
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200">
+                                <i class="fas fa-key text-purple-600"></i> {{ $propPossession }}
+                            </span>
+                        @elseif($isCommercial)
                             <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
                                 <i class="fas fa-store"></i> Ready to Occupy
                             </span>
@@ -479,28 +548,30 @@
                         <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
                             <i class="fas fa-shield-alt"></i> Verified Property
                         </span>
-                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200">
-                            <i class="fas fa-bolt"></i> 24/7 Power Backup
-                        </span>
                         <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
                             <i class="fas fa-hand-holding-usd"></i> Zero Brokerage
                         </span>
-                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-teal-50 text-teal-700 border border-teal-200">
-                            <i class="fas fa-calendar-check"></i> {{ $propNoticePeriod }} Days Notice
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200">
-                            <i class="fas fa-screwdriver-wrench"></i> {{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . '/mo Maint.' : 'Zero Maintenance' }}
-                        </span>
+                        @if(!$isSale)
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200">
+                                <i class="fas fa-bolt"></i> 24/7 Power Backup
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-teal-50 text-teal-700 border border-teal-200">
+                                <i class="fas fa-calendar-check"></i> {{ $propNoticePeriod }} Days Notice
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                <i class="fas fa-screwdriver-wrench"></i> {{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . '/mo Maint.' : 'Zero Maintenance' }}
+                            </span>
+                        @endif
                     </div>
                 </div>
 
                 <!-- About / Description -->
                 <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
                     <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <i class="fas fa-info-circle text-brand"></i> {{ $isCommercial ? 'About this Commercial Space' : ($isFlat ? 'About this Flat / House' : 'About this Stay') }}
+                        <i class="fas fa-info-circle text-brand"></i> {{ $isSale ? 'About this Property For Sale' : ($isCommercial ? 'About this Commercial Space' : ($isFlat ? 'About this Flat / House' : 'About this Stay')) }}
                     </h2>
                     <p class="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                        {{ $property->description ?? ($propName . ' offers premium, ' . ($isCommercial ? 'commercial office/retail space.' : ($isFlat ? 'independent apartment/house rental.' : 'student and professional accommodation.')) . ' Located in a prime area with 24/7 security, high-speed connectivity, and verified amenities.') }}
+                        {{ $property->description ?? ($propName . ' offers premium, ' . ($isSale ? 'verified property for sale with clear title and prime connectivity.' : ($isCommercial ? 'commercial office/retail space.' : ($isFlat ? 'independent apartment/house rental.' : 'student and professional accommodation.')))) }}
                     </p>
                     
                     @if($property && $property->landmark)
@@ -511,17 +582,17 @@
                     @endif
                 </div>
 
-                @if($isFlat)
-                    <!-- 🏡 Apartment / Flat Configuration (Displayed when listing is not PG) -->
+                @if($isFlat || $isSale)
+                    <!-- 🏡 Apartment / Flat / Property Configuration -->
                     <div class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm">
                         <h2 class="text-base sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <i class="fas fa-home text-brand text-lg"></i> Apartment / Flat Configuration
+                            <i class="fas fa-home text-brand text-lg"></i> Property Specifications &amp; Area
                         </h2>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
                             <!-- BHK Type -->
                             <div class="p-3.5 sm:p-4 rounded-2xl bg-gray-50 border border-gray-200/80 flex flex-col justify-between">
-                                <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">BHK Type</span>
+                                <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">BHK / Config</span>
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold shrink-0"><i class="fas fa-door-open"></i></div>
                                     <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $flatBhk }}</span>
@@ -542,30 +613,30 @@
                                 <span class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">Carpet Area (sq ft)</span>
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold shrink-0"><i class="fas fa-ruler-combined"></i></div>
-                                    <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $flatCarpetArea }}</span>
+                                    <span class="text-sm sm:text-base font-extrabold text-gray-900 truncate">{{ $propCarpetArea }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Flat Key Specifications -->
-                        <!-- <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-gray-100 text-xs">
+                        <!-- Key Specifications -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-gray-100 text-xs">
                             <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
                                 <i class="fas fa-bath text-indigo-500"></i>
                                 <span class="text-gray-700 font-medium"><strong class="text-gray-900">{{ $flatBaths }}</strong> Bathrooms</span>
                             </div>
                             <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
-                                <i class="fas fa-sun text-amber-500"></i>
-                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">East</strong> Facing</span>
+                                <i class="fas fa-compass text-teal-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">North-East</strong> Facing</span>
                             </div>
                             <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
-                                <i class="fas fa-square-parking text-blue-500"></i>
+                                <i class="fas fa-layer-group text-purple-500"></i>
+                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">{{ $isSale ? $propOwnership : 'Mid-Rise (4th Floor)' }}</strong></span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-car text-blue-500"></i>
                                 <span class="text-gray-700 font-medium"><strong class="text-gray-900">Covered</strong> Parking</span>
                             </div>
-                            <div class="p-2.5 rounded-xl bg-gray-50 flex items-center gap-2">
-                                <i class="fas fa-faucet-drip text-cyan-500"></i>
-                                <span class="text-gray-700 font-medium"><strong class="text-gray-900">24h</strong> Water</span>
-                            </div>
-                        </div> -->
+                        </div>
                     </div>
                 @elseif($isCommercial)
                     <!-- 🏬 Commercial Space Configuration -->
@@ -627,7 +698,58 @@
             </div>
 
             <!-- 2. PRICING & SPACE CONFIGURATION SECTION -->
-            @if($isCommercial)
+            @if($isSale)
+                <!-- Property Sale Valuation & Details -->
+                <div id="sec-pricing" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <h2 class="text-base sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-tags text-amber-600"></i> Property Valuation &amp; Purchase Details
+                        </h2>
+                        <span class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-xl">
+                            100% Zero Brokerage Sale
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-4">
+                        <div class="p-4 rounded-2xl border-2 border-amber-500/40 bg-amber-50/40 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">Expected Selling Price</span>
+                                <h3 class="text-xl sm:text-2xl font-black text-gray-900 mt-1">{{ $salePriceDisplay }}</h3>
+                                <p class="text-[11px] text-gray-600 mt-0.5">{{ $propRatePerSqft }} • Total Valuation</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-amber-200 flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-amber-700">0% Commission</span>
+                                <button type="button" onclick="openBookStayModal('Property Purchase / Site Visit', {{ (int)$propExpectedPrice }})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold rounded-xl transition tap-effect shadow-xs cursor-pointer">
+                                    Book Site Visit
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Booking Token Amount</span>
+                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mt-1">{{ $propTokenBooking }}</h3>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Adjustable against total property price</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-600">
+                                <span>Ownership:</span>
+                                <span class="font-bold text-gray-900">{{ $propOwnership }}</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Possession Status</span>
+                                <h3 class="text-lg sm:text-xl font-black text-gray-900 mt-1">{{ $propPossession }}</h3>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Direct seller deal with verified title docs</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-600">
+                                <span>Home Loan:</span>
+                                <span class="font-bold text-emerald-600 flex items-center gap-1"><i class="fas fa-check-circle text-[10px]"></i> Pre-approved 80%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @elseif($isCommercial)
                 <!-- Commercial Space Lease & Pricing Details -->
                 <div id="sec-pricing" class="bg-white rounded-3xl p-5 sm:p-7 border border-gray-100 shadow-sm scroll-mt-36 md:scroll-mt-40">
                     <div class="flex items-center justify-between gap-3 mb-4">
@@ -740,28 +862,42 @@
                     <div class="grid grid-cols-1 sm:grid-cols-{{ min(3, max(1, $roomConfigurations->count())) }} gap-3.5">
                         @foreach($roomConfigurations as $rc)
                             @php
-                                $isPopular = ($rc->room_type_slug === 'double') || ($roomConfigurations->count() === 1);
+                                $isRoomBooked = ($rc->room_status === 'occupied' || $rc->room_status === 'booked' || $rc->room_status === 'sold_out' || (int)$rc->available_beds === 0);
+                                $isPopular = !$isRoomBooked && (($rc->room_type_slug === 'double') || ($roomConfigurations->count() === 1));
                                 $occLabel = $rc->max_occupancy == 1 ? 'Private Room' : ($rc->max_occupancy == 2 ? 'Shared Room' : ($rc->max_occupancy == 3 ? 'Triple Shared' : 'Group Sharing'));
                                 $occTitle = $rc->max_occupancy == 1 ? 'Single Occupancy' : ($rc->max_occupancy == 2 ? 'Double Sharing' : ($rc->max_occupancy == 3 ? 'Triple Sharing' : ($rc->max_occupancy == 4 ? 'Four Sharing' : $rc->room_type_name)));
                                 $occDesc = $rc->max_occupancy == 1 ? 'Attached washroom & personal space' : ($rc->max_occupancy . ' beds per room with separate wardrobes');
                             @endphp
-                            <div class="p-4 rounded-2xl {{ $isPopular ? 'border-2 border-brand bg-brand-light/30 relative shadow-xs' : 'border border-gray-200 bg-gray-50/50 hover:border-brand transition' }} flex flex-col justify-between">
-                                @if($isPopular && $roomConfigurations->count() > 1)
+                            <div class="p-4 rounded-2xl {{ $isRoomBooked ? 'border border-rose-200 bg-rose-50/20 relative' : ($isPopular ? 'border-2 border-brand bg-brand-light/30 relative shadow-xs' : 'border border-gray-200 bg-gray-50/50 hover:border-brand transition') }} flex flex-col justify-between">
+                                @if($isRoomBooked)
+                                    <span class="absolute -top-2.5 right-3 bg-rose-600 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-xs">
+                                        <i class="fas fa-lock text-[8px]"></i> Full Booked
+                                    </span>
+                                @elseif($isPopular && $roomConfigurations->count() > 1)
                                     <span class="absolute -top-2.5 right-3 bg-brand text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Most Popular</span>
                                 @endif
                                 <div>
-                                    <span class="text-xs font-bold {{ $isPopular ? 'text-brand' : 'text-gray-500' }} uppercase tracking-wider">{{ $occLabel }}</span>
-                                    <h3 class="text-sm font-black text-gray-900 mt-1">{{ $occTitle }}</h3>
+                                    <span class="text-xs font-bold {{ $isRoomBooked ? 'text-rose-700' : ($isPopular ? 'text-brand' : 'text-gray-500') }} uppercase tracking-wider">{{ $occLabel }}</span>
+                                    <h3 class="text-sm font-black {{ $isRoomBooked ? 'text-gray-700' : 'text-gray-900' }} mt-1">{{ $occTitle }}</h3>
                                     <p class="text-[11px] text-gray-500 mt-0.5">{{ $occDesc }}</p>
                                 </div>
-                                <div class="mt-4 pt-3 {{ $isPopular ? 'border-t border-brand/20' : 'border-t border-gray-200' }} flex items-center justify-between">
+                                <div class="mt-4 pt-3 {{ $isRoomBooked ? 'border-t border-rose-100' : ($isPopular ? 'border-t border-brand/20' : 'border-t border-gray-200') }} flex items-center justify-between">
                                     <div>
-                                        <span class="text-base font-extrabold {{ $isPopular ? 'text-brand-dark' : 'text-gray-900' }}">₹{{ number_format($rc->monthly_rent) }}</span>
+                                        <span class="text-base font-extrabold {{ $isRoomBooked ? 'text-gray-400 line-through' : ($isPopular ? 'text-brand-dark' : 'text-gray-900') }}">₹{{ number_format($rc->monthly_rent) }}</span>
                                         <span class="text-[11px] text-gray-500">/mo</span>
+                                        @if($isRoomBooked)
+                                            <span class="block text-[10px] font-bold text-rose-600">0 Beds Vacant</span>
+                                        @endif
                                     </div>
-                                    <button type="button" onclick="openBookStayModal('{{ addslashes($rc->room_type_name) }}', {{ $rc->monthly_rent }})" class="px-3 py-1.5 {{ $isPopular ? 'bg-brand hover:bg-brand-dark text-white' : 'bg-white hover:bg-brand hover:text-white text-brand border border-brand/30' }} text-[11px] font-bold rounded-xl transition tap-effect shadow-2xs cursor-pointer">
-                                        Book Room
-                                    </button>
+                                    @if($isRoomBooked)
+                                        <button type="button" disabled class="px-3 py-1.5 bg-gray-200 text-gray-400 text-[11px] font-bold rounded-xl cursor-not-allowed">
+                                            Room Full
+                                        </button>
+                                    @else
+                                        <button type="button" onclick="openBookStayModal('{{ addslashes($rc->room_type_name) }}', {{ $rc->monthly_rent }})" class="px-3 py-1.5 {{ $isPopular ? 'bg-brand hover:bg-brand-dark text-white' : 'bg-white hover:bg-brand hover:text-white text-brand border border-brand/30' }} text-[11px] font-bold rounded-xl transition tap-effect shadow-2xs cursor-pointer">
+                                            Book Room
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
@@ -797,6 +933,9 @@
                             elseif (str_contains($slug, 'housekeeping') || str_contains($slug, 'clean')) { $iconName = 'broom'; $iconColor = 'text-teal-600'; }
                             elseif (str_contains($slug, 'water') || str_contains($slug, 'ro')) { $iconName = 'tint'; $iconColor = 'text-sky-500'; }
                             elseif (str_contains($slug, 'bath') || str_contains($slug, 'washroom')) { $iconName = 'bath'; $iconColor = 'text-purple-500'; }
+                            elseif (str_contains($slug, '2-wheeler') || str_contains($slug, 'bike') || str_contains($slug, 'motorcycle')) { $iconName = 'motorcycle'; $iconColor = 'text-indigo-600'; }
+                            elseif (str_contains($slug, 'almirah') || str_contains($slug, 'wardrobe') || str_contains($slug, 'cupboard')) { $iconName = 'door-closed'; $iconColor = 'text-amber-600'; }
+                            elseif (str_contains($slug, 'study') || str_contains($slug, 'desk') || str_contains($slug, 'table')) { $iconName = 'chair'; $iconColor = 'text-purple-600'; }
                             elseif (str_contains($slug, 'parking')) { $iconName = 'square-parking'; $iconColor = 'text-blue-600'; }
                             elseif (str_contains($slug, 'fridge') || str_contains($slug, 'refrigerator')) { $iconName = 'temperature-low'; $iconColor = 'text-cyan-600'; }
                             elseif (!empty($am->icon)) { $iconName = $am->icon; }
@@ -1186,33 +1325,50 @@
                 <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl">
                     <div class="flex items-baseline justify-between mb-3 pb-3 border-b border-gray-100">
                         <div>
-                            <span class="text-xs font-semibold text-gray-500 block">Monthly Rent</span>
+                            <span class="text-xs font-semibold text-gray-500 block">{{ $isSale ? 'Total Valuation' : 'Monthly Rent' }}</span>
                             <div class="text-2xl sm:text-3xl font-black text-gray-900 leading-none">
-                                ₹{{ $propRent }}<span class="text-xs font-normal text-gray-500">/month</span>
+                                {{ $isSale ? $salePriceDisplay : ('₹' . $propRent) }}<span class="text-xs font-normal text-gray-500">{{ $isSale ? '' : '/month' }}</span>
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="text-[11px] font-semibold text-gray-500 block">Deposit</span>
-                            <span class="text-sm font-bold text-gray-800">₹{{ $propDeposit }}</span>
+                            <span class="text-[11px] font-semibold text-gray-500 block">{{ $isSale ? 'Token Deposit' : 'Deposit' }}</span>
+                            <span class="text-sm font-bold text-gray-800">{{ $isSale ? $propTokenBooking : ('₹' . $propDeposit) }}</span>
                         </div>
                     </div>
 
-                    <!-- Notice Period & Maintenance Badges -->
+                    <!-- Details / Notice Badges -->
                     <div class="grid grid-cols-2 gap-2 mb-4 p-2.5 rounded-2xl bg-gray-50 border border-gray-100 text-xs">
-                        <div>
-                            <span class="text-[10px] text-gray-400 font-bold uppercase block leading-none mb-1">Maintenance</span>
-                            <span class="font-bold text-gray-900 leading-tight flex items-center gap-1 text-xs">
-                                <i class="fas fa-screwdriver-wrench text-indigo-500 text-[10px]"></i>
-                                {{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . '/mo' : 'Included (₹0)' }}
-                            </span>
-                        </div>
-                        <div>
-                            <span class="text-[10px] text-gray-400 font-bold uppercase block leading-none mb-1">Notice Period</span>
-                            <span class="font-bold text-gray-900 leading-tight flex items-center gap-1 text-xs">
-                                <i class="fas fa-calendar-day text-teal-600 text-[10px]"></i>
-                                {{ $propNoticePeriod }} Days
-                            </span>
-                        </div>
+                        @if($isSale)
+                            <div>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase block leading-none mb-1">Rate</span>
+                                <span class="font-bold text-gray-900 leading-tight flex items-center gap-1 text-xs">
+                                    <i class="fas fa-calculator text-blue-500 text-[10px]"></i>
+                                    {{ $propRatePerSqft }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase block leading-none mb-1">Possession</span>
+                                <span class="font-bold text-gray-900 leading-tight flex items-center gap-1 text-xs">
+                                    <i class="fas fa-key text-amber-500 text-[10px]"></i>
+                                    {{ $propPossession }}
+                                </span>
+                            </div>
+                        @else
+                            <div>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase block leading-none mb-1">Maintenance</span>
+                                <span class="font-bold text-gray-900 leading-tight flex items-center gap-1 text-xs">
+                                    <i class="fas fa-screwdriver-wrench text-indigo-500 text-[10px]"></i>
+                                    {{ $propMaintenance > 0 ? '₹' . number_format($propMaintenance) . '/mo' : 'Included (₹0)' }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase block leading-none mb-1">Notice Period</span>
+                                <span class="font-bold text-gray-900 leading-tight flex items-center gap-1 text-xs">
+                                    <i class="fas fa-calendar-day text-teal-600 text-[10px]"></i>
+                                    {{ $propNoticePeriod }} Days
+                                </span>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Direct Book & Contact CTA -->
@@ -1231,9 +1387,9 @@
                                 </a>
                             </div>
                         @else
-                            <button type="button" onclick="openBookStayModal('{{ $isCommercial ? 'Full Commercial Space' : ($isFlat ? 'Full Flat / House' : 'Standard Stay') }}', {{ (int)str_replace(',', '', $propRent) }})" class="w-full bg-gradient-to-r {{ $isCommercial ? 'from-amber-600 to-amber-700 shadow-amber-500/30' : ($isFlat ? 'from-indigo-600 to-indigo-700 shadow-indigo-500/30' : 'from-brand to-brand-dark shadow-brand/30') }} hover:shadow-lg text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md cursor-pointer">
-                                <i class="fas {{ $isCommercial ? 'fa-store' : ($isFlat ? 'fa-building' : 'fa-calendar-check') }}"></i> 
-                                {{ $isCommercial ? 'Book Commercial Space' : ($isFlat ? 'Book Flat / House Online' : 'Book Stay Online') }}
+                            <button type="button" onclick="openBookStayModal('{{ $isSale ? 'Property Purchase / Site Visit' : ($isCommercial ? 'Full Commercial Space' : ($isFlat ? 'Full Flat / House' : 'Standard Stay')) }}', {{ (int)($isSale ? $propExpectedPrice : (int)str_replace(',', '', $propRent)) }})" class="w-full bg-gradient-to-r {{ $isSale ? 'from-amber-500 to-amber-600 shadow-amber-500/30' : ($isCommercial ? 'from-amber-600 to-amber-700 shadow-amber-500/30' : ($isFlat ? 'from-indigo-600 to-indigo-700 shadow-indigo-500/30' : 'from-brand to-brand-dark shadow-brand/30')) }} hover:shadow-lg text-white font-bold py-3.5 rounded-2xl transition tap-effect flex items-center justify-center gap-2 text-center text-sm shadow-md cursor-pointer">
+                                <i class="fas {{ $isSale ? 'fa-building-circle-check' : ($isCommercial ? 'fa-store' : ($isFlat ? 'fa-building' : 'fa-calendar-check')) }}"></i> 
+                                {{ $isSale ? 'Book Site Visit / Inquire' : ($isCommercial ? 'Book Commercial Space' : ($isFlat ? 'Book Flat / House Online' : 'Book Stay Online')) }}
                             </button>
                         @endif
 
@@ -1733,12 +1889,28 @@
                         <div>
                             <label class="block font-bold text-gray-700 mb-1.5">Select Sharing / Room Type <span class="text-rose-500">*</span></label>
                             <div class="grid grid-cols-2 sm:grid-cols-{{ min(3, $roomConfigurations->count()) }} gap-2" id="bookingRoomTypeContainer">
+                                @php $firstAvailableChecked = false; @endphp
                                 @foreach($roomConfigurations as $idx => $rc)
-                                    <label class="room-opt-card border-2 {{ $idx === 0 ? 'border-brand bg-brand-light/30' : 'border-gray-200 bg-white' }} rounded-xl p-2.5 cursor-pointer flex flex-col justify-between transition hover:border-brand">
-                                        <input type="radio" name="room_type_select" value="{{ $rc->room_type_name }}" data-rent="{{ $rc->monthly_rent }}" {{ $idx === 0 ? 'checked' : '' }} onchange="updateBookingRoom(this)" class="sr-only">
-                                        <div class="font-bold text-gray-900 text-xs truncate">{{ $rc->room_type_name }}</div>
-                                        <div class="text-brand font-black text-xs mt-1">₹{{ number_format($rc->monthly_rent) }}<span class="text-[9px] text-gray-400 font-normal">/mo</span></div>
-                                    </label>
+                                    @php
+                                        $isRoomBooked = ($rc->room_status === 'occupied' || $rc->room_status === 'booked' || $rc->room_status === 'sold_out' || (int)$rc->available_beds === 0);
+                                        $shouldCheck = !$isRoomBooked && !$firstAvailableChecked;
+                                        if ($shouldCheck) { $firstAvailableChecked = true; }
+                                    @endphp
+                                    @if($isRoomBooked)
+                                        <div class="border-2 border-dashed border-gray-200 bg-gray-100/70 rounded-xl p-2.5 opacity-60 cursor-not-allowed flex flex-col justify-between select-none">
+                                            <div class="font-bold text-gray-500 text-xs truncate flex items-center justify-between">
+                                                <span>{{ $rc->room_type_name }}</span>
+                                                <span class="text-[8px] bg-rose-100 text-rose-700 font-extrabold px-1 py-0.5 rounded uppercase">Full</span>
+                                            </div>
+                                            <div class="text-gray-400 font-bold text-xs mt-1">Booked</div>
+                                        </div>
+                                    @else
+                                        <label class="room-opt-card border-2 {{ $shouldCheck ? 'border-brand bg-brand-light/30' : 'border-gray-200 bg-white' }} rounded-xl p-2.5 cursor-pointer flex flex-col justify-between transition hover:border-brand">
+                                            <input type="radio" name="room_type_select" value="{{ $rc->room_type_name }}" data-rent="{{ $rc->monthly_rent }}" {{ $shouldCheck ? 'checked' : '' }} onchange="updateBookingRoom(this)" class="sr-only">
+                                            <div class="font-bold text-gray-900 text-xs truncate">{{ $rc->room_type_name }}</div>
+                                            <div class="text-brand font-black text-xs mt-1">₹{{ number_format($rc->monthly_rent) }}<span class="text-[9px] text-gray-400 font-normal">/mo</span></div>
+                                        </label>
+                                    @endif
                                 @endforeach
                             </div>
                         </div>

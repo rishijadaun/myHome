@@ -100,15 +100,33 @@ class SitemapController extends Controller
             foreach ($cities as $city) {
                 $citySlug = strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $city->slug ?: $city->name)));
                 
-                // Clean Programmatic City URL (e.g. /pg-in-noida)
+                // Clean Programmatic City URLs (PGs, Flats, Commercial, Sale)
                 $cityPages[] = [
                     'url' => route('user.seo.city-area', ['city' => $citySlug]),
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'daily',
+                    'priority' => '0.90'
+                ];
+                $cityPages[] = [
+                    'url' => route('user.seo.flats', ['city' => $citySlug]),
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'daily',
+                    'priority' => '0.90'
+                ];
+                $cityPages[] = [
+                    'url' => route('user.seo.commercial', ['city' => $citySlug]),
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'daily',
+                    'priority' => '0.85'
+                ];
+                $cityPages[] = [
+                    'url' => route('user.seo.sale', ['city' => $citySlug]),
                     'lastmod' => now()->toAtomString(),
                     'changefreq' => 'daily',
                     'priority' => '0.85'
                 ];
 
-                // City + Property Type
+                // City + Property Type Filter URLs
                 foreach ($categories as $cat) {
                     $cityPages[] = [
                         'url' => route('user.search', ['city' => $citySlug, 'type' => $cat]),

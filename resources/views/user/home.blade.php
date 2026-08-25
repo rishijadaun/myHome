@@ -666,9 +666,19 @@
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden">
                                     <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
-                                    <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                                        <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
-                                    </div>
+                                    @if($pg->is_sale)
+                                        <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                            <i class="fas fa-tag text-[8px]"></i> For Sale
+                                        </div>
+                                    @elseif($pg->is_fully_booked || ((int)$pg->available_beds === 0 && $pg->available_beds !== null))
+                                        <div class="absolute top-2 left-2 bg-rose-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                            <i class="fas fa-lock text-[8px]"></i> Full Booked
+                                        </div>
+                                    @else
+                                        <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                            <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
+                                        </div>
+                                    @endif
                                     <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                         <i class="far fa-heart text-[10px]"></i>
                                     </button>
@@ -709,8 +719,8 @@
                                     </div>
                                     <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
                                         <div>
-                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
-                                            <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                            <span class="text-xs font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] font-normal text-gray-500">/m</span>@endif</span>
                                         </div>
                                         <span class="bg-brand hover:bg-brand-dark text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-brand/30 transition">View</span>
                                     </div>
@@ -738,9 +748,19 @@
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden">
                             <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                                <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
-                            </div>
+                            @if($pg->is_sale)
+                                <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                    <i class="fas fa-tag text-[9px]"></i> For Sale
+                                </div>
+                            @elseif($pg->is_fully_booked || ((int)$pg->available_beds === 0 && $pg->available_beds !== null))
+                                <div class="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                    <i class="fas fa-lock text-[9px]"></i> Full Booked
+                                </div>
+                            @else
+                                <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                    <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
+                                </div>
+                            @endif
                             <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                 <i class="far fa-heart text-xs"></i>
                             </button>
@@ -786,8 +806,8 @@
                             </div>
                             <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                 <div>
-                                    <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
-                                    <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                    <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                    <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                 </div>
                                 <span class="bg-brand hover:bg-brand-dark text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-brand/30 transition">View</span>
                             </div>
@@ -890,8 +910,8 @@
                                     </div>
                                     <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
                                         <div>
-                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
-                                            <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                            <span class="text-xs font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] font-normal text-gray-500">/m</span>@endif</span>
                                         </div>
                                         <span class="bg-brand hover:bg-brand-dark text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-brand/30 transition">View</span>
                                     </div>
@@ -964,8 +984,8 @@
                             </div>
                             <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                 <div>
-                                    <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
-                                    <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                    <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                    <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                 </div>
                                 <span class="bg-brand hover:bg-brand-dark text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-brand/30 transition">View</span>
                             </div>
@@ -1054,8 +1074,8 @@
                                     </div>
                                     <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
                                         <div>
-                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
-                                            <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                            <span class="text-xs font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] font-normal text-gray-500">/m</span>@endif</span>
                                         </div>
                                         <span class="bg-pink-600 hover:bg-pink-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-pink-500/30 transition">View</span>
                                     </div>
@@ -1130,8 +1150,8 @@
                             </div>
                             <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                 <div>
-                                    <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
-                                    <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                    <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                    <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                 </div>
                                 <span class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-pink-500/30 transition">View</span>
                             </div>
@@ -1221,8 +1241,8 @@
                                     </div>
                                     <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
                                         <div>
-                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
-                                            <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                            <span class="text-[9px] text-gray-400 block font-medium leading-none">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                            <span class="text-xs font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] font-normal text-gray-500">/m</span>@endif</span>
                                         </div>
                                         <span class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-blue-500/30 transition">View</span>
                                     </div>
@@ -1294,8 +1314,8 @@
                             </div>
                             <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                 <div>
-                                    <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
-                                    <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                    <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                    <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                 </div>
                                 <span class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-blue-500/30 transition">View</span>
                             </div>
@@ -1380,8 +1400,8 @@
                             </div>
                             <div class="pt-2.5 sm:pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                 <div>
-                                    <span class="text-[9px] sm:text-[10px] text-gray-400 block font-medium">Rent</span>
-                                    <span class="text-xs sm:text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></span>
+                                    <span class="text-[9px] sm:text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                    <span class="text-xs sm:text-base font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                 </div>
                                 <span class="bg-brand hover:bg-brand-dark text-white text-[11px] sm:text-xs font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl shadow-sm shadow-brand/30 transition">View</span>
                             </div>
@@ -1458,10 +1478,16 @@
                                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                         <div class="relative h-28 sm:h-36 overflow-hidden">
                                             <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
-                                            <div class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                                                <i class="fas fa-building text-[8px]"></i> Flat
-                                            </div>
-                                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Flat', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                            @if($pg->is_sale)
+                                                <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                                    <i class="fas fa-tag text-[8px]"></i> For Sale
+                                                </div>
+                                            @else
+                                                <div class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                                    <i class="fas fa-building text-[8px]"></i> Flat
+                                                </div>
+                                            @endif
+                                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ $pg->display_price_formatted }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Flat', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                                 <i class="far fa-heart text-[10px]"></i>
                                             </button>
                                             <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
@@ -1475,7 +1501,11 @@
                                             <div>
                                                 <div class="flex justify-between items-center gap-1 mb-1">
                                                     <span class="font-bold text-xs text-gray-900 truncate">{{ $pg->name }}</span>
-                                                    <span class="bg-indigo-50 text-indigo-700 text-[8px] font-extrabold px-1 py-0.5 rounded flex-shrink-0">Flat</span>
+                                                    @if($pg->is_sale)
+                                                        <span class="bg-amber-50 text-amber-700 text-[8px] font-extrabold px-1 py-0.5 rounded flex-shrink-0">For Sale</span>
+                                                    @else
+                                                        <span class="bg-indigo-50 text-indigo-700 text-[8px] font-extrabold px-1 py-0.5 rounded flex-shrink-0">Flat</span>
+                                                    @endif
                                                 </div>
                                                 <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-1 truncate">
                                                     <i class="fas fa-map-marker-alt text-indigo-600 text-[9px]"></i> {{ $locationText }}
@@ -1501,8 +1531,8 @@
                                             </div>
                                             <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
                                                 <div>
-                                                    <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
-                                                    <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                                    <span class="text-[9px] text-gray-400 block font-medium leading-none">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                                    <span class="text-xs font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] font-normal text-gray-500">/m</span>@endif</span>
                                                 </div>
                                                 <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-indigo-500/30 transition">View</span>
                                             </div>
@@ -1527,10 +1557,16 @@
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-44 overflow-hidden">
                                     <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                                        <i class="fas fa-building text-[9px]"></i> Flat / Apartment
-                                    </div>
-                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Flat', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                    @if($pg->is_sale)
+                                        <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                            <i class="fas fa-tag text-[9px]"></i> For Sale
+                                        </div>
+                                    @else
+                                        <div class="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                            <i class="fas fa-building text-[9px]"></i> Flat / Apartment
+                                        </div>
+                                    @endif
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ $pg->display_price_formatted }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Flat', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                         <i class="far fa-heart text-xs"></i>
                                     </button>
                                     <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -1544,7 +1580,11 @@
                                     <div>
                                         <div class="flex justify-between items-center gap-1 mb-1">
                                             <span class="font-bold text-base text-gray-900 truncate">{{ $pg->name }}</span>
-                                            <span class="bg-indigo-50 text-indigo-700 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">Verified Flat</span>
+                                            @if($pg->is_sale)
+                                                <span class="bg-amber-50 text-amber-700 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">For Sale</span>
+                                            @else
+                                                <span class="bg-indigo-50 text-indigo-700 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">Verified Flat</span>
+                                            @endif
                                         </div>
                                         <p class="text-xs text-gray-500 flex items-center gap-1 mb-1 truncate">
                                             <i class="fas fa-map-marker-alt text-indigo-600 text-[11px]"></i> {{ $locationText }}
@@ -1570,8 +1610,8 @@
                                     </div>
                                     <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                         <div>
-                                            <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
-                                            <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                            <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                            <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                         </div>
                                         <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-indigo-500/30 transition">View Details</span>
                                     </div>
@@ -1676,8 +1716,8 @@
                                         </div>
                                         <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
                                             <div>
-                                                <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
-                                                <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                                <span class="text-[9px] text-gray-400 block font-medium leading-none">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                                <span class="text-xs font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] font-normal text-gray-500">/m</span>@endif</span>
                                             </div>
                                             <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-indigo-500/30 transition">View</span>
                                         </div>
@@ -1746,8 +1786,8 @@
                                 </div>
                                 <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                     <div>
-                                        <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
-                                        <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                        <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                        <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                     </div>
                                     <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-indigo-500/30 transition">View</span>
                                 </div>
@@ -1799,7 +1839,7 @@
                                             <div class="absolute top-2 left-2 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                                 <i class="fas fa-store text-[8px]"></i> Shop
                                             </div>
-                                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Commercial', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                            <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ $pg->display_price_formatted }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Commercial', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                                 <i class="far fa-heart text-[10px]"></i>
                                             </button>
                                             <div class="absolute bottom-1.5 left-2 bg-black/75 backdrop-blur text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
@@ -1839,8 +1879,8 @@
                                             </div>
                                             <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
                                                 <div>
-                                                    <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
-                                                    <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                                    <span class="text-[9px] text-gray-400 block font-medium leading-none">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                                    <span class="text-xs font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] font-normal text-gray-500">/m</span>@endif</span>
                                                 </div>
                                                 <span class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-amber-500/30 transition">View</span>
                                             </div>
@@ -1865,10 +1905,16 @@
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-44 overflow-hidden">
                                     <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                                        <i class="fas fa-store text-[9px]"></i> Commercial
-                                    </div>
-                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Commercial', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
+                                    @if($pg->is_sale)
+                                        <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                            <i class="fas fa-tag text-[9px]"></i> For Sale
+                                        </div>
+                                    @else
+                                        <div class="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                                            <i class="fas fa-store text-[9px]"></i> Commercial
+                                        </div>
+                                    @endif
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ $pg->display_price_formatted }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: 'Commercial', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-400 hover:text-red-500 shadow tap-ripple transition">
                                         <i class="far fa-heart text-xs"></i>
                                     </button>
                                     <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -1882,7 +1928,11 @@
                                     <div>
                                         <div class="flex justify-between items-center gap-1 mb-1">
                                             <span class="font-bold text-base text-gray-900 truncate">{{ $pg->name }}</span>
-                                            <span class="bg-amber-50 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">Commercial</span>
+                                            @if($pg->is_sale)
+                                                <span class="bg-amber-50 text-amber-700 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">For Sale</span>
+                                            @else
+                                                <span class="bg-amber-50 text-amber-700 text-[10px] font-extrabold px-2 py-0.5 rounded flex-shrink-0">Verified Commercial</span>
+                                            @endif
                                         </div>
                                         <p class="text-xs text-gray-500 flex items-center gap-1 mb-1 truncate">
                                             <i class="fas fa-map-marker-alt text-amber-600 text-[11px]"></i> {{ $locationText }}
@@ -1908,8 +1958,8 @@
                                     </div>
                                     <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                         <div>
-                                            <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
-                                            <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                            <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                            <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                         </div>
                                         <span class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-amber-500/30 transition">View Details</span>
                                     </div>
@@ -2014,8 +2064,8 @@
                                         </div>
                                         <div class="pt-2 border-t border-gray-100 flex items-center justify-between mt-auto">
                                             <div>
-                                                <span class="text-[9px] text-gray-400 block font-medium leading-none">Rent</span>
-                                                <span class="text-xs font-black text-gray-900 leading-tight">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] font-normal text-gray-500">/m</span></span>
+                                                <span class="text-[9px] text-gray-400 block font-medium leading-none">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                                <span class="text-xs font-black text-gray-900 leading-tight">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-[9px] font-normal text-gray-500">/m</span>@endif</span>
                                             </div>
                                             <span class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-amber-500/30 transition">View</span>
                                         </div>
@@ -2084,8 +2134,8 @@
                                 </div>
                                 <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                                     <div>
-                                        <span class="text-[10px] text-gray-400 block font-medium">Rent</span>
-                                        <span class="text-base font-black text-gray-900">₹{{ number_format($pg->monthly_rent) }}<span class="text-xs font-normal text-gray-500">/mo</span></span>
+                                        <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                                        <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                     </div>
                                     <span class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-amber-500/30 transition">View</span>
                                 </div>
@@ -2251,7 +2301,8 @@
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16 hidden md:block">
+    <!-- Desktop/Tablet Only App Banner (Hidden on Mobile) -->
+    <section class="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
         <div class="bg-gradient-to-br from-brand-50/80 via-teal-50/30 to-white rounded-3xl p-6 sm:p-8 md:p-12 border border-brand/15 relative overflow-hidden shadow-xs">
             <div class="absolute right-0 top-0 w-80 sm:w-96 h-80 sm:h-96 bg-brand/10 rounded-full -mr-24 -mt-24 blur-3xl pointer-events-none"></div>
             <div class="absolute left-0 bottom-0 w-64 h-64 bg-teal-500/5 rounded-full -ml-20 -mb-20 blur-2xl pointer-events-none"></div>
@@ -2263,20 +2314,20 @@
                     <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 tracking-tight leading-tight">Get the StayNest App</h2>
                     <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg leading-relaxed">Search, shortlist &amp; book your favourite verified stays, pay rent with zero brokerage, and get instant owner assistance on the go.</p>
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4">
-                        <button type="button" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
+                        <button type="button" onclick="installPwaApp('android')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
                             <i class="fab fa-google-play text-2xl sm:text-3xl text-emerald-400"></i>
                             <div class="text-left">
                                 <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">GET IT ON</div>
                                 <div class="text-xs sm:text-sm md:text-base font-bold">Google Play</div>
                             </div>
                         </button>
-                        <!-- <button type="button" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
+                        <button type="button" onclick="installPwaApp('ios')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
                             <i class="fab fa-apple text-2xl sm:text-3xl text-white"></i>
                             <div class="text-left">
                                 <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">Download on the</div>
                                 <div class="text-xs sm:text-sm md:text-base font-bold">App Store</div>
                             </div>
-                        </button> -->
+                        </button>
                     </div>
                     <!-- <div class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 text-xs text-gray-500 font-medium">
                         <span class="flex items-center gap-1.5"><i class="fas fa-star text-yellow-400"></i> 4.8★ Rating</span>

@@ -9,37 +9,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Partner Broker Login - StayNest Portal</title>
     
-    <script>
-        (function(){
-            var _w = console.warn;
-            console.warn = function(){
-                if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
-                _w.apply(console, arguments);
-            };
-        })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            DEFAULT: '#4bb59d',
-                            light: '#e6f7f3',
-                            dark: '#3a9a85',
-                            50: '#f0fdf9',
-                            100: '#ccf0e8'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .gradient-text { background: linear-gradient(135deg, #4bb59d 0%, #3a9a85 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .tap-effect { transition: all 0.2s; }

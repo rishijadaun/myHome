@@ -9,7 +9,7 @@
         <span class="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-white text-xs shadow-sm">
             <i class="fas fa-map-location-dot"></i>
         </span>
-        <span class="text-xs font-bold tracking-wide pr-1">Map View</span>
+        <span class="text-xs font-bold tracking-wide pr-1">View on Map</span>
     </a>
     @endif
 

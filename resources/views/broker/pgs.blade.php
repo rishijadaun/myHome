@@ -1,17 +1,17 @@
 @extends('broker.layouts.app')
 
-@section('title', 'My PGs & Properties')
+@section('title', 'My Properties')
 
 @section('content')
 <!-- Header -->
 <header class="hidden lg:flex bg-white border-b border-gray-100 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">My PG Properties</h1>
-        <p class="text-sm text-gray-500">Manage, edit, and toggle status for your listed PG properties.</p>
+        <h1 class="text-2xl font-bold text-gray-900">My Properties Management</h1>
+        <p class="text-sm text-gray-500">Manage, edit, and toggle status for your listed properties (PGs, Flats, Commercial, Plots).</p>
     </div>
     <div class="flex items-center gap-3">
         <a href="{{ route('user.list-property') }}" class="bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-2.5 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 hover:shadow-xl transition flex items-center gap-2">
-            <i class="fas fa-plus text-sm"></i> Add New PG
+            <i class="fas fa-plus text-sm"></i> Add New Property
         </a>
     </div>
 </header>
@@ -33,7 +33,7 @@
     <!-- Mobile Add Button -->
     <div class="lg:hidden">
         <a href="{{ route('user.list-property') }}" class="w-full bg-gradient-to-r from-brand to-brand-dark text-white px-5 py-3 rounded-xl font-semibold tap-effect shadow-lg shadow-brand/30 flex items-center justify-center gap-2">
-            <i class="fas fa-plus"></i> Add New PG Property
+            <i class="fas fa-plus"></i> Add New Property
         </a>
     </div>
 
@@ -77,15 +77,72 @@
         </div>
     </div>
 
+    <!-- ================= LISTING TYPE TABS BAR (All, PG, Flat, Commercial, Land) ================= -->
+    <div class="bg-white rounded-2xl p-2.5 border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <!-- Tab: All Properties -->
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'all', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'all' || empty($currentType)) ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-layer-group text-xs sm:text-sm"></i>
+                <span>All Properties</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'all' || empty($currentType)) ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['all'] ?? $totalProperties) }}
+                </span>
+            </a>
+
+            <!-- Tab: PG / Hostel -->
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'pg-hostel', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'pg-hostel' || $currentType === 'pg') ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-bed text-xs sm:text-sm"></i>
+                <span>PG / Hostel</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'pg-hostel' || $currentType === 'pg') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['pg-hostel'] ?? 0) }}
+                </span>
+            </a>
+
+            <!-- Tab: Flat / House -->
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'flat-apartment', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'flat-apartment' || $currentType === 'flat') ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-building text-xs sm:text-sm"></i>
+                <span>Flat / House</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'flat-apartment' || $currentType === 'flat') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['flat-apartment'] ?? 0) }}
+                </span>
+            </a>
+
+            <!-- Tab: Commercial -->
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'commercial', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'commercial') ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-store text-xs sm:text-sm"></i>
+                <span>Commercial</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'commercial') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['commercial'] ?? 0) }}
+                </span>
+            </a>
+
+            <!-- Tab: Land / Plot (if exists or active) -->
+            @if(($tabCounts['land-plot'] ?? 0) > 0 || $currentType === 'land-plot')
+            <a href="{{ request()->fullUrlWithQuery(['type' => 'land-plot', 'page' => null]) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap {{ ($currentType === 'land-plot') ? 'bg-brand text-white shadow-md shadow-brand/25' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                <i class="fas fa-mountain text-xs sm:text-sm"></i>
+                <span>Land / Plot</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ ($currentType === 'land-plot') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    {{ number_format($tabCounts['land-plot'] ?? 0) }}
+                </span>
+            </a>
+            @endif
+        </div>
+    </div>
+
     <!-- Search & Real-Time Filters -->
     <div class="bg-white rounded-2xl p-4 md:p-5 border border-gray-100 shadow-sm">
         <div class="flex flex-col md:flex-row gap-3">
             <div class="flex-1 relative">
                 <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                <input id="pgSearchInput" onkeyup="filterPGs()" type="text" placeholder="Search by PG name, city, sector, address..." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
+                <input id="pgSearchInput" onkeyup="filterPGs()" type="text" placeholder="Search by property name, city, sector, address..." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
             </div>
             <select id="typeFilter" onchange="filterPGs()" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
-                <option value="">All Types (Boys, Girls, Co-Ed)</option>
+                <option value="">All Genders / Sub-types</option>
                 <option value="BOYS">Boys PG</option>
                 <option value="GIRLS">Girls PG</option>
                 <option value="CO-ED">Co-living / Co-Ed</option>
@@ -104,12 +161,12 @@
             <table class="w-full text-left" id="pgTable">
                 <thead class="bg-gray-50/80 border-b border-gray-100">
                     <tr>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">PG Details</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Property Details</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Location</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Rent / Mo</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Beds</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Occupancy</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Price / Rent</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Capacity / Space</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status / Occupancy</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Listing Status</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
                     </tr>
@@ -125,6 +182,14 @@
                             $statusType = $isActive ? 'ACTIVE' : 'DRAFT';
                             $statusBadgeClass = $isActive ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-amber-100 text-amber-800 border-amber-200';
                             
+                            $ptSlug = strtolower($property->propertyType?->slug ?? '');
+                            $isComm = $property->property_category === 'commercial' || in_array($ptSlug, ['commercial', 'office', 'shop', 'warehouse']);
+                            $isFlat = $property->property_category === 'residential' && in_array($ptSlug, ['flat-apartment', 'flat', 'apartment', 'house-villa', 'house', 'villa', 'builder-floor']);
+                            $isLand = $property->property_category === 'land-plot' || in_array($ptSlug, ['land-plot', 'plot', 'land']);
+                            $isPg = !$isComm && !$isFlat && !$isLand;
+
+                            $prefix = $isComm ? 'COM' : ($isFlat ? 'FLAT' : ($isLand ? 'PLOT' : 'PG'));
+
                             $tBeds = max(1, (int) $property->total_beds);
                             $aBeds = (int) $property->available_beds;
                             $occBeds = max(0, $tBeds - $aBeds);
@@ -138,7 +203,7 @@
                                     <img src="{{ $imgSrc }}" alt="{{ $property->name }}" class="w-12 h-12 rounded-xl object-cover shadow-xs border border-gray-100">
                                     <div>
                                         <a href="{{ url('/list-property?edit_id=' . $property->id) }}" class="font-bold text-gray-900 pg-name hover:text-brand transition block">{{ $property->name }}</a>
-                                        <div class="text-xs text-gray-400 font-mono">#PG-{{ substr($property->id, 0, 8) }}</div>
+                                        <div class="text-xs text-gray-400 font-mono">#{{ $prefix }}-{{ substr($property->id, 0, 8) }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -149,25 +214,57 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="{{ $genderBadgeClass }} text-xs font-bold px-2.5 py-1 rounded-lg">{{ $genderType }}</span>
+                                @if($isComm)
+                                    <span class="bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-2.5 py-1 rounded-lg">Commercial</span>
+                                @elseif($isFlat)
+                                    <span class="bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold px-2.5 py-1 rounded-lg">Flat / House</span>
+                                @elseif($isLand)
+                                    <span class="bg-teal-50 text-teal-700 border border-teal-200 text-xs font-bold px-2.5 py-1 rounded-lg">Land / Plot</span>
+                                @else
+                                    <span class="{{ $genderBadgeClass }} text-xs font-bold px-2.5 py-1 rounded-lg">{{ $genderType }}</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm font-bold text-gray-900">
-                                ₹{{ number_format($property->monthly_rent, 0) }}<span class="text-[11px] font-normal text-gray-500">/mo</span>
+                                @if($property->is_sale)
+                                    <span class="text-amber-600">{{ $property->display_price_formatted }}</span>
+                                    <div class="text-[10px] text-gray-400 font-semibold uppercase">For Sale</div>
+                                @else
+                                    ₹{{ number_format($property->monthly_rent, 0) }}<span class="text-[11px] font-normal text-gray-500">/mo</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm font-semibold text-gray-800">
-                                {{ $property->total_beds }} beds
-                                <div class="text-[11px] text-emerald-600 font-medium">{{ $property->available_beds }} available</div>
+                                @if($isComm)
+                                    <span class="font-bold text-gray-900">Commercial Space</span>
+                                    <div class="text-[11px] text-gray-500">{{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' sq ft' : 'Ready Office / Shop' }}</div>
+                                @elseif($isFlat)
+                                    <span class="font-bold text-gray-900">{{ $property->bhk_type ?: 'Apartment / House' }}</span>
+                                    <div class="text-[11px] text-gray-500">{{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' sq ft' : 'Full House' }}</div>
+                                @elseif($isLand)
+                                    <span class="font-bold text-gray-900">Land / Plot</span>
+                                    <div class="text-[11px] text-gray-500">{{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' Sq. Yards' : 'Plot Layout' }}</div>
+                                @else
+                                    {{ $property->total_beds }} beds
+                                    <div class="text-[11px] {{ (int)$property->available_beds > 0 ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-bold' }}">
+                                        {{ (int)$property->available_beds > 0 ? $property->available_beds . ' available' : '0 available (Full)' }}
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between text-xs">
-                                        <span class="font-bold text-gray-700">{{ $occPct }}%</span>
-                                        <span class="text-[10px] text-gray-400">({{ $occBeds }}/{{ $tBeds }})</span>
+                                @if($isComm || $isFlat || $isLand)
+                                    <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <i class="fas fa-check-circle text-[10px]"></i> Active Listing
+                                    </span>
+                                @else
+                                    <div class="space-y-1">
+                                        <div class="flex items-center justify-between text-xs">
+                                            <span class="font-bold text-gray-700">{{ $occPct }}%</span>
+                                            <span class="text-[10px] text-gray-400">({{ $occBeds }}/{{ $tBeds }})</span>
+                                        </div>
+                                        <div class="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-brand rounded-full transition-all duration-300" style="width: {{ $occPct }}%"></div>
+                                        </div>
                                     </div>
-                                    <div class="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-brand rounded-full transition-all duration-300" style="width: {{ $occPct }}%"></div>
-                                    </div>
-                                </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <!-- 1-Click Status Change Toggle Switch -->
@@ -233,6 +330,14 @@
                 $statusType = $isActive ? 'ACTIVE' : 'DRAFT';
                 $statusBadgeClass = $isActive ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-amber-100 text-amber-800 border-amber-200';
                 
+                $ptSlug = strtolower($property->propertyType?->slug ?? '');
+                $isComm = $property->property_category === 'commercial' || in_array($ptSlug, ['commercial', 'office', 'shop', 'warehouse']);
+                $isFlat = $property->property_category === 'residential' && in_array($ptSlug, ['flat-apartment', 'flat', 'apartment', 'house-villa', 'house', 'villa', 'builder-floor']);
+                $isLand = $property->property_category === 'land-plot' || in_array($ptSlug, ['land-plot', 'plot', 'land']);
+                $isPg = !$isComm && !$isFlat && !$isLand;
+
+                $prefix = $isComm ? 'COM' : ($isFlat ? 'FLAT' : ($isLand ? 'PLOT' : 'PG'));
+
                 $tBeds = max(1, (int) $property->total_beds);
                 $aBeds = (int) $property->available_beds;
                 $occBeds = max(0, $tBeds - $aBeds);
@@ -255,19 +360,48 @@
                         </div>
                         <p class="text-xs text-gray-500 mt-1 truncate pg-location"><i class="fas fa-map-marker-alt text-brand"></i> {{ $property->area?->name ?? 'Zone' }}, {{ $property->city?->name ?? 'City' }}</p>
                         <div class="flex items-center gap-2 mt-2">
-                            <span class="{{ $genderBadgeClass }} text-[10px] font-bold px-2 py-0.5 rounded">{{ $genderType }}</span>
-                            <span class="text-xs font-bold text-gray-900">₹{{ number_format($property->monthly_rent, 0) }}/mo</span>
+                            @if($isComm)
+                                <span class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded">Commercial</span>
+                            @elseif($isFlat)
+                                <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded">Flat / House</span>
+                            @elseif($isLand)
+                                <span class="bg-teal-50 text-teal-700 text-[10px] font-bold px-2 py-0.5 rounded">Land / Plot</span>
+                            @else
+                                <span class="{{ $genderBadgeClass }} text-[10px] font-bold px-2 py-0.5 rounded">{{ $genderType }}</span>
+                            @endif
+                            <span class="text-xs font-bold text-gray-900">
+                                @if($property->is_sale)
+                                    <span class="text-amber-600">{{ $property->display_price_formatted }}</span>
+                                @else
+                                    ₹{{ number_format($property->monthly_rent, 0) }}/mo
+                                @endif
+                            </span>
                         </div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <div class="flex justify-between text-[11px] mb-1">
-                        <span class="text-gray-500">Occupancy</span>
-                        <span class="font-bold text-brand">{{ $occPct }}% ({{ $occBeds }}/{{ $tBeds }} beds)</span>
-                    </div>
-                    <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                        <div class="h-full bg-brand rounded-full" style="width: {{ $occPct }}%"></div>
-                    </div>
+                    @if($isComm || $isFlat || $isLand)
+                        <div class="flex justify-between text-[11px] py-1 bg-gray-50 px-2.5 rounded-lg border border-gray-100">
+                            <span class="text-gray-500 font-medium">Specification</span>
+                            <span class="font-bold text-gray-900">
+                                @if($isComm)
+                                    {{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' sq ft' : 'Ready Commercial Space' }}
+                                @elseif($isFlat)
+                                    {{ $property->bhk_type ?: 'Apartment / House' }} ({{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' sq ft' : 'Full Unit' }})
+                                @else
+                                    {{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' Sq. Yds' : 'Plot Land' }}
+                                @endif
+                            </span>
+                        </div>
+                    @else
+                        <div class="flex justify-between text-[11px] mb-1">
+                            <span class="text-gray-500">Occupancy</span>
+                            <span class="font-bold text-brand">{{ $occPct }}% ({{ $occBeds }}/{{ $tBeds }} beds)</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand rounded-full" style="width: {{ $occPct }}%"></div>
+                        </div>
+                    @endif
                 </div>
                 <div class="flex gap-2 pt-3 border-t border-gray-100">
                     <a href="{{ url('/list-property?edit_id=' . $property->id) }}" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold py-2 rounded-lg tap-effect text-center flex items-center justify-center gap-1"><i class="fas fa-edit"></i> Edit</a>
@@ -277,8 +411,8 @@
             </div>
         @empty
             <div class="bg-white rounded-2xl p-8 border border-gray-100 text-center text-gray-500">
-                <p class="font-bold">No PG Properties Listed</p>
-                <p class="text-xs text-gray-400 mt-1">Tap "Add New PG Property" to get started.</p>
+                <p class="font-bold">No Properties Listed</p>
+                <p class="text-xs text-gray-400 mt-1">Tap "Add New Property" to get started.</p>
             </div>
         @endforelse
     </div>

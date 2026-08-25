@@ -358,7 +358,9 @@ class UserHomeController extends Controller
         $query = Property::where('status', 'active')
             ->where('verification_status', 'verified')
             ->where('is_active', 1)
-            ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
+            ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType'])
+            ->withCount(['approvedReviews as approved_reviews_count'])
+            ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating');
 
         // Property Type Filter
         if ($selectedPropertyType === 'pg-hostel') {
@@ -473,7 +475,9 @@ class UserHomeController extends Controller
             $fallbackQuery = Property::where('status', 'active')
                 ->where('verification_status', 'verified')
                 ->where('is_active', 1)
-                ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType']);
+                ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType'])
+                ->withCount(['approvedReviews as approved_reviews_count'])
+                ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating');
 
             if ($selectedCity !== '') {
                 $fallbackQuery->where(function ($q) use ($selectedCity) {
@@ -1149,7 +1153,7 @@ class UserHomeController extends Controller
     }
 
     /**
-     * Display Dynamic SEO Programmatic City and Area Landing Page.
+     * Display Dynamic SEO Programmatic City and Area Landing Page for PGs.
      */
     public function seoSearch(
         Request $request,
@@ -1166,6 +1170,74 @@ class UserHomeController extends Controller
             'area' => $area ? strtolower($area) : null,
             'type' => 'pg-hostel',
             'property_type' => 'pg-hostel',
+        ]);
+
+        return $this->search($request, $intentParser, $rankingService);
+    }
+
+    /**
+     * Display Dynamic SEO Programmatic City and Area Landing Page for Flats & Apartments.
+     */
+    public function seoFlatSearch(
+        Request $request,
+        string $city,
+        ?string $area = null,
+        ?\App\Services\AiIntentParserService $intentParser = null,
+        ?\App\Services\PropertyRankingService $rankingService = null
+    ) {
+        $intentParser = $intentParser ?? app(\App\Services\AiIntentParserService::class);
+        $rankingService = $rankingService ?? app(\App\Services\PropertyRankingService::class);
+
+        $request->merge([
+            'city' => strtolower($city),
+            'area' => $area ? strtolower($area) : null,
+            'type' => 'flat-apartment',
+            'property_type' => 'flat-apartment',
+        ]);
+
+        return $this->search($request, $intentParser, $rankingService);
+    }
+
+    /**
+     * Display Dynamic SEO Programmatic City and Area Landing Page for Commercial Spaces.
+     */
+    public function seoCommercialSearch(
+        Request $request,
+        string $city,
+        ?string $area = null,
+        ?\App\Services\AiIntentParserService $intentParser = null,
+        ?\App\Services\PropertyRankingService $rankingService = null
+    ) {
+        $intentParser = $intentParser ?? app(\App\Services\AiIntentParserService::class);
+        $rankingService = $rankingService ?? app(\App\Services\PropertyRankingService::class);
+
+        $request->merge([
+            'city' => strtolower($city),
+            'area' => $area ? strtolower($area) : null,
+            'type' => 'commercial',
+            'property_type' => 'commercial',
+        ]);
+
+        return $this->search($request, $intentParser, $rankingService);
+    }
+
+    /**
+     * Display Dynamic SEO Programmatic City and Area Landing Page for Properties For Sale.
+     */
+    public function seoSaleSearch(
+        Request $request,
+        string $city,
+        ?string $area = null,
+        ?\App\Services\AiIntentParserService $intentParser = null,
+        ?\App\Services\PropertyRankingService $rankingService = null
+    ) {
+        $intentParser = $intentParser ?? app(\App\Services\AiIntentParserService::class);
+        $rankingService = $rankingService ?? app(\App\Services\PropertyRankingService::class);
+
+        $request->merge([
+            'city' => strtolower($city),
+            'area' => $area ? strtolower($area) : null,
+            'ad_type' => 'sale',
         ]);
 
         return $this->search($request, $intentParser, $rankingService);

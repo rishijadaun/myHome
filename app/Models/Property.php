@@ -24,6 +24,8 @@ class Property extends Model
         'city_id',
         'area_id',
         'property_type_id',
+        'ad_type',
+        'property_category',
         'name',
         'slug',
         'description',
@@ -35,6 +37,14 @@ class Property extends Model
         'total_beds',
         'available_beds',
         'monthly_rent',
+        'expected_price',
+        'booking_token_amount',
+        'price_negotiable',
+        'ownership_type',
+        'possession_status',
+        'carpet_area_sqft',
+        'bhk_type',
+        'furnishing_status',
         'security_deposit',
         'maintenance_charges',
         'notice_period_days',
@@ -56,8 +66,12 @@ class Property extends Model
         'is_recommended' => 'boolean',
         'featured' => 'boolean',
         'is_active' => 'boolean',
+        'price_negotiable' => 'boolean',
         'rating' => 'float',
         'monthly_rent' => 'float',
+        'expected_price' => 'float',
+        'booking_token_amount' => 'float',
+        'carpet_area_sqft' => 'integer',
     ];
 
     public const ALLOWED_TAGS = [
@@ -209,16 +223,54 @@ class Property extends Model
         ];
     }
 
+    public function getIsSaleAttribute(): bool
+    {
+        return strtolower($this->ad_type ?? 'rent') === 'sale';
+    }
+
+    public function getIsRentAttribute(): bool
+    {
+        return strtolower($this->ad_type ?? 'rent') !== 'sale';
+    }
+
+    public function getDisplayPriceFormattedAttribute(): string
+    {
+        if ($this->is_sale) {
+            $price = (float)($this->expected_price ?: $this->monthly_rent);
+            if ($price >= 10000000) {
+                return '₹' . number_format($price / 10000000, 2) . ' Cr';
+            } elseif ($price >= 100000) {
+                return '₹' . number_format($price / 100000, 2) . ' Lac';
+            }
+            return '₹' . number_format($price);
+        }
+        return '₹' . number_format($this->monthly_rent);
+    }
+
+    public function getPricePerSqftAttribute(): ?string
+    {
+        $sqft = $this->carpet_area_sqft;
+        $price = (float)($this->expected_price ?: $this->monthly_rent);
+        if ($sqft && $sqft > 0 && $price > 0) {
+            return '₹' . number_format(round($price / $sqft)) . '/sq ft';
+        }
+        return null;
+    }
+
     protected function casts(): array
     {
         return [
             'monthly_rent' => 'decimal:2',
+            'expected_price' => 'decimal:2',
+            'booking_token_amount' => 'decimal:2',
             'security_deposit' => 'decimal:2',
             'rating' => 'decimal:2',
             'total_beds' => 'integer',
             'available_beds' => 'integer',
+            'carpet_area_sqft' => 'integer',
             'total_reviews' => 'integer',
             'featured' => 'boolean',
+            'price_negotiable' => 'boolean',
             'is_active' => 'boolean',
         ];
     }
@@ -262,11 +314,11 @@ class Property extends Model
      */
     public function getDynamicReviewsCountAttribute(): int
     {
-        if (isset($this->attributes['approved_reviews_count'])) {
-            return (int) $this->attributes['approved_reviews_count'];
+        if (array_key_exists('approved_reviews_count', $this->attributes)) {
+            return (int) ($this->attributes['approved_reviews_count'] ?? 0);
         }
-        if (isset($this->attributes['reviews_count'])) {
-            return (int) $this->attributes['reviews_count'];
+        if (array_key_exists('reviews_count', $this->attributes)) {
+            return (int) ($this->attributes['reviews_count'] ?? 0);
         }
         if ($this->relationLoaded('approvedReviews')) {
             return $this->approvedReviews->count();
@@ -274,7 +326,7 @@ class Property extends Model
         if ($this->total_reviews !== null && (int)$this->total_reviews > 0) {
             return (int) $this->total_reviews;
         }
-        return (int) $this->approvedReviews()->count();
+        return 0;
     }
 
     /**
@@ -282,24 +334,30 @@ class Property extends Model
      */
     public function getDynamicRatingAttribute(): string
     {
-        if (isset($this->attributes['dynamic_rating']) && $this->attributes['dynamic_rating'] !== null) {
-            return number_format((float) $this->attributes['dynamic_rating'], 1);
+        if (array_key_exists('dynamic_rating', $this->attributes)) {
+            return $this->attributes['dynamic_rating'] !== null 
+                ? number_format((float) $this->attributes['dynamic_rating'], 1)
+                : ($this->rating && floatval($this->rating) > 0 ? number_format((float) $this->rating, 1) : '4.8');
         }
-        if (isset($this->attributes['avg_rating']) && $this->attributes['avg_rating'] !== null) {
-            return number_format((float) $this->attributes['avg_rating'], 1);
+        if (array_key_exists('approved_reviews_avg_rating', $this->attributes)) {
+            return $this->attributes['approved_reviews_avg_rating'] !== null 
+                ? number_format((float) $this->attributes['approved_reviews_avg_rating'], 1)
+                : ($this->rating && floatval($this->rating) > 0 ? number_format((float) $this->rating, 1) : '4.8');
+        }
+        if (array_key_exists('avg_rating', $this->attributes)) {
+            return $this->attributes['avg_rating'] !== null 
+                ? number_format((float) $this->attributes['avg_rating'], 1)
+                : ($this->rating && floatval($this->rating) > 0 ? number_format((float) $this->rating, 1) : '4.8');
         }
         if ($this->relationLoaded('approvedReviews')) {
             $count = $this->approvedReviews->count();
             if ($count > 0) {
                 return number_format($this->approvedReviews->avg('rating'), 1);
             }
+            return $this->rating && floatval($this->rating) > 0 ? number_format((float) $this->rating, 1) : '4.8';
         }
         if ($this->rating && floatval($this->rating) > 0) {
             return number_format((float) $this->rating, 1);
-        }
-        $avg = $this->approvedReviews()->avg('rating');
-        if ($avg) {
-            return number_format($avg, 1);
         }
         return '4.8';
     }
@@ -391,6 +449,7 @@ class Property extends Model
                 'rooms.security_deposit',
                 'rooms.total_beds',
                 'rooms.available_beds',
+                'rooms.status as room_status',
                 'rooms.attached_bathroom',
                 'rooms.ac_available',
                 'rooms.balcony',
@@ -401,6 +460,20 @@ class Property extends Model
             )
             ->orderBy('room_types.max_occupancy', 'asc')
             ->get();
+    }
+
+    /**
+     * Check if entire property is fully booked / sold out (0 available beds).
+     */
+    public function getIsFullyBookedAttribute(): bool
+    {
+        if ($this->status === 'fully_booked' || $this->status === 'occupied' || $this->status === 'sold_out') {
+            return true;
+        }
+        if ($this->available_beds !== null && (int)$this->available_beds === 0) {
+            return true;
+        }
+        return false;
     }
 
     /**

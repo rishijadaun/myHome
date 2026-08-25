@@ -91,11 +91,29 @@
                 <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Portals</h4>
                 <ul class="space-y-2.5 text-sm">
                     <li><a href="{{ route('user.bookings') }}" class="hover:text-brand transition">My Bookings</a></li>
-                    <li><a href="{{ route('broker.login') }}" class="hover:text-brand transition">Broker/Builder  Portal</a></li>
-                    <!-- <li><a href="{{ route('admin.login') }}" class="hover:text-brand transition">Admin Console</a></li> -->
+                    <li><a href="{{ route('broker.login') }}" class="hover:text-brand transition">Broker/Builder Portal</a></li>
                 </ul>
             </div>
-        </div>
+            <!-- <div>
+                <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Get the App</h4>
+                <div class="space-y-2">
+                    <button type="button" onclick="installPwaApp('android')" class="w-full bg-gray-800 hover:bg-gray-700 text-white px-3.5 py-2 rounded-xl flex items-center gap-2.5 transition tap-effect border border-gray-700/80 cursor-pointer">
+                        <i class="fab fa-google-play text-emerald-400 text-base"></i>
+                        <div class="text-left leading-tight">
+                            <div class="text-[8px] uppercase tracking-wider text-gray-400">GET IT ON</div>
+                            <div class="text-xs font-bold">Google Play</div>
+                        </div>
+                    </button>
+                    <button type="button" onclick="installPwaApp('ios')" class="w-full bg-gray-800 hover:bg-gray-700 text-white px-3.5 py-2 rounded-xl flex items-center gap-2.5 transition tap-effect border border-gray-700/80 cursor-pointer">
+                        <i class="fab fa-apple text-white text-base"></i>
+                        <div class="text-left leading-tight">
+                            <div class="text-[8px] uppercase tracking-wider text-gray-400">Download on</div>
+                            <div class="text-xs font-bold">App Store</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div> -->
 
         <!-- ================= EXPLORE PGS ACROSS INDIA - SEO DIRECTORY MATRIX (COLLAPSIBLE TOGGLE) ================= -->
         <div class="border-t border-gray-800 pt-6 pb-2 mb-4">

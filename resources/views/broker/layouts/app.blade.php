@@ -9,37 +9,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>@yield('title', 'Broker Panel') - StayNest</title>
-    <script>
-        (function(){
-            var _w = console.warn;
-            console.warn = function(){
-                if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
-                _w.apply(console, arguments);
-            };
-        })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            DEFAULT: '#4bb59d',
-                            light: '#e6f7f3',
-                            dark: '#3a9a85',
-                            50: '#f0fdf9',
-                            100: '#ccf0e8'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .gradient-text { background: linear-gradient(135deg, #4bb59d 0%, #3a9a85 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .tap-effect { transition: all 0.2s; }
@@ -99,7 +72,7 @@
                 </a>
                 <a href="{{ route('broker.pgs') }}" class="sidebar-link {{ request()->routeIs('broker.pgs') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-building w-5 text-center"></i>
-                    <span class="text-sm font-medium">My PGs</span>
+                    <span class="text-sm font-medium">My Properties</span>
                     <span class="ml-auto bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $brokerSidebarStats['properties'] ?? 0 }}</span>
                 </a>
                 <a href="{{ route('broker.bookings') }}" class="sidebar-link {{ request()->routeIs('broker.bookings') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">

@@ -60,43 +60,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="https://images.unsplash.com">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        (function(){
-            var _w = console.warn;
-            console.warn = function(){
-                if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
-                _w.apply(console, arguments);
-            };
-        })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: { DEFAULT: '#4bb59d', light: '#e6f7f3', dark: '#3a9a85', 50: '#f0fdf9', 100: '#ccf0e8' },
-                        primary: { DEFAULT: '#1a1a7f', light: '#eef2ff', dark: '#23239c' }
-                    }
-                }
-            }
-        }
-    </script>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
@@ -172,6 +144,7 @@
         @include('user.partials.footer')
         @include('user.partials.floating-actions')
         @include('user.partials.wishlist-helper')
+        @include('user.partials.pwa-modal')
 
         <!-- PWA Native App Install Toast / Banner (Mobile Only) -->
         <div id="pwaInstallBanner" class="fixed bottom-20 left-4 right-4 z-[9999] hidden md:hidden">
@@ -186,10 +159,10 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <button id="pwaInstallBtn" type="button" class="bg-brand hover:bg-brand-dark text-white font-bold text-xs px-3.5 py-2 rounded-xl tap-effect shadow-md">
+                    <button id="pwaInstallBtn" onclick="installPwaApp('auto')" type="button" class="bg-brand hover:bg-brand-dark text-white font-bold text-xs px-3.5 py-2 rounded-xl tap-effect shadow-md cursor-pointer">
                         Install
                     </button>
-                    <button onclick="dismissPwaBanner()" type="button" class="text-gray-400 hover:text-white p-1 tap-effect" aria-label="Close">
+                    <button onclick="dismissPwaBanner()" type="button" class="text-gray-400 hover:text-white p-1 tap-effect cursor-pointer" aria-label="Close">
                         <i class="fas fa-times text-xs"></i>
                     </button>
                 </div>
@@ -200,7 +173,7 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Native App Helpers: Haptic Touch, Native Share & PWA Service Worker -->
+    <!-- Native App Helpers: Haptic Touch, Native Share & Universal PWA App Install -->
     <script>
         // 1. Global Haptic Vibration Feedback Helper
         window.triggerHaptic = function(ms = 12) {
@@ -244,18 +217,22 @@
             }
         };
 
-        // 3. PWA Service Worker Registration & App Install Prompt
+        // 3. PWA Service Worker Registration & Universal App Install Prompt
         let deferredPrompt = null;
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
 
+        // Capture PWA beforeinstallprompt on all devices (mobile, tablet, desktop)
         window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show mobile banner if not dismissed yet
             if (window.innerWidth < 768) {
-                e.preventDefault();
-                deferredPrompt = e;
                 const dismissed = localStorage.getItem('staynest_pwa_dismissed');
                 if (!dismissed) {
                     const banner = document.getElementById('pwaInstallBanner');
@@ -264,20 +241,135 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const installBtn = document.getElementById('pwaInstallBtn');
-            if (installBtn) {
-                installBtn.addEventListener('click', async () => {
-                    window.triggerHaptic(20);
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        deferredPrompt = null;
-                        dismissPwaBanner();
-                    }
-                });
+        // Detect if app is currently running in Standalone PWA mode
+        window.isPwaStandalone = function() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true || 
+                   document.referrer.includes('android-app://');
+        };
+
+        // Universal Function to Trigger PWA Download / Install on Google Play & App Store Button Clicks
+        window.installPwaApp = async function(platform = 'auto') {
+            window.triggerHaptic(20);
+
+            // If already installed and opened as app
+            if (window.isPwaStandalone()) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'App Already Installed!',
+                        text: 'You are currently using the official StayNest app on your device.',
+                        confirmButtonColor: '#4bb59d',
+                        confirmButtonText: 'Great!'
+                    });
+                } else {
+                    alert('StayNest is already installed on your device!');
+                }
+                return;
             }
-        });
+
+            // Direct native PWA browser prompt if available
+            if (deferredPrompt) {
+                try {
+                    deferredPrompt.prompt();
+                    const choice = await deferredPrompt.userChoice;
+                    if (choice.outcome === 'accepted') {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Installing StayNest App...',
+                                showConfirmButton: false,
+                                timer: 2500
+                            });
+                        }
+                    }
+                    deferredPrompt = null;
+                    window.dismissPwaBanner();
+                    window.closePwaModal();
+                    return;
+                } catch(err) {}
+            }
+
+            // If native prompt is not active, open custom interactive guide modal
+            window.openPwaModal(platform);
+        };
+
+        // Open PWA Modal with Platform-Specific Guidance
+        window.openPwaModal = function(platform = 'auto') {
+            const modal = document.getElementById('pwaInstallModal');
+            if (!modal) return;
+
+            const isIos = platform === 'ios' || /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isAndroid = platform === 'android' || /Android/.test(navigator.userAgent);
+
+            const directBox = document.getElementById('pwaDirectTriggerBox');
+            const iosBox = document.getElementById('pwaIosGuideBox');
+            const androidBox = document.getElementById('pwaAndroidFallbackBox');
+            const modalBtnText = document.getElementById('pwaModalBtnText');
+
+            if (isIos) {
+                if (directBox) directBox.classList.add('hidden');
+                if (iosBox) iosBox.classList.remove('hidden');
+                if (androidBox) androidBox.classList.add('hidden');
+            } else if (isAndroid) {
+                if (directBox) directBox.classList.remove('hidden');
+                if (iosBox) iosBox.classList.add('hidden');
+                if (androidBox) androidBox.classList.remove('hidden');
+                if (modalBtnText) modalBtnText.innerText = 'Install for Android (PWA)';
+            } else {
+                if (directBox) directBox.classList.remove('hidden');
+                if (iosBox) iosBox.classList.add('hidden');
+                if (androidBox) androidBox.classList.add('hidden');
+                if (modalBtnText) modalBtnText.innerText = 'Install StayNest App';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        // Close PWA Modal
+        window.closePwaModal = function() {
+            window.triggerHaptic(10);
+            const modal = document.getElementById('pwaInstallModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        // Trigger Direct Install from inside the modal
+        window.triggerPwaPromptDirectly = async function() {
+            window.triggerHaptic(20);
+            if (deferredPrompt) {
+                try {
+                    deferredPrompt.prompt();
+                    const choice = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    window.closePwaModal();
+                    window.dismissPwaBanner();
+                    return;
+                } catch(e){}
+            }
+
+            // If prompt unavailable, check platform
+            const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIos) {
+                window.openPwaModal('ios');
+            } else {
+                const androidBox = document.getElementById('pwaAndroidFallbackBox');
+                if (androidBox) androidBox.classList.remove('hidden');
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Install via Browser Menu',
+                        html: 'Tap your browser menu (<i class="fas fa-ellipsis-vertical"></i>) and choose <strong>"Install app"</strong> or <strong>"Add to Home Screen"</strong>.',
+                        confirmButtonColor: '#4bb59d'
+                    });
+                }
+            }
+        };
 
         window.dismissPwaBanner = function() {
             window.triggerHaptic(10);

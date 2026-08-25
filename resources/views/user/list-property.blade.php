@@ -22,7 +22,7 @@
         $pageHighlight = 'Direct Landlord Listing';
         $pageTitle = 'List Your Property Free - Post PG, Flat & Commercial Space | StayNest';
         $pageDesc = 'Post your property online for free on StayNest. List PGs, residential flats, builder floors, and commercial shops with 0% brokerage forever.';
-        $pageKeywords = 'list your property, list your property free, post your property online, landlord property listing, zero brokerage property listing';
+        $pageKeywords = 'list your property,rent your property faster, list your property free, post your property online, landlord property listing, zero brokerage property listing';
         $defaultTypeSlug = 'pg-hostel';
     } elseif ($currentPath === 'post-property' || $currentPath === 'post-property-free') {
         $pageHeading = 'Post Property Free';
@@ -383,110 +383,76 @@
                     <!-- ================= STEP 1: LISTING TYPE & BASIC INFO ================= -->
                     <div id="step-pane-1" class="step-pane space-y-6">
                         
-                        <!-- Listing Type Selector -->
+                        <!-- Listing Category & Type Selector -->
                         <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
-                            <div class="flex items-center justify-between mb-4">
+                            <!-- Category Segmented Header -->
+                            <div class="flex items-center justify-between mb-3">
                                 <div>
-                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900">Select Property  Type *</h2>
-                                    <p class="text-xs sm:text-sm text-gray-500">Pick what you are listing. Get rent on your Property.</p>
+                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900">Property Category *</h2>
+                                    <p class="text-xs sm:text-sm text-gray-500">Pick what category of property you are listing. Sell or rent your property faster with StayNest.</p>
                                 </div>
-                                <!-- <span class="bg-brand/10 text-brand text-xs font-bold px-3 py-1 rounded-full">Dynamic Filter</span> -->
                             </div>
 
-                            <div class="grid grid-cols-3 gap-2.5 sm:gap-4 max-w-3xl" id="listingTypeContainer">
-                                <!-- Card 1: PG & Hostels (Default Selected) -->
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="listing_type" value="pg-hostel" class="hidden" checked onchange="handleTypeChange('pg-hostel')">
-                                    <div id="card-type-pg-hostel" class="property-type-card active-pg rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
-                                        <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
-                                            <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <!-- Left taller green building -->
-                                                <rect x="11" y="14" width="22" height="42" rx="3" fill="#4bb59d" stroke="#134e48" stroke-width="2"/>
-                                                <rect x="15.5" y="19" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
-                                                <rect x="24" y="19" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
-                                                <rect x="15.5" y="28" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
-                                                <rect x="24" y="28" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
-                                                <rect x="15.5" y="37" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
-                                                <rect x="24" y="37" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
-                                                <rect x="19" y="47" width="6" height="9" rx="1" fill="#134e48"/>
-                                                <!-- Right building with pitched roof -->
-                                                <path d="M30 25L45 15L54 25V56H30V25Z" fill="#ffffff" stroke="#134e48" stroke-width="2" stroke-linejoin="round"/>
-                                                <path d="M28 25L45 13L56 25" stroke="#134e48" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-                                                <path d="M30 25L45 15L54 25" fill="#34d399"/>
-                                                <rect x="36" y="29" width="5" height="6" rx="1" fill="#a7f3d0" stroke="#134e48" stroke-width="1.2"/>
-                                                <rect x="45" y="29" width="5" height="6" rx="1" fill="#a7f3d0" stroke="#134e48" stroke-width="1.2"/>
-                                                <rect x="40" y="42" width="7" height="14" rx="1" fill="#4bb59d" stroke="#134e48" stroke-width="1.3"/>
-                                                <circle cx="8" cy="51" r="3.5" fill="#10b981"/>
-                                                <circle cx="56" cy="49" r="4" fill="#10b981"/>
-                                                <line x1="6" y1="56" x2="58" y2="56" stroke="#134e48" stroke-width="2" stroke-linecap="round"/>
-                                            </svg>
-                                        </div>
-                                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">PG &amp; Hostels</p>
-                                        
-                                    </div>
-                                </label>
+                            <!-- Category Segmented Control (Tabs matching screenshot) -->
+                            <div class="grid grid-cols-3 gap-2 p-1.5 bg-gray-100/90 rounded-2xl mb-6">
+                                <button type="button" onclick="selectPropertyCategory('residential')" id="catBtn_residential" class="category-tab-btn py-3 px-2 sm:px-4 rounded-xl font-extrabold text-xs sm:text-sm transition-all shadow-xs bg-white text-gray-900 border border-gray-200/80 flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-home text-brand"></i>
+                                    <span>Residential</span>
+                                </button>
+                                <button type="button" onclick="selectPropertyCategory('commercial')" id="catBtn_commercial" class="category-tab-btn py-3 px-2 sm:px-4 rounded-xl font-bold text-xs sm:text-sm transition-all text-gray-600 hover:text-gray-900 flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-briefcase text-amber-500"></i>
+                                    <span>Commercial</span>
+                                </button>
+                                <button type="button" onclick="selectPropertyCategory('land-plot')" id="catBtn_land-plot" class="category-tab-btn py-3 px-2 sm:px-4 rounded-xl font-bold text-xs sm:text-sm transition-all text-gray-600 hover:text-gray-900 flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-vector-square text-indigo-500"></i>
+                                    <span>Land / Plot</span>
+                                    <span class="bg-rose-500 text-white text-[9px] px-1.5 py-0.2 rounded-full font-black hidden sm:inline">New</span>
+                                </button>
+                            </div>
+                            <input type="hidden" id="propCategory" name="property_category" value="residential">
 
-                                <!-- Card 2: Flats & Houses -->
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="listing_type" value="flat-apartment" class="hidden" onchange="handleTypeChange('flat-apartment')">
-                                    <div id="card-type-flat-apartment" class="property-type-card rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
-                                        <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
-                                            <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <!-- Left tall building -->
-                                                <rect x="13" y="12" width="22" height="44" rx="3" fill="#ffffff" stroke="#1e1b4b" stroke-width="2"/>
-                                                <rect x="17.5" y="16.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="25.5" y="16.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="17.5" y="24" width="5" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="25.5" y="24" width="5" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="17.5" y="31.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="25.5" y="31.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="17.5" y="39" width="5" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="25.5" y="39" width="5" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="21" y="48.5" width="6" height="7.5" rx="1" fill="#312e81"/>
-                                                <!-- Right building -->
-                                                <rect x="33" y="22" width="18" height="34" rx="2" fill="#e0e7ff" stroke="#1e1b4b" stroke-width="2"/>
-                                                <rect x="37" y="26.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="43.5" y="26.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="37" y="34" width="4" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="43.5" y="34" width="4" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="37" y="41.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
-                                                <rect x="43.5" y="41.5" width="4" height="4.5" rx="1" fill="#6366f1"/>
-                                                <circle cx="9" cy="50" r="3.5" fill="#34d399"/>
-                                                <circle cx="55" cy="48" r="4" fill="#34d399"/>
-                                                <line x1="7" y1="56" x2="57" y2="56" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round"/>
-                                            </svg>
-                                        </div>
-                                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Flats &amp; Houses</p>
-                                      
-                                    </div>
-                                </label>
+                            <!-- Looking To... (Rent / Sell Toggle matching screenshot) -->
+                            <div class="mb-6 pb-6 border-b border-gray-100">
+                                <label class="block text-xs sm:text-sm font-bold text-gray-800 mb-2.5">You're looking to... *</label>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" onclick="selectAdType('rent')" id="adTypeBtn_rent" class="ad-type-btn px-6 sm:px-8 py-3 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center gap-2 bg-brand text-white shadow-md shadow-brand/20 border-2 border-brand">
+                                        <i class="fas fa-key text-xs"></i>
+                                        <span>Rent</span>
+                                    </button>
+                                    <button type="button" onclick="selectAdType('sale')" id="adTypeBtn_sale" class="ad-type-btn px-6 sm:px-8 py-3 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200">
+                                        <i class="fas fa-tags text-xs text-amber-500"></i>
+                                        <span>Sell</span>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="propAdType" name="ad_type" value="rent">
+                            </div>
 
-                                <!-- Card 3: Commercial -->
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="listing_type" value="commercial" class="hidden" onchange="handleTypeChange('commercial')">
-                                    <div id="card-type-commercial" class="property-type-card rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
-                                        <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
-                                            <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <rect x="11" y="22" width="42" height="34" rx="2" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-                                                <rect x="9" y="16" width="46" height="7" rx="2" fill="#1e3a8a" stroke="#1e293b" stroke-width="1.8"/>
-                                                <path d="M10 23L13 32H51L54 23H10Z" fill="#3b82f6" stroke="#1e293b" stroke-width="1.8" stroke-linejoin="round"/>
-                                                <path d="M19 23L18 32M28 23L27 32M37 23L37 32M46 23L47 32" stroke="#ffffff" stroke-width="2"/>
-                                                <path d="M13 32Q15.5 35 18 32Q20.5 35 23 32Q25.5 35 28 32Q30.5 35 33 32Q35.5 35 38 32Q40.5 35 43 32Q45.5 35 48 32Q50.5 35 51 32" fill="#60a5fa" stroke="#1e293b" stroke-width="1.5"/>
-                                                <rect x="16" y="37" width="10" height="12" rx="1" fill="#dbeafe" stroke="#1e293b" stroke-width="1.2"/>
-                                                <line x1="21" y1="37" x2="21" y2="49" stroke="#93c5fd" stroke-width="1"/>
-                                                <rect x="29" y="36" width="10" height="20" rx="1" fill="#1d4ed8" stroke="#1e293b" stroke-width="1.2"/>
-                                                <rect x="31" y="38" width="6" height="9" fill="#bfdbfe"/>
-                                                <circle cx="37" cy="48" r="0.9" fill="#ffffff"/>
-                                                <rect x="42" y="37" width="8" height="12" rx="1" fill="#dbeafe" stroke="#1e293b" stroke-width="1.2"/>
-                                                <circle cx="7" cy="50" r="3" fill="#22c55e"/>
-                                                <circle cx="57" cy="50" r="3" fill="#22c55e"/>
-                                                <line x1="5" y1="56" x2="59" y2="56" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
-                                            </svg>
+                            <!-- Sub-Property Type Cards Grid -->
+                            <div>
+                                <h3 class="text-xs sm:text-sm font-bold text-gray-800 mb-3" id="subTypeHeading">Select Property Type</h3>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 max-w-3xl" id="listingTypeContainer">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="listing_type" value="pg-hostel" class="hidden" {{ ($defaultTypeSlug ?? 'pg-hostel') === 'pg-hostel' ? 'checked' : '' }} onchange="handleTypeChange('pg-hostel')">
+                                        <div id="card-type-pg-hostel" class="property-type-card {{ ($defaultTypeSlug ?? 'pg-hostel') === 'pg-hostel' ? 'active-pg' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-brand"><i class="fas fa-hotel"></i></div>
+                                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">PG &amp; Hostels</p>
                                         </div>
-                                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Commercial</p>
-                                     
-                                    </div>
-                                </label>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="listing_type" value="flat-apartment" class="hidden" {{ ($defaultTypeSlug ?? 'pg-hostel') === 'flat-apartment' ? 'checked' : '' }} onchange="handleTypeChange('flat-apartment')">
+                                        <div id="card-type-flat-apartment" class="property-type-card {{ ($defaultTypeSlug ?? 'pg-hostel') === 'flat-apartment' ? 'active-flat' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-indigo-500"><i class="fas fa-building"></i></div>
+                                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Flats &amp; Apartments</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="listing_type" value="house-villa" class="hidden" {{ ($defaultTypeSlug ?? 'pg-hostel') === 'house-villa' ? 'checked' : '' }} onchange="handleTypeChange('house-villa')">
+                                        <div id="card-type-house-villa" class="property-type-card {{ ($defaultTypeSlug ?? 'pg-hostel') === 'house-villa' ? 'active-flat' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-emerald-600"><i class="fas fa-house-chimney"></i></div>
+                                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">House / Villa</p>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -619,75 +585,124 @@
                     <!-- ================= STEP 2: ROOMS & AMENITIES ================= -->
                     <div id="step-pane-2" class="step-pane hidden space-y-6">
                         
-                        <!-- Dynamic PG Sharing Options -->
+                        <!-- 1. Dynamic PG Sharing Options -->
                         <div id="pgRoomConfigs" class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
-                            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <i class="fas fa-door-open text-brand"></i> PG Room Sharing Types & Capacity
-                            </h2>
-                            <p class="text-xs sm:text-sm text-gray-500 mb-6">Select available sharing options in your PG / Hostel (All amounts must be positive).</p>
-
-                            <div class="space-y-3">
-                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition cursor-pointer">
-                                    <div class="flex items-center gap-3">
-                                        <input type="checkbox" id="chk_room_single" name="room_single" checked class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
-                                        <div>
-                                            <div class="font-bold text-sm text-gray-900">Single Occupancy (Private Room)</div>
-                                            <div class="text-xs text-gray-500">1 person per room &bull; Personal space</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs text-gray-400">₹</span>
-                                        <input type="number" id="rent_room_single" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="12000" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
-                                    </div>
-                                </label>
-
-                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition cursor-pointer">
-                                    <div class="flex items-center gap-3">
-                                        <input type="checkbox" id="chk_room_double" name="room_double" checked class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
-                                        <div>
-                                            <div class="font-bold text-sm text-gray-900">Double Sharing Room</div>
-                                            <div class="text-xs text-gray-500">2 beds per room &bull; Shared accommodation</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs text-gray-400">₹</span>
-                                        <input type="number" id="rent_room_double" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="8500" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
-                                    </div>
-                                </label>
-
-                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition cursor-pointer">
-                                    <div class="flex items-center gap-3">
-                                        <input type="checkbox" id="chk_room_triple" name="room_triple" class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
-                                        <div>
-                                            <div class="font-bold text-sm text-gray-900">Triple Sharing Room</div>
-                                            <div class="text-xs text-gray-500">3 beds per room &bull; Budget friendly</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs text-gray-400">₹</span>
-                                        <input type="number" id="rent_room_triple" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="6500" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
-                                    </div>
-                                </label>
-
-                                <label class="flex items-center justify-between p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition cursor-pointer">
-                                    <div class="flex items-center gap-3">
-                                        <input type="checkbox" id="chk_room_four" name="room_four" class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
-                                        <div>
-                                            <div class="font-bold text-sm text-gray-900">Four Sharing Room</div>
-                                            <div class="text-xs text-gray-500">4 beds per room &bull; Economical option</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs text-gray-400">₹</span>
-                                        <input type="number" id="rent_room_four" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="5000" class="w-28 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
-                                    </div>
-                                </label>
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <i class="fas fa-door-open text-brand"></i> PG Room Sharing Types &amp; Rent
+                                    </h2>
+                                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Select available sharing options and set monthly rent per bed.</p>
+                                </div>
+                                <span class="bg-brand/10 text-brand text-xs font-extrabold px-3 py-1 rounded-full uppercase">PG &amp; Hostel</span>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                            <div class="space-y-3">
+                                <!-- Single Room -->
+                                <div class="p-3.5 sm:p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white" id="card_room_single">
+                                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                                        <input type="checkbox" id="chk_room_single" name="room_single" checked onchange="toggleRoomCardState('single')" class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-900 flex items-center gap-2">
+                                                <span>Single Occupancy (Private Room)</span>
+                                                <span id="badge_status_single" class="bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">🟢 Vacant</span>
+                                            </div>
+                                            <div class="text-xs text-gray-500">1 person per room &bull; Personal space</div>
+                                        </div>
+                                    </label>
+                                    <div class="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                                        <select id="status_room_single" onchange="handleRoomStatusChange('single', this.value)" class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer">
+                                            <option value="available" selected>🟢 Vacant / Available</option>
+                                            <option value="booked">🔴 Full / Booked</option>
+                                        </select>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-xs text-gray-400 font-bold">₹</span>
+                                            <input type="number" id="rent_room_single" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="12000" class="w-24 sm:w-28 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
+                                            <span class="text-[10px] text-gray-400">/mo</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Double Room -->
+                                <div class="p-3.5 sm:p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white" id="card_room_double">
+                                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                                        <input type="checkbox" id="chk_room_double" name="room_double" checked onchange="toggleRoomCardState('double')" class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-900 flex items-center gap-2">
+                                                <span>Double Sharing Room</span>
+                                                <span id="badge_status_double" class="bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">🟢 Vacant</span>
+                                            </div>
+                                            <div class="text-xs text-gray-500">2 beds per room &bull; Shared accommodation</div>
+                                        </div>
+                                    </label>
+                                    <div class="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                                        <select id="status_room_double" onchange="handleRoomStatusChange('double', this.value)" class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer">
+                                            <option value="available" selected>🟢 Vacant / Available</option>
+                                            <option value="booked">🔴 Full / Booked</option>
+                                        </select>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-xs text-gray-400 font-bold">₹</span>
+                                            <input type="number" id="rent_room_double" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="8500" class="w-24 sm:w-28 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
+                                            <span class="text-[10px] text-gray-400">/mo</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Triple Room -->
+                                <div class="p-3.5 sm:p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white" id="card_room_triple">
+                                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                                        <input type="checkbox" id="chk_room_triple" name="room_triple" onchange="toggleRoomCardState('triple')" class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-900 flex items-center gap-2">
+                                                <span>Triple Sharing Room</span>
+                                                <span id="badge_status_triple" class="bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">🟢 Vacant</span>
+                                            </div>
+                                            <div class="text-xs text-gray-500">3 beds per room &bull; Budget friendly</div>
+                                        </div>
+                                    </label>
+                                    <div class="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                                        <select id="status_room_triple" onchange="handleRoomStatusChange('triple', this.value)" class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer">
+                                            <option value="available" selected>🟢 Vacant / Available</option>
+                                            <option value="booked">🔴 Full / Booked</option>
+                                        </select>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-xs text-gray-400 font-bold">₹</span>
+                                            <input type="number" id="rent_room_triple" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="6500" class="w-24 sm:w-28 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
+                                            <span class="text-[10px] text-gray-400">/mo</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Four Sharing Room -->
+                                <div class="p-3.5 sm:p-4 border border-gray-200 rounded-2xl hover:border-brand/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white" id="card_room_four">
+                                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                                        <input type="checkbox" id="chk_room_four" name="room_four" onchange="toggleRoomCardState('four')" class="w-5 h-5 text-brand rounded focus:ring-brand cursor-pointer">
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-900 flex items-center gap-2">
+                                                <span>Four Sharing Room</span>
+                                                <span id="badge_status_four" class="bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">🟢 Vacant</span>
+                                            </div>
+                                            <div class="text-xs text-gray-500">4 beds per room &bull; Economical option</div>
+                                        </div>
+                                    </label>
+                                    <div class="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                                        <select id="status_room_four" onchange="handleRoomStatusChange('four', this.value)" class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer">
+                                            <option value="available" selected>🟢 Vacant / Available</option>
+                                            <option value="booked">🔴 Full / Booked</option>
+                                        </select>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-xs text-gray-400 font-bold">₹</span>
+                                            <input type="number" id="rent_room_four" min="500" max="1000000" maxlength="7" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000)" placeholder="Rent (₹)" value="5000" class="w-24 sm:w-28 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-brand font-semibold text-gray-800">
+                                            <span class="text-[10px] text-gray-400">/mo</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
                                 <div>
                                     <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Total Bed Capacity * <span class="text-[10px] text-gray-400 font-normal">(Max 5,000)</span></label>
-                                    <input type="number" id="propTotalBeds" name="total_beds" min="1" max="5000" maxlength="4" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 5000); clearError(this);" value="20" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
+                                    <input type="number" id="propTotalBeds" name="total_beds" min="1" max="5000" maxlength="4" onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 5000); clearError(this);" value="20" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
                                     <div class="error-msg hidden" id="err-propTotalBeds">Total bed capacity must be between 1 and 5,000.</div>
                                 </div>
                                 <div>
@@ -696,44 +711,234 @@
                                     <div class="error-msg hidden" id="err-propAvailableBeds">Available beds cannot exceed total bed capacity.</div>
                                 </div>
                             </div>
+
+                            <!-- Entire Property Fully Booked Toggle -->
+                            <div class="mt-4 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/90 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm flex-shrink-0 shadow-sm">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-xs sm:text-sm text-gray-900">Mark Property as 100% Fully Booked</div>
+                                        <div class="text-[11px] text-gray-600">Sets available beds to 0 &amp; displays "Fully Booked / Sold Out" notice to tenants</div>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="propIsFullyBooked" name="is_fully_booked" value="1" onchange="handleFullyBookedToggle(this)" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                                </label>
+                            </div>             
                         </div>
 
-                        <!-- Dynamic Flat / House Configuration -->
+                        <!-- 2. Dynamic Flat / House Configuration -->
                         <div id="flatConfigs" class="hidden bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
-                            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <i class="fas fa-home text-brand"></i> Apartment / Flat Configuration
-                            </h2>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div class="flex items-center justify-between mb-4">
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">BHK Type</label>
-                                    <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
-                                        <option>1 BHK</option>
-                                        <option selected>2 BHK</option>
-                                        <option>3 BHK</option>
-                                        <option>4+ BHK / Studio</option>
+                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <i class="fas fa-building text-indigo-600"></i> Apartment &amp; Residential Specifications
+                                    </h2>
+                                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Specify configuration, carpet area, furnishings, and floor details.</p>
+                                </div>
+                                <span class="bg-indigo-50 text-indigo-700 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Residential</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                                <div id="bhkTypeField">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">BHK / Space Configuration *</label>
+                                    <select id="flatBhkType" name="bhk_type" onchange="updateLivePreview()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                        <option value="1 RK / Studio">1 RK / Studio</option>
+                                        <option value="1 BHK">1 BHK</option>
+                                        <option value="2 BHK" selected>2 BHK</option>
+                                        <option value="3 BHK">3 BHK</option>
+                                        <option value="4 BHK">4 BHK</option>
+                                        <option value="5+ BHK / Luxury Villa">5+ BHK / Luxury Villa</option>
+                                    </select>
+                                </div>
+                                <div id="furnishingField">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Furnishing Status *</label>
+                                    <select id="flatFurnishing" name="furnishing_status" onchange="updateLivePreview()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                        <option value="Fully Furnished">Fully Furnished</option>
+                                        <option value="Semi Furnished" selected>Semi Furnished</option>
+                                        <option value="Unfurnished">Unfurnished (Raw Shell)</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Furnishing</label>
-                                    <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
-                                        <option>Fully Furnished</option>
-                                        <option selected>Semi Furnished</option>
-                                        <option>Unfurnished</option>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Carpet Area (sq ft) *</label>
+                                    <input type="number" id="flatCarpetArea" name="carpet_area_sqft" min="0" max="500000" onkeydown="preventNegative(event)" oninput="sanitizePositive(this); updateLivePreview();" placeholder="e.g. 1150" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Bathrooms</label>
+                                    <select id="flatBathrooms" name="bathrooms" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                        <option value="1">1 Bathroom</option>
+                                        <option value="2" selected>2 Bathrooms</option>
+                                        <option value="3">3 Bathrooms</option>
+                                        <option value="4">4 Bathrooms</option>
+                                        <option value="5+">5+ Bathrooms</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Carpet Area (sq ft)</label>
-                                    <input type="number" min="0" onkeydown="preventNegative(event)" oninput="sanitizePositive(this)" placeholder="e.g. 1100" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Balconies</label>
+                                    <select id="flatBalconies" name="balconies" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                        <option value="0">0 Balconies</option>
+                                        <option value="1">1 Balcony</option>
+                                        <option value="2" selected>2 Balconies</option>
+                                        <option value="3">3 Balconies</option>
+                                        <option value="3+">3+ Balconies</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Property Floor</label>
+                                    <input type="number" id="flatFloorNo" name="floor_number" min="0" max="150" placeholder="e.g. 4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Total Floors</label>
+                                    <input type="number" id="flatTotalFloors" name="total_floors" min="1" max="150" placeholder="e.g. 14" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Facing Direction</label>
+                                    <select id="flatFacing" name="facing_direction" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                        <option value="North-East" selected>North-East (Vastu Compliant)</option>
+                                        <option value="East">East</option>
+                                        <option value="North">North</option>
+                                        <option value="North-West">North-West</option>
+                                        <option value="West">West</option>
+                                        <option value="South">South</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Society / Project Name (Optional)</label>
+                                    <input type="text" id="flatProjectName" name="project_name" placeholder="e.g. ATS Greens / DLF Phase 5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Amenities Selector -->
+                        <!-- 3. Dynamic Commercial Configuration -->
+                        <div id="commercialConfigs" class="hidden bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <i class="fas fa-briefcase text-amber-500"></i> Commercial Space Specifications
+                                    </h2>
+                                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Details about commercial office, retail shop, or warehouse space.</p>
+                                </div>
+                                <span class="bg-amber-50 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Commercial</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Commercial Space Type *</label>
+                                    <select id="commSpaceType" name="commercial_space_type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                                        <option value="Ready-to-use Office" selected>Ready-to-use Office (Plug &amp; Play)</option>
+                                        <option value="Bare Shell Office">Bare Shell / Raw Office</option>
+                                        <option value="Retail Shop">Retail Shop (Ground Floor)</option>
+                                        <option value="Showroom">Showroom / High Street Space</option>
+                                        <option value="Warehouse / Godown">Warehouse / Industrial Godown</option>
+                                        <option value="Cloud Kitchen / Restaurant">Cloud Kitchen / Restaurant</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Carpet Area (sq ft) *</label>
+                                    <input type="number" id="commCarpetArea" min="0" max="5000000" onkeydown="preventNegative(event)" oninput="sanitizePositive(this); updateLivePreview();" placeholder="e.g. 1500" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Dedicated Washrooms</label>
+                                    <select id="commWashrooms" name="commercial_washrooms" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                                        <option value="Private Washroom" selected>Private Attached Washroom</option>
+                                        <option value="Shared Floor Washroom">Shared Floor Washroom</option>
+                                        <option value="Both Private &amp; Shared">Both Private &amp; Shared</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Floor Level &amp; Total Floors</label>
+                                    <input type="text" id="commFloorDetails" name="commercial_floor" placeholder="e.g. 2nd Floor (of 8 Floors)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Road Frontage / Width (ft)</label>
+                                    <input type="number" id="commRoadFrontage" name="commercial_frontage" min="0" placeholder="e.g. 45 ft main road" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Reserved Car / Bike Parking</label>
+                                    <input type="text" id="commParking" name="commercial_parking" placeholder="e.g. 2 Cars + 5 Bikes" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Dynamic Land / Plot Configuration -->
+                        <div id="plotConfigs" class="hidden bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <i class="fas fa-vector-square text-teal-600"></i> Land &amp; Plot Specifications
+                                    </h2>
+                                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Plot area, dimensions, facing road, and boundary details.</p>
+                                </div>
+                                <span class="bg-teal-50 text-teal-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Land / Plot</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Plot / Land Type *</label>
+                                    <select id="plotLandType" name="plot_land_type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/50">
+                                        <option value="Residential Plot" selected>Residential Plot (Gated Layout)</option>
+                                        <option value="Commercial Land">Commercial Plot / Land</option>
+                                        <option value="Industrial Land">Industrial Land / Factory Plot</option>
+                                        <option value="Agricultural / Farmhouse">Agricultural / Farmhouse Land</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Plot Area (sq. yards / sq ft) *</label>
+                                    <input type="number" id="plotCarpetArea" min="0" max="5000000" onkeydown="preventNegative(event)" oninput="sanitizePositive(this); updateLivePreview();" placeholder="e.g. 200 Sq. Yards" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Plot Dimensions (L x B in ft)</label>
+                                    <input type="text" id="plotDimensions" name="plot_dimensions" placeholder="e.g. 30 x 60 ft" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/50">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Open Sides</label>
+                                    <select id="plotOpenSides" name="plot_open_sides" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/50">
+                                        <option value="1 Side Open">1 Side Open</option>
+                                        <option value="2 Sides Open (Corner Plot)" selected>2 Sides Open (Corner Plot)</option>
+                                        <option value="3 Sides Open">3 Sides Open</option>
+                                        <option value="4 Sides Open (Independent)">4 Sides Open (Independent Island)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Facing Road Width (ft)</label>
+                                    <input type="number" id="plotRoadWidth" name="plot_road_width" min="0" placeholder="e.g. 40 ft road" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Boundary Wall</label>
+                                    <select id="plotBoundaryWall" name="plot_boundary_wall" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/50">
+                                        <option value="Constructed" selected>Boundary Wall Constructed</option>
+                                        <option value="Not Constructed">No Boundary Wall</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Universal Amenities & Facilities Selector -->
                         <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
-                            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                                <i class="fas fa-concierge-bell text-brand"></i> Amenities & Facilities
-                            </h2>
-                            <p class="text-xs sm:text-sm text-gray-500 mb-6">Select all amenities included at your property.</p>
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <i class="fas fa-concierge-bell text-brand"></i> Amenities &amp; Facilities
+                                    </h2>
+                                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Select all amenities and highlights available at your property.</p>
+                                </div>
+                                <span class="bg-emerald-50 text-emerald-700 text-xs font-extrabold px-3 py-1 rounded-full">Included</span>
+                            </div>
 
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="amenitiesGrid">
                                 <label class="amenity-chip cursor-pointer">
@@ -775,7 +980,42 @@
                                     <input type="checkbox" name="amenities[]" value="cctv" checked class="hidden">
                                     <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
                                         <i class="fas fa-shield-alt text-emerald-600"></i>
-                                        <span class="text-xs sm:text-sm font-semibold">CCTV & Security</span>
+                                        <span class="text-xs sm:text-sm font-semibold">CCTV &amp; 24x7 Security</span>
+                                    </div>
+                                </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="lift" checked class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-elevator text-sky-600"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">Lift / Elevator</span>
+                                    </div>
+                                </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="parking" checked class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-square-parking text-blue-600"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">Vehicle Parking (4W)</span>
+                                    </div>
+                                </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="parking-2-wheeler" class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-motorcycle text-indigo-600"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">2-Wheeler Parking</span>
+                                    </div>
+                                </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="almirah" class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-door-closed text-amber-600"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">Almirah / Wardrobe</span>
+                                    </div>
+                                </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="study-table" class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-chair text-purple-600"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">Study Table &amp; Chair</span>
                                     </div>
                                 </label>
                                 <label class="amenity-chip cursor-pointer">
@@ -800,10 +1040,17 @@
                                     </div>
                                 </label>
                                 <label class="amenity-chip cursor-pointer">
-                                    <input type="checkbox" name="amenities[]" value="parking" checked class="hidden">
+                                    <input type="checkbox" name="amenities[]" value="gym" class="hidden">
                                     <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
-                                        <i class="fas fa-square-parking text-blue-600"></i>
-                                        <span class="text-xs sm:text-sm font-semibold">Parking (Bike/Car)</span>
+                                        <i class="fas fa-dumbbell text-rose-500"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">Gym &amp; Fitness</span>
+                                    </div>
+                                </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="swimming-pool" class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-person-swimming text-cyan-600"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">Swimming Pool</span>
                                     </div>
                                 </label>
                                 <label class="amenity-chip cursor-pointer">
@@ -811,6 +1058,13 @@
                                     <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
                                         <i class="fas fa-temperature-low text-cyan-600"></i>
                                         <span class="text-xs sm:text-sm font-semibold">Fridge / Refrigerator</span>
+                                    </div>
+                                </label>
+                                <label class="amenity-chip cursor-pointer">
+                                    <input type="checkbox" name="amenities[]" value="ev-charging" class="hidden">
+                                    <div class="flex items-center gap-3 p-3.5 border-2 border-gray-200 rounded-2xl transition hover:border-brand/40">
+                                        <i class="fas fa-charging-station text-emerald-500"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">EV Charging Station</span>
                                     </div>
                                 </label>
                             </div>
@@ -821,7 +1075,7 @@
                                 <i class="fas fa-arrow-left text-xs mr-1"></i> Back
                             </button>
                             <button type="button" onclick="goToStep(3)" class="bg-gradient-to-r from-brand to-brand-dark text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition flex items-center gap-2">
-                                Continue to Pricing & Photos <i class="fas fa-arrow-right text-xs"></i>
+                                Continue to Pricing &amp; Photos <i class="fas fa-arrow-right text-xs"></i>
                             </button>
                         </div>
                     </div>
@@ -845,42 +1099,109 @@
                             </div>
                         </div>
 
-                        <!-- Pricing Details -->
+                        <!-- Pricing & Financials (Rent vs Sell Dynamic) -->
                         <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
-                            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                <i class="fas fa-rupee-sign text-brand"></i> Pricing & Deposits
-                            </h2>
+                            
+                            <!-- RENT PRICING CONTAINER -->
+                            <div id="rentPricingContainer" class="space-y-4">
+                                <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-rupee-sign text-brand"></i> Rental Pricing & Deposits
+                                </h2>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Monthly Starting Rent (₹) * <span class="text-[10px] text-brand font-bold">(₹500 - ₹10,00,000)</span></label>
-                                    <input type="number" id="propRent" name="monthly_rent" required min="500" max="1000000" maxlength="7" placeholder="e.g. 6500" 
-                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000); updateLivePreview(); clearError(this);" 
-                                           class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
-                                    <div class="error-msg hidden" id="err-propRent">Monthly starting rent must be between ₹500 and ₹10,00,000.</div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Monthly Starting Rent (₹) * <span class="text-[10px] text-brand font-bold">(₹500 - ₹10,00,000)</span></label>
+                                        <input type="number" id="propRent" name="monthly_rent" min="500" max="1000000" maxlength="7" placeholder="e.g. 6500" 
+                                               onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 1000000); updateLivePreview(); clearError(this);" 
+                                               class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                        <div class="error-msg hidden" id="err-propRent">Monthly starting rent must be between ₹500 and ₹10,00,000.</div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Security Deposit (₹) <span class="text-[10px] text-gray-400 font-normal">(Max ₹20,00,000)</span></label>
+                                        <input type="number" id="propDeposit" name="security_deposit" min="0" max="2000000" maxlength="7" placeholder="e.g. 10000" 
+                                               onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 2000000); clearError(this);" 
+                                               class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                        <div class="error-msg hidden" id="err-propDeposit">Security deposit cannot exceed ₹20,00,000.</div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Maintenance (₹ / mo) <span class="text-[10px] text-gray-400 font-normal">(Max ₹1,00,000)</span></label>
+                                        <input type="number" id="propMaintenance" name="maintenance_charges" min="0" max="100000" maxlength="6" placeholder="e.g. 0" 
+                                               onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 100000); clearError(this);" 
+                                               class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Notice Period</label>
+                                        <select name="notice_period_days" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
+                                            <option value="0">No Notice Period</option>
+                                            <option value="15">15 Days</option>
+                                            <option value="30" selected>30 Days (Standard)</option>
+                                            <option value="60">60 Days</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Security Deposit (₹) <span class="text-[10px] text-gray-400 font-normal">(Max ₹20,00,000)</span></label>
-                                    <input type="number" id="propDeposit" name="security_deposit" min="0" max="2000000" maxlength="7" placeholder="e.g. 500" 
-                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 2000000); clearError(this);" 
-                                           class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
-                                    <div class="error-msg hidden" id="err-propDeposit">Security deposit cannot exceed ₹20,00,000.</div>
+                            </div>
+
+                            <!-- SALE PRICING CONTAINER (Shown when Sell is chosen) -->
+                            <div id="salePricingContainer" class="hidden space-y-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <i class="fas fa-tags text-amber-500"></i> Selling Price & Ownership Details
+                                    </h2>
+                                    <span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">
+                                        Property For Sale
+                                    </span>
                                 </div>
-                                <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Maintenance (₹ / mo) <span class="text-[10px] text-gray-400 font-normal">(Max ₹1,00,000)</span></label>
-                                    <input type="number" id="propMaintenance" name="maintenance_charges" min="0" max="100000" maxlength="6" placeholder="e.g. 0" 
-                                           onkeydown="preventNegative(event)" oninput="sanitizePositive(this, 100000); clearError(this);" 
-                                           class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
-                                    <div class="error-msg hidden" id="err-propMaintenance">Maintenance charges cannot exceed ₹1,00,000 / month.</div>
-                                </div>
-                                <div>
-                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Notice Period</label>
-                                    <select name="notice_period_days" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50">
-                                        <option value="0">No Notice Period</option>
-                                        <option value="15">15 Days</option>
-                                        <option value="30" selected>30 Days (Standard)</option>
-                                        <option value="60">60 Days</option>
-                                    </select>
+                                <p class="text-xs text-gray-500 mb-4">Set your expected selling valuation and property legal terms.</p>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Expected Total Selling Price (₹) *</label>
+                                        <div class="relative">
+                                            <span class="absolute left-4 top-3.5 text-base font-bold text-gray-400">₹</span>
+                                            <input type="number" id="propExpectedPrice" name="expected_price" min="10000" max="1000000000" placeholder="e.g. 4500000 (45 Lakh)" 
+                                                   onkeydown="preventNegative(event)" oninput="handleSalePriceChange(this); updateLivePreview(); clearError(this);" 
+                                                   class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-base font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:bg-white transition">
+                                        </div>
+                                        <!-- Live Indian Words Converter (e.g. ₹ 45.00 Lakh / ₹ 1.25 Crore) -->
+                                        <div id="salePriceInWords" class="text-xs font-bold text-amber-700 mt-1.5 flex items-center gap-1.5">
+                                            <i class="fas fa-calculator text-[10px]"></i> <span id="priceWordsText">Enter price (e.g. ₹45 Lakh, ₹1.5 Crore)</span>
+                                        </div>
+                                        <div class="error-msg hidden" id="err-propExpectedPrice">Please enter the expected selling price.</div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Booking / Token Amount (₹)</label>
+                                        <input type="number" id="propTokenAmount" name="booking_token_amount" min="0" max="100000000" placeholder="e.g. 100000" 
+                                               onkeydown="preventNegative(event)" oninput="sanitizePositive(this); clearError(this);" 
+                                               class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:bg-white transition">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Ownership Type</label>
+                                        <select id="propOwnership" name="ownership_type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                                            <option value="Freehold" selected>Freehold (Clear Title)</option>
+                                            <option value="Leasehold">Leasehold</option>
+                                            <option value="Cooperative Society">Co-operative Society</option>
+                                            <option value="Power of Attorney">Power of Attorney (POA)</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Possession Status</label>
+                                        <select id="propPossession" name="possession_status" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                                            <option value="Ready to Move" selected>Ready to Move (Immediate)</option>
+                                            <option value="Under Construction (Within 3 Months)">Under Construction (Within 3 Months)</option>
+                                            <option value="Under Construction (Within 6 Months)">Under Construction (Within 6 Months)</option>
+                                            <option value="Under Construction (1-2 Years)">Under Construction (1-2 Years)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="flex items-center gap-3 pt-6 sm:pt-7">
+                                        <label class="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                                            <input type="checkbox" id="propNegotiable" name="price_negotiable" value="1" class="w-4 h-4 text-amber-600 rounded border-gray-300 focus:ring-amber-500">
+                                            <span class="text-xs sm:text-sm font-bold text-gray-800">Price is Negotiable</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1612,6 +1933,17 @@
         initHeroBannerTimer();
         renderPhotoPreviews();
         initPropertyMap();
+
+        const defaultSlug = '{{ $defaultTypeSlug ?? "pg-hostel" }}';
+        if (defaultSlug.includes('commercial')) {
+            selectPropertyCategory('commercial');
+        } else if (defaultSlug.includes('plot')) {
+            selectPropertyCategory('land-plot');
+        } else {
+            selectPropertyCategory('residential');
+        }
+        renderSubtypeCards(defaultSlug);
+        updatePricingVisibility();
         updateLivePreview();
         checkForEditMode();
     });
@@ -2447,8 +2779,6 @@
         if (alertBox) alertBox.classList.add('hidden');
         return { passed: true };
     }
-
-    // Step Validation
     function validateStep(step) {
         let isValid = true;
 
@@ -2458,19 +2788,19 @@
             const area = document.getElementById('propArea');
             const address = document.getElementById('propAddress');
 
-            if (!name.value.trim() || name.value.trim().length < 3) {
+            if (!name || !name.value.trim() || name.value.trim().length < 3) {
                 showError('propName', 'Please enter a valid property title (at least 3 characters).');
                 isValid = false;
             }
-            if (!city.value.trim() || city.value.trim().length < 2) {
+            if (!city || !city.value.trim() || city.value.trim().length < 2) {
                 showError('propCity', 'Please enter a valid city name.');
                 isValid = false;
             }
-            if (!area.value.trim()) {
+            if (!area || !area.value.trim()) {
                 showError('propArea', 'Please specify area or sector.');
                 isValid = false;
             }
-            if (!address.value.trim() || address.value.trim().length < 5) {
+            if (!address || !address.value.trim() || address.value.trim().length < 5) {
                 showError('propAddress', 'Please enter a complete address.');
                 isValid = false;
             }
@@ -2483,19 +2813,25 @@
         }
 
         if (step === 2) {
-            const totalBeds = document.getElementById('propTotalBeds');
-            const availBeds = document.getElementById('propAvailableBeds');
-            if (totalBeds) {
-                const tbVal = Number(totalBeds.value);
-                if (isNaN(tbVal) || tbVal < 1 || tbVal > 5000) {
-                    showError('propTotalBeds', 'Total bed capacity must be between 1 and 5,000.');
-                    isValid = false;
-                }
-                if (availBeds) {
-                    const abVal = Number(availBeds.value);
-                    if (abVal > tbVal) {
-                        showError('propAvailableBeds', 'Available beds cannot exceed total bed capacity (' + tbVal + ').');
+            const typeRadio = document.querySelector('input[name="listing_type"]:checked');
+            const typeVal = typeRadio ? typeRadio.value : 'pg-hostel';
+            const isPgType = (typeVal === 'pg-hostel' || typeVal === 'co-living');
+
+            if (isPgType && currentAdType === 'rent') {
+                const totalBeds = document.getElementById('propTotalBeds');
+                const availBeds = document.getElementById('propAvailableBeds');
+                if (totalBeds) {
+                    const tbVal = Number(totalBeds.value);
+                    if (isNaN(tbVal) || tbVal < 1 || tbVal > 5000) {
+                        showError('propTotalBeds', 'Total bed capacity must be between 1 and 5,000.');
                         isValid = false;
+                    }
+                    if (availBeds) {
+                        const abVal = Number(availBeds.value);
+                        if (abVal > tbVal) {
+                            showError('propAvailableBeds', 'Available beds cannot exceed total bed capacity (' + tbVal + ').');
+                            isValid = false;
+                        }
                     }
                 }
             }
@@ -2503,33 +2839,41 @@
 
         if (step === 3) {
             const rent = document.getElementById('propRent');
+            const expPrice = document.getElementById('propExpectedPrice');
             const deposit = document.getElementById('propDeposit');
             const maintenance = document.getElementById('propMaintenance');
             const desc = document.getElementById('propDescription');
             const rules = document.getElementById('propRules');
 
-            if (!rent.value || Number(rent.value) < 500 || Number(rent.value) > 1000000) {
-                showError('propRent', 'Monthly starting rent must be between ₹500 and ₹10,00,000.');
-                isValid = false;
+            if (currentAdType === 'sale') {
+                if (!expPrice || !expPrice.value || Number(expPrice.value) < 1000) {
+                    showError('propExpectedPrice', 'Please enter a valid expected selling price (min ₹1,000).');
+                    isValid = false;
+                }
+            } else {
+                if (!rent || !rent.value || Number(rent.value) < 100 || Number(rent.value) > 1000000) {
+                    showError('propRent', 'Monthly starting rent must be between ₹500 and ₹10,00,000.');
+                    isValid = false;
+                }
+
+                if (deposit && deposit.value !== '' && Number(deposit.value) > 2000000) {
+                    showError('propDeposit', 'Security deposit cannot exceed ₹20,00,000.');
+                    isValid = false;
+                }
+
+                if (maintenance && maintenance.value !== '' && Number(maintenance.value) > 100000) {
+                    showError('propMaintenance', 'Maintenance charges cannot exceed ₹1,00,000 / month.');
+                    isValid = false;
+                }
             }
 
-            if (deposit && deposit.value !== '' && Number(deposit.value) > 2000000) {
-                showError('propDeposit', 'Security deposit cannot exceed ₹20,00,000.');
-                isValid = false;
-            }
-
-            if (maintenance && maintenance.value !== '' && Number(maintenance.value) > 100000) {
-                showError('propMaintenance', 'Maintenance charges cannot exceed ₹1,00,000 / month.');
-                isValid = false;
-            }
-
-            if (!desc.value.trim() || desc.value.trim().length < 20) {
+            if (!desc || !desc.value.trim() || desc.value.trim().length < 20) {
                 showError('propDescription', 'Please enter a detailed description (at least 20 characters).');
                 isValid = false;
             }
 
-            if (!rules.value.trim() || rules.value.trim().length < 5) {
-                showError('propRules', 'Please specify the house rules / tenant guidelines.');
+            if (!rules || !rules.value.trim() || rules.value.trim().length < 5) {
+                showError('propRules', 'Please specify the house rules / property guidelines.');
                 isValid = false;
             }
 
@@ -2541,6 +2885,254 @@
         }
 
         return isValid;
+    }
+
+    let currentCategory = 'residential';
+    let currentAdType = 'rent';
+
+    function selectPropertyCategory(cat, initialSlug = null) {
+        currentCategory = cat;
+        const propCatInput = document.getElementById('propCategory');
+        if (propCatInput) propCatInput.value = cat;
+
+        document.querySelectorAll('.category-tab-btn').forEach(btn => {
+            btn.className = 'category-tab-btn py-3 px-2 sm:px-4 rounded-xl font-bold text-xs sm:text-sm transition-all text-gray-500 hover:text-gray-900 flex items-center justify-center gap-1.5';
+        });
+        const activeBtn = document.getElementById(`catBtn_${cat}`);
+        if (activeBtn) {
+            activeBtn.className = 'category-tab-btn py-3 px-2 sm:px-4 rounded-xl font-extrabold text-xs sm:text-sm transition-all shadow-xs bg-white text-gray-900 border border-gray-200/80 flex items-center justify-center gap-1.5';
+        }
+
+        renderSubtypeCards(initialSlug);
+        updatePricingVisibility();
+        updateLivePreview();
+    }
+
+    function selectAdType(type, initialSlug = null) {
+        currentAdType = type;
+        const propAdTypeInput = document.getElementById('propAdType');
+        if (propAdTypeInput) propAdTypeInput.value = type;
+
+        const rentBtn = document.getElementById('adTypeBtn_rent');
+        const saleBtn = document.getElementById('adTypeBtn_sale');
+
+        if (type === 'rent') {
+            if (rentBtn) rentBtn.className = 'ad-type-btn px-6 sm:px-8 py-3 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center gap-2 bg-brand text-white shadow-md shadow-brand/20 border-2 border-brand';
+            if (saleBtn) saleBtn.className = 'ad-type-btn px-6 sm:px-8 py-3 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200';
+        } else {
+            if (rentBtn) rentBtn.className = 'ad-type-btn px-6 sm:px-8 py-3 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200';
+            if (saleBtn) saleBtn.className = 'ad-type-btn px-6 sm:px-8 py-3 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center gap-2 bg-amber-500 text-white shadow-md shadow-amber-500/20 border-2 border-amber-500';
+        }
+
+        renderSubtypeCards(initialSlug);
+        updatePricingVisibility();
+        updateLivePreview();
+    }
+
+    function updatePricingVisibility() {
+        const rentBox = document.getElementById('rentPricingContainer');
+        const saleBox = document.getElementById('salePricingContainer');
+
+        if (currentAdType === 'sale') {
+            if (rentBox) rentBox.classList.add('hidden');
+            if (saleBox) saleBox.classList.remove('hidden');
+        } else {
+            if (rentBox) rentBox.classList.remove('hidden');
+            if (saleBox) saleBox.classList.add('hidden');
+        }
+    }
+
+    function formatIndianCurrencyWords(num) {
+        if (!num || isNaN(num) || num <= 0) return 'Enter price';
+        num = Number(num);
+        if (num >= 10000000) {
+            const cr = (num / 10000000).toFixed(2);
+            return `₹ ${cr.replace(/\.00$/, '')} Crore`;
+        } else if (num >= 100000) {
+            const lakh = (num / 100000).toFixed(2);
+            return `₹ ${lakh.replace(/\.00$/, '')} Lakh`;
+        } else if (num >= 1000) {
+            const k = (num / 1000).toFixed(1);
+            return `₹ ${k.replace(/\.0$/, '')} Thousand`;
+        }
+        return `₹ ${num.toLocaleString('en-IN')}`;
+    }
+
+    function handleSalePriceChange(input) {
+        sanitizePositive(input, 1000000000);
+        const val = Number(input.value);
+        const wordsEl = document.getElementById('priceWordsText');
+        if (wordsEl) {
+            wordsEl.innerText = formatIndianCurrencyWords(val);
+        }
+    }
+
+    function handleTypeChange(type) {
+        document.querySelectorAll('.property-type-card').forEach(card => {
+            card.classList.remove('active-pg', 'active-flat', 'active-commercial');
+        });
+
+        const checkedRadio = document.querySelector(`input[name="listing_type"][value="${type}"]`);
+        if (checkedRadio) {
+            checkedRadio.checked = true;
+            const card = checkedRadio.closest('label')?.querySelector('.property-type-card');
+            if (card) {
+                if (type === 'pg-hostel' || type === 'co-living') {
+                    card.classList.add('active-pg');
+                } else if (type.includes('commercial')) {
+                    card.classList.add('active-commercial');
+                } else {
+                    card.classList.add('active-flat');
+                }
+            }
+        }
+
+        const pgGender = document.getElementById('pgGenderField');
+        const pgRoomConfigs = document.getElementById('pgRoomConfigs');
+        const flatConfigs = document.getElementById('flatConfigs');
+        const commConfigs = document.getElementById('commercialConfigs');
+        const plotConfigs = document.getElementById('plotConfigs');
+
+        // Hide ALL Step 2 config boxes first
+        if (pgRoomConfigs) pgRoomConfigs.classList.add('hidden');
+        if (flatConfigs) flatConfigs.classList.add('hidden');
+        if (commConfigs) commConfigs.classList.add('hidden');
+        if (plotConfigs) plotConfigs.classList.add('hidden');
+
+        // Show ONLY the single matching active config box
+        if (type === 'pg-hostel' || type === 'co-living') {
+            if (pgGender) pgGender.classList.remove('hidden');
+            if (pgRoomConfigs) pgRoomConfigs.classList.remove('hidden');
+        } else if (type.includes('commercial') || type.includes('office') || type.includes('shop') || type.includes('warehouse')) {
+            if (pgGender) pgGender.classList.add('hidden');
+            if (commConfigs) commConfigs.classList.remove('hidden');
+        } else if (type.includes('plot') || type.includes('land')) {
+            if (pgGender) pgGender.classList.add('hidden');
+            if (plotConfigs) plotConfigs.classList.remove('hidden');
+        } else {
+            // Flat, House, Villa, Builder floor, Apartment
+            if (pgGender) pgGender.classList.add('hidden');
+            if (flatConfigs) flatConfigs.classList.remove('hidden');
+        }
+
+        updateLivePreview();
+    }
+
+    function renderSubtypeCards(initialSlug = null) {
+        const container = document.getElementById('listingTypeContainer');
+        if (!container) return;
+
+        let cardsHtml = '';
+        if (currentCategory === 'residential') {
+            if (currentAdType === 'rent') {
+                const sel = initialSlug || 'pg-hostel';
+                cardsHtml = `
+                    <label class="cursor-pointer">
+                        <input type="radio" name="listing_type" value="pg-hostel" class="hidden" ${sel === 'pg-hostel' ? 'checked' : ''} onchange="handleTypeChange('pg-hostel')">
+                        <div id="card-type-pg-hostel" class="property-type-card ${sel === 'pg-hostel' ? 'active-pg' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-brand"><i class="fas fa-hotel"></i></div>
+                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">PG &amp; Hostels</p>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="listing_type" value="flat-apartment" class="hidden" ${sel === 'flat-apartment' ? 'checked' : ''} onchange="handleTypeChange('flat-apartment')">
+                        <div id="card-type-flat-apartment" class="property-type-card ${sel === 'flat-apartment' ? 'active-flat' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-indigo-500"><i class="fas fa-building"></i></div>
+                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Flats &amp; Apartments</p>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="listing_type" value="house-villa" class="hidden" ${sel === 'house-villa' ? 'checked' : ''} onchange="handleTypeChange('house-villa')">
+                        <div id="card-type-house-villa" class="property-type-card ${sel === 'house-villa' ? 'active-flat' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-emerald-600"><i class="fas fa-house-chimney"></i></div>
+                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">House / Villa</p>
+                        </div>
+                    </label>
+                `;
+            } else {
+                const sel = initialSlug || 'flat-apartment';
+                cardsHtml = `
+                    <label class="cursor-pointer">
+                        <input type="radio" name="listing_type" value="flat-apartment" class="hidden" ${sel === 'flat-apartment' ? 'checked' : ''} onchange="handleTypeChange('flat-apartment')">
+                        <div id="card-type-flat-apartment" class="property-type-card ${sel === 'flat-apartment' ? 'active-flat' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-indigo-500"><i class="fas fa-building"></i></div>
+                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Flats &amp; Apartments</p>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="listing_type" value="house-villa" class="hidden" ${sel === 'house-villa' ? 'checked' : ''} onchange="handleTypeChange('house-villa')">
+                        <div id="card-type-house-villa" class="property-type-card ${sel === 'house-villa' ? 'active-flat' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-emerald-600"><i class="fas fa-house-chimney"></i></div>
+                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">House / Villa</p>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="listing_type" value="builder-floor" class="hidden" ${sel === 'builder-floor' ? 'checked' : ''} onchange="handleTypeChange('builder-floor')">
+                        <div id="card-type-builder-floor" class="property-type-card ${sel === 'builder-floor' ? 'active-flat' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                            <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-purple-600"><i class="fas fa-layer-group"></i></div>
+                            <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Builder Floor</p>
+                        </div>
+                    </label>
+                `;
+            }
+        } else if (currentCategory === 'commercial') {
+            const sel = initialSlug || 'commercial-office';
+            cardsHtml = `
+                <label class="cursor-pointer">
+                    <input type="radio" name="listing_type" value="commercial-office" class="hidden" ${sel === 'commercial-office' ? 'checked' : ''} onchange="handleTypeChange('commercial-office')">
+                    <div id="card-type-commercial-office" class="property-type-card ${sel === 'commercial-office' ? 'active-commercial' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-amber-500"><i class="fas fa-briefcase"></i></div>
+                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Office Space</p>
+                    </div>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="listing_type" value="commercial-shop" class="hidden" ${sel === 'commercial-shop' ? 'checked' : ''} onchange="handleTypeChange('commercial-shop')">
+                    <div id="card-type-commercial-shop" class="property-type-card ${sel === 'commercial-shop' ? 'active-commercial' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-blue-500"><i class="fas fa-store"></i></div>
+                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Retail Shop / Showroom</p>
+                    </div>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="listing_type" value="commercial-warehouse" class="hidden" ${sel === 'commercial-warehouse' ? 'checked' : ''} onchange="handleTypeChange('commercial-warehouse')">
+                    <div id="card-type-commercial-warehouse" class="property-type-card ${sel === 'commercial-warehouse' ? 'active-commercial' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-slate-700"><i class="fas fa-warehouse"></i></div>
+                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Warehouse / Godown</p>
+                    </div>
+                </label>
+            `;
+        } else { // Land/Plot
+            const sel = initialSlug || 'plot-residential';
+            cardsHtml = `
+                <label class="cursor-pointer">
+                    <input type="radio" name="listing_type" value="plot-residential" class="hidden" ${sel === 'plot-residential' ? 'checked' : ''} onchange="handleTypeChange('plot-residential')">
+                    <div id="card-type-plot-residential" class="property-type-card ${sel === 'plot-residential' ? 'active-flat' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-indigo-500"><i class="fas fa-map"></i></div>
+                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Residential Plot</p>
+                    </div>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="listing_type" value="plot-commercial" class="hidden" ${sel === 'plot-commercial' ? 'checked' : ''} onchange="handleTypeChange('plot-commercial')">
+                    <div id="card-type-plot-commercial" class="property-type-card ${sel === 'plot-commercial' ? 'active-flat' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-amber-500"><i class="fas fa-chart-area"></i></div>
+                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Commercial Land</p>
+                    </div>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="listing_type" value="plot-agricultural" class="hidden" ${sel === 'plot-agricultural' ? 'checked' : ''} onchange="handleTypeChange('plot-agricultural')">
+                    <div id="card-type-plot-agricultural" class="property-type-card ${sel === 'plot-agricultural' ? 'active-flat' : ''} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer flex flex-col items-center justify-center group h-full">
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center mb-1 text-2xl text-emerald-600"><i class="fas fa-seedling"></i></div>
+                        <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Agricultural / Farm Land</p>
+                    </div>
+                </label>
+            `;
+        }
+
+        container.innerHTML = cardsHtml;
+        const checkedRadio = container.querySelector('input[type="radio"]:checked') || container.querySelector('input[type="radio"]');
+        if (checkedRadio) {
+            checkedRadio.checked = true;
+            handleTypeChange(checkedRadio.value);
+        }
     }
 
     function goToStep(step) {
@@ -2566,60 +3158,86 @@
 
         // Update Stepper fill
         const fillPercent = ((currentStep - 1) / 3) * 100;
-        document.getElementById('progress-bar-fill').style.width = `${Math.max(10, fillPercent)}%`;
+        const fillEl = document.getElementById('progress-bar-fill');
+        if (fillEl) fillEl.style.width = `${Math.max(10, fillPercent)}%`;
 
         // Update Stepper Nodes
         for (let i = 1; i <= 4; i++) {
             const node = document.getElementById(`step-node-${i}`);
-            if (i === currentStep) {
-                node.className = 'w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-brand text-white shadow-md transition-all';
-                node.innerHTML = i;
-            } else if (i < currentStep) {
-                node.className = 'w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-emerald-600 text-white transition-all';
-                node.innerHTML = '<i class="fas fa-check"></i>';
-            } else {
-                node.className = 'w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-600 transition-all';
-                node.innerHTML = i;
+            if (node) {
+                if (i === currentStep) {
+                    node.className = 'w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-brand text-white shadow-md transition-all';
+                    node.innerHTML = i;
+                } else if (i < currentStep) {
+                    node.className = 'w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-emerald-600 text-white transition-all';
+                    node.innerHTML = '<i class="fas fa-check"></i>';
+                } else {
+                    node.className = 'w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-600 transition-all';
+                    node.innerHTML = i;
+                }
             }
         }
 
         window.scrollTo({ top: 100, behavior: 'smooth' });
     }
 
-    function handleTypeChange(type) {
-        document.querySelectorAll('.property-type-card').forEach(card => {
-            card.classList.remove('active-pg', 'active-flat', 'active-commercial');
-        });
-        const checkedRadio = document.querySelector(`input[name="listing_type"][value="${type}"]`);
-        if (checkedRadio) {
-            checkedRadio.checked = true;
-            const card = checkedRadio.closest('label')?.querySelector('.property-type-card');
+    function handleRoomStatusChange(type, status) {
+        const badge = document.getElementById(`badge_status_${type}`);
+        const select = document.getElementById(`status_room_${type}`);
+        const card = document.getElementById(`card_room_${type}`);
+        if (status === 'booked') {
+            if (badge) {
+                badge.innerText = '🔴 Full / Booked';
+                badge.className = 'bg-rose-50 text-rose-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-rose-200';
+            }
+            if (select) {
+                select.className = 'bg-rose-50 text-rose-800 border border-rose-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-rose-400 cursor-pointer';
+            }
             if (card) {
-                if (type === 'pg-hostel' || type === 'co-living') {
-                    card.classList.add('active-pg');
-                } else if (type === 'flat-apartment') {
-                    card.classList.add('active-flat');
-                } else if (type === 'commercial') {
-                    card.classList.add('active-commercial');
-                }
+                card.classList.add('bg-rose-50/20', 'border-rose-200');
+            }
+        } else {
+            if (badge) {
+                badge.innerText = '🟢 Vacant';
+                badge.className = 'bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200';
+            }
+            if (select) {
+                select.className = 'bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer';
+            }
+            if (card) {
+                card.classList.remove('bg-rose-50/20', 'border-rose-200');
             }
         }
+    }
 
-        const pgGender = document.getElementById('pgGenderField');
-        const pgRoomConfigs = document.getElementById('pgRoomConfigs');
-        const flatConfigs = document.getElementById('flatConfigs');
-
-        if (type === 'pg-hostel' || type === 'co-living') {
-            if (pgGender) pgGender.classList.remove('hidden');
-            if (pgRoomConfigs) pgRoomConfigs.classList.remove('hidden');
-            if (flatConfigs) flatConfigs.classList.add('hidden');
+    function toggleRoomCardState(type) {
+        const chk = document.getElementById(`chk_room_${type}`);
+        const select = document.getElementById(`status_room_${type}`);
+        const rent = document.getElementById(`rent_room_${type}`);
+        const card = document.getElementById(`card_room_${type}`);
+        if (!chk || !chk.checked) {
+            if (select) select.disabled = true;
+            if (rent) rent.disabled = true;
+            if (card) card.classList.add('opacity-50');
         } else {
-            if (pgGender) pgGender.classList.add('hidden');
-            if (pgRoomConfigs) pgRoomConfigs.classList.add('hidden');
-            if (flatConfigs) flatConfigs.classList.remove('hidden');
+            if (select) select.disabled = false;
+            if (rent) rent.disabled = false;
+            if (card) card.classList.remove('opacity-50');
         }
+    }
 
-        updateLivePreview();
+    function handleFullyBookedToggle(el) {
+        const availBeds = document.getElementById('propAvailableBeds');
+        if (el.checked) {
+            if (availBeds) {
+                availBeds.dataset.prevVal = availBeds.value || '6';
+                availBeds.value = '0';
+            }
+        } else {
+            if (availBeds && availBeds.value === '0') {
+                availBeds.value = availBeds.dataset.prevVal || '6';
+            }
+        }
     }
 
     function updateLivePreview() {
@@ -2627,6 +3245,7 @@
         const city = document.getElementById('propCity')?.value.trim() || '****';
         const area = document.getElementById('propArea')?.value.trim() || '****';
         const rent = document.getElementById('propRent')?.value.trim() || '*,***';
+        const expPrice = document.getElementById('propExpectedPrice')?.value.trim() || '';
         
         const typeRadio = document.querySelector('input[name="listing_type"]:checked');
         const typeVal = typeRadio ? typeRadio.value : 'pg-hostel';
@@ -2640,21 +3259,42 @@
         const previewLocation = document.getElementById('previewLocation');
         if (previewLocation) previewLocation.innerHTML = `<i class="fas fa-map-marker-alt text-brand"></i> ${area}, ${city}`;
 
+        const previewPriceLabel = document.getElementById('previewPriceLabel');
+        const previewRentPeriod = document.getElementById('previewRentPeriod');
         const previewRent = document.getElementById('previewRent');
-        if (previewRent) previewRent.innerText = `₹${Number(rent >= 500 ? rent : (rent > 0 ? rent : 0)).toLocaleString('en-IN')}`;
+
+        if (previewRent) {
+            if (currentAdType === 'sale') {
+                if (previewPriceLabel) previewPriceLabel.innerText = 'Expected Price';
+                if (previewRentPeriod) previewRentPeriod.style.display = 'none';
+                previewRent.innerText = expPrice ? formatIndianCurrencyWords(expPrice) : '₹ Total Valuation';
+                previewRent.className = 'text-base font-extrabold text-amber-600';
+            } else {
+                if (previewPriceLabel) previewPriceLabel.innerText = 'Starting From';
+                if (previewRentPeriod) previewRentPeriod.style.display = '';
+                previewRent.innerText = `₹${Number(rent >= 500 ? rent : (rent > 0 ? rent : 0)).toLocaleString('en-IN')}`;
+                previewRent.className = 'text-base font-extrabold text-brand';
+            }
+        }
 
         const typeBadge = document.getElementById('previewTypeBadge');
         if (typeBadge) {
-            if (typeVal === 'pg-hostel') typeBadge.innerText = 'PG / Hostel';
-            else if (typeVal === 'co-living') typeBadge.innerText = 'Co-Living';
-            else if (typeVal === 'flat-apartment') typeBadge.innerText = 'Flat / House';
-            else typeBadge.innerText = 'Commercial';
+            if (currentAdType === 'sale') {
+                typeBadge.innerText = 'For Sale';
+                typeBadge.className = 'absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider';
+            } else {
+                typeBadge.className = 'absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg';
+                if (typeVal === 'pg-hostel') typeBadge.innerText = 'PG / Hostel';
+                else if (typeVal === 'co-living') typeBadge.innerText = 'Co-Living';
+                else if (typeVal.includes('flat') || typeVal.includes('house')) typeBadge.innerText = 'Flat / House';
+                else typeBadge.innerText = 'Commercial';
+            }
         }
 
-        // Show Gender Preference in Live Listing Preview ONLY when pg-hostel (or co-living) is selected
+        // Show Gender Preference in Live Listing Preview ONLY when pg-hostel (or co-living) is selected and rent
         const genderBadge = document.getElementById('previewGenderBadge');
         if (genderBadge) {
-            if (typeVal === 'pg-hostel' || typeVal === 'co-living') {
+            if ((typeVal === 'pg-hostel' || typeVal === 'co-living') && currentAdType === 'rent') {
                 genderBadge.classList.remove('hidden');
                 genderBadge.style.display = '';
                 if (genderVal === 'boys') {
@@ -2843,6 +3483,25 @@
         const titleEl = document.getElementById('editingPropTitle');
         if (titleEl) titleEl.innerText = p.name;
 
+        // 1. Accurately resolve Category & Ad Type
+        const listingType = (p.listing_type || '').toLowerCase();
+        let category = p.property_category;
+        if (!category) {
+            if (listingType.includes('commercial') || listingType.includes('office') || listingType.includes('shop') || listingType.includes('warehouse')) {
+                category = 'commercial';
+            } else if (listingType.includes('plot') || listingType.includes('land')) {
+                category = 'land-plot';
+            } else {
+                category = 'residential';
+            }
+        }
+
+        const adType = p.ad_type || (p.is_sale ? 'sale' : 'rent');
+
+        // Step 1: Set Ad Type and Category (passes listingType to preserve active subtype card)
+        selectAdType(adType, listingType);
+        selectPropertyCategory(category, listingType);
+
         // Step 1: Basic Info & Location
         const nameInput = document.getElementById('propName');
         const cityInput = document.getElementById('propCity');
@@ -2870,22 +3529,36 @@
             propertyMarker.bindPopup(`<strong>${p.name}</strong><br>${p.address || ''}`).openPopup();
         }
 
-        // Step 2: Listing Type & Gender
-        if (p.listing_type) {
-            const radio = document.querySelector(`input[name="listing_type"][value="${p.listing_type}"]`);
-            if (radio) {
-                radio.checked = true;
-                handleTypeChange(p.listing_type);
-            }
-        }
+        // Explicitly trigger Type Change to show the exact Step 2 configuration pane and hide PG rooms for flat/commercial/plot
+        handleTypeChange(listingType);
 
         if (p.gender_preference) {
             const gRadio = document.querySelector(`input[name="gender_preference"][value="${p.gender_preference}"]`);
             if (gRadio) gRadio.checked = true;
         }
 
-        // Step 2 & 3: Pricing & Beds
+        // Configuration & Real Estate Fields (Flat, Commercial, Plot)
+        const bhkSelect = document.getElementById('flatBhkType');
+        const furnSelect = document.getElementById('flatFurnishing');
+        const flatCarpetInput = document.getElementById('flatCarpetArea');
+        const commCarpetInput = document.getElementById('commCarpetArea');
+        const plotCarpetInput = document.getElementById('plotCarpetArea');
+        const commSpaceSelect = document.getElementById('commSpaceType');
+
+        if (bhkSelect && p.bhk_type) bhkSelect.value = p.bhk_type;
+        if (furnSelect && p.furnishing_status) furnSelect.value = p.furnishing_status;
+        if (flatCarpetInput && p.carpet_area_sqft) flatCarpetInput.value = p.carpet_area_sqft;
+        if (commCarpetInput && p.carpet_area_sqft) commCarpetInput.value = p.carpet_area_sqft;
+        if (plotCarpetInput && p.carpet_area_sqft) plotCarpetInput.value = p.carpet_area_sqft;
+        if (commSpaceSelect && p.commercial_space_type) commSpaceSelect.value = p.commercial_space_type;
+
+        // Step 3: Pricing, Sale Details & Beds
         const rentInput = document.getElementById('propRent');
+        const expPriceInput = document.getElementById('propExpectedPrice');
+        const tokenInput = document.getElementById('propTokenAmount');
+        const ownSelect = document.getElementById('propOwnership');
+        const possSelect = document.getElementById('propPossession');
+        const negCheckbox = document.getElementById('propNegotiable');
         const depositInput = document.getElementById('propDeposit');
         const maintInput = document.getElementById('propMaintenance');
         const noticeSelect = document.querySelector('select[name="notice_period_days"]');
@@ -2895,6 +3568,14 @@
         const rulesInput = document.getElementById('propRules');
 
         if (rentInput) rentInput.value = p.monthly_rent || '';
+        if (expPriceInput) {
+            expPriceInput.value = p.expected_price || (p.ad_type === 'sale' ? p.monthly_rent : '');
+            handleSalePriceChange(expPriceInput);
+        }
+        if (tokenInput) tokenInput.value = p.booking_token_amount || '';
+        if (ownSelect && p.ownership_type) ownSelect.value = p.ownership_type;
+        if (possSelect && p.possession_status) possSelect.value = p.possession_status;
+        if (negCheckbox) negCheckbox.checked = !!p.price_negotiable;
         if (depositInput) depositInput.value = p.security_deposit || '';
         if (maintInput) maintInput.value = p.maintenance_charges !== undefined ? p.maintenance_charges : '';
         if (noticeSelect && p.notice_period_days !== undefined) noticeSelect.value = String(p.notice_period_days);
@@ -2903,18 +3584,19 @@
         if (descInput) descInput.value = p.description || '';
         if (rulesInput) rulesInput.value = p.house_rules || '';
 
-        // Room Sharing Configurations
-        const chkSingle = document.getElementById('chk_room_single');
-        const chkDouble = document.getElementById('chk_room_double');
-        const chkTriple = document.getElementById('chk_room_triple');
-        const chkFour = document.getElementById('chk_room_four');
+        // Room Sharing Configurations (Only for PG / Hostel listings)
+        const isPg = (listingType === 'pg-hostel' || listingType === 'co-living');
+        if (isPg && p.room_sharing && Array.isArray(p.room_sharing)) {
+            const chkSingle = document.getElementById('chk_room_single');
+            const chkDouble = document.getElementById('chk_room_double');
+            const chkTriple = document.getElementById('chk_room_triple');
+            const chkFour = document.getElementById('chk_room_four');
 
-        const rentSingle = document.getElementById('rent_room_single');
-        const rentDouble = document.getElementById('rent_room_double');
-        const rentTriple = document.getElementById('rent_room_triple');
-        const rentFour = document.getElementById('rent_room_four');
+            const rentSingle = document.getElementById('rent_room_single');
+            const rentDouble = document.getElementById('rent_room_double');
+            const rentTriple = document.getElementById('rent_room_triple');
+            const rentFour = document.getElementById('rent_room_four');
 
-        if (p.room_sharing && Array.isArray(p.room_sharing)) {
             if (chkSingle) chkSingle.checked = false;
             if (chkDouble) chkDouble.checked = false;
             if (chkTriple) chkTriple.checked = false;
@@ -2923,21 +3605,35 @@
             p.room_sharing.forEach(rs => {
                 const type = (rs.type || '').toLowerCase();
                 const rent = rs.rent || p.monthly_rent;
+                const status = (rs.status || (rs.is_available === false ? 'booked' : 'available')).toLowerCase();
                 if (type === 'single') {
-                    if (chkSingle) chkSingle.checked = true;
+                    if (chkSingle) { chkSingle.checked = true; toggleRoomCardState('single'); }
                     if (rentSingle && rent) rentSingle.value = rent;
+                    const statusEl = document.getElementById('status_room_single');
+                    if (statusEl) { statusEl.value = status; handleRoomStatusChange('single', status); }
                 } else if (type === 'double') {
-                    if (chkDouble) chkDouble.checked = true;
+                    if (chkDouble) { chkDouble.checked = true; toggleRoomCardState('double'); }
                     if (rentDouble && rent) rentDouble.value = rent;
+                    const statusEl = document.getElementById('status_room_double');
+                    if (statusEl) { statusEl.value = status; handleRoomStatusChange('double', status); }
                 } else if (type === 'triple') {
-                    if (chkTriple) chkTriple.checked = true;
+                    if (chkTriple) { chkTriple.checked = true; toggleRoomCardState('triple'); }
                     if (rentTriple && rent) rentTriple.value = rent;
+                    const statusEl = document.getElementById('status_room_triple');
+                    if (statusEl) { statusEl.value = status; handleRoomStatusChange('triple', status); }
                 } else if (type === 'four') {
-                    if (chkFour) chkFour.checked = true;
+                    if (chkFour) { chkFour.checked = true; toggleRoomCardState('four'); }
                     if (rentFour && rent) rentFour.value = rent;
+                    const statusEl = document.getElementById('status_room_four');
+                    if (statusEl) { statusEl.value = status; handleRoomStatusChange('four', status); }
                 }
             });
         }
+
+        // Entire Property Fully Booked Toggle state
+        const isFullyBooked = (p.available_beds !== undefined && Number(p.available_beds) === 0) || p.status === 'fully_booked';
+        const fullyBookedToggle = document.getElementById('propIsFullyBooked');
+        if (fullyBookedToggle) fullyBookedToggle.checked = isFullyBooked;
 
         // Amenities
         if (p.amenities && Array.isArray(p.amenities)) {
@@ -2987,6 +3683,7 @@
         }
 
         updateLocationSummaryCard(p.city, p.area, p.address, p.pincode);
+        updatePricingVisibility();
         updateLivePreview();
     }
 
@@ -3038,7 +3735,19 @@
         const latEl = document.getElementById('propLatitude');
         const lngEl = document.getElementById('propLongitude');
         const rentEl = document.getElementById('propRent');
+        const expPriceEl = document.getElementById('propExpectedPrice');
+        const tokenEl = document.getElementById('propTokenAmount');
+        const ownEl = document.getElementById('propOwnership');
+        const possEl = document.getElementById('propPossession');
+        const negEl = document.getElementById('propNegotiable');
+        const bhkEl = document.getElementById('flatBhkType');
+        const furnEl = document.getElementById('flatFurnishing');
         const depEl = document.getElementById('propDeposit');
+        const carpetEl = (document.getElementById('flatCarpetArea') && !document.getElementById('flatConfigs')?.classList.contains('hidden')) 
+            ? document.getElementById('flatCarpetArea') 
+            : (document.getElementById('commCarpetArea') && !document.getElementById('commercialConfigs')?.classList.contains('hidden'))
+            ? document.getElementById('commCarpetArea')
+            : document.getElementById('plotCarpetArea');
         const maintEl = document.getElementById('propMaintenance');
         const tBedsEl = document.getElementById('propTotalBeds');
         const aBedsEl = document.getElementById('propAvailableBeds');
@@ -3070,11 +3779,23 @@
             return;
         }
 
-        if (!rentEl?.value || Number(rentEl.value) < 100) {
-            goToStep(3);
-            showError('propRent', 'Please specify a starting monthly rent.');
-            rentEl?.focus();
-            return;
+        const isSale = currentAdType === 'sale';
+        const expectedPriceVal = isSale ? Number(expPriceEl?.value || 0) : null;
+
+        if (isSale) {
+            if (!expectedPriceVal || expectedPriceVal < 1000) {
+                goToStep(3);
+                showError('propExpectedPrice', 'Please specify expected selling price (min ₹1,000).');
+                expPriceEl?.focus();
+                return;
+            }
+        } else {
+            if (!rentEl?.value || Number(rentEl.value) < 100) {
+                goToStep(3);
+                showError('propRent', 'Please specify a starting monthly rent.');
+                rentEl?.focus();
+                return;
+            }
         }
 
         // Moderation Check
@@ -3101,52 +3822,84 @@
         const maintVal = maintEl?.value ? Number(maintEl.value) : 0;
         const noticeVal = noticeSelect?.value ? Number(noticeSelect.value) : 30;
 
-        const descriptionVal = descEl?.value.trim() || 'Premium accommodation and paying guest stay in prime location with full amenities.';
-        const rulesVal = rulesEl?.value.trim() || '• Gate closes at 11:00 PM\n• No smoking inside rooms\n• Maintain cleanliness';
-
-        // Collect checked room sharing types & pricing
-        const roomSharing = [];
-        if (document.getElementById('chk_room_single')?.checked) {
-            roomSharing.push({
-                type: 'single',
-                name: 'Single Occupancy (Private Room)',
-                rent: Math.max(500, Number(document.getElementById('rent_room_single')?.value || 12000))
-            });
-        }
-        if (document.getElementById('chk_room_double')?.checked) {
-            roomSharing.push({
-                type: 'double',
-                name: 'Double Sharing Room',
-                rent: Math.max(500, Number(document.getElementById('rent_room_double')?.value || 8500))
-            });
-        }
-        if (document.getElementById('chk_room_triple')?.checked) {
-            roomSharing.push({
-                type: 'triple',
-                name: 'Triple Sharing Room',
-                rent: Math.max(500, Number(document.getElementById('rent_room_triple')?.value || 6500))
-            });
-        }
-        if (document.getElementById('chk_room_four')?.checked) {
-            roomSharing.push({
-                type: 'four',
-                name: 'Four Sharing Room',
-                rent: Math.max(500, Number(document.getElementById('rent_room_four')?.value || 5000))
-            });
-        }
+        const descriptionVal = descEl?.value.trim() || 'Premium accommodation in prime location with full modern amenities.';
+        const rulesVal = rulesEl?.value.trim() || '• Standard safety guidelines apply\n• Maintain property cleanliness';
 
         const selectedListingType = typeRadio ? typeRadio.value : 'pg-hostel';
+        const isPgType = !isSale && (selectedListingType === 'pg-hostel' || selectedListingType === 'co-living');
+
+        // Collect checked room sharing types, availability status & pricing (ONLY for PG / Hostels)
+        const roomSharing = [];
+        if (isPgType) {
+            if (document.getElementById('chk_room_single')?.checked) {
+                const statusVal = document.getElementById('status_room_single')?.value || 'available';
+                roomSharing.push({
+                    type: 'single',
+                    name: 'Single Occupancy (Private Room)',
+                    rent: Math.max(500, Number(document.getElementById('rent_room_single')?.value || 12000)),
+                    is_available: statusVal === 'available',
+                    status: statusVal
+                });
+            }
+            if (document.getElementById('chk_room_double')?.checked) {
+                const statusVal = document.getElementById('status_room_double')?.value || 'available';
+                roomSharing.push({
+                    type: 'double',
+                    name: 'Double Sharing Room',
+                    rent: Math.max(500, Number(document.getElementById('rent_room_double')?.value || 8500)),
+                    is_available: statusVal === 'available',
+                    status: statusVal
+                });
+            }
+            if (document.getElementById('chk_room_triple')?.checked) {
+                const statusVal = document.getElementById('status_room_triple')?.value || 'available';
+                roomSharing.push({
+                    type: 'triple',
+                    name: 'Triple Sharing Room',
+                    rent: Math.max(500, Number(document.getElementById('rent_room_triple')?.value || 6500)),
+                    is_available: statusVal === 'available',
+                    status: statusVal
+                });
+            }
+            if (document.getElementById('chk_room_four')?.checked) {
+                const statusVal = document.getElementById('status_room_four')?.value || 'available';
+                roomSharing.push({
+                    type: 'four',
+                    name: 'Four Sharing Room',
+                    rent: Math.max(500, Number(document.getElementById('rent_room_four')?.value || 5000)),
+                    is_available: statusVal === 'available',
+                    status: statusVal
+                });
+            }
+        }
+
         let calculatedGender = 'co-ed';
-        if (selectedListingType === 'commercial') {
+        if (selectedListingType.includes('commercial')) {
             calculatedGender = null;
-        } else if (selectedListingType === 'flat-apartment') {
+        } else if (selectedListingType.includes('flat') || selectedListingType.includes('house') || selectedListingType.includes('plot') || selectedListingType.includes('builder')) {
             calculatedGender = 'all';
         } else {
             calculatedGender = genderRadio ? genderRadio.value : 'co-ed';
         }
 
+        const rentAmount = isSale ? (expectedPriceVal || 5000) : Math.max(100, Number(rentEl?.value || 5000));
+
+        const isFullyBooked = document.getElementById('propIsFullyBooked')?.checked || (aBedsEl && Number(aBedsEl.value) === 0);
+        const finalTotalBeds = Math.max(1, Number(tBedsEl?.value || 10));
+        const finalAvailableBeds = isFullyBooked ? 0 : Math.max(0, Number(aBedsEl?.value ?? 6));
+
         const payload = {
             listing_type: selectedListingType,
+            ad_type: currentAdType || 'rent',
+            property_category: currentCategory || 'residential',
+            expected_price: expectedPriceVal,
+            booking_token_amount: tokenEl?.value ? Number(tokenEl.value) : null,
+            price_negotiable: negEl?.checked ? 1 : 0,
+            ownership_type: ownEl?.value || 'Freehold',
+            possession_status: possEl?.value || 'Ready to Move',
+            carpet_area_sqft: carpetEl?.value ? Number(carpetEl.value) : null,
+            bhk_type: bhkEl?.value || null,
+            furnishing_status: furnEl?.value || null,
             name: nameEl.value.trim(),
             city: cityEl.value.trim(),
             area: areaEl?.value.trim() || '',
@@ -3156,12 +3909,13 @@
             latitude: latEl?.value ? Number(latEl.value) : null,
             longitude: lngEl?.value ? Number(lngEl.value) : null,
             gender_preference: calculatedGender,
-            monthly_rent: Math.max(100, Number(rentEl.value)),
-            security_deposit: depositVal,
+            monthly_rent: rentAmount,
+            security_deposit: isSale ? 0 : depositVal,
             maintenance_charges: maintVal,
             notice_period_days: noticeVal,
-            total_beds: Math.max(1, Number(tBedsEl?.value || 10)),
-            available_beds: Math.max(0, Number(aBedsEl?.value || 0)),
+            total_beds: finalTotalBeds,
+            available_beds: finalAvailableBeds,
+            is_fully_booked: isFullyBooked ? 1 : 0,
             description: descriptionVal,
             house_rules: rulesVal,
             owner_name: ownerNameEl?.value.trim() || 'Property Manager',

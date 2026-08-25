@@ -27,6 +27,8 @@ Disallow: /saved
 Disallow: /login
 Disallow: /logout
 Disallow: /ai/
+Disallow: /list-property/edit/*
+Disallow: /list-property?edit_id=*
 
 # XML Sitemap
 Sitemap: https://staynest.com/sitemap.xml

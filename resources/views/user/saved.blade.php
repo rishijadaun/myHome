@@ -145,50 +145,41 @@
             card.className = 'saved-item bg-white rounded-3xl overflow-hidden shadow-xs hover:shadow-lg border border-gray-100 flex flex-col transition-all duration-300 transform group relative';
             card.id = `savedCard_${pg.id}`;
 
-            const badgeBg = pg.type === 'GIRLS' ? 'bg-pink-50 text-pink-600' : (pg.type === 'CO-ED' ? 'bg-purple-50 text-purple-600' : 'bg-blue-50 text-blue-600');
             const slugVal = pg.slug || (pg.title ? pg.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : pg.id);
             const detailUrl = `/detail/${slugVal}`;
-
+            const isSale = (pg.type && pg.type.toLowerCase().includes('sale')) || (pg.price && (pg.price.includes('Cr') || pg.price.includes('Lac') || pg.price.includes('Lakh')));
+            
             card.innerHTML = `
-                <a href="${detailUrl}" class="block relative h-48 overflow-hidden bg-gray-100 no-underline">
-                    <img src="${pg.image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'}" 
-                         alt="${pg.title}" 
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    
-                    <span class="absolute top-3 left-3 bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
-                        <i class="fas fa-check-circle text-[9px]"></i> Verified Stay
+                <div class="relative h-44 overflow-hidden">
+                    <img src="${pg.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=600&q=80'}" alt="${pg.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <span class="absolute top-2.5 left-2.5 ${isSale ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black uppercase' : 'bg-brand text-white font-bold'} text-[10px] px-2.5 py-0.5 rounded-full shadow-sm">
+                        ${isSale ? '<i class="fas fa-tag mr-1 text-[9px]"></i> For Sale' : (pg.type || 'StayNest')}
                     </span>
-
-                    <!-- Remove from Wishlist Button -->
-                    <button type="button" 
-                            onclick="event.preventDefault(); event.stopPropagation(); removeSavedItem('${pg.id}', this)" 
-                            class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-red-500 shadow-md hover:bg-white hover:scale-110 transition tap-effect" 
-                            title="Remove from saved">
-                        <i class="fas fa-heart text-sm"></i>
+                    <button type="button" onclick="removeSavedItem('${pg.id}', this)" class="absolute top-2.5 right-2.5 w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 hover:text-gray-400 shadow-sm transition tap-effect" title="Remove from wishlist">
+                        <i class="fas fa-heart text-xs"></i>
                     </button>
-
-                    <div class="absolute bottom-2.5 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                         <i class="fas fa-star text-yellow-400 text-[9px]"></i> ${pg.rating || '4.8'}
                     </div>
-                </a>
+                </div>
 
                 <div class="p-4 flex flex-col flex-1 justify-between">
                     <div>
-                        <div class="flex justify-between items-start gap-1.5 mb-1.5">
-                            <h3 class="font-black text-sm sm:text-base text-gray-900 truncate leading-tight">
-                                <a href="${detailUrl}" class="hover:text-brand transition text-gray-900 no-underline">${pg.title}</a>
-                            </h3>
-                            <span class="${badgeBg} text-[9px] font-black uppercase px-2 py-0.5 rounded-md flex-shrink-0">${pg.type || 'BOYS'}</span>
+                        <div class="flex justify-between items-center gap-1 mb-1">
+                            <h3 class="font-bold text-base text-gray-900 truncate">${pg.title}</h3>
+                            <span class="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold px-1.5 py-0.5 rounded flex items-center gap-1 flex-shrink-0">
+                                <i class="fas fa-check-circle text-[8px]"></i> Verified
+                            </span>
                         </div>
                         <p class="text-xs text-gray-500 flex items-center gap-1 mb-3 truncate">
-                            <i class="fas fa-map-marker-alt text-brand text-[10px]"></i> ${pg.location || 'Sector 62, Noida'}
+                            <i class="fas fa-map-marker-alt text-brand text-[11px]"></i> ${pg.location || 'Noida, India'}
                         </p>
                     </div>
 
                     <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                         <div>
-                            <span class="text-[9px] text-gray-400 block font-semibold leading-none">Starting from</span>
-                            <span class="text-base font-black text-gray-900">${pg.price || '₹8,500'}<span class="text-[10px] font-normal text-gray-500">/mo</span></span>
+                            <span class="text-[9px] text-gray-400 block font-semibold leading-none">${isSale ? 'Price' : 'Starting from'}</span>
+                            <span class="text-base font-black text-gray-900">${pg.price || '₹8,500'}${isSale ? '' : '<span class="text-[10px] font-normal text-gray-500">/mo</span>'}</span>
                         </div>
                         <a href="${detailUrl}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-md hover:shadow-brand/20 text-white text-xs font-bold px-4 py-2 rounded-xl transition tap-effect no-underline">
                             View Details

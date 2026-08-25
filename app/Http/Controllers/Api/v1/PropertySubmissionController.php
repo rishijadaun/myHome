@@ -84,6 +84,16 @@ class PropertySubmissionController extends Controller
     {
         $validated = $request->validate([
             'listing_type' => ['nullable', 'string', 'max:50'],
+            'ad_type' => ['nullable', 'string', 'in:rent,sale'],
+            'property_category' => ['nullable', 'string', 'in:residential,commercial,land-plot,land_plot'],
+            'expected_price' => ['nullable', 'numeric', 'min:1000', 'max:1000000000'],
+            'booking_token_amount' => ['nullable', 'numeric', 'min:0', 'max:100000000'],
+            'price_negotiable' => ['nullable', 'boolean'],
+            'ownership_type' => ['nullable', 'string', 'max:50'],
+            'possession_status' => ['nullable', 'string', 'max:50'],
+            'carpet_area_sqft' => ['nullable', 'integer', 'min:1', 'max:500000'],
+            'bhk_type' => ['nullable', 'string', 'max:50'],
+            'furnishing_status' => ['nullable', 'string', 'max:50'],
             'name' => ['required', 'string', 'min:3', 'max:200'],
             'city' => ['required', 'string', 'min:2', 'max:100'],
             'area' => ['nullable', 'string', 'max:150'],
@@ -93,9 +103,9 @@ class PropertySubmissionController extends Controller
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'gender_preference' => ['nullable', 'string', 'in:boys,girls,co-ed,all,any,not_applicable'],
-            'monthly_rent' => ['required', 'numeric', 'min:500', 'max:1000000'],
-            'security_deposit' => ['nullable', 'numeric', 'min:0', 'max:2000000'],
-            'maintenance_charges' => ['nullable', 'numeric', 'min:0', 'max:100000'],
+            'monthly_rent' => ['nullable', 'numeric', 'min:100', 'max:1000000000'],
+            'security_deposit' => ['nullable', 'numeric', 'min:0', 'max:200000000'],
+            'maintenance_charges' => ['nullable', 'numeric', 'min:0', 'max:1000000'],
             'notice_period_days' => ['nullable', 'integer', 'min:0', 'max:365'],
             'total_beds' => ['nullable', 'integer', 'min:1', 'max:5000'],
             'available_beds' => ['nullable', 'integer', 'min:0', 'max:5000'],
@@ -113,20 +123,10 @@ class PropertySubmissionController extends Controller
             'name.min' => 'Property title must be at least 3 characters long.',
             'city.required' => 'Please specify the city.',
             'address.required' => 'Full address is required for tenant navigation.',
-            'monthly_rent.required' => 'Please enter the starting monthly rent.',
-            'monthly_rent.min' => 'Monthly starting rent cannot be less than ₹500.',
-            'monthly_rent.max' => 'Monthly starting rent cannot exceed ₹10,00,000.',
-            'security_deposit.min' => 'Security deposit cannot be a negative amount.',
-            'security_deposit.max' => 'Security deposit cannot exceed ₹20,00,000.',
-            'maintenance_charges.min' => 'Maintenance charges cannot be negative.',
-            'maintenance_charges.max' => 'Maintenance charges cannot exceed ₹1,00,000.',
-            'total_beds.min' => 'Total bed capacity must be at least 1.',
-            'total_beds.max' => 'Total bed capacity cannot exceed 5,000.',
-            'available_beds.min' => 'Available beds cannot be negative.',
-            'available_beds.max' => 'Available beds cannot exceed 5,000.',
+            'monthly_rent.min' => 'Monthly starting rent cannot be less than ₹100.',
             'description.required' => 'Please provide a detailed property description (at least 20 characters).',
             'description.min' => 'Property description must be at least 20 characters long.',
-            'house_rules.required' => 'Please specify house rules / tenant guidelines.',
+            'house_rules.required' => 'Please specify house rules / guidelines.',
             'house_rules.min' => 'House rules must be at least 5 characters long.',
             'owner_name.required' => 'Please provide the contact person / owner name.',
             'owner_phone.required' => 'Please provide a valid 10-digit mobile number for verification.',
@@ -256,12 +256,18 @@ class PropertySubmissionController extends Controller
                 $finalGender = $finalGender ?: 'co-ed';
             }
 
+            $isSale = ($validated['ad_type'] ?? 'rent') === 'sale';
+            $expectedPrice = !empty($validated['expected_price']) ? $validated['expected_price'] : ($isSale ? ($validated['monthly_rent'] ?? null) : null);
+            $rentPrice = !empty($validated['monthly_rent']) ? $validated['monthly_rent'] : ($expectedPrice ?: 5000);
+
             $property = Property::create([
                 'id' => (string) Str::uuid(),
                 'broker_id' => $assignedBrokerId,
                 'city_id' => $city->id,
                 'area_id' => $area->id,
                 'property_type_id' => $propertyType->id,
+                'ad_type' => $validated['ad_type'] ?? 'rent',
+                'property_category' => $validated['property_category'] ?? 'residential',
                 'name' => $validated['name'],
                 'slug' => Str::slug($validated['name']) . '-' . substr((string) Str::uuid(), 0, 6),
                 'description' => $validated['description'] ?? null,
@@ -272,8 +278,16 @@ class PropertySubmissionController extends Controller
                 'gender_preference' => $finalGender,
                 'total_beds' => $validated['total_beds'] ?? 10,
                 'available_beds' => $validated['available_beds'] ?? ($validated['total_beds'] ?? 10),
-                'monthly_rent' => $validated['monthly_rent'],
-                'security_deposit' => $validated['security_deposit'] ?? $validated['monthly_rent'],
+                'monthly_rent' => $rentPrice,
+                'expected_price' => $expectedPrice,
+                'booking_token_amount' => $validated['booking_token_amount'] ?? null,
+                'price_negotiable' => !empty($validated['price_negotiable']),
+                'ownership_type' => $validated['ownership_type'] ?? null,
+                'possession_status' => $validated['possession_status'] ?? null,
+                'carpet_area_sqft' => $validated['carpet_area_sqft'] ?? null,
+                'bhk_type' => $validated['bhk_type'] ?? null,
+                'furnishing_status' => $validated['furnishing_status'] ?? null,
+                'security_deposit' => $validated['security_deposit'] ?? ($isSale ? 0 : $rentPrice),
                 'maintenance_charges' => $validated['maintenance_charges'] ?? 0,
                 'notice_period_days' => $validated['notice_period_days'] ?? 30,
                 'verification_status' => 'pending', // PENDING ADMIN APPROVAL
@@ -466,6 +480,18 @@ class PropertySubmissionController extends Controller
             'id' => $property->id,
             'name' => $property->name,
             'listing_type' => $property->propertyType?->slug ?? 'pg-hostel',
+            'property_category' => $property->property_category ?? 'residential',
+            'ad_type' => $property->ad_type ?? ($property->is_sale ? 'sale' : 'rent'),
+            'is_sale' => (bool) $property->is_sale,
+            'expected_price' => $property->expected_price ? (float) $property->expected_price : null,
+            'booking_token_amount' => $property->booking_token_amount ? (float) $property->booking_token_amount : null,
+            'price_negotiable' => (bool) $property->price_negotiable,
+            'ownership_type' => $property->ownership_type ?? 'Freehold',
+            'possession_status' => $property->possession_status ?? 'Ready to Move',
+            'carpet_area_sqft' => $property->carpet_area_sqft ? (int) $property->carpet_area_sqft : null,
+            'bhk_type' => $property->bhk_type,
+            'furnishing_status' => $property->furnishing_status,
+            'commercial_space_type' => $property->commercial_space_type,
             'city' => $property->city?->name ?? '',
             'city_id' => $property->city_id,
             'area' => $property->area?->name ?? $property->landmark ?? '',
@@ -491,10 +517,13 @@ class PropertySubmissionController extends Controller
             'owner_email' => $property->broker?->email ?? '',
             'amenities' => $amenitySlugs,
             'room_sharing' => $property->room_configurations->map(function ($rc) {
+                $isBooked = ($rc->room_status === 'occupied' || $rc->room_status === 'booked' || $rc->room_status === 'sold_out' || (int)$rc->available_beds === 0);
                 return [
                     'type' => $rc->room_type_slug,
                     'name' => $rc->room_type_name,
                     'rent' => (float) $rc->monthly_rent,
+                    'is_available' => !$isBooked,
+                    'status' => $isBooked ? 'booked' : 'available',
                     'selected' => true,
                 ];
             })->values()->toArray(),
@@ -524,6 +553,16 @@ class PropertySubmissionController extends Controller
 
         $validated = $request->validate([
             'listing_type' => ['nullable', 'string', 'max:50'],
+            'ad_type' => ['nullable', 'string', 'in:rent,sale'],
+            'property_category' => ['nullable', 'string', 'in:residential,commercial,land-plot,land_plot'],
+            'expected_price' => ['nullable', 'numeric', 'min:1000', 'max:1000000000'],
+            'booking_token_amount' => ['nullable', 'numeric', 'min:0', 'max:100000000'],
+            'price_negotiable' => ['nullable', 'boolean'],
+            'ownership_type' => ['nullable', 'string', 'max:50'],
+            'possession_status' => ['nullable', 'string', 'max:50'],
+            'carpet_area_sqft' => ['nullable', 'integer', 'min:1', 'max:500000'],
+            'bhk_type' => ['nullable', 'string', 'max:50'],
+            'furnishing_status' => ['nullable', 'string', 'max:50'],
             'name' => ['required', 'string', 'min:2', 'max:200'],
             'city' => ['required', 'string', 'min:2', 'max:100'],
             'area' => ['nullable', 'string', 'max:150'],
@@ -533,9 +572,9 @@ class PropertySubmissionController extends Controller
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'gender_preference' => ['nullable', 'string', 'in:boys,girls,co-ed,all,any,not_applicable'],
-            'monthly_rent' => ['required', 'numeric', 'min:500', 'max:1000000'],
-            'security_deposit' => ['nullable', 'numeric', 'min:0', 'max:2000000'],
-            'maintenance_charges' => ['nullable', 'numeric', 'min:0', 'max:100000'],
+            'monthly_rent' => ['nullable', 'numeric', 'min:100', 'max:1000000000'],
+            'security_deposit' => ['nullable', 'numeric', 'min:0', 'max:200000000'],
+            'maintenance_charges' => ['nullable', 'numeric', 'min:0', 'max:1000000'],
             'notice_period_days' => ['nullable', 'integer', 'min:0', 'max:365'],
             'total_beds' => ['nullable', 'integer', 'min:1', 'max:5000'],
             'available_beds' => ['nullable', 'integer', 'min:0', 'max:5000'],
@@ -549,10 +588,7 @@ class PropertySubmissionController extends Controller
             'owner_email' => ['nullable', 'email', 'max:150'],
             'status' => ['nullable', 'in:active,draft,inactive'],
         ], [
-            'monthly_rent.min' => 'Monthly starting rent cannot be less than ₹500.',
-            'monthly_rent.max' => 'Monthly starting rent cannot exceed ₹10,00,000.',
-            'security_deposit.max' => 'Security deposit cannot exceed ₹20,00,000.',
-            'maintenance_charges.max' => 'Maintenance charges cannot exceed ₹1,00,000.',
+            'monthly_rent.min' => 'Monthly starting rent cannot be less than ₹100.',
             'total_beds.max' => 'Total bed capacity cannot exceed 5,000.',
             'available_beds.max' => 'Available beds cannot exceed 5,000.',
         ]);
@@ -561,17 +597,21 @@ class PropertySubmissionController extends Controller
         try {
             // Resolve City
             $cityName = !empty($validated['city']) ? trim($validated['city']) : 'City';
-            $city = City::firstOrCreate(
-                ['name' => $cityName],
-                [
+            $citySlug = Str::slug($cityName);
+            $city = City::where('slug', $citySlug)->orWhere('name', 'like', "%{$cityName}%")->first();
+            if (!$city) {
+                $defaultStateId = DB::table('states')->value('id') ?? 'c9adb837-8dab-11f1-a4cf-1062e5a5cd6c';
+                $city = City::create([
                     'id' => (string) Str::uuid(),
-                    'slug' => Str::slug($cityName),
+                    'state_id' => $defaultStateId,
+                    'name' => $cityName,
+                    'slug' => $citySlug,
                     'is_active' => 1,
                     'is_metro' => 0,
                     'is_tier1' => 0,
                     'version' => 1
-                ]
-            );
+                ]);
+            }
 
             // Resolve Area
             $areaId = $property->area_id;
@@ -605,18 +645,33 @@ class PropertySubmissionController extends Controller
                 $finalGender = $finalGender ?: ($property->gender_preference ?: 'co-ed');
             }
 
+            $isSale = ($validated['ad_type'] ?? ($property->ad_type ?: 'rent')) === 'sale';
+            $expectedPrice = !empty($validated['expected_price']) ? $validated['expected_price'] : ($isSale ? ($validated['monthly_rent'] ?? $property->expected_price) : null);
+            $rentPrice = !empty($validated['monthly_rent']) ? $validated['monthly_rent'] : ($expectedPrice ?: $property->monthly_rent);
+
             $property->property_type_id = $propertyType->id;
+            if (isset($validated['ad_type'])) $property->ad_type = $validated['ad_type'];
+            if (isset($validated['property_category'])) $property->property_category = $validated['property_category'];
+            if ($expectedPrice !== null) $property->expected_price = $expectedPrice;
+            if (isset($validated['booking_token_amount'])) $property->booking_token_amount = $validated['booking_token_amount'];
+            if (isset($validated['price_negotiable'])) $property->price_negotiable = !empty($validated['price_negotiable']);
+            if (isset($validated['ownership_type'])) $property->ownership_type = $validated['ownership_type'];
+            if (isset($validated['possession_status'])) $property->possession_status = $validated['possession_status'];
+            if (isset($validated['carpet_area_sqft'])) $property->carpet_area_sqft = $validated['carpet_area_sqft'];
+            if (isset($validated['bhk_type'])) $property->bhk_type = $validated['bhk_type'];
+            if (isset($validated['furnishing_status'])) $property->furnishing_status = $validated['furnishing_status'];
+
             $property->address = $validated['address'];
             $property->landmark = $validated['landmark'] ?? $property->landmark;
             $property->gender_preference = $finalGender;
-            $property->monthly_rent = $validated['monthly_rent'];
+            $property->monthly_rent = $rentPrice;
             $property->security_deposit = $validated['security_deposit'] ?? $property->security_deposit;
             $property->maintenance_charges = $validated['maintenance_charges'] ?? $property->maintenance_charges;
             $property->notice_period_days = $validated['notice_period_days'] ?? $property->notice_period_days;
             $property->total_beds = $validated['total_beds'] ?? $property->total_beds;
             $property->available_beds = $validated['available_beds'] ?? $property->available_beds;
             
-            $descriptionText = !empty($validated['description']) ? trim($validated['description']) : ($property->description ?: "Premium PG and accommodation in {$city->name} with modern amenities.");
+            $descriptionText = !empty($validated['description']) ? trim($validated['description']) : ($property->description ?: "Premium accommodation in {$city->name} with modern amenities.");
             $property->description = $descriptionText;
 
             if (!empty($validated['latitude'])) $property->latitude = $validated['latitude'];
@@ -771,7 +826,7 @@ class PropertySubmissionController extends Controller
                     }
                 } else {
                     // Regular broker/owner updating their own property
-                    if ($property->broker && $property->broker_id === $user->id) {
+                    if ($user && $property->broker && $property->broker_id === $user->id) {
                         if ($ownerName && $user->profile) {
                             $nameParts = explode(' ', $ownerName, 2);
                             $user->profile->first_name = $nameParts[0] ?? 'Property';
@@ -869,19 +924,30 @@ class PropertySubmissionController extends Controller
             }
 
             $roomRent = max(500, (float)($item['rent'] ?? $property->monthly_rent));
+            
+            $isAvailable = true;
+            if (isset($item['is_available'])) {
+                $isAvailable = filter_var($item['is_available'], FILTER_VALIDATE_BOOLEAN);
+            } elseif (isset($item['status'])) {
+                $isAvailable = !in_array(strtolower(trim($item['status'])), ['booked', 'occupied', 'sold_out', 'full']);
+            }
+
+            $roomStatus = $isAvailable ? 'available' : 'occupied';
+            $availBeds = $isAvailable ? max(1, (int)($item['available_beds'] ?? max(1, $rt->max_occupancy - 1))) : 0;
+
             DB::table('rooms')->insert([
                 'id' => (string) Str::uuid(),
                 'floor_id' => $floorId,
                 'room_type_id' => $rt->id,
                 'room_number' => strtoupper(substr($slug, 0, 1)) . '-' . (101 + $idx),
                 'total_beds' => $rt->max_occupancy,
-                'available_beds' => max(0, $rt->max_occupancy - 1),
+                'available_beds' => $availBeds,
                 'monthly_rent' => $roomRent,
                 'security_deposit' => $property->security_deposit ?? ($roomRent * 2),
                 'attached_bathroom' => 1,
                 'ac_available' => 1,
                 'balcony' => 1,
-                'status' => 'available',
+                'status' => $roomStatus,
                 'is_active' => 1,
                 'version' => 1,
                 'created_at' => now(),

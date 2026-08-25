@@ -366,9 +366,9 @@
         <!-- Row 2: Results Count & Sort By Dropdown -->
         <div class="flex items-center justify-between mt-2.5 px-1">
             <div class="flex items-center gap-2">
-                <h1 class="text-xs sm:text-sm text-gray-600 font-normal">
+                <p class="text-xs sm:text-sm text-gray-600 font-normal">
                     Showing <span class="font-bold text-gray-900" id="resultsCount">{{ $properties->count() }}</span> verified properties{{ !empty($selectedCity) ? ' in ' . $selectedCity : '' }}
-                </h1>
+                </p>
                 @if($activeBadgeCount > 0 || !empty($searchQuery))
                     <a href="{{ route('user.search') }}" class="text-[11px] sm:text-xs font-semibold text-red-500 hover:underline tap-effect flex items-center gap-1 no-underline">
                         <i class="fas fa-undo-alt text-[9px]"></i> Clear Filters
@@ -570,10 +570,20 @@
                     <div class="relative h-32 sm:h-44 md:h-52 overflow-hidden w-full bg-gray-100">
                         <img src="{{ $displayImg }}" alt="{{ $pg->name }} - Verified Stay in {{ $locationText }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async">
                         
-                        <!-- Verified Solid Tag -->
-                        <div class="absolute top-2 left-2 sm:top-3 sm:left-3 {{ $tagMeta['solid_badge'] }} text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
-                            <i class="fas fa-{{ $tagMeta['icon'] }}"></i> <span class="hidden sm:inline">{{ $tagMeta['label'] }}</span>
-                        </div>
+                        <!-- Verified Solid Tag or For Sale Tag or Fully Booked Tag -->
+                        @if($pg->is_sale)
+                            <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-amber-500 text-white text-[9px] sm:text-xs font-black px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
+                                <i class="fas fa-tags"></i> <span>FOR SALE</span>
+                            </div>
+                        @elseif($pg->is_fully_booked || ((int)$pg->available_beds === 0 && $pg->available_beds !== null))
+                            <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-rose-600 text-white text-[9px] sm:text-xs font-black px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                <i class="fas fa-lock"></i> <span>FULLY BOOKED</span>
+                            </div>
+                        @else
+                            <div class="absolute top-2 left-2 sm:top-3 sm:left-3 {{ $tagMeta['solid_badge'] }} text-white text-[9px] sm:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-xl flex items-center gap-1 shadow-sm">
+                                <i class="fas fa-{{ $tagMeta['icon'] }}"></i> <span class="hidden sm:inline">{{ $tagMeta['label'] }}</span>
+                            </div>
+                        @endif
 
                         <!-- Match Score Badge (AI Matching) -->
                         @if($matchScore)
@@ -584,7 +594,7 @@
                         @endif
 
                         <!-- Heart / Wishlist Toggle Button -->
-                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
+                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); heartToggle(this, { id: '{{ $pg->id }}', slug: '{{ $pg->slug ?: \Illuminate\Support\Str::slug($pg->name) }}', title: '{{ addslashes($pg->name) }}', price: '{{ $pg->is_sale ? $pg->display_price_formatted : number_format($pg->monthly_rent) }}', image: '{{ $displayImg }}', location: '{{ addslashes($locationText) }}', type: '{{ $pg->is_sale ? 'For Sale' : $genderMeta['label'] }}', rating: '{{ $ratingVal }}' })" data-prop-id="{{ $pg->id }}" class="save-btn absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition tap-effect shadow-sm">
                             <i class="far fa-heart text-xs sm:text-sm"></i>
                         </button>
                         
@@ -603,7 +613,7 @@
                     <div class="p-2.5 sm:p-4">
                         <div class="flex justify-between items-start mb-1 gap-1">
                             <h3 class="font-bold text-xs sm:text-base text-gray-900 group-hover:text-brand transition prop-title truncate">{{ $pg->name }}</h3>
-                            <span class="{{ $genderMeta['class'] }} text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $genderMeta['label'] }}</span>
+                            <span class="{{ $pg->is_sale ? 'bg-amber-100 text-amber-800' : $genderMeta['class'] }} text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0">{{ $pg->is_sale ? 'Sale' : $genderMeta['label'] }}</span>
                         </div>
                         <p class="text-gray-500 text-[10px] sm:text-xs mb-1 flex items-center gap-1 prop-loc truncate">
                             <i class="fas fa-map-marker-alt text-brand text-[9px]"></i> {{ $locationText }}
@@ -645,8 +655,12 @@
 
                 <div class="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-1.5 sm:pt-2 border-t border-gray-100 flex items-center justify-between">
                     <div>
-                        <span class="text-[9px] sm:text-xs text-gray-500 block">Rent</span>
-                        <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
+                        <span class="text-[9px] sm:text-xs text-gray-500 block">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
+                        @if($pg->is_sale)
+                            <div class="text-xs sm:text-base font-black text-amber-600 leading-none">{{ $pg->display_price_formatted }}</div>
+                        @else
+                            <div class="text-xs sm:text-lg font-extrabold text-gray-900 leading-none">₹{{ number_format($pg->monthly_rent) }}<span class="text-[9px] sm:text-xs font-normal text-gray-500">/mo</span></div>
+                        @endif
                     </div>
                     <a href="{{ $slugUrl }}" class="bg-brand hover:bg-brand-dark text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition tap-effect shadow-sm no-underline">View</a>
                 </div>

@@ -46,7 +46,41 @@ class BrokerPropertyController extends Controller
         $occupiedBeds = max(0, $totalBeds - $availableBeds);
         $occupancyRate = $totalBeds > 0 ? round(($occupiedBeds / $totalBeds) * 100) : 0;
 
-        // 2. Query Builder with Search and Filters
+        // 2. Listing Type Tabs Aggregation
+        $pgCount = (clone $baseQuery)->where(function($q) {
+            $q->where(function($sq) {
+                $sq->where('property_category', 'residential')
+                   ->whereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['pg-hostel', 'pg', 'hostel', 'co-living']));
+            })->orWhere(function($sq) {
+                $sq->whereNull('property_category')
+                   ->whereDoesntHave('propertyType', fn($pt) => $pt->whereIn('slug', ['commercial', 'office', 'shop', 'flat-apartment', 'flat', 'apartment', 'house-villa', 'land-plot', 'plot']));
+            });
+        })->count();
+
+        $flatCount = (clone $baseQuery)->where(function($q) {
+            $q->where('property_category', 'residential')
+              ->whereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['flat-apartment', 'flat', 'apartment', 'house', 'house-villa', 'villa', 'builder-floor']));
+        })->count();
+
+        $commercialCount = (clone $baseQuery)->where(function($q) {
+            $q->where('property_category', 'commercial')
+              ->orWhereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['commercial', 'commercial-property', 'office', 'shop', 'warehouse']));
+        })->count();
+
+        $landCount = (clone $baseQuery)->where(function($q) {
+            $q->where('property_category', 'land-plot')
+              ->orWhereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['land-plot', 'land', 'plot']));
+        })->count();
+
+        $tabCounts = [
+            'all' => $totalProperties,
+            'pg-hostel' => $pgCount,
+            'flat-apartment' => $flatCount,
+            'commercial' => $commercialCount,
+            'land-plot' => $landCount,
+        ];
+
+        // 3. Query Builder with Search and Filters
         $query = (clone $baseQuery)->with([
             'city',
             'area',
@@ -55,6 +89,38 @@ class BrokerPropertyController extends Controller
             'images',
             'amenities',
         ]);
+
+        // Listing Type Tab Filter
+        $currentType = strtolower($request->query('type', 'all'));
+        if ($currentType === 'pg-hostel' || $currentType === 'pg') {
+            $query->where(function($q) {
+                $q->where(function($sq) {
+                    $sq->where('property_category', 'residential')
+                       ->whereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['pg-hostel', 'pg', 'hostel', 'co-living']));
+                })->orWhere(function($sq) {
+                    $sq->whereNull('property_category')
+                       ->whereDoesntHave('propertyType', fn($pt) => $pt->whereIn('slug', ['commercial', 'office', 'shop', 'flat-apartment', 'flat', 'apartment', 'house-villa', 'land-plot', 'plot']));
+                });
+            });
+        } elseif ($currentType === 'flat-apartment' || $currentType === 'flat') {
+            $query->where(function($q) {
+                $q->where('property_category', 'residential')
+                  ->whereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['flat-apartment', 'flat', 'apartment', 'house', 'house-villa', 'villa', 'builder-floor']));
+            });
+        } elseif ($currentType === 'commercial') {
+            $query->where(function($q) {
+                $q->where('property_category', 'commercial')
+                  ->orWhereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['commercial', 'commercial-property', 'office', 'shop', 'warehouse']));
+            });
+        } elseif ($currentType === 'land-plot' || $currentType === 'land' || $currentType === 'plot') {
+            $query->where(function($q) {
+                $q->where('property_category', 'land-plot')
+                  ->orWhereHas('propertyType', fn($pt) => $pt->whereIn('slug', ['land-plot', 'land', 'plot']));
+            });
+        } elseif (in_array(strtoupper($currentType), ['BOYS', 'GIRLS', 'CO-ED', 'COED'])) {
+            $gender = in_array(strtoupper($currentType), ['CO-ED', 'COED']) ? 'co-ed' : strtolower($currentType);
+            $query->where('gender_preference', $gender);
+        }
 
         // Search Filter
         if ($request->filled('search')) {
@@ -66,22 +132,6 @@ class BrokerPropertyController extends Controller
                   ->orWhereHas('city', fn($c) => $c->where('name', 'like', "%{$search}%"))
                   ->orWhereHas('area', fn($a) => $a->where('name', 'like', "%{$search}%"));
             });
-        }
-
-        // Type / Gender Filter
-        if ($request->filled('type')) {
-            $type = strtoupper($request->query('type'));
-            if (in_array($type, ['BOYS', 'GIRLS', 'CO-ED', 'COED'])) {
-                $gender = in_array($type, ['CO-ED', 'COED']) ? 'co-ed' : strtolower($type);
-                $query->where('gender_preference', $gender);
-            } else {
-                $query->where(function ($q) use ($type) {
-                    $q->whereHas('propertyType', function ($pt) use ($type) {
-                        $pt->where('slug', strtolower($type))
-                           ->orWhere('name', 'like', "%{$type}%");
-                    })->orWhere('gender_preference', strtolower($type));
-                });
-            }
         }
 
         // Status Filter
@@ -101,7 +151,7 @@ class BrokerPropertyController extends Controller
 
         $properties = $query->latest('created_at')->get();
 
-        // 3. Dropdown Options for Modals
+        // 4. Dropdown Options for Modals
         $cities = City::where('is_active', 1)->orderBy('name')->get();
         $propertyTypes = PropertyType::where('is_active', 1)->orderBy('name')->get();
 
@@ -117,7 +167,8 @@ class BrokerPropertyController extends Controller
                     'available_beds' => $availableBeds,
                     'occupied_beds' => $occupiedBeds,
                     'occupancy_rate' => $occupancyRate,
-                ]
+                ],
+                'tab_counts' => $tabCounts
             ]);
         }
 
@@ -131,7 +182,9 @@ class BrokerPropertyController extends Controller
             'occupiedBeds',
             'occupancyRate',
             'cities',
-            'propertyTypes'
+            'propertyTypes',
+            'tabCounts',
+            'currentType'
         ));
     }
 

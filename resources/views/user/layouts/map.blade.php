@@ -52,8 +52,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin>
     <link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossorigin>
@@ -63,8 +61,6 @@
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com">
     <link rel="dns-prefetch" href="https://b.basemaps.cartocdn.com">
@@ -74,29 +70,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        (function(){
-            var _w = console.warn;
-            console.warn = function(){
-                if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
-                _w.apply(console, arguments);
-            };
-        })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'] },
-                    colors: {
-                        brand: { DEFAULT: '#4bb59d', light: '#e6f7f3', dark: '#3a9a85', 50: '#f0fdf9', 100: '#ccf0e8' },
-                        primary: { DEFAULT: '#1a1a7f', light: '#eef2ff', dark: '#23239c' }
-                    }
-                }
-            }
-        }
-    </script>
     @vite(['resources/css/map.css', 'resources/js/app.js'])
     <style>
         * { -webkit-tap-highlight-color: transparent; }
@@ -110,6 +83,8 @@
 </head>
 <body class="bg-gray-50 text-slate-800 font-sans antialiased h-screen flex flex-col overflow-hidden">
     @yield('content')
+    @include('user.partials.pwa-modal')
+
     <script>
         window.triggerHaptic = function(ms = 12) {
             if ('vibrate' in navigator) {
@@ -122,6 +97,100 @@
                 window.triggerHaptic(10);
             }
         }, { passive: true });
+
+        // PWA Service Worker & Prompt
+        let deferredPrompt = null;
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        window.isPwaStandalone = function() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true || 
+                   document.referrer.includes('android-app://');
+        };
+
+        window.installPwaApp = async function(platform = 'auto') {
+            window.triggerHaptic(20);
+            if (window.isPwaStandalone()) {
+                alert('StayNest is already installed on your device!');
+                return;
+            }
+            if (deferredPrompt) {
+                try {
+                    deferredPrompt.prompt();
+                    await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    window.closePwaModal();
+                    return;
+                } catch(err) {}
+            }
+            window.openPwaModal(platform);
+        };
+
+        window.openPwaModal = function(platform = 'auto') {
+            const modal = document.getElementById('pwaInstallModal');
+            if (!modal) return;
+            const isIos = platform === 'ios' || /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isAndroid = platform === 'android' || /Android/.test(navigator.userAgent);
+            const directBox = document.getElementById('pwaDirectTriggerBox');
+            const iosBox = document.getElementById('pwaIosGuideBox');
+            const androidBox = document.getElementById('pwaAndroidFallbackBox');
+            const modalBtnText = document.getElementById('pwaModalBtnText');
+
+            if (isIos) {
+                if (directBox) directBox.classList.add('hidden');
+                if (iosBox) iosBox.classList.remove('hidden');
+                if (androidBox) androidBox.classList.add('hidden');
+            } else if (isAndroid) {
+                if (directBox) directBox.classList.remove('hidden');
+                if (iosBox) iosBox.classList.add('hidden');
+                if (androidBox) androidBox.classList.remove('hidden');
+                if (modalBtnText) modalBtnText.innerText = 'Install for Android (PWA)';
+            } else {
+                if (directBox) directBox.classList.remove('hidden');
+                if (iosBox) iosBox.classList.add('hidden');
+                if (androidBox) androidBox.classList.add('hidden');
+                if (modalBtnText) modalBtnText.innerText = 'Install StayNest App';
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closePwaModal = function() {
+            window.triggerHaptic(10);
+            const modal = document.getElementById('pwaInstallModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        window.triggerPwaPromptDirectly = async function() {
+            window.triggerHaptic(20);
+            if (deferredPrompt) {
+                try {
+                    deferredPrompt.prompt();
+                    await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    window.closePwaModal();
+                    return;
+                } catch(e){}
+            }
+            const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIos) {
+                window.openPwaModal('ios');
+            } else {
+                const androidBox = document.getElementById('pwaAndroidFallbackBox');
+                if (androidBox) androidBox.classList.remove('hidden');
+            }
+        };
     </script>
     @stack('scripts')
 </body>

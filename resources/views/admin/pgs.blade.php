@@ -239,6 +239,10 @@
                             $isVerified = ($property->verification_status === 'verified' && $property->status === 'active');
                             $isPending = ($property->verification_status === 'pending');
                             $tagMeta = $property->tag_meta;
+                            $isComm = $property->property_category === 'commercial' || str_contains($typeSlug, 'commercial');
+                            $isFlat = $property->property_category === 'residential' && (str_contains($typeSlug, 'flat') || str_contains($typeSlug, 'apartment') || str_contains($typeSlug, 'house') || str_contains($typeSlug, 'villa'));
+                            $isLand = $property->property_category === 'land-plot' || str_contains($typeSlug, 'land') || str_contains($typeSlug, 'plot');
+                            $isPg = !$isComm && !$isFlat && !$isLand;
                         @endphp
                         <tr id="pg-row-{{ $property->id }}" class="admin-pg-row hover:bg-gray-50/70 transition">
                             <td class="px-6 py-4">
@@ -299,10 +303,29 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                {{ $property->total_beds ?? 1 }} beds
+                                @if($isComm)
+                                    <span class="font-bold text-gray-900">Commercial</span>
+                                    <div class="text-[11px] text-gray-500">{{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' sq ft' : 'Ready Space' }}</div>
+                                @elseif($isFlat)
+                                    <span class="font-bold text-gray-900">{{ $property->bhk_type ?: 'Apartment' }}</span>
+                                    <div class="text-[11px] text-gray-500">{{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' sq ft' : 'Full House' }}</div>
+                                @elseif($isLand)
+                                    <span class="font-bold text-gray-900">Land / Plot</span>
+                                    <div class="text-[11px] text-gray-500">{{ $property->carpet_area_sqft ? number_format($property->carpet_area_sqft) . ' Sq. Yds' : 'Plot Layout' }}</div>
+                                @else
+                                    {{ $property->total_beds ?? 1 }} beds
+                                    <div class="text-[11px] {{ (int)($property->available_beds ?? 0) > 0 ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-bold' }}">
+                                        {{ (int)($property->available_beds ?? 0) > 0 ? ($property->available_beds . ' avail.') : '0 avail (Full)' }}
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm font-bold text-gray-900">
-                                ₹{{ number_format($property->monthly_rent) }}
+                                @if($property->is_sale)
+                                    <span class="text-amber-600">{{ $property->display_price_formatted }}</span>
+                                    <div class="text-[10px] text-gray-400 font-semibold uppercase">For Sale</div>
+                                @else
+                                    ₹{{ number_format($property->monthly_rent) }}<span class="text-[10px] font-normal text-gray-500">/mo</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 <span id="status-badge-{{ $property->id }}" class="status-badge text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase {{ $isVerified ? 'bg-emerald-100 text-emerald-700' : ($isPending ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700') }}">

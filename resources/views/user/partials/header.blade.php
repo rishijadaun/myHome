@@ -261,6 +261,7 @@
         
         const dismissedUntil = localStorage.getItem('staynest_top_app_banner_dismissed_until');
         if (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)) {
+            banner.style.display = 'none';
             banner.classList.add('hidden');
             banner.classList.remove('flex');
             adjustMainPadding(false);
@@ -268,10 +269,12 @@
         }
 
         if (window.innerWidth < 768) {
+            banner.style.display = 'flex';
             banner.classList.remove('hidden');
             banner.classList.add('flex');
             adjustMainPadding(true);
         } else {
+            banner.style.display = 'none';
             banner.classList.add('hidden');
             banner.classList.remove('flex');
             adjustMainPadding(false);

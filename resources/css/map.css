@@ -1,5 +1,3 @@
-@import '@fortawesome/fontawesome-free/css/all.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -271,4 +269,60 @@ input[type='range']::-moz-range-thumb {
   cursor: pointer;
   border: 2px solid white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================================
+   CRITICAL RESPONSIVE VISIBILITY UTILITY OVERRIDES
+   Guarantees md:hidden and hidden md:block ALWAYS take effect
+   ======================================================== */
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 767.98px) {
+  .hidden-on-mobile,
+  .mobile-hidden,
+  .hidden.md\:block,
+  .hidden.md\:flex,
+  .hidden.md\:grid,
+  .hidden.md\:inline,
+  .hidden.md\:inline-block,
+  .hidden.md\:table,
+  [class*="hidden"][class*="md:block"],
+  [class*="hidden"][class*="md:flex"],
+  [class*="hidden"][class*="md:grid"] {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:hidden,
+  .md\:hidden.flex,
+  .md\:hidden.grid,
+  .md\:hidden.block,
+  .md\:hidden.inline-block,
+  .md\:hidden.inline-flex,
+  header.md\:hidden,
+  nav.md\:hidden,
+  div.md\:hidden,
+  section.md\:hidden,
+  aside.md\:hidden,
+  [class*="md:hidden"] {
+    display: none !important;
+  }
+  
+  .hidden.md\:block,
+  [class*="hidden"][class*="md:block"] {
+    display: block !important;
+  }
+  
+  .hidden.md\:flex,
+  [class*="hidden"][class*="md:flex"] {
+    display: flex !important;
+  }
+  
+  .hidden.md\:grid,
+  [class*="hidden"][class*="md:grid"] {
+    display: grid !important;
+  }
 }

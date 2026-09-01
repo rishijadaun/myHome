@@ -205,10 +205,13 @@ Route::name('user.')->group(function () {
     Route::view('/contact', 'user.contact');
     Route::post('/contact-us', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit'])->name('contact.submit');
     Route::post('/contact', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit']);
-    Route::view('/terms', 'user.terms')->name('terms');
-    Route::view('/terms-and-conditions', 'user.terms');
-    Route::view('/privacy', 'user.privacy')->name('privacy');
-    Route::view('/privacy-policy', 'user.privacy');
+    // SEO-Friendly Legal Pages (canonical URLs)
+    Route::view('/terms-of-service', 'user.terms')->name('terms');
+    Route::view('/privacy-policy', 'user.privacy')->name('privacy');
+    // Legacy URL redirects → 301 to canonical SEO URLs (preserves backlinks & crawl equity)
+    Route::get('/terms', fn() => redirect()->route('user.terms', [], 301));
+    Route::get('/terms-and-conditions', fn() => redirect()->route('user.terms', [], 301));
+    Route::get('/privacy', fn() => redirect()->route('user.privacy', [], 301));
     Route::view('/404', 'errors.404')->name('404');
     Route::get('/detail/{slug?}', [UserHomeController::class, 'show'])->name('detail');
     Route::get('/pg-details', [UserHomeController::class, 'show']);

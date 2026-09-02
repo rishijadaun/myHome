@@ -480,7 +480,7 @@
                             </div>
                             <div class="flex items-center justify-center gap-4 flex-wrap text-xs text-gray-600 pt-1">
                                 <span class="flex items-center gap-1.5 font-medium"><i class="fas fa-shield-check text-emerald-600 text-sm"></i> Verified Tenants</span>
-                                <span class="flex items-center gap-1.5 font-medium"><i class="fab fa-whatsapp text-emerald-600 text-sm"></i> Direct WhatsApp</span>
+                                <span class="flex items-center gap-1.5 font-medium"><i class="fab fa-whatsapp text-emerald-600 text-sm"></i> Direct Chat</span>
                                 <span class="flex items-center gap-1.5 font-medium"><i class="fas fa-bolt text-amber-500 text-sm"></i> Live in 2 Min</span>
                             </div>
                             <div class="pt-2">

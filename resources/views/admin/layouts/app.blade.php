@@ -25,6 +25,10 @@
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
     </style>
     @stack('styles')
 </head>
@@ -48,24 +52,27 @@
     </div>
 
     <!-- Sidebar -->
-    <aside class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-100 z-50 transition-transform duration-300 lg:translate-x-0 flex flex-col justify-between shadow-lg lg:shadow-none">
-        <div>
-            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-brand to-brand-dark rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand/30">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <div>
-                        <div class="font-bold text-xl leading-tight">StayNest</div>
-                        <div class="text-xs text-brand font-semibold tracking-wide">Admin Panel</div>
-                    </div>
-                </a>
-                <button onclick="toggleSidebar()" class="lg:hidden w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center tap-effect">
-                    <i class="fas fa-times text-gray-500 text-sm"></i>
-                </button>
-            </div>
+    <aside class="sidebar fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-100 z-50 transition-transform duration-300 lg:translate-x-0 flex flex-col shadow-lg lg:shadow-none overflow-hidden">
+        <!-- Fixed Header / Logo -->
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between flex-shrink-0 bg-white">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-brand to-brand-dark rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand/30 shrink-0">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div>
+                    <div class="font-bold text-xl leading-tight text-gray-900">StayNest</div>
+                    <div class="text-xs text-brand font-semibold tracking-wide">Admin Panel</div>
+                </div>
+            </a>
+            <button onclick="toggleSidebar()" class="lg:hidden w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center tap-effect cursor-pointer" aria-label="Close Menu">
+                <i class="fas fa-times text-gray-500 text-sm"></i>
+            </button>
+        </div>
 
-            <nav class="p-4 space-y-1">
+        <!-- Scrollable Navigation Menu -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1 overscroll-contain">
+            <div class="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Main Navigation</div>
+            <nav class="space-y-1">
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-chart-line w-5 text-center"></i>
                     <span class="text-sm font-medium">Dashboard</span>
@@ -127,7 +134,8 @@
             </nav>
         </div>
 
-        <div class="p-4 border-t border-gray-100 space-y-1">
+        <!-- Fixed Bottom Profile & System Menu -->
+        <div class="p-4 border-t border-gray-100 flex-shrink-0 bg-white space-y-1">
             @if(Auth::check())
             <div class="px-3 py-2.5 mb-2 bg-brand-50/60 border border-brand-100/80 rounded-xl flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand to-brand-dark text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-brand/30 shrink-0">

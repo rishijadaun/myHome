@@ -48,8 +48,8 @@
     </div>
 
     <!-- Quick Contact Channels Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
-        <!-- Phone Card -->
+    <!-- <div class="grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
+   
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-hover flex flex-col justify-between">
             <div class="flex items-start gap-4">
                 <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl flex-shrink-0">
@@ -68,7 +68,7 @@
             </a>
         </div>
 
-        <!-- WhatsApp Card -->
+    
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-hover flex flex-col justify-between">
             <div class="flex items-start gap-4">
                 <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-2xl flex-shrink-0">
@@ -87,7 +87,7 @@
             </a>
         </div>
 
-        <!-- Email Card -->
+      
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-hover flex flex-col justify-between sm:col-span-2 lg:col-span-1">
             <div class="flex items-start gap-4">
                 <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-xl flex-shrink-0">
@@ -105,7 +105,7 @@
                 <i class="fas fa-paper-plane text-[10px]"></i> Send Email
             </a>
         </div>
-    </div>
+    </div> -->
 
     <!-- Contact Form & Office Info Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-14">
@@ -230,10 +230,52 @@
                 </button>
             </form>
         </div>
+        <div class="lg:col-span-5 space-y-6">
+              <!-- Frequently Asked Questions -->
+    <div class="bg-white rounded-3xl p-4 md:p-6 border border-gray-100 shadow-sm mb-12">
+        <div class="text-center max-w-xl mx-auto mb-8">
+            <span class="text-brand bg-brand-light text-xs font-bold px-3 py-1 rounded-full uppercase">Got Questions?</span>
+            <h2 class="text-2xl font-bold text-slate-900 mt-2">Frequently Asked Questions</h2>
+            <p class="text-xs text-slate-500 mt-1">Quick answers to help you navigate StayNest seamlessly</p>
+        </div>
+
+        <div class="space-y-4 max-w-3xl mx-auto">
+            <div class="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
+                <h4 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                    <span>Is there any brokerage fee for booking a PG on StayNest?</span>
+                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
+                </h4>
+                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                    No, StayNest is 100% brokerage-free for students and working professionals. You connect directly with verified property hosts and caretakers.
+                </p>
+            </div>
+
+            <div class="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
+                <h4 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                    <span>How do I schedule a visit to inspect a property?</span>
+                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
+                </h4>
+                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                    On any PG detail page, simply tap the "Schedule a Visit" or "Contact Host" button to set up an in-person or virtual walkthrough directly.
+                </p>
+            </div>
+
+            <div class="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
+                <h4 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                    <span>How can I list my PG or hostel on StayNest?</span>
+                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
+                </h4>
+                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                    You can click on the "Post Property Free" button in the navigation header or go to the List Property page. It takes less than 3 minutes to submit your property details.
+                </p>
+            </div>
+        </div>
+    </div>
+        </div>
 
         <!-- Office & Presence Info (5 Cols) -->
-        <div class="lg:col-span-5 space-y-6">
-            <!-- Headquarters Card -->
+        <!-- <div class="lg:col-span-5 space-y-6">
+          
             <div class="bg-gradient-to-br from-brand-50 to-white rounded-3xl p-6 border border-brand-100 shadow-sm space-y-5">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-brand rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-md shadow-brand/30">
@@ -281,7 +323,7 @@
                 </div>
             </div>
 
-            <!-- Zero Brokerage Assurance Box -->
+         
             <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-3">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">
@@ -293,49 +335,10 @@
                     StayNest does not charge any brokerage or finding fee from tenants. Every interaction and booking on StayNest is completely transparent and direct.
                 </p>
             </div>
-        </div>
+        </div> -->
     </div>
 
-    <!-- Frequently Asked Questions -->
-    <div class="bg-white rounded-3xl p-6 md:p-10 border border-gray-100 shadow-sm mb-12">
-        <div class="text-center max-w-xl mx-auto mb-8">
-            <span class="text-brand bg-brand-light text-xs font-bold px-3 py-1 rounded-full uppercase">Got Questions?</span>
-            <h2 class="text-2xl font-bold text-slate-900 mt-2">Frequently Asked Questions</h2>
-            <p class="text-xs text-slate-500 mt-1">Quick answers to help you navigate StayNest seamlessly</p>
-        </div>
-
-        <div class="space-y-4 max-w-3xl mx-auto">
-            <div class="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
-                <h4 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
-                    <span>Is there any brokerage fee for booking a PG on StayNest?</span>
-                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
-                </h4>
-                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                    No, StayNest is 100% brokerage-free for students and working professionals. You connect directly with verified property hosts and caretakers.
-                </p>
-            </div>
-
-            <div class="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
-                <h4 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
-                    <span>How do I schedule a visit to inspect a property?</span>
-                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
-                </h4>
-                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                    On any PG detail page, simply tap the "Schedule a Visit" or "Contact Host" button to set up an in-person or virtual walkthrough directly.
-                </p>
-            </div>
-
-            <div class="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
-                <h4 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
-                    <span>How can I list my PG or hostel on StayNest?</span>
-                    <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
-                </h4>
-                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                    You can click on the "Post Property Free" button in the navigation header or go to the List Property page. It takes less than 3 minutes to submit your property details.
-                </p>
-            </div>
-        </div>
-    </div>
+  
 
 </div>
 @endsection

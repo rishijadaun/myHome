@@ -48,19 +48,23 @@ class UserHomeController extends Controller
             return in_array($slug, ['commercial', 'shop', 'office', 'retail', 'showroom', 'warehouse']);
         });
 
+        $totalRoommates = \App\Models\RoommatePost::where('status', 'active')->count();
+
         // Dynamic Counts for Category Switcher Cards
         $propertyTypeCounts = [
             'pg' => $pgProperties->count(),
             'flat' => $flatProperties->count(),
             'commercial' => $commercialProperties->count(),
+            'roommate' => $totalRoommates,
         ];
 
         // 3. PG Sections (Main Priority)
         $nearMeProperties = $pgProperties->take(20);
 
+        // Recommended for You: Strictly 4 list only on home page
         $recommendedProperties = $pgProperties->filter(function ($p) {
             return (bool) $p->is_recommended || (bool) $p->featured;
-        })->take(8)->values();
+        })->take(4)->values();
 
         $girlsProperties = $pgProperties->filter(function ($p) {
             $pref = strtolower($p->gender_preference ?? '');
@@ -86,15 +90,15 @@ class UserHomeController extends Controller
 
         $recentProperties = $pgProperties->take(4);
 
-        // 4. Flat / House Sections
-        $flatNearMe = $flatProperties->take(20);
+        // 4. Flat / House Sections: Strictly 8 list only on home page
+        $flatNearMe = $flatProperties->take(8);
         $flatRecommended = $flatProperties->filter(function ($p) {
             return (bool) $p->is_recommended || (bool) $p->featured;
         })->take(8)->values();
         $flatFeatured = $flatRecommended;
 
-        // 5. Commercial Sections
-        $commercialNearMe = $commercialProperties->take(20);
+        // 5. Commercial Sections: Strictly new 8 list only on home page
+        $commercialNearMe = $commercialProperties->take(8);
         $commercialRecommended = $commercialProperties->filter(function ($p) {
             return (bool) $p->is_recommended || (bool) $p->featured;
         })->take(8)->values();
@@ -102,7 +106,7 @@ class UserHomeController extends Controller
 
         // 6. Selected Active Property Type (default 'pg-hostel')
         $selectedType = $request->query('type', 'pg-hostel');
-        if (!in_array($selectedType, ['pg-hostel', 'flat-apartment', 'commercial'])) {
+        if (!in_array($selectedType, ['pg-hostel', 'flat-apartment', 'commercial', 'roommate'])) {
             $selectedType = 'pg-hostel';
         }
 
@@ -136,6 +140,14 @@ class UserHomeController extends Controller
             })->take(12);
         });
 
+        // 8. Roommates & Flatmates Section: Strictly 8 recent listings
+        $roommatePosts = \App\Models\RoommatePost::where('status', 'active')
+            ->with(['user.profile'])
+            ->latest('created_at')
+            ->take(8)
+            ->get();
+        $totalRoommates = \App\Models\RoommatePost::where('status', 'active')->count();
+
         return view('user.home', compact(
             'pgProperties',
             'flatProperties',
@@ -153,7 +165,9 @@ class UserHomeController extends Controller
             'commercialNearMe',
             'commercialRecommended',
             'commercialFeatured',
-            'topCities'
+            'topCities',
+            'roommatePosts',
+            'totalRoommates'
         ));
     }
 

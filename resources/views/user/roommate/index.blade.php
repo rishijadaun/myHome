@@ -39,7 +39,7 @@
         $seoDesc = 'Find top matching flatmates and shared rooms for "' . e($searchQ) . '" with zero brokerage on StayNest.';
     } else {
         $seoTitle = 'Find Flatmate & Roommate in India — 100% Verified, Zero Brokerage | StayNest';
-        $seoDesc = 'Discover verified flatmates, private rooms, and shared apartments across Delhi, Noida, Gurgaon, Bangalore, Mumbai, and Pune. Direct WhatsApp chat on StayNest.';
+        $seoDesc = 'Discover verified flatmates, private rooms, and shared apartments across Delhi, Noida, Gurgaon, Bangalore, Mumbai, and Pune. Direct chat on StayNest.';
     }
     $seoKeywords = 'flatmate in ' . ($selectedCity ?: 'India') . ', roommate in ' . ($selectedCity ?: 'India') . ', shared room, 2 bhk flatmate, girls pg flatmate, boys room, zero brokerage flatmate';
     $canonicalUrl = url()->current();

@@ -297,6 +297,58 @@
         box-shadow: 0 4px 14px -2px rgba(234, 88, 12, 0.18) !important;
     }
 
+    .property-type-card.active-roommate {
+        border-color: #4c30dd !important;
+        border-width: 2px !important;
+        background-color: #f3f0ff !important;
+        box-shadow: 0 4px 14px -2px rgba(76, 48, 221, 0.22) !important;
+    }
+
+    /* Roommate & Flatmate #4c30dd Dedicated Styles */
+    .roommate-card {
+        border-radius: 0px !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .roommate-card:hover {
+        border-color: #4c30dd !important;
+        box-shadow: 0 10px 25px -4px rgba(76, 48, 221, 0.2) !important;
+    }
+    .roommate-btn-view {
+        background-color: #4c30dd !important;
+        color: #ffffff !important;
+        border-radius: 0px !important;
+        font-weight: 700 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 8px rgba(76, 48, 221, 0.35) !important;
+    }
+    .roommate-btn-view:hover {
+        background-color: #3d24c0 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(76, 48, 221, 0.5) !important;
+    }
+    .roommate-post-banner {
+        background: linear-gradient(135deg, #09051d 0%, #150d3a 50%, #2b1770 100%) !important;
+        border: 1.5px solid rgba(76, 48, 221, 0.45) !important;
+        border-radius: 0px !important;
+        box-shadow: 0 12px 30px -5px rgba(9, 5, 29, 0.5) !important;
+    }
+    .roommate-btn-cta {
+        background-color: #4c30dd !important;
+        color: #ffffff !important;
+        border-radius: 0px !important;
+        font-weight: 800 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 18px rgba(76, 48, 221, 0.45) !important;
+    }
+    .roommate-btn-cta:hover {
+        background-color: #3b20c8 !important;
+        color: #ffffff !important;
+        box-shadow: 0 6px 24px rgba(76, 48, 221, 0.65) !important;
+        transform: translateY(-1px);
+    }
+
     .view-container-fade {
         animation: fadeInView 0.24s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -496,6 +548,53 @@
                             </div>
                         </div>
 
+                        {{-- Slide 5: Find Flatmates & Roommates --}}
+                        <div class="swiper-slide !h-auto">
+                            <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#06241b">
+                                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                                     alt="Find Flatmates and Roommates" class="absolute inset-0 w-full h-full object-cover opacity-35">
+                                <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(6,36,27,0.97) 0%,rgba(16,77,59,0.80) 50%,rgba(10,30,24,0.3) 100%)"></div>
+                                <div class="absolute top-0 right-0 w-64 h-64 rounded-full" style="background:radial-gradient(circle,rgba(52,211,153,0.3) 0%,transparent 70%);transform:translate(30%,-30%)"></div>
+                                
+                                <div class="relative z-10 w-full">
+                                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                                        <div class="max-w-lg">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <span class="inline-flex items-center gap-1.5 bg-emerald-400/20 border border-emerald-400/40 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold text-emerald-300">
+                                                    <i class="fas fa-handshake text-emerald-400"></i> ZERO BROKERAGE
+                                                </span>
+                                                <span class="inline-flex items-center gap-1 bg-white/10 border border-white/20 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold text-white/80">
+                                                    <i class="fas fa-users text-emerald-300 text-[10px]"></i> Direct Connect
+                                                </span>
+                                            </div>
+                                            <h2 class="text-xl sm:text-3xl md:text-4xl font-black leading-tight mb-1.5 text-white">
+                                                Find Flatmates & Roommates <span style="color:#34d399">| 100% Direct</span>
+                                            </h2>
+                                            <p class="text-xs sm:text-sm text-white/70 mb-3 max-w-md line-clamp-2">Connect with verified flatmates, shared flats & vacant rooms with zero brokerage fee.</p>
+                                            <div class="flex flex-wrap gap-2.5">
+                                                <a href="{{ route('user.roommate.index') }}" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm tap-ripple transition shadow-lg shadow-emerald-500/30">
+                                                    <i class="fas fa-search"></i> Find Flatmates
+                                                </a>
+                                                <a href="{{ route('user.roommate.create') }}" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm tap-ripple transition">
+                                                    Post Free Listing
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0 mr-0 sm:mr-4 md:mr-6">
+                                            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-2.5 text-center min-w-[120px]">
+                                                <p class="text-xl sm:text-2xl font-black text-white">500+</p>
+                                                <p class="text-[10px] sm:text-[11px] text-white/70 font-medium">Active Flatmates</p>
+                                            </div>
+                                            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-2.5 text-center">
+                                                <p class="text-xl sm:text-2xl font-black text-emerald-300">₹0</p>
+                                                <p class="text-[10px] sm:text-[11px] text-white/70 font-medium">Brokerage Fee</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     {{-- Custom nav arrows (desktop 640px+) --}}
@@ -510,15 +609,15 @@
     </section>
 
     {{-- ============================= PROPERTY TYPE SWITCHER CARDS (OPTION 3) ============================= --}}
-    <section class="mt-4 sm:mt-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl sm:max-w-3xl mx-auto" id="propertyTypeSwitcherGrid">
+    <section class="mt-3 sm:mt-6">
+        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-4 gap-1.5 sm:gap-3 md:gap-4 max-w-4xl sm:max-w-5xl mx-auto" id="propertyTypeSwitcherGrid">
                 
                 <!-- Card 1: PG & Hostels (Main Priority) -->
                 <button type="button" onclick="switchPropertyType('pg-hostel', false)" id="card-type-pg-hostel" 
-                    class="property-type-card {{ $selectedType === 'pg-hostel' ? 'active-pg' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group">
-                    <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
-                        <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    class="property-type-card {{ $selectedType === 'pg-hostel' ? 'active-pg' : '' }} rounded-xl sm:rounded-2xl p-2 sm:p-3.5 md:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group overflow-hidden">
+                    <div class="w-8 h-8 sm:w-12 md:w-14 sm:h-12 md:h-14 flex items-center justify-center mb-1 sm:mb-1.5 shrink-0">
+                        <svg class="w-7 h-7 sm:w-11 md:w-13 sm:h-11 md:h-13 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <!-- Left taller green building -->
                             <rect x="11" y="14" width="22" height="42" rx="3" fill="#4bb59d" stroke="#134e48" stroke-width="2"/>
                             <rect x="15.5" y="19" width="4.5" height="5.5" rx="1" fill="#e6f7f3" stroke="#134e48" stroke-width="1.2"/>
@@ -540,15 +639,15 @@
                             <line x1="6" y1="56" x2="58" y2="56" stroke="#134e48" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                     </div>
-                    <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">PG & Hostels</p>
-                    <p class="text-[9px] sm:text-xs text-slate-500 font-semibold mt-0.5">{{ $propertyTypeCounts['pg'] > 0 ? $propertyTypeCounts['pg'] . '+ Stays' : '850+ Stays' }}</p>
+                    <p class="font-extrabold text-[10px] sm:text-xs md:text-sm text-slate-900 leading-tight truncate w-full">PG & Hostels</p>
+                    <p class="text-[8px] sm:text-[10px] md:text-xs text-slate-500 font-semibold mt-0.5 truncate w-full">{{ $propertyTypeCounts['pg'] > 0 ? $propertyTypeCounts['pg'] . '+ Stays' : '850+ Stays' }}</p>
                 </button>
 
                 <!-- Card 2: Flats & Houses -->
                 <button type="button" onclick="switchPropertyType('flat-apartment', false)" id="card-type-flat-apartment" 
-                    class="property-type-card {{ $selectedType === 'flat-apartment' ? 'active-flat' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group">
-                    <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
-                        <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    class="property-type-card {{ $selectedType === 'flat-apartment' ? 'active-flat' : '' }} rounded-xl sm:rounded-2xl p-2 sm:p-3.5 md:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group overflow-hidden">
+                    <div class="w-8 h-8 sm:w-12 md:w-14 sm:h-12 md:h-14 flex items-center justify-center mb-1 sm:mb-1.5 shrink-0">
+                        <svg class="w-7 h-7 sm:w-11 md:w-13 sm:h-11 md:h-13 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <!-- Left tall building -->
                             <rect x="13" y="12" width="22" height="44" rx="3" fill="#ffffff" stroke="#1e1b4b" stroke-width="2"/>
                             <rect x="17.5" y="16.5" width="5" height="4.5" rx="1" fill="#6366f1"/>
@@ -573,15 +672,15 @@
                             <line x1="7" y1="56" x2="57" y2="56" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                     </div>
-                    <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Flats & Houses</p>
-                    <p class="text-[9px] sm:text-xs text-slate-500 font-semibold mt-0.5">{{ $propertyTypeCounts['flat'] > 0 ? $propertyTypeCounts['flat'] . '+ Properties' : '0+ Properties' }}</p>
+                    <p class="font-extrabold text-[10px] sm:text-xs md:text-sm text-slate-900 leading-tight truncate w-full">Flats & Houses</p>
+                    <p class="text-[8px] sm:text-[10px] md:text-xs text-slate-500 font-semibold mt-0.5 truncate w-full">{{ $propertyTypeCounts['flat'] > 0 ? $propertyTypeCounts['flat'] . '+ Flats' : '0+ Flats' }}</p>
                 </button>
 
                 <!-- Card 3: Commercial -->
                 <button type="button" onclick="switchPropertyType('commercial', false)" id="card-type-commercial" 
-                    class="property-type-card {{ $selectedType === 'commercial' ? 'active-commercial' : '' }} rounded-xl sm:rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group">
-                    <div class="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-1 sm:mb-1.5">
-                        <svg class="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    class="property-type-card {{ $selectedType === 'commercial' ? 'active-commercial' : '' }} rounded-xl sm:rounded-2xl p-2 sm:p-3.5 md:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group overflow-hidden">
+                    <div class="w-8 h-8 sm:w-12 md:w-14 sm:h-12 md:h-14 flex items-center justify-center mb-1 sm:mb-1.5 shrink-0">
+                        <svg class="w-7 h-7 sm:w-11 md:w-13 sm:h-11 md:h-13 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect x="11" y="22" width="42" height="34" rx="2" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
                             <rect x="9" y="16" width="46" height="7" rx="2" fill="#1e3a8a" stroke="#1e293b" stroke-width="1.8"/>
                             <path d="M10 23L13 32H51L54 23H10Z" fill="#3b82f6" stroke="#1e293b" stroke-width="1.8" stroke-linejoin="round"/>
@@ -598,8 +697,30 @@
                             <line x1="5" y1="56" x2="59" y2="56" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                     </div>
-                    <p class="font-extrabold text-[11px] sm:text-sm text-slate-900 leading-tight">Commercial</p>
-                    <p class="text-[9px] sm:text-xs text-slate-500 font-semibold mt-0.5">{{ $propertyTypeCounts['commercial'] > 0 ? $propertyTypeCounts['commercial'] . '+ Spaces' : '120+ Spaces' }}</p>
+                    <p class="font-extrabold text-[10px] sm:text-xs md:text-sm text-slate-900 leading-tight truncate w-full">Commercial</p>
+                    <p class="text-[8px] sm:text-[10px] md:text-xs text-slate-500 font-semibold mt-0.5 truncate w-full">{{ $propertyTypeCounts['commercial'] > 0 ? $propertyTypeCounts['commercial'] . '+ Spaces' : '120+ Spaces' }}</p>
+                </button>
+
+                <!-- Card 4: Roommates & Flatmates (Theme #4c30dd) -->
+                <button type="button" onclick="switchPropertyType('roommate', false)" id="card-type-roommate" 
+                    class="property-type-card {{ $selectedType === 'roommate' ? 'active-roommate' : '' }} rounded-xl sm:rounded-2xl p-2 sm:p-3.5 md:p-4 text-center cursor-pointer tap-ripple flex flex-col items-center justify-center group overflow-hidden">
+                    <div class="w-8 h-8 sm:w-12 md:w-14 sm:h-12 md:h-14 flex items-center justify-center mb-1 sm:mb-1.5 shrink-0">
+                        <svg class="w-7 h-7 sm:w-11 md:w-13 sm:h-11 md:h-13 transition-transform duration-300 group-hover:scale-105" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background soft circle in #4c30dd tone -->
+                            <circle cx="32" cy="32" r="26" fill="#f3f0ff" stroke="#4c30dd" stroke-width="1.8"/>
+                            <!-- Left Avatar Figure -->
+                            <circle cx="23" cy="22" r="7" fill="#4c30dd"/>
+                            <path d="M12 45C12 36.7157 16.9249 32 23 32C29.0751 32 34 36.7157 34 45V48H12V45Z" fill="#6d4aff"/>
+                            <!-- Right Avatar Figure -->
+                            <circle cx="41" cy="22" r="7" fill="#2e1b8b"/>
+                            <path d="M30 45C30 36.7157 34.9249 32 41 32C47.0751 32 52 36.7157 52 45V48H30V45Z" fill="#4c30dd"/>
+                            <!-- Connected Handshake / Heart badge -->
+                            <circle cx="32" cy="33" r="5" fill="#ffffff" stroke="#4c30dd" stroke-width="1.5"/>
+                            <path d="M32 31.5C31.5 30.5 30 30.5 29.5 31.5C29 32.5 32 35 32 35C32 35 35 32.5 34.5 31.5C34 30.5 32.5 30.5 32 31.5Z" fill="#4c30dd"/>
+                        </svg>
+                    </div>
+                    <p class="font-extrabold text-[10px] sm:text-xs md:text-sm text-slate-900 leading-tight truncate w-full">Roommates</p>
+                    <p class="text-[8px] sm:text-[10px] md:text-xs text-slate-500 font-semibold mt-0.5 truncate w-full">{{ ($propertyTypeCounts['roommate'] ?? 0) > 0 ? ($propertyTypeCounts['roommate']) . '+ Flatmates' : '10+ Flatmates' }}</p>
                 </button>
             </div>
         </div>
@@ -1462,10 +1583,10 @@
                 </div>
 
                 @if($flatProperties->isNotEmpty())
-                    {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
+                    {{-- ===== MOBILE: 2-Column Horizontal Slider (Max 8) ===== --}}
                     <div id="flatNearMeMobileContainer" class="md:hidden swiper flatNearMeSwiper overflow-hidden">
                         <div class="swiper-wrapper" id="flatNearMeSwiperWrapper">
-                            @foreach ($flatProperties as $pg)
+                            @foreach ($flatNearMe as $pg)
                                 @php
                                     $tagMeta = $pg->display_tag_meta;
                                     $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
@@ -1543,9 +1664,9 @@
                         </div>
                     </div>
 
-                    {{-- ===== DESKTOP: 4-Col Grid ===== --}}
+                    {{-- ===== DESKTOP: 4-Col Grid (Max 8) ===== --}}
                     <div id="flatNearMeDesktopGrid" class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        @foreach ($flatProperties as $pg)
+                        @foreach ($flatNearMe as $pg)
                             @php
                                 $tagMeta = $pg->display_tag_meta;
                                 $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
@@ -1613,7 +1734,7 @@
                                             <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
                                             <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                         </div>
-                                        <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-indigo-500/30 transition">View Details</span>
+                                        <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-indigo-500/30 transition">View</span>
                                     </div>
                                 </div>
                             </a>
@@ -1820,10 +1941,10 @@
                 </div>
 
                 @if($commercialProperties->isNotEmpty())
-                    {{-- ===== MOBILE: 2-Column Horizontal Slider ===== --}}
+                    {{-- ===== MOBILE: 2-Column Horizontal Slider (Max 8) ===== --}}
                     <div id="commercialNearMeMobileContainer" class="md:hidden swiper commercialNearMeSwiper overflow-hidden">
                         <div class="swiper-wrapper" id="commercialNearMeSwiperWrapper">
-                            @foreach ($commercialProperties as $pg)
+                            @foreach ($commercialNearMe as $pg)
                                 @php
                                     $tagMeta = $pg->display_tag_meta;
                                     $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
@@ -1891,9 +2012,9 @@
                         </div>
                     </div>
 
-                    {{-- ===== DESKTOP: 4-Col Grid ===== --}}
+                    {{-- ===== DESKTOP: 4-Col Grid (Max 8) ===== --}}
                     <div id="commercialNearMeDesktopGrid" class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        @foreach ($commercialProperties as $pg)
+                        @foreach ($commercialNearMe as $pg)
                             @php
                                 $tagMeta = $pg->display_tag_meta;
                                 $slugUrl = route('user.detail', ['slug' => $pg->slug ?: \Illuminate\Support\Str::slug($pg->name)]);
@@ -1961,7 +2082,7 @@
                                             <span class="text-[10px] text-gray-400 block font-medium">{{ $pg->is_sale ? 'Price' : 'Rent' }}</span>
                                             <span class="text-base font-black text-gray-900">{{ $pg->display_price_formatted }}@if(!$pg->is_sale)<span class="text-xs font-normal text-gray-500">/mo</span>@endif</span>
                                         </div>
-                                        <span class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-amber-500/30 transition">View Details</span>
+                                        <span class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-amber-500/30 transition">View</span>
                                     </div>
                                 </div>
                             </a>
@@ -2148,8 +2269,161 @@
         @endif
     </div> {{-- ============================= END COMMERCIAL VIEW CONTAINER ============================= --}}
 
-    {{-- ============================= 7. EXPLORE TOP CITIES ============================= --}}
-    <section class="mt-8 sm:mt-10">
+    {{-- ============================= ROOMMATES / FLATMATES VIEW CONTAINER (OPTION 3) ============================= --}}
+    <div id="roommateViewContainer" class="{{ $selectedType === 'roommate' ? '' : 'hidden' }}">
+        <section class="mt-8 sm:mt-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <div>
+                        <h2 class="section-title flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-[#f3f0ff] inline-flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-users text-[#4c30dd] text-sm"></i>
+                            </span>
+                            Recent Flatmates & Roommates
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1 ml-10">Explore verified flatmates & shared accommodations across top cities</p>
+                    </div>
+                    <a href="{{ route('user.roommate.index') }}" class="text-xs font-bold text-[#4c30dd] flex items-center gap-1.5 bg-[#f3f0ff] hover:bg-[#4c30dd]/15 px-3.5 py-1.5 rounded-full tap-ripple transition">
+                        See all <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                {{-- 8 Recent Roommate Listings (Responsive Grid: 2-col mobile, 4-col desktop) --}}
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-6">
+                    @forelse($roommatePosts->take(8) as $r)
+                        @php
+                            $rPref = strtolower($r->gender_preference ?? 'any');
+                            $bhkLabels = [
+                                '1rk' => '1 RK Flat',
+                                '1bhk' => '1 BHK Flat',
+                                '2bhk' => '2 BHK Flat',
+                                '3bhk' => '3 BHK Flat',
+                                '4bhk_plus' => '4+ BHK Villa',
+                                'shared_room' => 'Shared Room',
+                                'single_room' => 'Single Room',
+                            ];
+                            $rBhk = $bhkLabels[$r->bhk_type] ?? (str_ends_with(strtolower($r->bhk_type), 'bhk') ? strtoupper($r->bhk_type) : ucwords(str_replace('_', ' ', $r->bhk_type)));
+                            $rSlugUrl = route('user.roommate.show', $r->slug);
+                            $rAvatar = $r->poster_avatar_url;
+                            $rLocation = ($r->locality ? $r->locality . ', ' : '') . ($r->city ?: 'City Center');
+                        @endphp
+                        <div class="roommate-card overflow-hidden flex flex-col justify-between h-full group">
+                            <div>
+                                <!-- Top Media Banner (0 padding, full bleed, no room badge) -->
+                                <div class="relative h-36 sm:h-44 w-full p-0 m-0 overflow-hidden bg-gradient-to-br from-slate-950 to-[#1b104a] flex flex-col items-center justify-center text-center {{ $rAvatar ? 'skeleton-shimmer' : '' }}">
+                                    @if($rAvatar)
+                                        <img src="{{ $rAvatar }}" alt="{{ $r->poster_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 block p-0 m-0" loading="lazy" onload="this.parentElement.classList.remove('skeleton-shimmer')">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+                                    @else
+                                        <div class="relative z-10 w-14 h-14 sm:w-16 sm:h-16 bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                            <span class="text-3xl sm:text-4xl">{{ $r->gender_icon }}</span>
+                                        </div>
+                                    @endif
+
+                                    <!-- Top-Right Gender Preference -->
+                                    <div class="absolute top-2.5 right-2.5 {{ $rPref === 'female' ? 'bg-pink-600' : ($rPref === 'male' ? 'bg-blue-600' : 'bg-[#4c30dd]') }} text-white text-[9px] font-extrabold px-2.5 py-0.5 shadow-xs z-20" style="{{ $rPref !== 'female' && $rPref !== 'male' ? 'background-color: #4c30dd !important;' : '' }}">
+                                        {{ $rPref === 'female' ? '👩 Girls Only' : ($rPref === 'male' ? '👨 Boys Only' : '🧑 Any') }}
+                                    </div>
+
+                                    <!-- Bottom-Left Move-in Date -->
+                                    <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur-md text-white text-[9px] font-medium px-2 py-0.5 z-20">
+                                        <i class="fas fa-calendar-day text-[#a594fd] text-[8px] mr-1"></i>
+                                        <span>{{ $r->move_in_date ? $r->move_in_date->format('d M') : 'Immediate' }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Content Details -->
+                                <div class="p-3 sm:p-4">
+                                    <div class="flex items-center justify-between gap-1 mb-1">
+                                        <a href="{{ $rSlugUrl }}" class="font-extrabold text-xs sm:text-base text-gray-900 group-hover:text-[#4c30dd] transition truncate block no-underline">
+                                            {{ $r->poster_name }}
+                                        </a>
+                                        <i class="fas fa-circle-check text-xs flex-shrink-0" style="color: #4c30dd !important;" title="Verified Member"></i>
+                                    </div>
+
+                                    <p class="text-[10px] sm:text-xs text-gray-500 truncate flex items-center gap-1 mb-2">
+                                        <i class="fas fa-map-marker-alt text-[10px] shrink-0" style="color: #4c30dd !important;"></i>
+                                        <span class="truncate">{{ $rLocation }}</span>
+                                    </p>
+
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="text-[9px] sm:text-[11px] font-extrabold px-2 py-0.5" style="background-color: #f3f0ff !important; color: #4c30dd !important; border: 1px solid rgba(76, 48, 221, 0.25) !important;">
+                                            {{ $rBhk }}
+                                        </span>
+                                        @if($r->profession)
+                                            <span class="text-[9px] sm:text-[10px] font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 truncate max-w-[100px]">
+                                                {{ $r->profession }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Footer with High Visibility #4c30dd View Button -->
+                            <div class="p-3 sm:p-4 pt-0 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
+                                <div>
+                                    <span class="text-[8px] sm:text-[9px] text-gray-400 uppercase font-bold block">Rent Budget</span>
+                                    <span class="text-xs sm:text-sm font-black text-gray-900">{{ $r->budget_range }}</span>
+                                </div>
+                                <a href="{{ $rSlugUrl }}" class="roommate-btn-view px-3.5 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold tap-effect flex items-center gap-1.5 no-underline">
+                                    <span>View</span>
+                                    <i class="fas fa-arrow-right text-[9px]"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-full py-12 text-center bg-white border border-gray-100 shadow-sm my-4">
+                            <div class="w-12 h-12 text-[#4c30dd] flex items-center justify-center mx-auto mb-3 text-lg" style="background-color: #f3f0ff !important;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-gray-900">Looking for a flatmate?</h3>
+                            <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Be the first to post your room vacancy or flatmate requirement.</p>
+                            <a href="{{ route('user.roommate.create') }}" class="roommate-btn-cta mt-4 inline-block text-xs font-bold px-5 py-2.5 shadow-md transition">
+                                Post Requirement Free
+                            </a>
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- Bottom Post Requirement Banner (Sharp, High-Contrast UI/UX) -->
+                <div class="mt-8 relative overflow-hidden roommate-post-banner p-6 sm:p-8 md:p-10">
+                    <!-- Background ambient glow circles -->
+                    <div class="absolute -right-10 -top-10 w-56 h-56 rounded-full bg-[#4c30dd]/25 blur-3xl pointer-events-none"></div>
+                    <div class="absolute -left-10 -bottom-10 w-56 h-56 rounded-full bg-[#4c30dd]/20 blur-3xl pointer-events-none"></div>
+
+                    <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div class="flex items-start sm:items-center gap-4 sm:gap-5">
+                            <div class="w-12 h-12 sm:w-16 sm:h-16 bg-[#4c30dd] text-white flex items-center justify-center text-xl sm:text-3xl shadow-lg shadow-[#4c30dd]/50 shrink-0 border border-white/20" style="background-color: #4c30dd !important;">
+                                <i class="fas fa-house-user"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5" style="background-color: rgba(76, 48, 221, 0.35) !important; color: #ddd6fe !important; border: 1px solid rgba(76, 48, 221, 0.7) !important;">
+                                        <i class="fas fa-bolt text-amber-300 text-[9px]"></i> 100% Free Listing
+                                    </span>
+                                    <span class="text-xs text-purple-200/80 font-medium hidden sm:inline">&bull; Zero Brokerage &bull; Direct Connect</span>
+                                </div>
+                                <h3 class="text-lg sm:text-2xl font-black text-white leading-tight">
+                                    Have a vacant room or searching for a flatmate?
+                                </h3>
+                                <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
+                                    Publish your requirement in 60 seconds with zero brokerage. Connect directly with verified flatmates & room owners.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 w-full sm:w-auto shrink-0">
+                            <a href="{{ route('user.roommate.create') }}" class="roommate-btn-cta w-full sm:w-auto text-center px-7 py-3.5 text-xs sm:text-sm whitespace-nowrap no-underline tap-effect flex items-center justify-center gap-2">
+                                <span>Post Requirement Free</span>
+                                <i class="fas fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
     {{-- ============================= 7. TOP CITIES (SWIPER SLIDER DESKTOP & MOBILE) ============================= --}}
     <section class="mt-8 sm:mt-10 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2733,24 +3007,26 @@ function switchPropertyType(type, triggerScroll = false) {
     const pgContainer = document.getElementById('pgViewContainer');
     const flatContainer = document.getElementById('flatViewContainer');
     const commercialContainer = document.getElementById('commercialViewContainer');
+    const roommateContainer = document.getElementById('roommateViewContainer');
     const skeleton = document.getElementById('homeSwitchSkeleton');
 
     const cardPg = document.getElementById('card-type-pg-hostel');
     const cardFlat = document.getElementById('card-type-flat-apartment');
     const cardCommercial = document.getElementById('card-type-commercial');
+    const cardRoommate = document.getElementById('card-type-roommate');
 
     if (typeof window.triggerHaptic === 'function') {
         window.triggerHaptic(10);
     }
 
     // Reset all cards
-    [cardPg, cardFlat, cardCommercial].forEach(c => {
+    [cardPg, cardFlat, cardCommercial, cardRoommate].forEach(c => {
         if (!c) return;
-        c.classList.remove('active-pg', 'active-flat', 'active-commercial');
+        c.classList.remove('active-pg', 'active-flat', 'active-commercial', 'active-roommate');
     });
 
     // Hide all containers & show skeleton shimmer
-    [pgContainer, flatContainer, commercialContainer].forEach(cnt => {
+    [pgContainer, flatContainer, commercialContainer, roommateContainer].forEach(cnt => {
         if (cnt) cnt.classList.add('hidden');
     });
     if (skeleton) skeleton.classList.remove('hidden');
@@ -2762,6 +3038,9 @@ function switchPropertyType(type, triggerScroll = false) {
     } else if (type === 'commercial') {
         if (cardCommercial) cardCommercial.classList.add('active-commercial');
         targetContainer = commercialContainer;
+    } else if (type === 'roommate') {
+        if (cardRoommate) cardRoommate.classList.add('active-roommate');
+        targetContainer = roommateContainer;
     } else {
         // Default PG / Hostel
         type = 'pg-hostel';
@@ -2805,7 +3084,9 @@ function switchPropertyType(type, triggerScroll = false) {
         });
 
         if (allCitiesBtn) {
-            if (type && type !== 'pg-hostel') {
+            if (type === 'roommate') {
+                allCitiesBtn.href = "{{ route('user.roommate.index') }}";
+            } else if (type && type !== 'pg-hostel') {
                 allCitiesBtn.href = searchBase + '?type=' + encodeURIComponent(type);
             } else {
                 allCitiesBtn.href = searchBase;
@@ -2836,7 +3117,7 @@ function switchPropertyType(type, triggerScroll = false) {
     }, 60);
 
     if (triggerScroll) {
-        const target = document.getElementById(type === 'flat-apartment' ? 'flatViewContainer' : (type === 'commercial' ? 'commercialViewContainer' : 'pgViewContainer'));
+        const target = document.getElementById(type === 'flat-apartment' ? 'flatViewContainer' : (type === 'commercial' ? 'commercialViewContainer' : (type === 'roommate' ? 'roommateViewContainer' : 'pgViewContainer')));
         if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }

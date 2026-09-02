@@ -51,13 +51,15 @@
 
     <div class="px-4 py-3">
         <div class="flex items-center justify-between">
-            <a href="{{ route('user.location') }}" class="flex-1 min-w-0 flex items-center gap-2">
+            <a href="{{ route('user.location') }}" class="flex-1 min-w-0 flex items-center gap-2" id="headerMobileLocationLink" title="Select or view current location">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5 mb-0.5">
                         <span class="text-lg font-bold text-gray-900">StayNest</span>
                         <i class="fas fa-chevron-down text-xs text-gray-400"></i>
                     </div>
-                    <p class="text-xs text-gray-500 truncate"><i class="fas fa-map-marker-alt text-brand text-[10px] mr-1"></i>Sector 62, Noida, Delhi NCR</p>
+                    <p class="text-xs text-gray-500 truncate" id="headerMobileLocationText">
+                        <i class="fas fa-map-marker-alt text-brand text-[10px] mr-1"></i><span id="headerUserLiveLocationText">Detecting location...</span>
+                    </p>
                 </div>
             </a>
 
@@ -112,6 +114,13 @@
                         <i class="fas fa-home"></i>
                     </div>
                     <span class="font-bold text-2xl text-gray-900 tracking-tight">Stay<span class="gradient-text">Nest</span></span>
+                </a>
+
+                <!-- Desktop Live Location Badge -->
+                <a href="{{ route('user.location') }}" class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 hover:bg-brand-light border border-gray-200 hover:border-brand/40 transition text-xs text-gray-700 hover:text-brand max-w-[220px]" title="Change Location on Map">
+                    <i class="fas fa-location-dot text-brand text-xs flex-shrink-0 animate-pulse"></i>
+                    <span class="truncate font-semibold" id="deskUserLiveLocationText">Detecting location...</span>
+                    <i class="fas fa-chevron-down text-[9px] text-gray-400 flex-shrink-0"></i>
                 </a>
                 <nav class="flex space-x-8">
                     <a href="{{ route('user.home') }}" class="{{ request()->routeIs('user.home') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Home</a>
@@ -350,4 +359,112 @@
 
     document.addEventListener('DOMContentLoaded', checkTopAppBanner);
     window.addEventListener('resize', checkTopAppBanner);
+
+    // =========================================================================
+    // Dynamic Live User Geolocation & Address Detection for Header
+    // =========================================================================
+    (function() {
+        function updateHeaderLocationDisplay(locationName) {
+            if (!locationName) return;
+            const mobLabel = document.getElementById('headerUserLiveLocationText');
+            const deskLabel = document.getElementById('deskUserLiveLocationText');
+            if (mobLabel) mobLabel.textContent = locationName;
+            if (deskLabel) deskLabel.textContent = locationName;
+        }
+
+        // 1. Initial Fast Render from Cached Location or Saved Address
+        const savedAddrStr = localStorage.getItem('staynest_default_address');
+        const cachedLocName = localStorage.getItem('staynest_user_location_name');
+        const isLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
+
+        if (cachedLocName) {
+            updateHeaderLocationDisplay(cachedLocName);
+        } else if (savedAddrStr) {
+            try {
+                const parsed = JSON.parse(savedAddrStr);
+                const line = parsed.line2 || parsed.line1 || '';
+                if (line) {
+                    updateHeaderLocationDisplay(line);
+                }
+            } catch(e) {}
+        } else {
+            updateHeaderLocationDisplay('Sector 62, Noida, Delhi NCR');
+        }
+
+        // 2. Reverse Geocoding with Nominatim & BigDataCloud fallback
+        async function reverseGeocodeLiveCoords(lat, lng) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const addr = data.address || {};
+                    const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.road || addr.village || addr.town || addr.city_district || '';
+                    const city = addr.city || addr.state_district || addr.county || '';
+                    const state = addr.state || '';
+
+                    let formatted = '';
+                    if (locality && city) {
+                        formatted = `${locality}, ${city}`;
+                    } else if (city) {
+                        formatted = state ? `${city}, ${state}` : city;
+                    } else if (locality) {
+                        formatted = locality;
+                    } else if (data.display_name) {
+                        const parts = data.display_name.split(',');
+                        formatted = parts.slice(0, 2).join(',').trim();
+                    }
+
+                    if (formatted) {
+                        localStorage.setItem('staynest_user_location_name', formatted);
+                        localStorage.setItem('staynest_user_lat', lat);
+                        localStorage.setItem('staynest_user_lng', lng);
+                        updateHeaderLocationDisplay(formatted);
+                        return;
+                    }
+                }
+            } catch(e) {}
+
+            // Fallback to BigDataCloud
+            try {
+                const bdcRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
+                if (bdcRes.ok) {
+                    const bdcData = await bdcRes.json();
+                    const loc = bdcData.locality || bdcData.city || '';
+                    const sub = bdcData.principalSubdivision || '';
+                    const bdcFormatted = loc ? (sub ? `${loc}, ${sub}` : loc) : '';
+                    if (bdcFormatted) {
+                        localStorage.setItem('staynest_user_location_name', bdcFormatted);
+                        localStorage.setItem('staynest_user_lat', lat);
+                        localStorage.setItem('staynest_user_lng', lng);
+                        updateHeaderLocationDisplay(bdcFormatted);
+                    }
+                }
+            } catch(e) {}
+        }
+
+        // 3. Live Browser GPS Geolocation Auto-Detection
+        if (navigator.geolocation && !isLocked) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    if (position && position.coords) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        reverseGeocodeLiveCoords(lat, lng);
+                    }
+                },
+                function(err) {
+                    // Keep existing cached location or default on denial
+                },
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 }
+            );
+        }
+    })();
 </script>

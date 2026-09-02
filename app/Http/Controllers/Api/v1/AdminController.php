@@ -13,8 +13,22 @@ class AdminController extends Controller
 {
     use ApiResponse;
 
+    /**
+     * Ensure the authenticated user has active administrator privileges.
+     */
+    protected function authorizeAdmin(Request $request): ?\Illuminate\Http\JsonResponse
+    {
+        $user = $request->user();
+        if (!$user || !$user->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || $user->status !== 'active') {
+            return $this->error('Forbidden. Administrator privileges required.', [], 403);
+        }
+        return null;
+    }
+
     public function dashboard(Request $request)
     {
+        if ($deny = $this->authorizeAdmin($request)) return $deny;
+
         $totalProperties = Property::count();
         $approvedProperties = Property::where('verification_status', 'verified')->count();
         $pendingProperties = Property::where('verification_status', 'pending')->count();
@@ -33,6 +47,8 @@ class AdminController extends Controller
 
     public function users(Request $request)
     {
+        if ($deny = $this->authorizeAdmin($request)) return $deny;
+
         $users = User::with('profile', 'roles')->latest()->paginate(20);
         return $this->success('User list fetched', $users);
     }
@@ -42,6 +58,8 @@ class AdminController extends Controller
      */
     public function properties(Request $request)
     {
+        if ($deny = $this->authorizeAdmin($request)) return $deny;
+
         $query = Property::with(['propertyType', 'city', 'area', 'broker.profile', 'primaryImage']);
 
         if ($request->filled('type')) {
@@ -83,6 +101,8 @@ class AdminController extends Controller
      */
     public function approveProperty(Request $request, $id)
     {
+        if ($deny = $this->authorizeAdmin($request)) return $deny;
+
         $property = Property::findOrFail($id);
         $property->verification_status = 'verified';
         $property->status = 'active';
@@ -111,6 +131,8 @@ class AdminController extends Controller
      */
     public function rejectProperty(Request $request, $id)
     {
+        if ($deny = $this->authorizeAdmin($request)) return $deny;
+
         $property = Property::findOrFail($id);
         $property->verification_status = 'rejected';
         $property->status = 'inactive';

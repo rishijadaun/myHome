@@ -546,6 +546,11 @@ class PropertySubmissionController extends Controller
         $user = $request->user() ?? Auth::user();
         $isAdmin = $user && ($user->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || ($user->role ?? '') === 'admin');
 
+        // Verify ownership: Only the listing's broker/owner or an admin can update this property
+        if (!$isAdmin && (!$user || $property->broker_id !== $user->id)) {
+            return $this->error('Unauthorized: You do not have permission to modify this property listing.', [], 403);
+        }
+
         // Convert empty string owner_email to null so email validator doesn't fail on empty string
         if ($request->has('owner_email') && trim((string) $request->input('owner_email')) === '') {
             $request->merge(['owner_email' => null]);

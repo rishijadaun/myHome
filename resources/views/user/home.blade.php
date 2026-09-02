@@ -2575,54 +2575,60 @@
         </div>
     </section>
 
-    <!-- Desktop/Tablet Only App Banner (Hidden on Mobile) -->
-    <section class="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
-        <div class="bg-gradient-to-br from-brand-50/80 via-teal-50/30 to-white rounded-3xl p-6 sm:p-8 md:p-12 border border-brand/15 relative overflow-hidden shadow-xs">
-            <div class="absolute right-0 top-0 w-80 sm:w-96 h-80 sm:h-96 bg-brand/10 rounded-full -mr-24 -mt-24 blur-3xl pointer-events-none"></div>
-            <div class="absolute left-0 bottom-0 w-64 h-64 bg-teal-500/5 rounded-full -ml-20 -mb-20 blur-2xl pointer-events-none"></div>
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 relative z-10">
-                <div class="max-w-xl text-center lg:text-left">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider mb-3">
-                        <i class="fas fa-mobile-screen"></i> StayNest Mobile App
-                    </span>
-                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 tracking-tight leading-tight">Get the StayNest App</h2>
-                    <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg leading-relaxed">Search, shortlist &amp; book your favourite verified stays, pay rent with zero brokerage, and get instant owner assistance on the go.</p>
-                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4">
-                        <button type="button" onclick="installPwaApp('android')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
-                            <i class="fab fa-google-play text-2xl sm:text-3xl"></i>
-                            <div class="text-left">
-                                <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">GET IT ON</div>
-                                <div class="text-xs sm:text-sm md:text-base font-bold">Google Play</div>
-                            </div>
-                        </button>
-                        <button type="button" onclick="installPwaApp('ios')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
-                            <i class="fab fa-apple text-2xl sm:text-3xl text-white"></i>
-                            <div class="text-left">
-                                <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">Download on the</div>
-                                <div class="text-xs sm:text-sm md:text-base font-bold">App Store</div>
-                            </div>
-                        </button>
-                    </div>
-                    <!-- <div class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 text-xs text-gray-500 font-medium">
-                        <span class="flex items-center gap-1.5"><i class="fas fa-star text-yellow-400"></i> 4.8★ Rating</span>
-                        <span class="w-1 h-1 rounded-full bg-gray-300 hidden sm:inline-block"></span>
-                        <span class="flex items-center gap-1.5"><i class="fas fa-download text-brand"></i> 50K+ Downloads</span>
-                        <span class="w-1 h-1 rounded-full bg-gray-300 hidden sm:inline-block"></span>
-                        <span class="flex items-center gap-1.5"><i class="fas fa-shield-alt text-blue-500"></i> 100% Free</span>
-                    </div> -->
-                </div>
-                <div class="flex items-center justify-center w-full lg:w-auto flex-shrink-0">
-                    <div class="relative group">
-                        <div class="absolute -inset-1 bg-gradient-to-r from-brand to-teal-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-35 transition duration-500"></div>
-                        <div class="relative bg-gray-900 p-2 sm:p-2.5 rounded-[2.2rem] sm:rounded-[2.5rem] shadow-2xl border-4 border-gray-800/80 max-w-[220px] sm:max-w-[260px] md:max-w-[280px] lg:max-w-[300px]">
-                            <div class="absolute top-2.5 left-1/2 -translate-x-1/2 w-12 h-1 bg-gray-700 rounded-full z-20"></div>
-                            <img src="/images/app-banner.png" alt="StayNest Mobile App Preview" loading="lazy" decoding="async" class="w-full h-auto object-contain rounded-[1.8rem] sm:rounded-[2.1rem] transition duration-500 group-hover:scale-[1.01]">
+    <!-- StayNest Mobile App Section (Dual Smartphone Mockup Presentation) -->
+   <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
+    <div class="bg-white rounded-3xl border border-gray-900/10 relative overflow-hidden shadow-sm">
+        <div class="grid lg:grid-cols-2 items-stretch">
+
+            <!-- Left: Copy & App Store Badges -->
+            <div class="p-8 sm:p-10 md:p-12 flex flex-col justify-center text-center lg:text-left order-2 lg:order-1">
+                <span class="inline-flex items-center gap-1.5 self-center lg:self-start px-3.5 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider mb-4 border border-brand/20 w-fit">
+                    <i class="fas fa-mobile-screen-button"></i> StayNest Mobile App
+                </span>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 tracking-tight leading-tight">
+                    Find your room. Find your people.
+                </h2>
+                <p class="text-gray-600 mb-7 sm:mb-8 text-sm sm:text-base lg:text-lg leading-relaxed max-w-md mx-auto lg:mx-0">
+                    Search, shortlist &amp; book verified PGs, discover compatible flatmates with zero brokerage, and manage your stay seamlessly on the go.
+                </p>
+
+                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-7 sm:mb-8">
+                    <button type="button" onclick="installPwaApp('android')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
+                        <i class="fab fa-google-play text-2xl sm:text-3xl"></i>
+                        <div class="text-left">
+                            <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">GET IT ON</div>
+                            <div class="text-xs sm:text-sm md:text-base font-bold">Google Play</div>
                         </div>
-                    </div>
+                    </button>
+                    <button type="button" onclick="installPwaApp('ios')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
+                        <i class="fab fa-apple text-2xl sm:text-3xl text-white"></i>
+                        <div class="text-left">
+                            <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">Download on the</div>
+                            <div class="text-xs sm:text-sm md:text-base font-bold">App Store</div>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 pt-5 border-t border-gray-100 text-xs text-gray-500 font-semibold">
+                    <span class="flex items-center gap-1.5"><i class="fas fa-star text-amber-400"></i> 4.9★ App Rating</span>
+                    <span class="flex items-center gap-1.5"><i class="fas fa-users text-purple-600"></i> Flatmate Matching</span>
+                    <span class="flex items-center gap-1.5"><i class="fas fa-shield-halved text-brand"></i> 100% Verified</span>
                 </div>
             </div>
+
+            <!-- Right: Dual Smartphone Mockup, on its own tinted panel -->
+            <div class="relative order-1 lg:order-2 bg-white flex items-center justify-center px-0 py-10 sm:py-12 lg:py-0 overflow-hidden">
+                <div class="absolute -right-16 -top-16 w-72 h-72 bg-brand/25 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-10 -bottom-16 w-64 h-64 bg-teal-500/25 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative group w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[420px] select-none">
+                    <img src="{{ file_exists(public_path('images/app-image.png')) ? asset('images/app-image.png') : asset('images/app-image.webp') }}" alt="StayNest Mobile App Dual Screen Preview" loading="lazy" decoding="async" class="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)] transition duration-500 group-hover:scale-[1.02]">
+                </div>
+            </div>
+
         </div>
-    </section>
+    </div>
+</section>
    
 </div>
 @endsection

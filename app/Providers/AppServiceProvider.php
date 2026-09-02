@@ -145,6 +145,65 @@ class AppServiceProvider extends ServiceProvider
             });
         });
 
+        // Contact Inquiries Rate Limiter (5 requests/minute per IP)
+        RateLimiter::for('contact-inquiry', function (Request $request) {
+            $key = 'contact_' . $request->ip();
+
+            return Limit::perMinute(5)->by($key)->response(function (Request $request, array $headers) {
+                $retryAfter = $headers['Retry-After'] ?? 60;
+                $msg = "Too many inquiry submissions from your network. Please wait {$retryAfter} seconds before trying again.";
+
+                if ($request->expectsJson() || $request->wantsJson() || str_starts_with($request->path(), 'api/')) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $msg,
+                        'retry_after' => (int) $retryAfter,
+                    ], Response::HTTP_TOO_MANY_REQUESTS, $headers);
+                }
+
+                return back()->with('error', $msg)->withInput();
+            });
+        });
+
+        // Forgot Password OTP Request Rate Limiter (4 requests/minute per IP + login)
+        RateLimiter::for('forgot-password', function (Request $request) {
+            $loginInput = $request->input('login', $request->input('email', ''));
+            $key = 'pwd_req_' . Str::transliterate(Str::lower($loginInput) . '|' . $request->ip());
+
+            return Limit::perMinute(4)->by($key)->response(function (Request $request, array $headers) {
+                $retryAfter = $headers['Retry-After'] ?? 60;
+                $msg = "Too many password reset requests. Please wait {$retryAfter} seconds before requesting a new code.";
+
+                if ($request->expectsJson() || $request->wantsJson() || str_starts_with($request->path(), 'api/')) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $msg,
+                        'retry_after' => (int) $retryAfter,
+                        'errors' => ['login' => [$msg]]
+                    ], Response::HTTP_TOO_MANY_REQUESTS, $headers);
+                }
+
+                return back()->withErrors(['login' => $msg])->withInput();
+            });
+        });
+
+        // Forgot Password OTP Verify Rate Limiter (8 attempts/minute per IP)
+        RateLimiter::for('forgot-password-verify', function (Request $request) {
+            $key = 'pwd_verify_' . $request->ip();
+
+            return Limit::perMinute(8)->by($key)->response(function (Request $request, array $headers) {
+                $retryAfter = $headers['Retry-After'] ?? 60;
+                $msg = "Too many verification attempts. Please wait {$retryAfter} seconds before trying again.";
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                    'retry_after' => (int) $retryAfter,
+                    'errors' => ['otp' => [$msg]]
+                ], Response::HTTP_TOO_MANY_REQUESTS, $headers);
+            });
+        });
+
         // Property Submission & Update Rate Limiter (10 requests/minute per User or IP)
         RateLimiter::for('property-submission', function (Request $request) {
             $key = $request->user()?->id ?: $request->ip();

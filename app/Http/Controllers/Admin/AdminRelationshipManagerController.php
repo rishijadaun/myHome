@@ -73,7 +73,10 @@ class AdminRelationshipManagerController extends Controller
             if (!File::isDirectory($uploadPath)) {
                 File::makeDirectory($uploadPath, 0755, true, true);
             }
-            $filename = 'rm_' . Str::slug($rmId) . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'webp']) 
+                ? strtolower($file->getClientOriginalExtension()) 
+                : ($file->extension() ?: 'jpg');
+            $filename = 'rm_' . Str::slug($rmId) . '_' . time() . '_' . Str::random(6) . '.' . $ext;
             $file->move($uploadPath, $filename);
             $avatarUrl = '/uploads/rm_avatars/' . $filename;
         }
@@ -182,7 +185,10 @@ class AdminRelationshipManagerController extends Controller
             if (!File::isDirectory($uploadPath)) {
                 File::makeDirectory($uploadPath, 0755, true, true);
             }
-            $filename = 'rm_' . Str::slug($manager->id) . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'webp']) 
+                ? strtolower($file->getClientOriginalExtension()) 
+                : ($file->extension() ?: 'jpg');
+            $filename = 'rm_' . Str::slug($manager->id) . '_' . time() . '_' . Str::random(6) . '.' . $ext;
             $file->move($uploadPath, $filename);
             $avatarUrl = '/uploads/rm_avatars/' . $filename;
         } elseif ($request->filled('avatar_url')) {

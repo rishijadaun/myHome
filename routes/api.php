@@ -13,8 +13,8 @@ use App\Http\Controllers\Api\v1\ContactInquiryController;
 Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
     // ---------------- CONTACT & INQUIRIES ----------------
-    Route::post('contact', [ContactInquiryController::class, 'submit']);
-    Route::post('contact/submit', [ContactInquiryController::class, 'submit']);
+    Route::post('contact', [ContactInquiryController::class, 'submit'])->middleware('throttle:contact-inquiry');
+    Route::post('contact/submit', [ContactInquiryController::class, 'submit'])->middleware('throttle:contact-inquiry');
 
     // ---------------- 1. AUTHENTICATION (USER & BROKER) ----------------
     Route::prefix('auth')->group(function () {
@@ -22,9 +22,9 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::post('login', [AuthController::class, 'login'])->middleware('throttle:login');
         
         // Password Reset / Forgot Password Endpoints
-        Route::post('forgot-password/request', [AuthController::class, 'forgotPasswordRequest'])->middleware('throttle:5,1');
-        Route::post('forgot-password/verify', [AuthController::class, 'forgotPasswordVerify'])->middleware('throttle:10,1');
-        Route::post('forgot-password/reset', [AuthController::class, 'forgotPasswordReset'])->middleware('throttle:5,1');
+        Route::post('forgot-password/request', [AuthController::class, 'forgotPasswordRequest'])->middleware('throttle:forgot-password');
+        Route::post('forgot-password/verify', [AuthController::class, 'forgotPasswordVerify'])->middleware('throttle:forgot-password-verify');
+        Route::post('forgot-password/reset', [AuthController::class, 'forgotPasswordReset'])->middleware('throttle:forgot-password');
         
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('me', [AuthController::class, 'me']);
@@ -40,18 +40,17 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     });
 
     // ---------------- AI SEARCH ASSISTANT (REST API FOR ANDROID & CLIENTS) ----------------
-    Route::post('ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search']);
+    Route::post('ai/search', [\App\Http\Controllers\Api\v1\AiSearchController::class, 'search'])->middleware('throttle:30,1');
 
     // ---------------- 3. PROPERTY SUBMISSION & TYPES (DYNAMIC) ----------------
     Route::get('property-types', [PropertySubmissionController::class, 'types']);
     Route::post('properties/submit', [PropertySubmissionController::class, 'submit'])->middleware('throttle:property-submission');
     Route::get('properties/details/{id}', [PropertySubmissionController::class, 'details']);
     Route::post('properties/{id}/update', [PropertySubmissionController::class, 'update'])->middleware('throttle:property-submission');
-    Route::post('properties/{id}/report', [\App\Http\Controllers\User\UserHomeController::class, 'report']);
-    Route::post('properties/{id}/review', [\App\Http\Controllers\User\UserHomeController::class, 'submitReview']);
+    Route::post('properties/{id}/report', [\App\Http\Controllers\User\UserHomeController::class, 'report'])->middleware('throttle:10,1');
+    Route::post('properties/{id}/review', [\App\Http\Controllers\User\UserHomeController::class, 'submitReview'])->middleware('throttle:10,1');
 
     // ---------------- 4. TENANT / USER MODULE APIS ----------------
-    Route::get('user/profile/{id}', [UserController::class, 'profile']);
     Route::prefix('user')->middleware('auth:sanctum')->group(function () {
         Route::get('dashboard', [UserController::class, 'dashboard']);
         Route::get('profile/{id?}', [UserController::class, 'profile']);
@@ -59,10 +58,10 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('bookings', [UserController::class, 'bookings']);
         Route::get('visits', [UserController::class, 'visits']);
         Route::post('visits', [UserController::class, 'scheduleVisit']);
-        Route::post('change-password', [UserController::class, 'changePassword']);
-        Route::post('email/update', [UserController::class, 'updateEmail']);
-        Route::post('email/request-otp', [UserController::class, 'requestEmailOtp']);
-        Route::post('email/verify-otp', [UserController::class, 'verifyEmailOtp']);
+        Route::post('change-password', [UserController::class, 'changePassword'])->middleware('throttle:5,1');
+        Route::post('email/update', [UserController::class, 'updateEmail'])->middleware('throttle:5,1');
+        Route::post('email/request-otp', [UserController::class, 'requestEmailOtp'])->middleware('throttle:5,1');
+        Route::post('email/verify-otp', [UserController::class, 'verifyEmailOtp'])->middleware('throttle:10,1');
         Route::post('saved/toggle', [UserController::class, 'toggleSaved']);
         Route::post('delete-account', [UserController::class, 'deleteAccount']);
     });
@@ -78,7 +77,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     });
 
     // ---------------- 6. ADMIN MODERATION & APPROVAL APIS ----------------
-    Route::prefix('admin')->group(function () {
+    Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
         Route::get('dashboard', [AdminController::class, 'dashboard']);
         Route::get('users', [AdminController::class, 'users']);
         Route::get('properties', [AdminController::class, 'properties']);

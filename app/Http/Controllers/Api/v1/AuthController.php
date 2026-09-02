@@ -347,7 +347,6 @@ class AuthController extends Controller
         return $this->success('Verification code sent successfully!', [
             'target' => $maskedTarget,
             'expires_in' => '15 minutes',
-            'demo_otp' => $otp, // Useful for testing or when mail server is offline
         ]);
     }
 
@@ -380,8 +379,7 @@ class AuthController extends Controller
 
         $cached = Cache::get("pwd_reset_{$user->id}") ?? Cache::get("pwd_reset_target_" . md5(strtolower($loginInput)));
 
-        $isValidOtp = ($cached && ($cached['otp'] ?? '') === $inputOtp)
-            || in_array($inputOtp, ['482910', '123456']); // Master demo codes
+        $isValidOtp = ($cached && ($cached['otp'] ?? '') === $inputOtp);
 
         if (!$isValidOtp) {
             return $this->error('Invalid or expired OTP code. Please try again or request a new code.', [
@@ -431,8 +429,7 @@ class AuthController extends Controller
 
         $cached = Cache::get("pwd_reset_{$user->id}") ?? Cache::get("pwd_reset_target_" . md5(strtolower($loginInput)));
 
-        $isValidOtp = ($cached && ($cached['otp'] ?? '') === $inputOtp)
-            || in_array($inputOtp, ['482910', '123456']);
+        $isValidOtp = ($cached && ($cached['otp'] ?? '') === $inputOtp);
 
         if (!$isValidOtp) {
             return $this->error('Invalid or expired OTP code. Please request a new verification code.', [

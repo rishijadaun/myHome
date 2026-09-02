@@ -267,7 +267,10 @@ class BrokerProfileController extends Controller
                 File::makeDirectory($uploadPath, 0755, true, true);
             }
 
-            $filename = 'broker_' . Str::slug($broker->id) . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'webp']) 
+                ? strtolower($file->getClientOriginalExtension()) 
+                : ($file->extension() ?: 'jpg');
+            $filename = 'broker_' . Str::slug($broker->id) . '_' . time() . '_' . Str::random(6) . '.' . $ext;
             $file->move($uploadPath, $filename);
 
             $avatarUrl = '/uploads/avatars/' . $filename;
@@ -389,7 +392,10 @@ class BrokerProfileController extends Controller
         }
 
         $originalName = $file->getClientOriginalName();
-        $filename = $validated['doc_type'] . '_' . Str::slug($broker->id) . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $ext = in_array(strtolower($file->getClientOriginalExtension()), ['pdf', 'jpg', 'jpeg', 'png', 'webp']) 
+            ? strtolower($file->getClientOriginalExtension()) 
+            : ($file->extension() ?: 'pdf');
+        $filename = $validated['doc_type'] . '_' . Str::slug($broker->id) . '_' . time() . '_' . Str::random(6) . '.' . $ext;
         $file->move($uploadPath, $filename);
 
         $docUrl = '/uploads/broker_docs/' . $filename;

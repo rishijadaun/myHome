@@ -323,7 +323,10 @@ class BrokerPropertyController extends Controller
         $imageUrl = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $fileName = 'pg_' . time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            $ext = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'webp']) 
+                ? strtolower($file->getClientOriginalExtension()) 
+                : ($file->extension() ?: 'jpg');
+            $fileName = 'pg_' . time() . '_' . Str::random(8) . '.' . $ext;
             $file->move(public_path('uploads/property_images'), $fileName);
             $imageUrl = asset('uploads/property_images/' . $fileName);
         } elseif (!empty($validated['image_url'])) {

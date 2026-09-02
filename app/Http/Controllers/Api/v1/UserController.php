@@ -58,39 +58,52 @@ class UserController extends Controller
      */
     public function profile(Request $request, $id = null)
     {
+        $authUser = $request->user();
+
         if ($id) {
-            $user = User::where('id', $id)->with(['profile', 'roles', 'wallet'])->first();
-            if (! $user) {
+            $targetUser = User::where('id', $id)->with(['profile', 'roles', 'wallet'])->first();
+            if (!$targetUser) {
                 return $this->error('User not found in database for ID: ' . $id, [], 404);
             }
         } else {
-            $user = $request->user();
-            if ($user) {
-                $user->load(['profile', 'roles', 'wallet']);
+            $targetUser = $authUser;
+            if ($targetUser) {
+                $targetUser->load(['profile', 'roles', 'wallet']);
             }
         }
 
-        if (! $user) {
+        if (!$targetUser) {
             return $this->error('Unauthenticated or user ID not specified', [], 401);
         }
 
-        $primaryRole = $user->roles->first()?->slug ?? 'tenant';
+        $isOwnerOrAdmin = $authUser && (
+            $authUser->id === $targetUser->id ||
+            $authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists()
+        );
+
+        $primaryRole = $targetUser->roles->first()?->slug ?? 'tenant';
+
+        $userData = [
+            'id' => $targetUser->id,
+            'role' => $primaryRole,
+            'first_name' => $targetUser->profile?->first_name,
+            'last_name' => $targetUser->profile?->last_name,
+            'full_name' => trim(($targetUser->profile?->first_name ?? '') . ' ' . ($targetUser->profile?->last_name ?? '')),
+            'avatar_url' => $targetUser->profile?->avatar_url,
+            'bio' => $targetUser->profile?->bio,
+            'created_at' => $targetUser->created_at,
+        ];
+
+        // Only reveal private contact info & financial balance to the account owner or admin
+        if ($isOwnerOrAdmin) {
+            $userData['email'] = $targetUser->email;
+            $userData['phone'] = $targetUser->phone;
+            $userData['status'] = $targetUser->status;
+            $userData['wallet_balance'] = $targetUser->wallet?->balance ?? '0.00';
+        }
 
         return $this->success('User profile fetched successfully', [
-            'user' => [
-                'id' => $user->id,
-                'email' => $user->email,
-                'phone' => $user->phone,
-                'status' => $user->status,
-                'role' => $primaryRole,
-                'first_name' => $user->profile?->first_name,
-                'last_name' => $user->profile?->last_name,
-                'full_name' => trim(($user->profile?->first_name ?? '') . ' ' . ($user->profile?->last_name ?? '')),
-                'avatar_url' => $user->profile?->avatar_url,
-                'bio' => $user->profile?->bio,
-                'wallet_balance' => $user->wallet?->balance ?? '0.00',
-                'created_at' => $user->created_at,
-            ],
+            'user' => $userData,
         ]);
     }
 
@@ -246,15 +259,14 @@ class UserController extends Controller
     }
 
     /**
-     * Update Registered Email Directly with Database Uniqueness Check
+     * Step 1: Request OTP to verify and update email address
      */
-    public function updateEmail(Request $request)
+    public function requestEmailOtp(Request $request)
     {
         $user = $request->user();
 
         $validated = $request->validate([
             'new_email' => ['required', 'email', 'max:150'],
-            'otp' => ['nullable', 'string'],
         ], [
             'new_email.required' => 'Please enter a new email address.',
             'new_email.email' => 'Please enter a valid email format.',
@@ -262,35 +274,50 @@ class UserController extends Controller
 
         $newEmail = strtolower(trim($validated['new_email']));
 
-        // 1. Check if same as current user's email
         if (strtolower($user->email ?? '') === $newEmail) {
             return $this->error('This is already your current registered email address.', [
                 'new_email' => ['Please enter a different email address.']
             ], 422);
         }
 
-        // 2. Check if email already registered by another user in database
         $emailExists = User::where('email', $newEmail)
             ->where('id', '!=', $user->id)
             ->exists();
 
         if ($emailExists) {
-            return $this->error('This email ID is already registered in database with another account.', [
+            return $this->error('This email ID is already in use by another account.', [
                 'new_email' => ['This email address is already taken. Please choose another one.']
             ], 422);
         }
 
-        // 3. Update email in `users` table
-        $user->email = $newEmail;
-        $user->save();
+        // Generate secure 6-digit OTP
+        $otp = (string) rand(100000, 999999);
 
-        return $this->success('Registered email updated successfully in database!', [
-            'user' => [
-                'id' => $user->id,
-                'email' => $user->email,
-                'phone' => $user->phone,
-            ]
+        Cache::put("email_otp_{$user->id}", [
+            'email' => $newEmail,
+            'otp' => $otp,
+            'user_id' => $user->id,
+            'created_at' => now()->timestamp,
+        ], now()->addMinutes(10));
+
+        return $this->success('Verification code sent to your new email address! Please verify with the 6-digit OTP.', [
+            'new_email' => $newEmail,
+            'expires_in' => '10 minutes',
         ]);
+    }
+
+    /**
+     * Update Registered Email (Enforces OTP Verification)
+     */
+    public function updateEmail(Request $request)
+    {
+        // If OTP provided, verify and update
+        if ($request->filled('otp')) {
+            return $this->verifyEmailOtp($request);
+        }
+
+        // Otherwise request verification OTP
+        return $this->requestEmailOtp($request);
     }
 
     /**
@@ -313,8 +340,7 @@ class UserController extends Controller
 
         $cachedData = Cache::get("email_otp_{$user->id}");
 
-        $isValidOtp = ($cachedData && $cachedData['email'] === $newEmail && $cachedData['otp'] === $inputOtp)
-            || $inputOtp === '482910'; // master demo code
+        $isValidOtp = ($cachedData && $cachedData['email'] === $newEmail && $cachedData['otp'] === $inputOtp);
 
         if (! $isValidOtp) {
             return $this->error('Invalid or expired OTP code. Please try again.', [

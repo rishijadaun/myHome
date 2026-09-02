@@ -845,15 +845,7 @@ class UserHomeController extends Controller
             }
         }
 
-        // Also check if auth_user_id was passed in form / payload
-        if (!$user && $request->filled('auth_user_id')) {
-            $user = User::find($request->input('auth_user_id'));
-        }
-
-        if ($user) {
-            // Keep web session active
-            Auth::login($user);
-        } else {
+        if (!$user) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,

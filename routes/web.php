@@ -253,8 +253,8 @@ Route::name('user.')->group(function () {
     Route::view('/contact-us', 'user.contact')->name('contact_us');
     Route::view('/contact-us', 'user.contact')->name('contact');
     Route::view('/contact', 'user.contact');
-    Route::post('/contact-us', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit'])->name('contact.submit');
-    Route::post('/contact', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit']);
+    Route::post('/contact-us', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit'])->name('contact.submit')->middleware('throttle:contact-inquiry');
+    Route::post('/contact', [\App\Http\Controllers\Api\v1\ContactInquiryController::class, 'submit'])->middleware('throttle:contact-inquiry');
     // SEO-Friendly Legal Pages (canonical URLs)
     Route::view('/terms-of-service', 'user.terms')->name('terms');
     Route::view('/privacy-policy', 'user.privacy')->name('privacy');

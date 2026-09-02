@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\User\UserHomeController;
+use App\Http\Controllers\User\RoommateController;
+use App\Http\Controllers\User\UserProfileController;
 
 Route::get('/', [UserHomeController::class, 'index'])->name('user.home');
 
@@ -14,6 +16,7 @@ use App\Http\Controllers\Admin\AdminRelationshipManagerController;
 use App\Http\Controllers\Admin\AdminContactController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\Admin\AdminRoommateController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Guest Admin Routes
@@ -56,6 +59,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/reports/{id}/status', [AdminReportController::class, 'updateStatus'])->name('reports.status');
         Route::post('/reports/{id}/property-action', [AdminReportController::class, 'takePropertyAction'])->name('reports.property-action');
         Route::delete('/reports/{id}', [AdminReportController::class, 'destroy'])->name('reports.destroy');
+
+        // Manage Roommates / Flatmates Routes
+        Route::get('/roommates', [AdminRoommateController::class, 'index'])->name('roommates');
+        Route::delete('/roommates/{id}', [AdminRoommateController::class, 'destroy'])->name('roommates.destroy');
+        Route::post('/roommates/{id}/status', [AdminRoommateController::class, 'toggleStatus'])->name('roommates.status');
+        Route::post('/roommates/bulk-delete', [AdminRoommateController::class, 'bulkDelete'])->name('roommates.bulk-delete');
 
         // Manage Brokers & Relationship Manager Assignment Routes
         Route::get('/brokers', [AdminBrokerController::class, 'index'])->name('brokers');
@@ -160,6 +169,24 @@ Route::get('/location', [UserHomeController::class, 'location'])->name('user.loc
 
 // Public User Routes
 Route::name('user.')->group(function () {
+    // ── Roommate / Flatmate Finder ─────────────────────────────────────
+    Route::get('/find-roommate', [RoommateController::class, 'index'])->name('roommate.index');
+    Route::get('/find-roommate/post', [RoommateController::class, 'create'])->name('roommate.create');
+    Route::post('/find-roommate/post', [RoommateController::class, 'store'])->name('roommate.store');
+    Route::get('/find-roommate/unread-stats', [RoommateController::class, 'getUnreadStats'])->name('roommate.unreadStats');
+    Route::get('/find-roommate/{slug}', [RoommateController::class, 'show'])->name('roommate.show');
+    Route::get('/find-roommate/{slug}/edit', [RoommateController::class, 'edit'])->name('roommate.edit');
+    Route::put('/find-roommate/{slug}', [RoommateController::class, 'update'])->name('roommate.update');
+    Route::post('/find-roommate/{slug}/fill', [RoommateController::class, 'markFilled'])->name('roommate.fill');
+    Route::delete('/find-roommate/{slug}', [RoommateController::class, 'destroy'])->name('roommate.destroy');
+    Route::get('/find-roommate/{slug}/messages', [RoommateController::class, 'getMessages'])->name('roommate.messages');
+    Route::post('/find-roommate/{slug}/message', [RoommateController::class, 'sendMessage'])->name('roommate.message');
+    Route::post('/find-roommate/{slug}/chat/bot-reply', [RoommateController::class, 'getBotReply'])->name('roommate.botReply');
+    // Also accept /flatmate as an alias
+    Route::get('/flatmate', fn() => redirect()->route('user.roommate.index', [], 301));
+    Route::get('/roommate', fn() => redirect()->route('user.roommate.index', [], 301));
+    // ──────────────────────────────────────────────────────────────────
+
     Route::view('/saved', 'user.saved')->name('saved');
     Route::view('/list-property', 'user.list-property')->name('list-property');
     Route::view('/list_property', 'user.list-property');
@@ -184,17 +211,39 @@ Route::name('user.')->group(function () {
     Route::get('/search', [UserHomeController::class, 'search'])->name('search');
     Route::get('/properties', [UserHomeController::class, 'search']);
     Route::get('/profile', function () {
-        if (\Illuminate\Support\Facades\Auth::check()) {
-            $authUser = \Illuminate\Support\Facades\Auth::user();
-            if ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists()) {
-                return redirect()->route('admin.dashboard');
-            }
-            if ($authUser->roles()->where('slug', 'broker')->exists()) {
-                return redirect()->route('broker.dashboard');
-            }
+        if (!\Illuminate\Support\Facades\Auth::check()) {
+            return redirect()->route('user.login')->with('flash_info', 'Please sign in to view your profile.');
         }
-        return view('user.profile');
+
+        /** @var \App\Models\User $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        if ($user->roles()->whereIn('slug', ['super_admin', 'admin'])->exists()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user->roles()->where('slug', 'broker')->exists()) {
+            return redirect()->route('broker.dashboard');
+        }
+
+        // Ensure UserProfile record is guaranteed to exist
+        \App\Models\UserProfile::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'first_name' => $user->name ?: 'Tenant',
+                'is_active' => true,
+                'version' => 1,
+            ]
+        );
+
+        $user->load(['profile', 'roommatePost', 'roles', 'wallet']);
+        $roommatePost = $user->roommatePost;
+        $isTenant = $user->isTenant();
+
+        return view('user.profile', compact('user', 'roommatePost', 'isTenant'));
     })->name('profile');
+    Route::post('/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('profile.avatar');
+    Route::post('/profile/update', [UserProfileController::class, 'updateProfile'])->name('profile.update');
     Route::view('/pricing', 'user.pricing')->name('pricing');
     Route::view('/about-us', 'user.about')->name('about_us');
     Route::view('/about-us', 'user.about')->name('about');

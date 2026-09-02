@@ -64,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
                     'totalContacts' => $totalContactsCount,
                     'pendingReports' => $pendingReportsCount,
                     'totalReports' => $totalReportsCount,
+                    'roommates' => \Illuminate\Support\Facades\Schema::hasTable('roommate_posts') ? \App\Models\RoommatePost::count() : 0,
                 ]);
             }
         });

@@ -153,4 +153,40 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class, 'user_id', 'id');
     }
+
+    public function roommatePost()
+    {
+        return $this->hasOne(RoommatePost::class, 'user_id', 'id')->latestOfMany();
+    }
+
+    public function roommatePosts()
+    {
+        return $this->hasMany(RoommatePost::class, 'user_id', 'id');
+    }
+
+    public function getCachedRoleSlug(): string
+    {
+        if (isset($this->attributes['_cached_role_slug'])) {
+            return $this->attributes['_cached_role_slug'];
+        }
+
+        $roles = $this->relationLoaded('roles') ? $this->roles : $this->roles()->get();
+        $slugs = $roles->pluck('slug')->toArray();
+
+        if (in_array('super_admin', $slugs) || in_array('admin', $slugs)) {
+            $role = 'admin';
+        } elseif (in_array('broker', $slugs)) {
+            $role = 'broker';
+        } else {
+            $role = 'tenant';
+        }
+
+        $this->attributes['_cached_role_slug'] = $role;
+        return $role;
+    }
+
+    public function isTenant(): bool
+    {
+        return $this->getCachedRoleSlug() === 'tenant';
+    }
 }

@@ -6,12 +6,13 @@
 
     if (Auth::check()) {
         $authUser = Auth::user();
-        if ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists()) {
+        $userRole = $authUser->getCachedRoleSlug();
+        if ($userRole === 'admin') {
             $headerProfileUrl = route('admin.dashboard');
             $headerProfileLabel = 'Admin Dashboard';
             $headerProfileIcon = 'fa-shield-halved';
             $headerRoleBadge = 'ADMIN';
-        } elseif ($authUser->roles()->where('slug', 'broker')->exists()) {
+        } elseif ($userRole === 'broker') {
             $headerProfileUrl = route('broker.dashboard');
             $headerProfileLabel = 'Broker Dashboard';
             $headerProfileIcon = 'fa-gauge-high';
@@ -64,17 +65,25 @@
                 <a href="{{ route('user.saved') }}" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center tap-effect shadow-xs" title="Saved">
                     <i class="fas fa-heart text-sm"></i>
                 </a>
-                <a href="{{ route('user.bookings') }}" class="w-10 h-10 rounded-full bg-brand-light text-brand flex items-center justify-center tap-effect shadow-xs relative" title="My Bookings">
-                    <i class="fas fa-calendar-check text-sm"></i>
-                    @auth
-                        @php
-                            $userActiveBkCount = \App\Models\Booking::where('user_id', auth()->id())->where('booking_status', '!=', 'cancelled')->where('broker_approval', '!=', 'rejected')->count();
-                        @endphp
-                        @if($userActiveBkCount > 0)
+                <button type="button" 
+                        id="mobRoommateChatBtn" 
+                        onclick="handleGlobalChatClick()" 
+                        class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center tap-effect shadow-xs relative cursor-pointer" 
+                        title="Roommate Chat & Inquiries">
+                    <i class="fab fa-whatsapp text-lg text-emerald-600"></i>
+                    <span id="mobWaUnreadBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full ring-2 ring-white">0</span>
+                </button>
+                @auth
+                    @php
+                        $userActiveBkCount = \App\Models\Booking::where('user_id', auth()->id())->where('booking_status', '!=', 'cancelled')->where('broker_approval', '!=', 'rejected')->count();
+                    @endphp
+                    @if($userActiveBkCount > 0)
+                        <a href="{{ route('user.bookings') }}" class="w-10 h-10 rounded-full bg-brand-light text-brand flex items-center justify-center tap-effect shadow-xs relative" title="My Bookings">
+                            <i class="fas fa-calendar-check text-sm"></i>
                             <span class="absolute -top-1 -right-1 bg-brand text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">{{ $userActiveBkCount }}</span>
-                        @endif
-                    @endauth
-                </a>
+                        </a>
+                    @endif
+                @endauth
                 
                 <!-- Dynamic Auth Header Item for Mobile -->
                 <div id="mobHeaderAuth">
@@ -120,17 +129,22 @@
                 <a href="{{ route('user.saved') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition" title="Saved Properties">
                     <i class="fas fa-heart text-red-500"></i>
                 </a>
-                <a href="{{ route('user.bookings') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition relative" title="My Bookings">
-                    <i class="fas fa-calendar-check text-gray-600"></i>
-                    @auth
-                        @php
-                            $userActiveBkCount = $userActiveBkCount ?? \App\Models\Booking::where('user_id', auth()->id())->where('booking_status', '!=', 'cancelled')->where('broker_approval', '!=', 'rejected')->count();
-                        @endphp
-                        @if($userActiveBkCount > 0)
+                <button type="button" 
+                        id="deskRoommateChatBtn" 
+                        onclick="handleGlobalChatClick()" 
+                        class="w-11 h-11 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition relative cursor-pointer group" 
+                        title="Roommate Messages & Chat">
+                    <i class="fab fa-whatsapp text-xl text-emerald-600 group-hover:scale-110 transition-transform"></i>
+                    <span id="deskWaUnreadBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full ring-2 ring-white">0</span>
+                </button>
+                @auth
+                    @if($userActiveBkCount > 0)
+                        <a href="{{ route('user.bookings') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition relative" title="My Bookings">
+                            <i class="fas fa-calendar-check text-gray-600"></i>
                             <span class="absolute -top-1 -right-1 bg-brand text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">{{ $userActiveBkCount }}</span>
-                        @endif
-                    @endauth
-                </a>
+                        </a>
+                    @endif
+                @endauth
 
                 <!-- Dynamic Auth Buttons in Desktop Header -->
                 <div id="deskHeaderAuth" class="flex items-center gap-2">
@@ -175,10 +189,21 @@
                     @endauth
                 </div>
 
-                <a href="{{ route('user.list-property') }}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-5 py-2.5 rounded-xl font-bold transition tap-effect text-sm flex items-center gap-1.5 shadow-sm">
+                @php
+                    $isTenantUser = Auth::check() && !Auth::user()->roles()->whereIn('slug', ['super_admin', 'admin', 'broker'])->exists();
+                @endphp
+
+                @if(!$isTenantUser)
+                <a href="{{ route('user.list-property') }}" id="headerPostPropertyBtn" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-5 py-2.5 rounded-xl font-bold transition tap-effect text-sm flex items-center gap-1.5 shadow-sm">
                     <i class="fas fa-plus-circle text-xs"></i>
                     <span>Post Property Free</span>
                 </a>
+                @else
+                <a href="{{ route('user.roommate.create') }}" id="headerPostRoommateBtn" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-lg hover:shadow-brand/30 text-white px-4 py-2.5 rounded-xl font-bold transition tap-effect text-sm flex items-center gap-1.5 shadow-sm">
+                    <i class="fas fa-door-open text-xs"></i>
+                    <span>Find Flatmate</span>
+                </a>
+                @endif
             </div>
         </div>
     </div>
@@ -201,6 +226,7 @@
                 const clientProfileLink = document.getElementById('clientProfileLink');
                 const mobProfileLink = document.getElementById('mobProfileLink');
                 const bottomNavProfileLink = document.getElementById('bottomNavProfileLink');
+                const postPropertyBtn = document.getElementById('headerPostPropertyBtn');
                 
                 let targetUrl = "{{ route('user.profile') }}";
                 let displayTitle = user.first_name || "My Profile";
@@ -218,6 +244,11 @@
                     displayTitle = "Dashboard";
                     badgeText = "BROKER";
                     iconClass = "fa-gauge-high";
+                } else {
+                    // Tenant login: Hide Post Property Free button
+                    if (postPropertyBtn) {
+                        postPropertyBtn.style.display = 'none';
+                    }
                 }
 
                 if (clientProfileLink) clientProfileLink.href = targetUrl;

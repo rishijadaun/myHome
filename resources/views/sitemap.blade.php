@@ -53,5 +53,23 @@
     </url>
     @endforeach
 
+    {{-- Dynamic Active Roommate & Flatmate Pages --}}
+    @if(!empty($roommatePages))
+    @foreach ($roommatePages as $page)
+    <url>
+        <loc>{{ $page['url'] }}</loc>
+        <lastmod>{{ $page['lastmod'] }}</lastmod>
+        <changefreq>{{ $page['changefreq'] }}</changefreq>
+        <priority>{{ $page['priority'] }}</priority>
+        @if(!empty($page['image']))
+        <image:image>
+            <image:loc>{{ htmlspecialchars($page['image'], ENT_XML1, 'UTF-8') }}</image:loc>
+            <image:title>{{ htmlspecialchars($page['title'] ?? 'Verified Flatmate Listing on StayNest', ENT_XML1, 'UTF-8') }}</image:title>
+        </image:image>
+        @endif
+    </url>
+    @endforeach
+    @endif
+
 </urlset>
 

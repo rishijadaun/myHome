@@ -365,7 +365,7 @@
     <div class="hidden md:block">
         <div class="min-h-screen flex">
             <!-- Left Side - Branding Hero -->
-            <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand via-brand-dark to-teal-700 relative overflow-hidden">
+            <div class=" lg:flex lg:w-1/2 bg-gradient-to-br from-brand via-brand-dark to-teal-700 relative overflow-hidden">
                 <div class="absolute inset-0 opacity-10">
                     <div class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -mr-48 -mt-48"></div>
                     <div class="absolute bottom-0 left-0 w-80 h-80 bg-white rounded-full -ml-40 -mb-40"></div>

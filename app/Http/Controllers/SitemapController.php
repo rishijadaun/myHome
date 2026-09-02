@@ -54,6 +54,18 @@ class SitemapController extends Controller
                     'priority' => '0.85'
                 ],
                 [
+                    'url' => route('user.roommate.index'),
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'daily',
+                    'priority' => '0.90'
+                ],
+                [
+                    'url' => route('user.roommate.create'),
+                    'lastmod' => now()->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.80'
+                ],
+                [
                     'url' => route('user.list-property'),
                     'lastmod' => now()->subDays(1)->toAtomString(),
                     'changefreq' => 'weekly',
@@ -167,6 +179,7 @@ class SitemapController extends Controller
             }
 
             // 4. Dynamic active, verified property detail pages
+            // 4. Dynamic active, verified property detail pages
             $properties = Property::where('status', 'active')
                 ->where('verification_status', 'verified')
                 ->where('is_active', 1)
@@ -186,11 +199,30 @@ class SitemapController extends Controller
                 ];
             }
 
+            // 5. Dynamic active Roommate & Flatmate detail pages
+            $roommatePosts = \App\Models\RoommatePost::where('status', 'active')
+                ->where('is_active', 1)
+                ->latest('updated_at')
+                ->get();
+
+            $roommatePages = [];
+            foreach ($roommatePosts as $post) {
+                $roommatePages[] = [
+                    'url' => route('user.roommate.show', ['slug' => $post->slug]),
+                    'lastmod' => ($post->updated_at ?? now())->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.85',
+                    'image' => $post->poster_avatar_url,
+                    'title' => $post->title
+                ];
+            }
+
             return view('sitemap', [
                 'staticPages' => $staticPages,
                 'cityPages' => $cityPages,
                 'areaPages' => $areaPages,
                 'propertyPages' => $propertyPages,
+                'roommatePages' => $roommatePages,
             ])->render();
         });
 

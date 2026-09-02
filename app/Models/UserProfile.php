@@ -21,8 +21,10 @@ class UserProfile extends Model
         'first_name',
         'last_name',
         'avatar_url',
+        'gender',
         'gender_id',
         'date_of_birth',
+        'occupation',
         'occupation_id',
         'company_name',
         'bio',
@@ -36,6 +38,34 @@ class UserProfile extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    public function getAgeAttribute(): ?int
+    {
+        if ($this->date_of_birth) {
+            return \Carbon\Carbon::parse($this->date_of_birth)->age;
+        }
+        return null;
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+    }
+
+    public function getTaglineAttribute(): string
+    {
+        $parts = [];
+        if ($this->age) {
+            $parts[] = "{$this->age} years";
+        }
+        if ($this->gender) {
+            $parts[] = ucfirst($this->gender);
+        }
+        if ($this->occupation) {
+            $parts[] = $this->occupation;
+        }
+        return !empty($parts) ? implode(' · ', $parts) : '';
+    }
 
     protected function casts(): array
     {

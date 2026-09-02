@@ -2315,7 +2315,7 @@
                     <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg leading-relaxed">Search, shortlist &amp; book your favourite verified stays, pay rent with zero brokerage, and get instant owner assistance on the go.</p>
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4">
                         <button type="button" onclick="installPwaApp('android')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
-                            <i class="fab fa-google-play text-2xl sm:text-3xl text-emerald-400"></i>
+                            <i class="fab fa-google-play text-2xl sm:text-3xl"></i>
                             <div class="text-left">
                                 <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">GET IT ON</div>
                                 <div class="text-xs sm:text-sm md:text-base font-bold">Google Play</div>

@@ -4,10 +4,11 @@
     $bottomNavProfileLabel = 'Profile';
     if (Auth::check()) {
         $u = Auth::user();
-        if ($u->roles()->whereIn('slug', ['super_admin', 'admin'])->exists()) {
+        $userRole = $u->getCachedRoleSlug();
+        if ($userRole === 'admin') {
             $bottomNavProfileUrl = route('admin.dashboard');
             $bottomNavProfileLabel = 'Dashboard';
-        } elseif ($u->roles()->where('slug', 'broker')->exists()) {
+        } elseif ($userRole === 'broker') {
             $bottomNavProfileUrl = route('broker.dashboard');
             $bottomNavProfileLabel = 'Dashboard';
         } else {
@@ -36,8 +37,9 @@
             <i class="fas fa-heart text-lg sm:text-xl {{ request()->routeIs('user.saved') ? 'text-brand' : 'text-gray-400' }}"></i>
             <span class="text-[9px] sm:text-[10px] font-medium truncate {{ request()->routeIs('user.saved') ? 'text-brand font-bold' : 'text-gray-500' }}">Saved</span>
         </a>
-        <a href="{{ $bottomNavProfileUrl }}" id="bottomNavProfileLink" class="flex flex-col items-center justify-center gap-1 tap-effect px-0.5">
+        <a href="{{ $bottomNavProfileUrl }}" id="bottomNavProfileLink" class="flex flex-col items-center justify-center gap-1 tap-effect px-0.5 relative">
             <i class="fas fa-user text-lg sm:text-xl {{ (request()->routeIs('user.profile') || request()->is('profile')) ? 'text-brand' : 'text-gray-400' }}"></i>
+            <span id="bottomNavProfileBadge" class="hidden absolute top-1 right-3.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
             <span class="text-[9px] sm:text-[10px] font-medium truncate {{ (request()->routeIs('user.profile') || request()->is('profile')) ? 'text-brand font-bold' : 'text-gray-500' }}">{{ $bottomNavProfileLabel }}</span>
         </a>
     </div>
@@ -79,15 +81,26 @@
                 </div>
             </div>
 
+            @php
+                $isTenantAuth = Auth::check() && !Auth::user()->roles()->whereIn('slug', ['super_admin', 'admin', 'broker'])->exists();
+            @endphp
+
             <div class="flex items-center gap-4">
-                <a href="{{ route('user.list-property') }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-brand/15 hover:bg-brand/25 text-brand border border-brand/30 hover:border-brand/50 font-semibold transition-all text-[11px]">
+                @if(!$isTenantAuth)
+                <a href="{{ route('user.list-property') }}" id="footerListPropertyBtn" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-brand/15 hover:bg-brand/25 text-brand border border-brand/30 hover:border-brand/50 font-semibold transition-all text-[11px]">
                     <i class="fas fa-plus text-[9px]"></i>
                     List Property Free
                 </a>
-                <a href="{{ route('broker.login') }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 hover:border-white/20 font-semibold transition-all text-[11px]">
+                <a href="{{ route('broker.login') }}" id="footerBrokerLoginBtn" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 hover:border-white/20 font-semibold transition-all text-[11px]">
                     <i class="fas fa-briefcase text-[9px]"></i>
                     Owner / Broker Login
                 </a>
+                @else
+                <a href="{{ route('user.roommate.create') }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-brand/15 hover:bg-brand/25 text-brand border border-brand/30 hover:border-brand/50 font-semibold transition-all text-[11px]">
+                    <i class="fas fa-door-open text-[9px]"></i>
+                    Find Flatmate / Post Roommate
+                </a>
+                @endif
             </div>
         </div>
     </div>
@@ -183,6 +196,14 @@
                         </a>
                     </li>
                     @endforeach
+                    {{-- Roommate Finder — new feature link --}}
+                    <!-- <li class="pt-1">
+                        <a href="{{ route('user.roommate.index') }}" class="group text-[12px] text-brand/80 hover:text-brand transition-colors duration-150 flex items-center gap-2 font-semibold">
+                            <span class="w-1 h-1 rounded-full bg-brand group-hover:scale-125 transition-all flex-shrink-0"></span>
+                            🤝 Find Roommate / Flatmate
+                            <span class="text-[9px] font-bold bg-brand/15 border border-brand/30 text-brand px-1.5 py-0.5 rounded">NEW</span>
+                        </a>
+                    </li> -->
                 </ul>
             </div>
 
@@ -213,7 +234,8 @@
                 </ul>
             </div>
 
-            {{-- COL 9-10: For Owners --}}
+            @if(!$isTenantAuth)
+            {{-- COL 9-10: For Owners (Guests & Non-Tenants) --}}
             <div class="col-span-2 space-y-4">
                 <h5 class="text-[11px] font-extrabold text-white uppercase tracking-widest flex items-center gap-1.5 after:flex-1 after:h-px after:bg-white/10 after:ml-2">
                     <i class="fas fa-building-user text-brand"></i>
@@ -230,7 +252,6 @@
                     @foreach([
                         ['Broker / Owner Login', route('broker.login')],
                         ['Pricing & Plans',      route('user.pricing')],
-                        ['My Bookings',          route('user.bookings')],
                         ['Saved Properties',     route('user.saved')],
                         ['Host RM Support',      route('user.contact')],
                     ] as [$label, $url])
@@ -243,6 +264,42 @@
                     @endforeach
                 </ul>
             </div>
+            @else
+            {{-- COL 9-10: For Tenants (Tenant Specific Quick Links) --}}
+            <div class="col-span-2 space-y-4">
+                <h5 class="text-[11px] font-extrabold text-white uppercase tracking-widest flex items-center gap-1.5 after:flex-1 after:h-px after:bg-white/10 after:ml-2">
+                    <i class="fas fa-users text-brand"></i>
+                    Tenant Hub
+                </h5>
+                <ul class="space-y-2.5">
+                    <li>
+                        <a href="{{ route('user.roommate.index') }}" class="group text-[12px] text-brand hover:text-white transition-colors duration-150 flex items-center gap-2 font-semibold">
+                            <span class="w-1 h-1 rounded-full bg-brand group-hover:scale-125 transition-all flex-shrink-0"></span>
+                            Find Flatmates
+                            <span class="text-[9px] font-bold bg-brand/20 border border-brand/40 text-brand px-1.5 py-0.5 rounded">NEW</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('broker.login') }}" class="group text-[12px] text-slate-300 hover:text-white transition-colors duration-150 flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-brand/50 group-hover:bg-brand group-hover:scale-125 transition-all flex-shrink-0"></span>
+                           Broker Login
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('user.bookings') }}" class="group text-[12px] text-slate-300 hover:text-white transition-colors duration-150 flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-brand/50 group-hover:bg-brand group-hover:scale-125 transition-all flex-shrink-0"></span>
+                            My Bookings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('user.saved') }}" class="group text-[12px] text-slate-300 hover:text-white transition-colors duration-150 flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-brand/50 group-hover:bg-brand group-hover:scale-125 transition-all flex-shrink-0"></span>
+                            Saved Properties
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            @endif
 
             {{-- COL 11-12: Company & Contact --}}
             <div class="col-span-2 space-y-4">

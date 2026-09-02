@@ -148,7 +148,7 @@
     <nav aria-label="Breadcrumb" class="hidden md:flex mb-3.5 text-xs text-gray-500 items-center gap-1.5 flex-wrap px-1">
         <a href="{{ route('user.home') }}" class="hover:text-brand transition flex items-center gap-1 text-gray-600 font-medium"><i class="fas fa-home text-[11px]"></i> Home</a>
         <i class="fas fa-chevron-right text-[8px] text-gray-400"></i>
-        <a href="{{ route('user.search') }}" class="hover:text-brand transition text-gray-600 font-medium">Verified PGs</a>
+        <a href="{{ route('user.search') }}" class="hover:text-brand transition text-gray-600 font-medium">Verified Properties</a>
         @if(!empty($selectedCity))
             <i class="fas fa-chevron-right text-[8px] text-gray-400"></i>
             <a href="{{ route('user.seo.city-area', ['city' => strtolower($selectedCity)]) }}" class="hover:text-brand transition font-medium text-gray-700">{{ ucfirst($selectedCity) }}</a>

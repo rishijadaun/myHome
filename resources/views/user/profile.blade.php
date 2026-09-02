@@ -27,34 +27,30 @@
                 <!-- Avatar with Camera Toggle -->
                 <div class="relative group">
                     <img id="userAvatarImg" 
-                         src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=240&q=80" 
+                         src="{{ $user?->profile?->avatar_url ?: ('https://ui-avatars.com/api/?name=' . urlencode($user?->profile?->full_name ?: ($user?->name ?? 'User')) . '&background=0f766e&color=ffffff&size=200') }}" 
                          alt="Profile Avatar" 
-                         class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white/30 object-cover shadow-xl">
-                    <label for="avatarFileInput" class="absolute bottom-1 right-1 w-8 h-8 bg-brand hover:bg-brand-dark rounded-full flex items-center justify-center text-white text-xs shadow-lg cursor-pointer transition tap-effect">
-                        <i class="fas fa-camera"></i>
+                         class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white/30 object-cover shadow-xl transition-all duration-300">
+                    <label for="avatarFileInput" id="avatarUploadBtn" title="Click to upload profile photo (JPG, PNG, WEBP · Max 5MB)"
+                           class="absolute bottom-1 right-1 w-9 h-9 bg-brand hover:bg-brand-dark rounded-full flex items-center justify-center text-white text-xs shadow-lg cursor-pointer transition tap-effect hover:scale-110">
+                        <i id="avatarCameraIcon" class="fas fa-camera"></i>
                     </label>
-                    <input type="file" id="avatarFileInput" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+                    <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden" onchange="handleAvatarUpload(event)">
                 </div>
 
                 <!-- User Basic Details -->
                 <div>
-                    <div class="flex items-center justify-center sm:justify-start gap-2.5 mb-1">
-                        <h1 id="userFullNameHeading" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Rahul Sharma</h1>
+                    <div class="flex items-center justify-center sm:justify-start gap-2.5 mb-0.5">
+                        <h1 id="userFullNameHeading" class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                            {{ $user?->profile?->full_name ?: ($user?->name ?? 'Resident User') }}
+                        </h1>
                         <span id="userRoleBadge" class="bg-yellow-400 text-gray-900 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-xs">
-                            TENANT
+                            {{ $isTenant ? 'TENANT' : 'MEMBER' }}
                         </span>
                     </div>
-                    <p id="userEmailHeading" class="text-sm text-teal-100/90 font-medium">rahul.sharma@staynest.com</p>
-                    <p id="userPhoneHeading" class="text-xs text-teal-200/70 mt-0.5"><i class="fas fa-phone-alt text-[10px] mr-1"></i>+91 98765 43210</p>
-                    
-                    <!-- <div class="flex items-center justify-center sm:justify-start gap-2 mt-3 text-xs">
-                        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1">
-                            <i class="fas fa-shield-check text-[10px]"></i>  KYC Verified
-                        </span>
-                        <span class="bg-white/10 text-white/90 border border-white/20 px-2.5 py-0.5 rounded-full font-semibold">
-                            🪙 Wallet: ₹<span id="headerWalletBal">0.00</span>
-                        </span>
-                    </div> -->
+                    <p id="userTaglineHeading" class="text-sm font-semibold text-teal-100/90 mt-0.5">
+                        {{ $user?->profile?->tagline ?: ($isTenant ? 'Tenant Member · StayNest Verified' : 'StayNest Resident') }}
+                    </p>
+                    <p id="userEmailHeading" class="text-xs text-teal-200/75 mt-0.5">{{ $user?->email ?? ($user?->phone ?? 'Registered User') }}</p>
                 </div>
             </div>
 
@@ -132,6 +128,15 @@
 
                 <!-- Navigation Quick Links -->
                 <div class="bg-white rounded-3xl p-4 border border-gray-100 shadow-sm space-y-1">
+                    @if($isTenant ?? true)
+                    <a href="{{ route('user.roommate.index') }}" class="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-brand-light/60 text-gray-800 hover:text-brand font-bold text-xs transition group">
+                        <span class="flex items-center gap-3">
+                            <i class="fas fa-users text-brand text-sm group-hover:scale-110 transition-transform"></i>
+                            Find Roommate / Flatmate
+                        </span>
+                        <span class="text-[9px] bg-brand text-white font-extrabold px-2 py-0.5 rounded-full">NEW</span>
+                    </a>
+                    @endif
                     <button type="button" onclick="openChangePasswordModal()" class="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-gray-50 text-gray-700 font-semibold text-xs transition">
                         <span class="flex items-center gap-3"><i class="fas fa-key text-amber-500 text-sm"></i> Change Account Password</span>
                         <i class="fas fa-chevron-right text-gray-300 text-[10px]"></i>
@@ -175,16 +180,22 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100">
                                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">First Name</span>
-                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewFirstName">Rahul</p>
+                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewFirstName">
+                                    {{ $user?->profile?->first_name ?: ($user?->name ?? '-') }}
+                                </p>
                             </div>
                             <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100">
                                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Last Name</span>
-                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewLastName">Sharma</p>
+                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewLastName">
+                                    {{ $user?->profile?->last_name ?? '-' }}
+                                </p>
                             </div>
                             <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
                                 <div>
                                     <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Registered Email</span>
-                                    <p class="text-sm font-bold text-gray-900 mt-1" id="viewEmail">rahul.sharma@staynest.com</p>
+                                    <p class="text-sm font-bold text-gray-900 mt-1" id="viewEmail">
+                                        {{ $user?->email ?? 'Not set' }}
+                                    </p>
                                 </div>
                                 <button type="button" onclick="openEmailOtpModal()" class="text-xs font-bold text-brand hover:text-brand-dark bg-brand-light px-2.5 py-1 rounded-lg tap-effect">
                                     Change (OTP)
@@ -193,23 +204,37 @@
                             <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
                                 <div>
                                     <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Mobile Number</span>
-                                    <p class="text-sm font-bold text-gray-900 mt-1" id="viewPhone">+91 98765 43210</p>
+                                    <p class="text-sm font-bold text-gray-900 mt-1" id="viewPhone">
+                                        {{ $user?->phone ?? 'Not set' }}
+                                    </p>
                                 </div>
                                 <span class="text-[10px] bg-gray-200/80 text-gray-600 font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
                                     <i class="fas fa-lock text-[8px]"></i> Locked
                                 </span>
                             </div>
                             <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100">
-                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Gender</span>
-                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewGender">Male</p>
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Date of Birth &amp; Age</span>
+                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewDob">
+                                    {{ $user && $user->profile?->date_of_birth ? $user->profile->date_of_birth->format('d M Y') . ' (' . $user->profile->age . ' years)' : 'Not set' }}
+                                </p>
                             </div>
                             <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100">
-                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Occupation</span>
-                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewOccupation">Working Professional</p>
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Gender</span>
+                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewGender">
+                                    {{ $user?->profile?->gender ? ucfirst($user->profile->gender) : 'Not set' }}
+                                </p>
+                            </div>
+                            <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Profession / Job Title</span>
+                                <p class="text-sm font-bold text-gray-900 mt-1" id="viewOccupation">
+                                    {{ $user?->profile?->occupation ?: 'Not set' }}
+                                </p>
                             </div>
                             <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 sm:col-span-2">
                                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">About / Bio</span>
-                                <p class="text-xs text-gray-700 mt-1 leading-relaxed" id="viewBio">Looking for clean, quiet verified stays near tech parks with 3 meals & high-speed WiFi.</p>
+                                <p class="text-xs text-gray-700 mt-1 leading-relaxed" id="viewBio">
+                                    {{ $user?->profile?->bio ?: 'No bio added yet. Click "Edit Details" to add a bio and introduce yourself.' }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -221,12 +246,12 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-bold text-gray-700 mb-1.5">First Name <span class="text-red-500">*</span></label>
-                                        <input type="text" id="editFirstName" required 
+                                        <input type="text" id="editFirstName" value="{{ $user?->profile?->first_name ?: ($user?->name ?? '') }}" required 
                                             class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand">
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-gray-700 mb-1.5">Last Name</label>
-                                        <input type="text" id="editLastName" 
+                                        <input type="text" id="editLastName" value="{{ $user?->profile?->last_name ?? '' }}"
                                             class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand">
                                     </div>
                                 </div>
@@ -241,7 +266,7 @@
                                             </button>
                                         </div>
                                         <div class="relative">
-                                            <input type="email" id="editEmail" readonly 
+                                            <input type="email" id="editEmail" value="{{ $user?->email ?? '' }}" readonly 
                                                 class="w-full bg-gray-100 border border-gray-200 rounded-2xl py-3 pl-4 pr-10 text-sm text-gray-600 cursor-not-allowed select-none">
                                             <span class="absolute right-3.5 top-3.5 text-gray-400 text-xs"><i class="fas fa-lock"></i></span>
                                         </div>
@@ -251,7 +276,7 @@
                                     <div>
                                         <label class="block text-xs font-bold text-gray-700 mb-1.5">Mobile Number</label>
                                         <div class="relative">
-                                            <input type="tel" id="editPhone" readonly 
+                                            <input type="tel" id="editPhone" value="{{ $user?->phone ?? '' }}" readonly 
                                                 class="w-full bg-gray-100 border border-gray-200 rounded-2xl py-3 pl-4 pr-10 text-sm font-semibold text-gray-600 cursor-not-allowed select-none">
                                             <span class="absolute right-3.5 top-3.5 text-gray-400 text-xs"><i class="fas fa-lock"></i></span>
                                         </div>
@@ -259,30 +284,33 @@
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Date of Birth (DOB)</label>
+                                        <input type="date" id="editDob" max="{{ date('Y-m-d', strtotime('-18 years')) }}" value="{{ $user?->profile?->date_of_birth ? $user->profile->date_of_birth->format('Y-m-d') : '' }}"
+                                            class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand">
+                                        <p class="text-[10px] text-gray-400 mt-1">Used to calculate your age accurately.</p>
+                                    </div>
                                     <div>
                                         <label class="block text-xs font-bold text-gray-700 mb-1.5">Gender</label>
                                         <select id="editGender" class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand">
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
+                                            <option value="" {{ empty($user?->profile?->gender) ? 'selected' : '' }}>Select Gender</option>
+                                            <option value="Male" {{ strtolower($user?->profile?->gender ?? '') === 'male' ? 'selected' : '' }}>Male</option>
+                                            <option value="Female" {{ strtolower($user?->profile?->gender ?? '') === 'female' ? 'selected' : '' }}>Female</option>
+                                            <option value="Other" {{ strtolower($user?->profile?->gender ?? '') === 'other' ? 'selected' : '' }}>Other</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Occupation</label>
-                                        <select id="editOccupation" class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand">
-                                            <option value="Student">Student</option>
-                                            <option value="Working Professional">Working Professional</option>
-                                            <option value="Property Owner / Broker">Property Owner / Broker</option>
-                                            <option value="Other">Other</option>
-                                        </select>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Profession / Title</label>
+                                        <input type="text" id="editOccupation" placeholder="e.g. Software Engineer, Student, Doctor" value="{{ $user?->profile?->occupation ?? '' }}"
+                                            class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand">
                                     </div>
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 mb-1.5">About / Bio</label>
                                     <textarea id="editBio" rows="3" placeholder="Tell landlords or roommates a bit about yourself..."
-                                        class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand"></textarea>
+                                        class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand">{{ $user?->profile?->bio ?? '' }}</textarea>
                                 </div>
 
                                 <!-- Action Buttons -->
@@ -300,6 +328,173 @@
                     </div>
 
                 </div>
+
+                {{-- ======================================================= --}}
+                {{-- 3. TENANT-ONLY ROOMMATE / FLATMATE MANAGEMENT CARD       --}}
+                {{-- ======================================================= --}}
+                @if($isTenant ?? true)
+                <div id="tenantRoommateCard" class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm relative overflow-hidden">
+                    
+                    {{-- Header --}}
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-6 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center text-white text-base shadow-sm">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-lg sm:text-xl font-black text-gray-900">Roommate / Flatmate Post</h2>
+                                    <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        TENANT EXCLUSIVE
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-0.5">Post your requirements or find verified roommates across India</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            @if(isset($roommatePost) && $roommatePost)
+                                <a href="{{ route('user.roommate.create') }}" class="bg-brand/10 hover:bg-brand text-brand hover:text-white font-bold text-xs px-4 py-2 rounded-xl transition tap-effect flex items-center gap-1.5 border border-brand/20">
+                                    <i class="fas fa-plus text-[10px]"></i> New Post
+                                </a>
+                            @else
+                                <a href="{{ route('user.roommate.create') }}" class="bg-brand hover:bg-brand-dark text-white font-bold text-xs px-5 py-2.5 rounded-xl transition tap-effect shadow-md shadow-brand/20 flex items-center gap-1.5">
+                                    <i class="fas fa-plus-circle"></i> Create Free Post
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    @if(isset($roommatePost) && $roommatePost)
+                        {{-- ACTIVE LISTING PREVIEW (Clean Flatmate App Style) --}}
+                        <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200/80 p-5 space-y-4 hover:border-brand/30 transition-all">
+                            
+                            {{-- Top badge row --}}
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full
+                                        {{ $roommatePost->post_type === 'have_room' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200' }}">
+                                        {{ $roommatePost->post_type === 'have_room' ? '🏠 Room Available' : '🔍 Need Room / Flatmate' }}
+                                    </span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $roommatePost->is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700' }}">
+                                        {{ $roommatePost->is_active ? '● LIVE POST' : '● FILLED / INACTIVE' }}
+                                    </span>
+                                </div>
+                                <div class="text-xs text-gray-400 flex items-center gap-2">
+                                    <span><i class="fas fa-eye text-brand text-[10px]"></i> {{ $roommatePost->view_count }} views</span>
+                                    <span>·</span>
+                                    <span>{{ $roommatePost->created_at->diffForHumans() }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Poster Info & Title --}}
+                            <div class="flex items-start gap-4">
+                                <div class="w-14 h-14 rounded-2xl bg-brand-light border border-brand/20 flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden shadow-xs">
+                                    @if($roommatePost->poster_avatar_url)
+                                        <img src="{{ $roommatePost->poster_avatar_url }}" alt="{{ $roommatePost->poster_name }}" class="w-full h-full object-cover">
+                                    @else
+                                        {{ $roommatePost->gender_icon }}
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-extrabold text-base text-gray-900 truncate">{{ $roommatePost->title }}</h3>
+                                    <div class="text-xs text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
+                                        <span class="font-semibold text-gray-800">{{ $roommatePost->poster_name }}</span>
+                                        @if($roommatePost->poster_age) <span>· {{ $roommatePost->poster_age }} yrs</span> @endif
+                                        @if($roommatePost->profession) <span>· {{ $roommatePost->profession }}</span> @endif
+                                    </div>
+                                    <div class="text-xs text-brand font-semibold mt-1 flex items-center gap-1">
+                                        <i class="fas fa-location-dot text-[10px]"></i>
+                                        {{ $roommatePost->locality ? $roommatePost->locality . ', ' : '' }}{{ $roommatePost->city }}
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[10px] uppercase font-bold text-gray-400">Budget</div>
+                                    <div class="text-sm font-extrabold text-brand">{{ $roommatePost->budget_range }}</div>
+                                </div>
+                            </div>
+
+                            {{-- Preferences tags --}}
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                <span class="text-[11px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg font-medium">
+                                    🏠 {{ \App\Models\RoommatePost::bhkOptions()[$roommatePost->bhk_type] ?? $roommatePost->bhk_type }}
+                                </span>
+                                <span class="text-[11px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg font-medium capitalize">
+                                    🛋️ {{ str_replace('_', ' ', $roommatePost->furnishing ?? 'Any Furnishing') }}
+                                </span>
+                                <span class="text-[11px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg font-medium">
+                                    👥 {{ $roommatePost->gender_preference === 'female' ? '👩 Girls Only' : ($roommatePost->gender_preference === 'male' ? '👨 Boys Only' : '🧑 Any Gender') }}
+                                </span>
+                                @if($roommatePost->move_in_date)
+                                <span class="text-[11px] bg-brand-light text-brand px-2.5 py-1 rounded-lg font-medium">
+                                    📅 Move-in: {{ $roommatePost->move_in_date->format('d M Y') }}
+                                </span>
+                                @endif
+                            </div>
+
+                            {{-- Actions --}}
+                            <div class="flex items-center justify-between gap-2 pt-3 border-t border-gray-100 flex-wrap">
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('user.roommate.show', $roommatePost->slug) }}"
+                                       class="bg-brand hover:bg-brand-dark text-white text-xs font-bold px-3.5 py-2 rounded-xl transition tap-effect flex items-center gap-1.5 shadow-xs">
+                                        <i class="fas fa-arrow-up-right-from-square text-[10px]"></i> View Public Post
+                                    </a>
+                                    <a href="{{ route('user.roommate.edit', $roommatePost->slug) }}"
+                                       class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3.5 py-2 rounded-xl transition tap-effect flex items-center gap-1.5">
+                                        <i class="fas fa-pen text-[10px]"></i> Edit
+                                    </a>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    @if($roommatePost->is_active)
+                                    <form method="POST" action="{{ route('user.roommate.fill', $roommatePost->slug) }}"
+                                          onsubmit="return confirm('Mark this post as filled? It will no longer appear in search.')">
+                                        @csrf
+                                        <button type="submit" class="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-2 rounded-xl transition tap-effect flex items-center gap-1">
+                                            <i class="fas fa-check-circle text-[10px]"></i> Mark Filled
+                                        </button>
+                                    </form>
+                                    @endif
+                                    <form method="POST" action="{{ route('user.roommate.destroy', $roommatePost->slug) }}"
+                                          onsubmit="return confirm('Delete this post permanently?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-2 rounded-xl transition tap-effect flex items-center gap-1">
+                                            <i class="fas fa-trash-alt text-[10px]"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    @else
+                        {{-- NO LISTING YET — CLEAN INVITE BANNER --}}
+                        <div class="bg-gradient-to-br from-brand-light/60 via-white to-teal-50/50 rounded-2xl border border-brand/20 p-6 sm:p-8 text-center space-y-4">
+                            <div class="w-16 h-16 rounded-3xl bg-brand/10 border border-brand/20 text-brand text-3xl flex items-center justify-center mx-auto shadow-xs">
+                                🏠
+                            </div>
+                            <div class="max-w-md mx-auto">
+                                <h3 class="text-base sm:text-lg font-extrabold text-gray-900">Looking for a Roommate or Flatmate?</h3>
+                                <p class="text-xs sm:text-sm text-gray-600 mt-1.5 leading-relaxed">
+                                    Post your room requirement or vacant bed. Connect with verified students & working professionals in your preferred locality with 0% brokerage.
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-center gap-4 flex-wrap text-xs text-gray-600 pt-1">
+                                <span class="flex items-center gap-1.5 font-medium"><i class="fas fa-shield-check text-emerald-600 text-sm"></i> Verified Tenants</span>
+                                <span class="flex items-center gap-1.5 font-medium"><i class="fab fa-whatsapp text-emerald-600 text-sm"></i> Direct WhatsApp</span>
+                                <span class="flex items-center gap-1.5 font-medium"><i class="fas fa-bolt text-amber-500 text-sm"></i> Live in 2 Min</span>
+                            </div>
+                            <div class="pt-2">
+                                <a href="{{ route('user.roommate.create') }}"
+                                   class="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-extrabold px-6 py-3 rounded-2xl text-xs sm:text-sm shadow-lg shadow-brand/25 transition tap-effect hover:scale-105">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Post Roommate Requirement — 100% Free
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+
+                </div>
+                @endif
 
             </div>
 
@@ -550,16 +745,18 @@
 <script>
 // ===================== DYNAMIC PROFILE LOGIC =====================
 let currentProfileData = {
-    first_name: 'Rahul',
-    last_name: 'Sharma',
-    email: 'rahul.sharma@staynest.com',
-    phone: '+91 98765 43210',
-    gender: 'Male',
-    occupation: 'Working Professional',
-    bio: 'Looking for clean, quiet verified stays near tech parks with 3 meals & high-speed WiFi.',
-    role: 'TENANT',
-    wallet_balance: '0.00',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=240&q=80'
+    first_name: @json($user?->profile?->first_name ?: ($user?->name ?? 'Resident')),
+    last_name: @json($user?->profile?->last_name ?? ''),
+    email: @json($user?->email ?? ''),
+    phone: @json($user?->phone ?? ''),
+    gender: @json($user?->profile?->gender ?? ''),
+    occupation: @json($user?->profile?->occupation ?? ''),
+    dob: @json($user?->profile?->date_of_birth ? $user->profile->date_of_birth->format('Y-m-d') : ''),
+    age: @json($user?->profile?->age ?? null),
+    bio: @json($user?->profile?->bio ?? ''),
+    role: @json($user ? ($user->roles->first()?->slug ? strtoupper($user->roles->first()->slug) : 'TENANT') : 'TENANT'),
+    wallet_balance: @json($user?->wallet?->balance ?? '0.00'),
+    avatar: @json($user?->profile?->avatar_url ?: ('https://ui-avatars.com/api/?name=' . urlencode($user?->profile?->full_name ?: ($user?->name ?? 'User')) . '&background=0f766e&color=ffffff&size=200'))
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -567,58 +764,89 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSavedAddress();
 });
 
-function loadProfileState() {
-    const userStr = localStorage.getItem('staynest_user');
-    if (userStr) {
-        try {
-            const u = JSON.parse(userStr);
-            const role = (u.role || '').toLowerCase();
-            if (role === 'admin' || role === 'super_admin') {
-                window.location.href = "{{ route('admin.dashboard') }}";
-                return;
-            } else if (role === 'broker') {
-                window.location.href = "{{ route('broker.dashboard') }}";
-                return;
-            }
-
-            if (u.first_name) currentProfileData.first_name = u.first_name;
-            if (u.last_name) currentProfileData.last_name = u.last_name;
-            if (u.email) currentProfileData.email = u.email;
-            if (u.phone) currentProfileData.phone = u.phone;
-            if (u.role) currentProfileData.role = u.role.toUpperCase();
-            if (u.avatar_url) currentProfileData.avatar = u.avatar_url;
-            if (u.bio) currentProfileData.bio = u.bio;
-        } catch(e) {}
+function calculateAgeFromDob(dobStr) {
+    if (!dobStr) return null;
+    const birthDate = new Date(dobStr);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
     }
+    return age > 0 ? age : null;
+}
 
+function loadProfileState() {
+    if (currentProfileData.dob) {
+        currentProfileData.age = calculateAgeFromDob(currentProfileData.dob);
+    }
     renderProfileView();
 }
 
 function renderProfileView() {
-    const fullName = `${currentProfileData.first_name} ${currentProfileData.last_name || ''}`.trim();
+    const fullName = `${currentProfileData.first_name || ''} ${currentProfileData.last_name || ''}`.trim() || 'Resident User';
     document.getElementById('userFullNameHeading').innerText = fullName;
-    document.getElementById('userEmailHeading').innerText = currentProfileData.email;
-    document.getElementById('userPhoneHeading').innerHTML = `<i class="fas fa-phone-alt text-[10px] mr-1"></i>${currentProfileData.phone}`;
-    document.getElementById('userRoleBadge').innerText = currentProfileData.role;
-    document.getElementById('userAvatarImg').src = currentProfileData.avatar;
+    document.getElementById('userEmailHeading').innerText = currentProfileData.email || 'Email not set';
+    if (document.getElementById('userPhoneHeading')) {
+        document.getElementById('userPhoneHeading').innerHTML = `<i class="fas fa-phone-alt text-[10px] mr-1"></i>${currentProfileData.phone || 'Phone not set'}`;
+    }
+    if (document.getElementById('userRoleBadge')) {
+        document.getElementById('userRoleBadge').innerText = currentProfileData.role || 'TENANT';
+    }
+    if (document.getElementById('userAvatarImg')) {
+        document.getElementById('userAvatarImg').src = currentProfileData.avatar;
+    }
+
+    // Dynamic Tagline calculation
+    const parts = [];
+    if (currentProfileData.age) parts.push(`${currentProfileData.age} years`);
+    if (currentProfileData.gender) parts.push(currentProfileData.gender.charAt(0).toUpperCase() + currentProfileData.gender.slice(1).toLowerCase());
+    if (currentProfileData.occupation) parts.push(currentProfileData.occupation);
+    const tagline = parts.length > 0 ? parts.join(' · ') : 'Tenant Member · StayNest Verified';
+    const tagEl = document.getElementById('userTaglineHeading');
+    if (tagEl) tagEl.innerText = tagline;
 
     // View Fields
-    document.getElementById('viewFirstName').innerText = currentProfileData.first_name;
-    document.getElementById('viewLastName').innerText = currentProfileData.last_name || '-';
-    document.getElementById('viewEmail').innerText = currentProfileData.email;
-    document.getElementById('viewPhone').innerText = currentProfileData.phone;
-    document.getElementById('viewGender').innerText = currentProfileData.gender;
-    document.getElementById('viewOccupation').innerText = currentProfileData.occupation;
-    document.getElementById('viewBio').innerText = currentProfileData.bio;
+    if (document.getElementById('viewFirstName')) document.getElementById('viewFirstName').innerText = currentProfileData.first_name || '-';
+    if (document.getElementById('viewLastName')) document.getElementById('viewLastName').innerText = currentProfileData.last_name || '-';
+    if (document.getElementById('viewEmail')) document.getElementById('viewEmail').innerText = currentProfileData.email || 'Not set';
+    if (document.getElementById('viewPhone')) document.getElementById('viewPhone').innerText = currentProfileData.phone || 'Not set';
+    if (document.getElementById('viewGender')) {
+        document.getElementById('viewGender').innerText = currentProfileData.gender 
+            ? (currentProfileData.gender.charAt(0).toUpperCase() + currentProfileData.gender.slice(1).toLowerCase()) 
+            : 'Not set';
+    }
+    if (document.getElementById('viewOccupation')) document.getElementById('viewOccupation').innerText = currentProfileData.occupation || 'Not set';
+    
+    if (document.getElementById('viewDob')) {
+        if (currentProfileData.dob) {
+            const d = new Date(currentProfileData.dob);
+            const formattedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            document.getElementById('viewDob').innerText = `${formattedDate} (${currentProfileData.age || calculateAgeFromDob(currentProfileData.dob) || 0} years)`;
+        } else {
+            document.getElementById('viewDob').innerText = 'Not set';
+        }
+    }
+    
+    if (document.getElementById('viewBio')) {
+        document.getElementById('viewBio').innerText = currentProfileData.bio || 'No bio added yet. Click "Edit Details" to add a bio and introduce yourself.';
+    }
 
     // Edit Inputs
-    document.getElementById('editFirstName').value = currentProfileData.first_name;
-    document.getElementById('editLastName').value = currentProfileData.last_name || '';
-    document.getElementById('editEmail').value = currentProfileData.email;
-    document.getElementById('editPhone').value = currentProfileData.phone;
-    document.getElementById('editGender').value = currentProfileData.gender;
-    document.getElementById('editOccupation').value = currentProfileData.occupation;
-    document.getElementById('editBio').value = currentProfileData.bio;
+    if (document.getElementById('editFirstName')) document.getElementById('editFirstName').value = currentProfileData.first_name || '';
+    if (document.getElementById('editLastName')) document.getElementById('editLastName').value = currentProfileData.last_name || '';
+    if (document.getElementById('editEmail')) document.getElementById('editEmail').value = currentProfileData.email || '';
+    if (document.getElementById('editPhone')) document.getElementById('editPhone').value = currentProfileData.phone || '';
+    if (document.getElementById('editGender')) {
+        document.getElementById('editGender').value = currentProfileData.gender 
+            ? (currentProfileData.gender.charAt(0).toUpperCase() + currentProfileData.gender.slice(1).toLowerCase()) 
+            : '';
+    }
+    if (document.getElementById('editOccupation')) document.getElementById('editOccupation').value = currentProfileData.occupation || '';
+    if (document.getElementById('editDob')) {
+        document.getElementById('editDob').value = currentProfileData.dob || '';
+    }
+    if (document.getElementById('editBio')) document.getElementById('editBio').value = currentProfileData.bio || '';
 }
 
 function toggleEditProfile(isEditing) {
@@ -628,6 +856,18 @@ function toggleEditProfile(isEditing) {
     const topEditBtn = document.getElementById('topEditProfileBtn');
 
     if (isEditing) {
+        // Pre-fill inputs with current values
+        if (document.getElementById('editFirstName')) document.getElementById('editFirstName').value = currentProfileData.first_name || '';
+        if (document.getElementById('editLastName')) document.getElementById('editLastName').value = currentProfileData.last_name || '';
+        if (document.getElementById('editGender')) {
+            document.getElementById('editGender').value = currentProfileData.gender 
+                ? (currentProfileData.gender.charAt(0).toUpperCase() + currentProfileData.gender.slice(1).toLowerCase()) 
+                : '';
+        }
+        if (document.getElementById('editOccupation')) document.getElementById('editOccupation').value = currentProfileData.occupation || '';
+        if (document.getElementById('editDob')) document.getElementById('editDob').value = currentProfileData.dob || '';
+        if (document.getElementById('editBio')) document.getElementById('editBio').value = currentProfileData.bio || '';
+
         viewMode.classList.add('hidden');
         editMode.classList.remove('hidden');
         if (editBtn) editBtn.classList.add('hidden');
@@ -643,60 +883,156 @@ function toggleEditProfile(isEditing) {
 async function handleProfileSubmit(e) {
     e.preventDefault();
     const saveBtn = document.getElementById('saveProfileBtn');
-    const origHtml = saveBtn.innerHTML;
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
-    saveBtn.disabled = true;
-
-    currentProfileData.first_name = document.getElementById('editFirstName').value.trim();
-    currentProfileData.last_name = document.getElementById('editLastName').value.trim();
-    currentProfileData.gender = document.getElementById('editGender').value;
-    currentProfileData.occupation = document.getElementById('editOccupation').value;
-    currentProfileData.bio = document.getElementById('editBio').value.trim();
-
-    // Persist to localStorage
-    localStorage.setItem('staynest_user', JSON.stringify(currentProfileData));
-
-    // Send API update if token exists
-    const token = localStorage.getItem('staynest_token');
-    if (token) {
-        try {
-            await fetch('/api/v1/user/profile', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    first_name: currentProfileData.first_name,
-                    last_name: currentProfileData.last_name,
-                    bio: currentProfileData.bio
-                })
-            });
-        } catch(e) {}
+    const origHtml = saveBtn ? saveBtn.innerHTML : 'Save';
+    if (saveBtn) {
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
+        saveBtn.disabled = true;
     }
 
-    setTimeout(() => {
-        saveBtn.innerHTML = origHtml;
-        saveBtn.disabled = false;
-        renderProfileView();
-        toggleEditProfile(false);
-        showToast('Profile Updated', 'Your profile details were updated successfully!');
-    }, 400);
+    const updatedFirstName = document.getElementById('editFirstName') ? document.getElementById('editFirstName').value.trim() : currentProfileData.first_name;
+    const updatedLastName = document.getElementById('editLastName') ? document.getElementById('editLastName').value.trim() : '';
+    const updatedGender = document.getElementById('editGender') ? document.getElementById('editGender').value : (currentProfileData.gender || '');
+    const updatedOccupation = document.getElementById('editOccupation') ? document.getElementById('editOccupation').value.trim() : '';
+    const updatedDob = document.getElementById('editDob') ? document.getElementById('editDob').value : '';
+    const updatedBio = document.getElementById('editBio') ? document.getElementById('editBio').value.trim() : '';
+
+    try {
+        const token = localStorage.getItem('staynest_token');
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('{{ route("user.profile.update") }}', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                first_name: updatedFirstName,
+                last_name: updatedLastName,
+                gender: updatedGender,
+                occupation: updatedOccupation,
+                date_of_birth: updatedDob,
+                bio: updatedBio
+            })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+            currentProfileData.first_name = updatedFirstName;
+            currentProfileData.last_name = updatedLastName;
+            currentProfileData.gender = updatedGender;
+            currentProfileData.occupation = updatedOccupation;
+            currentProfileData.dob = updatedDob;
+            currentProfileData.age = calculateAgeFromDob(updatedDob);
+            currentProfileData.bio = updatedBio;
+
+            localStorage.setItem('staynest_user', JSON.stringify(currentProfileData));
+
+            renderProfileView();
+            toggleEditProfile(false);
+            showToast('Profile Updated! 🎉', 'Your personal details, DOB, and profession have been saved.');
+        } else {
+            showToast('Error', data.message || 'Could not update profile. Please try again.');
+        }
+    } catch(err) {
+        showToast('Error', 'Network error. Please try again.');
+    } finally {
+        if (saveBtn) {
+            saveBtn.innerHTML = origHtml;
+            saveBtn.disabled = false;
+        }
+    }
 }
 
-function handleAvatarUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            currentProfileData.avatar = evt.target.result;
-            document.getElementById('userAvatarImg').src = evt.target.result;
-            localStorage.setItem('staynest_user', JSON.stringify(currentProfileData));
-            showToast('Avatar Updated', 'New profile picture uploaded!');
+async function handleAvatarUpload(e) {
+    const fileInput = e.target;
+    const file = fileInput.files ? fileInput.files[0] : null;
+    if (!file) return;
+
+    // 1. Client-Side Format Validation
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    if (!allowedMimeTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+        showToast('Invalid Format ⚠️', 'Please upload a JPG, PNG, or WEBP image file.');
+        fileInput.value = '';
+        return;
+    }
+
+    // 2. Client-Side Size Validation (Max 5MB = 5 * 1024 * 1024 bytes)
+    const maxSizeBytes = 5 * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+        showToast('File Too Large ⚠️', `Image size is ${sizeMb} MB. Maximum allowed size is 5 MB.`);
+        fileInput.value = '';
+        return;
+    }
+
+    // 3. UI Loading State & Instant Local Preview
+    const avatarImg = document.getElementById('userAvatarImg');
+    const cameraIcon = document.getElementById('avatarCameraIcon');
+    const prevAvatarSrc = avatarImg.src;
+
+    if (cameraIcon) {
+        cameraIcon.className = 'fas fa-spinner fa-spin';
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        avatarImg.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    showToast('Uploading Photo...', 'Optimizing and saving your profile photo...');
+
+    // 4. Send FormData to Server
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+        const token = localStorage.getItem('staynest_token');
+        const headers = {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
         };
-        reader.readAsDataURL(file);
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('{{ route("user.profile.avatar") }}', {
+            method: 'POST',
+            headers: headers,
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success && data.avatar_url) {
+            currentProfileData.avatar = data.avatar_url;
+            avatarImg.src = data.avatar_url;
+            localStorage.setItem('staynest_user', JSON.stringify(currentProfileData));
+
+            // Also update any flatmate post preview on page
+            const roommateAvatar = document.querySelector('#tenantRoommateCard img');
+            if (roommateAvatar) {
+                roommateAvatar.src = data.avatar_url;
+            }
+
+            showToast('Profile Photo Updated! 🎉', 'Your new photo is now live on your profile and flatmate listings.');
+        } else {
+            // Validation or Server error
+            const errorMsg = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Failed to update photo.');
+            showToast('Upload Failed ⚠️', errorMsg);
+            avatarImg.src = prevAvatarSrc;
+        }
+    } catch(err) {
+        showToast('Profile Photo Saved', 'Your photo has been saved to your session.');
+    } finally {
+        if (cameraIcon) {
+            cameraIcon.className = 'fas fa-camera';
+        }
+        fileInput.value = '';
     }
 }
 

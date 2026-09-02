@@ -204,6 +204,7 @@
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tag / Badge</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Capacity</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Price / Mo</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Listed Date</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
                     </tr>
@@ -251,6 +252,9 @@
                                     <div class="min-w-0">
                                         <a href="{{ url('/list-property?edit_id=' . $property->id) }}" class="font-bold text-gray-900 truncate max-w-xs pg-name hover:text-brand transition block">{{ $property->name }}</a>
                                         <div class="text-xs text-gray-500 truncate max-w-xs">{{ $property->landmark ?? ($property->address ?? 'Verified Stay') }}</div>
+                                        <div class="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5">
+                                            <i class="far fa-clock text-[9px]"></i> Listed: {{ $property->created_at ? $property->created_at->format('d M Y') : 'N/A' }}
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -327,6 +331,16 @@
                                     ₹{{ number_format($property->monthly_rent) }}<span class="text-[10px] font-normal text-gray-500">/mo</span>
                                 @endif
                             </td>
+                            <!-- Listed Date Column -->
+                            <td class="px-6 py-4 text-xs whitespace-nowrap">
+                                <div class="font-bold text-gray-900 flex items-center gap-1.5">
+                                    <i class="far fa-calendar-alt text-brand text-[11px]"></i>
+                                    <span>{{ $property->created_at ? $property->created_at->format('d M Y') : 'N/A' }}</span>
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-0.5">
+                                    {{ $property->created_at ? $property->created_at->diffForHumans() : '' }}
+                                </div>
+                            </td>
                             <td class="px-6 py-4">
                                 <span id="status-badge-{{ $property->id }}" class="status-badge text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase {{ $isVerified ? 'bg-emerald-100 text-emerald-700' : ($isPending ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700') }}">
                                     {{ $isVerified ? 'APPROVED' : ($isPending ? 'PENDING' : strtoupper($property->status)) }}
@@ -365,7 +379,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="px-6 py-12 text-center text-gray-400">
+                            <td colspan="11" class="px-6 py-12 text-center text-gray-400">
                                 <div class="w-12 h-12 rounded-full bg-gray-50 text-gray-300 flex items-center justify-center mx-auto mb-2 text-xl">
                                     <i class="fas fa-search"></i>
                                 </div>
@@ -444,6 +458,10 @@
                         </p>
                         <p class="text-xs text-gray-600 font-medium mt-0.5 truncate broker-name">Broker: {{ $brokerName }}</p>
                         <p class="text-xs font-bold text-gray-900 mt-1">₹{{ number_format($property->monthly_rent) }}/mo • {{ $property->total_beds }} beds</p>
+                        <p class="text-[11px] text-gray-500 mt-1 flex items-center gap-1 font-medium">
+                            <i class="far fa-calendar-alt text-brand text-[10px]"></i> 
+                            <span>Listed: <strong class="text-gray-800">{{ $property->created_at ? $property->created_at->format('d M Y') : 'N/A' }}</strong> <span class="text-gray-400">({{ $property->created_at ? $property->created_at->diffForHumans() : '' }})</span></span>
+                        </p>
                     </div>
                 </div>
 
@@ -1035,7 +1053,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3 bg-gray-50 p-4 rounded-2xl">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-gray-50 p-4 rounded-2xl">
                             <div>
                                 <span class="text-xs text-gray-500 block font-medium">Monthly Rent</span>
                                 <span class="text-base font-extrabold text-gray-900">₹${Number(p.monthly_rent).toLocaleString()}</span>
@@ -1051,6 +1069,14 @@
                             <div>
                                 <span class="text-xs text-gray-500 block font-medium">Gender Preference</span>
                                 <span class="text-sm font-bold uppercase text-brand">${p.gender_preference || 'Co-Ed'}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block font-medium">Listed On</span>
+                                <span class="text-xs font-bold text-gray-900 flex items-center gap-1 mt-0.5"><i class="far fa-calendar-alt text-brand"></i> ${p.created_at ? new Date(p.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block font-medium">Status</span>
+                                <span class="text-xs font-bold uppercase text-emerald-600">${p.status || 'Active'}</span>
                             </div>
                         </div>
 

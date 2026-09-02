@@ -92,6 +92,11 @@
                     <span class="text-sm font-medium">Users</span>
                     <span class="ml-auto bg-purple-50 text-purple-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['users'] ?? 0 }}</span>
                 </a>
+                <a href="{{ route('admin.roommates') }}" class="sidebar-link {{ request()->routeIs('admin.roommates*') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+                    <i class="fas fa-handshake w-5 text-center text-emerald-600"></i>
+                    <span class="text-sm font-medium">Flatmates / Roommates</span>
+                    <span class="ml-auto bg-emerald-50 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['roommates'] ?? 0 }}</span>
+                </a>
                 <a href="{{ route('admin.reviews') }}" class="sidebar-link {{ request()->routeIs('admin.reviews*') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-star w-5 text-center text-amber-500"></i>
                     <span class="text-sm font-medium">Reviews</span>

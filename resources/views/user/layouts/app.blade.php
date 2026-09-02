@@ -145,6 +145,8 @@
         @include('user.partials.floating-actions')
         @include('user.partials.wishlist-helper')
         @include('user.partials.pwa-modal')
+        @include('user.roommate.partials.whatsapp-chat-modal')
+        @include('user.partials.roommate-notifier')
 
         <!-- PWA Native App Install Toast / Banner (Mobile Only) -->
         <div id="pwaInstallBanner" class="fixed bottom-20 left-4 right-4 z-[9999] hidden md:hidden">

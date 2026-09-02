@@ -26,7 +26,7 @@
                 {{ !empty($exception) && $exception->getMessage() ? $exception->getMessage() : "Oops! Property Not Found" }}
             </h1>
             <p class="text-slate-600 text-sm md:text-base max-w-md mx-auto leading-relaxed">
-                The PG accommodation you are looking for is currently unapproved by admin, under review, or no longer publicly accessible.
+                The property you are looking for is currently unapproved by admin, under review, or no longer publicly accessible.
             </p>
         </div>
 
@@ -56,7 +56,7 @@
                     <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">
                         <i class="fas fa-bed"></i>
                     </div>
-                    <span class="text-xs font-bold text-slate-900">Find PG</span>
+                    <span class="text-xs font-bold text-slate-900">Find Listing</span>
                 </a>
 
                 <a href="{{ route('user.location') }}" class="bg-white p-3.5 rounded-2xl border border-gray-100 card-hover text-center tap-effect flex flex-col items-center gap-1.5">

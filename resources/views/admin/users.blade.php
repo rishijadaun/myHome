@@ -111,9 +111,9 @@
                 <tbody class="divide-y divide-gray-100" id="userBody">
                     @forelse($users as $user)
                         @php
-                            $fullName = $user->profile->full_name ?? ($user->name ?? $user->email);
-                            $firstName = $user->profile->first_name ?? $fullName;
-                            $lastName = $user->profile->last_name ?? '';
+                            $fullName = $user->profile?->full_name ?? ($user->name ?? $user->email);
+                            $firstName = $user->profile?->first_name ?? $fullName;
+                            $lastName = $user->profile?->last_name ?? '';
                             $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
                             if (empty(trim($initials))) $initials = 'US';
 
@@ -244,9 +244,9 @@
     <div class="md:hidden space-y-3" id="userMobileList">
         @forelse($users as $user)
             @php
-                $fullName = $user->profile->full_name ?? ($user->name ?? $user->email);
-                $firstName = $user->profile->first_name ?? $fullName;
-                $lastName = $user->profile->last_name ?? '';
+                $fullName = $user->profile?->full_name ?? ($user->name ?? $user->email);
+                $firstName = $user->profile?->first_name ?? $fullName;
+                $lastName = $user->profile?->last_name ?? '';
                 $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
                 if (empty(trim($initials))) $initials = 'US';
 

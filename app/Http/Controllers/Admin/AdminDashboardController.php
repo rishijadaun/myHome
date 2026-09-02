@@ -9,6 +9,7 @@ use App\Models\Notification;
 use App\Models\Property;
 use App\Models\PropertyReport;
 use App\Models\Role;
+use App\Models\RoommatePost;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

@@ -177,7 +177,7 @@
         <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between mb-1">
-                    <h3 class="font-bold text-gray-900 text-lg">PG Category Breakdown</h3>
+                    <h3 class="font-bold text-gray-900 text-lg">Property Category Breakdown</h3>
                     <span class="text-xs font-semibold text-brand bg-brand-50 px-2 py-0.5 rounded-md">Live</span>
                 </div>
                 <p class="text-xs text-gray-500 mb-4">{{ $totalProperties }} verified & listed property stays</p>

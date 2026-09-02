@@ -2,7 +2,8 @@ User-agent: *
 Allow: /
 Allow: /search
 Allow: /pg-in-
-Allow: /location
+Allow: /explore-near-me
+Allow: /find-roommate
 Allow: /detail/
 Allow: /pg-details
 Allow: /about-us

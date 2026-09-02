@@ -165,7 +165,8 @@ Route::prefix('broker')->name('broker.')->group(function () {
 
 use App\Http\Controllers\User\UserBookingController;
 
-Route::get('/location', [UserHomeController::class, 'location'])->name('user.location');
+Route::get('/explore-near-me', [UserHomeController::class, 'location'])->name('user.location');
+Route::permanentRedirect('/location', '/explore-near-me');
 
 // Public User Routes
 Route::name('user.')->group(function () {

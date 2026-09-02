@@ -1,8 +1,8 @@
 @extends('user.layouts.map')
 
-@section('title', 'Explore PGs on Map - Find Verified Stays & Hostels Near You | StayNest')
-@section('meta_description', 'Locate verified paying guest (PG) accommodations, boys & girls hostels, and luxury co-living spaces on an interactive GPS map. Filter by budget, gender, amenities, and get instant directions with zero brokerage.')
-@section('meta_keywords', 'PG on map, find PG near me, interactive PG map, PG locator India, hostel map, student housing near me, StayNest map, PG directions')
+@section('title', 'Explore PGs, Flats & Flatmates Near You on Map | StayNest')
+@section('meta_description', 'Discover verified PGs, hostels, shared flats, commercial spaces, and verified flatmates near you on an interactive GPS map. Filter by budget, gender, amenities & connect with zero brokerage on StayNest.')
+@section('meta_keywords', 'explore near me, find PG near me, flatmate near me, roommates near me, flats near me on map, interactive PG map, PG locator India, student housing, StayNest map')
 @section('canonical', route('user.location'))
 @section('og_type', 'website')
 
@@ -11,12 +11,12 @@
 {
   "@context": "https://schema.org",
   "@type": "SearchResultsPage",
-  "name": "Explore Verified PGs and Stays on Interactive Map",
-  "description": "Locate verified paying guest accommodations, boys & girls PGs, and luxury co-living stays on an interactive map.",
+  "name": "Explore Verified PGs, Flats & Flatmates Near You on Interactive Map",
+  "description": "Locate verified paying guest accommodations, flats, commercial spaces, and flatmates on an interactive GPS map.",
   "url": "{{ route('user.location') }}",
   "mainEntity": {
     "@type": "ItemList",
-    "name": "Map Located Accommodations",
+    "name": "Nearby Map Located Stays and Flatmates",
     "itemListOrder": "https://schema.org/ItemListUnordered",
     "numberOfItems": {{ isset($properties) ? count($properties) : 20 }}
   }
@@ -118,7 +118,7 @@
         @media (min-width: 768px) {
             #sidebar { 
                 transform: none !important; 
-                width: 420px; 
+                width: 520px; 
                 height: 100% !important;
                 transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             }
@@ -173,6 +173,41 @@
             background: linear-gradient(135deg, #4bb59d 0%, #3a9a85 100%);
             color: #ffffff !important;
             box-shadow: 0 4px 12px rgba(75, 181, 157, 0.35);
+        }
+        .loc-type-tab.active-roommate-tab {
+            background: linear-gradient(135deg, #4c30dd 0%, #341db0 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(76, 48, 221, 0.4) !important;
+        }
+
+        .custom-price-badge.roommate-price-badge {
+            background: linear-gradient(135deg, #4c30dd 0%, #2e1b8b 100%) !important;
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 4px 16px rgba(76, 48, 221, 0.4), 0 0 0 2px rgba(255,255,255,0.15) !important;
+        }
+        .custom-price-badge.roommate-price-badge:hover {
+            background: linear-gradient(135deg, #6d4aff 0%, #4c30dd 100%) !important;
+            transform: translate(-50%, -130%) scale(1.1);
+        }
+        @media (max-width: 767px) {
+            .custom-price-badge.roommate-price-badge {
+                padding: 5px 10px;
+                border-radius: 16px;
+                font-size: 11px;
+                transform: translate(60%, -50%);
+            }
+            .custom-price-badge.roommate-price-badge:hover {
+                transform: translate(60%, -50%) scale(1.05);
+            }
+        }
+
+        .roommate-card-view-btn {
+            background: #4c30dd !important;
+            color: #ffffff !important;
+        }
+        .roommate-card-view-btn:hover {
+            background: #3921b3 !important;
         }
         .tab-divider {
             height: 16px;
@@ -326,7 +361,7 @@
     <div class="flex flex-1 overflow-hidden relative w-full h-[70vh] md:h-auto min-h-[500px]" id="mainContainer">
         
         <!-- Sidebar / Android App Drawer Bottom Sheet -->
-        <aside id="sidebar" class="bg-white md:border-r border-gray-100 flex flex-col z-[500] flex-shrink-0 md:relative fixed bottom-0 left-0 h-[88vh] md:h-full shadow-2xl md:shadow-none rounded-t-[28px] md:rounded-none overflow-hidden w-full md:w-[420px]">
+        <aside id="sidebar" class="bg-white md:border-r border-gray-100 flex flex-col z-[500] flex-shrink-0 md:relative fixed bottom-0 left-0 h-[88vh] md:h-full shadow-2xl md:shadow-none rounded-t-[28px] md:rounded-none overflow-hidden w-full md:w-[520px]">
             <!-- Interactive Drag Header for Mobile -->
             <div class="md:hidden flex flex-col items-center pt-2.5 pb-2.5 px-4 bg-white border-b border-gray-100 cursor-pointer select-none" id="drawerDragArea" onclick="toggleMobileSidebar()">
                 <div class="drag-handle mb-2"></div>
@@ -446,6 +481,14 @@
                         <i class="fas fa-store text-xs"></i>
                         <span>Commercial</span>
                     </button>
+                    <div class="tab-divider" id="divider-comm-roommate" style="{{ ($selectedType ?? '') === 'commercial' || ($selectedType ?? '') === 'roommate' ? 'opacity: 0;' : '' }}"></div>
+                    <button type="button" 
+                        onclick="switchLocationPropertyType('roommate')" 
+                        id="locTab-roommate" 
+                        class="loc-type-tab {{ ($selectedType ?? '') === 'roommate' ? 'active-loc-tab active-roommate-tab' : '' }}">
+                        <i class="fas fa-users text-xs"></i>
+                        <span>Roommates</span>
+                    </button>
                 </div>
 
                 <div class="flex items-center justify-between pt-1">
@@ -521,6 +564,7 @@
         let currentSelectedPropertyType = '{{ $selectedType ?? 'pg-hostel' }}';
         let activeFilter = 'all';
         let rawDatabaseProperties = @json($properties ?? []);
+        let rawDatabaseRoommates = @json($roommates ?? []);
         let allCitiesList = @json($cities ?? []);
         let currentPGList = [];
         let markerMap = {};
@@ -624,7 +668,9 @@
             };
 
             // 0. Detect Property Type
-            if (/\b(flat|flats|apartment|apartments|bhk|1bhk|2bhk|3bhk|house|houses|villa|villas|builder floor|builder-floor)\b/i.test(q)) {
+            if (/\b(roommate|roommates|flatmate|flatmates|room partner|room partner|share flat|share room)\b/i.test(q)) {
+                result.propertyType = 'roommate';
+            } else if (/\b(flat|flats|apartment|apartments|bhk|1bhk|2bhk|3bhk|house|houses|villa|villas|builder floor|builder-floor)\b/i.test(q)) {
                 result.propertyType = 'flat-apartment';
             } else if (/\b(commercial|shop|shops|office|offices|showroom|showrooms|retail|warehouse|commercial space)\b/i.test(q)) {
                 result.propertyType = 'commercial';
@@ -934,9 +980,6 @@
         }
 
         function switchLocationPropertyType(type) {
-            if (!type || (type !== 'pg-hostel' && type !== 'flat-apartment' && type !== 'commercial')) {
-                type = 'pg-hostel';
-            }
             currentSelectedPropertyType = type;
             activeFilter = 'all';
 
@@ -944,27 +987,39 @@
             const tabPg = document.getElementById('locTab-pg-hostel');
             const tabFlat = document.getElementById('locTab-flat-apartment');
             const tabComm = document.getElementById('locTab-commercial');
+            const tabRoommate = document.getElementById('locTab-roommate');
 
             const divider1 = document.getElementById('divider-pg-flat');
             const divider2 = document.getElementById('divider-flat-comm');
+            const divider3 = document.getElementById('divider-comm-roommate');
 
-            [tabPg, tabFlat, tabComm].forEach(btn => {
-                if (btn) btn.classList.remove('active-loc-tab');
+            [tabPg, tabFlat, tabComm, tabRoommate].forEach(btn => {
+                if (btn) {
+                    btn.classList.remove('active-loc-tab', 'active-roommate-tab');
+                }
             });
 
             if (type === 'flat-apartment') {
                 if (tabFlat) tabFlat.classList.add('active-loc-tab');
                 if (divider1) divider1.style.opacity = '0';
                 if (divider2) divider2.style.opacity = '0';
+                if (divider3) divider3.style.opacity = '1';
             } else if (type === 'commercial') {
                 if (tabComm) tabComm.classList.add('active-loc-tab');
                 if (divider1) divider1.style.opacity = '1';
                 if (divider2) divider2.style.opacity = '0';
+                if (divider3) divider3.style.opacity = '0';
+            } else if (type === 'roommate') {
+                if (tabRoommate) tabRoommate.classList.add('active-loc-tab', 'active-roommate-tab');
+                if (divider1) divider1.style.opacity = '1';
+                if (divider2) divider2.style.opacity = '1';
+                if (divider3) divider3.style.opacity = '0';
             } else {
                 type = 'pg-hostel';
                 if (tabPg) tabPg.classList.add('active-loc-tab');
                 if (divider1) divider1.style.opacity = '0';
                 if (divider2) divider2.style.opacity = '1';
+                if (divider3) divider3.style.opacity = '1';
             }
 
             // 2. Render sub-filter chips
@@ -981,14 +1036,27 @@
             // 4. Re-render map and list
             const refLat = userLocation ? userLocation[0] : 28.6280;
             const refLng = userLocation ? userLocation[1] : 77.3649;
-            generatePGsForRegion(refLat, refLng, type === 'flat-apartment' ? 'Flats & Houses' : (type === 'commercial' ? 'Commercial Spaces' : 'PGs'));
+            generatePGsForRegion(refLat, refLng, type === 'roommate' ? 'Flatmates & Roommates' : (type === 'flat-apartment' ? 'Flats & Houses' : (type === 'commercial' ? 'Commercial Spaces' : 'PGs')));
         }
 
         function renderSubFilterChips(type) {
             const container = document.getElementById('subFilterChipsContainer');
             if (!container) return;
 
-            if (type === 'flat-apartment') {
+            if (type === 'roommate') {
+                container.innerHTML = `
+                    <button onclick="filterPGs('all', this)" class="chip-active whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all">All Roommates</button>
+                    <button onclick="filterPGs('male', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-male mr-1 text-blue-500"></i> Male Flatmate</button>
+                    <button onclick="filterPGs('female', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-female mr-1 text-pink-500"></i> Female Flatmate</button>
+                    <button onclick="filterPGs('furnished', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-couch mr-1 text-purple-500"></i> Furnished</button>
+                    <button onclick="filterPGs('2bhk', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-house mr-1 text-indigo-500"></i> 2 BHK Flat</button>
+                    <button onclick="filterPGs('under10k', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-tag mr-1 text-green-500"></i> Under ₹10K</button>
+                    <button onclick="filterPGs('under15k', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-tag mr-1 text-green-500"></i> Under ₹15K</button>
+                    <button onclick="filterPGs('wifi', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-wifi mr-1 text-indigo-500"></i> WiFi</button>
+                    <button onclick="filterPGs('ac', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-snowflake mr-1 text-cyan-500"></i> AC</button>
+                    <button onclick="filterPGs('veg', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-leaf mr-1 text-emerald-500"></i> Veg Preferred</button>
+                `;
+            } else if (type === 'flat-apartment') {
                 container.innerHTML = `
                     <button onclick="filterPGs('all', this)" class="chip-active whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all">All Flats</button>
                     <button onclick="filterPGs('1bhk', this)" class="whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold border border-gray-200 bg-white text-slate-700 tap-effect transition-all"><i class="fas fa-door-open mr-1 text-indigo-500"></i> 1 BHK</button>
@@ -1043,9 +1111,16 @@
             const refLat = customLat !== undefined ? customLat : (userLocation ? userLocation[0] : 28.6280);
             const refLng = customLng !== undefined ? customLng : (userLocation ? userLocation[1] : 77.3649);
 
+            let sourceList = list;
+            if (currentSelectedPropertyType === 'roommate') {
+                sourceList = rawDatabaseRoommates;
+            }
+
             // Filter properties according to the selected property type tab
-            const typeFiltered = list.filter(p => {
-                if (currentSelectedPropertyType === 'flat-apartment') {
+            const typeFiltered = sourceList.filter(p => {
+                if (currentSelectedPropertyType === 'roommate') {
+                    return Boolean(p.is_roommate);
+                } else if (currentSelectedPropertyType === 'flat-apartment') {
                     return Boolean(p.is_flat);
                 } else if (currentSelectedPropertyType === 'commercial') {
                     return Boolean(p.is_commercial);
@@ -1059,43 +1134,82 @@
                 distance: calculateDistance(refLat, refLng, p.lat, p.lng)
             }));
 
+            // Strict Distance-Wise Sorting
             currentPGList.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
 
             currentPGList.forEach(pg => {
+                const isRoommate = Boolean(pg.is_roommate);
+                const badgeClass = isRoommate ? 'custom-price-badge roommate-price-badge' : 'custom-price-badge';
+                const badgeSuffix = isRoommate ? '<span style="font-size:10px; font-weight:600; opacity:0.8"> budget</span>' : '<span style="font-size:10px; font-weight:600; opacity:0.7">/mo</span>';
+                const pricePrefix = pg.price !== '0' && pg.price ? '₹' : '';
+                const priceText = pg.price !== '0' && pg.price ? pg.price : 'Budget Open';
+
                 const priceBadgeIcon = L.divIcon({
                     className: 'price-badge-container',
-                    html: `<div id="badge-${pg.id}" class="custom-price-badge"><span>${pg.price}<span style="font-size:10px; font-weight:600; opacity:0.7">/mo</span></span></div>`,
+                    html: `<div id="badge-${pg.id}" class="${badgeClass}"><span>${pricePrefix}${priceText}${badgeSuffix}</span></div>`,
                     iconSize: [0, 0]
                 });
 
                 const pgMarker = L.marker([pg.lat, pg.lng], { icon: priceBadgeIcon });
                 
-                pgMarker.bindPopup(`
-                    <div class="font-sans">
-                        <img src="${pg.image}" loading="lazy" decoding="async" class="w-full h-32 object-cover rounded-t-xl" alt="${pg.name}">
-                        <div style="padding: 14px;">
-                            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:6px;">
-                                <h4 style="color:#0f172a; font-weight:800; font-size:15px; margin:0;">${pg.name}</h4>
-                                <div style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700;">
-                                    <i class="fas fa-star" style="color:#fbbf24;"></i> ${pg.rating}
+                if (isRoommate) {
+                    pgMarker.bindPopup(`
+                        <div class="font-sans">
+                            <div style="position:relative;">
+                                <img src="${pg.image}" loading="lazy" decoding="async" class="w-full h-32 object-cover rounded-t-xl" alt="${pg.name}">
+                                <span style="position:absolute; top:8px; left:8px; background:#4c30dd; color:#fff; font-size:10px; font-weight:800; padding:2px 8px; border-radius:6px; text-transform:uppercase;">
+                                    ${pg.gender_label} FLATMATE
+                                </span>
+                            </div>
+                            <div style="padding: 14px;">
+                                <h4 style="color:#0f172a; font-weight:800; font-size:14px; margin:0 0 4px 0; line-height:1.3;">${pg.name}</h4>
+                                <div style="color:#4c30dd; font-size:12px; font-weight:700; margin-bottom:6px;">
+                                    <i class="fas fa-user text-xs mr-1"></i> ${pg.poster_name}
+                                </div>
+                                <div style="color:#ef4444; font-size:12px; font-weight:700; margin-bottom:8px;">
+                                    <i class="fas fa-location-dot" style="color:#ef4444;"></i> ${pg.distance} km away &middot; <span style="color:#64748b; font-weight:500;">${pg.location_text || pg.city}</span>
+                                </div>
+                                <div style="color:#4c30dd; font-weight:800; font-size:17px; margin-bottom:12px;">₹${pg.price}<span style="font-size:11px; color:#64748b; font-weight:500;"> / month budget</span></div>
+                                
+                                <div style="display:flex; gap:8px;">
+                                    <button class="btn-directions" style="flex:1; padding:9px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;" onclick="handleRouteClick(${pg.lat}, ${pg.lng})">
+                                        <i class="fas fa-diamond-turn-right"></i> Directions
+                                    </button>
+                                    <a href="${pg.detail_url}" class="btn-roommate-view" style="flex:1; padding:9px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; color:white; background:#4c30dd; text-align:center;">
+                                        <i class="fas fa-user-check"></i> Connect
+                                    </a>
                                 </div>
                             </div>
-                            <div style="color:#1a1a7f; font-size:12px; font-weight:700; margin-bottom:8px;">
-                                <i class="fas fa-location-dot" style="color:#ef4444;"></i> ${pg.distance} km away &middot; <span style="color:#64748b; font-weight:500;">${pg.location_text || pg.city}</span>
-                            </div>
-                            <div style="color:#4bb59d; font-weight:800; font-size:18px; margin-bottom:12px;">₹${pg.price}<span style="font-size:12px; color:#94a3b8; font-weight:500;">/mo</span></div>
-                            
-                            <div style="display:flex; gap:8px;">
-                                <button class="btn-directions" style="flex:1; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;" onclick="handleRouteClick(${pg.lat}, ${pg.lng})">
-                                    <i class="fas fa-diamond-turn-right"></i> Directions
-                                </button>
-                                <a href="${pg.detail_url}" class="btn-view-property" style="flex:1; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; color:white; text-align:center;">
-                                    <i class="fas fa-eye"></i> View
-                                </a>
+                        </div>
+                    `);
+                } else {
+                    pgMarker.bindPopup(`
+                        <div class="font-sans">
+                            <img src="${pg.image}" loading="lazy" decoding="async" class="w-full h-32 object-cover rounded-t-xl" alt="${pg.name}">
+                            <div style="padding: 14px;">
+                                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:6px;">
+                                    <h4 style="color:#0f172a; font-weight:800; font-size:15px; margin:0;">${pg.name}</h4>
+                                    <div style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700;">
+                                        <i class="fas fa-star" style="color:#fbbf24;"></i> ${pg.rating}
+                                    </div>
+                                </div>
+                                <div style="color:#1a1a7f; font-size:12px; font-weight:700; margin-bottom:8px;">
+                                    <i class="fas fa-location-dot" style="color:#ef4444;"></i> ${pg.distance} km away &middot; <span style="color:#64748b; font-weight:500;">${pg.location_text || pg.city}</span>
+                                </div>
+                                <div style="color:#4bb59d; font-weight:800; font-size:18px; margin-bottom:12px;">₹${pg.price}<span style="font-size:12px; color:#94a3b8; font-weight:500;">/mo</span></div>
+                                
+                                <div style="display:flex; gap:8px;">
+                                    <button class="btn-directions" style="flex:1; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;" onclick="handleRouteClick(${pg.lat}, ${pg.lng})">
+                                        <i class="fas fa-diamond-turn-right"></i> Directions
+                                    </button>
+                                    <a href="${pg.detail_url}" class="btn-view-property" style="flex:1; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; color:white; text-align:center;">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `);
+                    `);
+                }
 
                 markersLayer.addLayer(pgMarker);
                 markerMap[pg.id] = pgMarker;
@@ -1132,11 +1246,17 @@
                 if (activeFilter === 'all') return true;
                 const f = activeFilter.toLowerCase();
                 
-                if (f === 'boys') {
-                    return (pg.gender && pg.gender.toLowerCase() === 'boys');
+                if (f === 'boys' || f === 'male') {
+                    return (pg.gender && pg.gender.toLowerCase() === 'boys') || (pg.gender && pg.gender.toLowerCase() === 'male') || (pg.poster_gender && pg.poster_gender.toLowerCase() === 'male');
                 }
-                if (f === 'girls') {
-                    return (pg.gender && pg.gender.toLowerCase() === 'girls');
+                if (f === 'girls' || f === 'female') {
+                    return (pg.gender && pg.gender.toLowerCase() === 'girls') || (pg.gender && pg.gender.toLowerCase() === 'female') || (pg.poster_gender && pg.poster_gender.toLowerCase() === 'female');
+                }
+                if (f === 'have_room') {
+                    return pg.post_type === 'have_room';
+                }
+                if (f === 'looking_for_room') {
+                    return pg.post_type === 'looking_for_room';
                 }
                 if (f === 'co-ed' || f === 'unisex' || f === 'coliving') {
                     return (pg.gender && (pg.gender.toLowerCase() === 'co-ed' || pg.gender.toLowerCase() === 'unisex' || pg.gender.toLowerCase() === 'coliving'));
@@ -1196,6 +1316,9 @@
                 if (f === 'gym') {
                     return Boolean(pg.has_gym) || (pg.tags && pg.tags.some(t => t.toLowerCase().includes('gym') || t.toLowerCase().includes('fitness'))) || (pg.amenities && pg.amenities.some(a => a.toLowerCase().includes('gym')));
                 }
+                if (f === 'veg') {
+                    return (pg.tags && pg.tags.some(t => t.toLowerCase().includes('veg')));
+                }
                 if (f === 'single') {
                     return Boolean(pg.has_single_room) || 
                            (pg.room_types && pg.room_types.some(r => r.toLowerCase().includes('single') || r.toLowerCase().includes('private') || r.toLowerCase().includes('1-bed'))) || 
@@ -1212,6 +1335,9 @@
                 }
                 if (f === 'under8k') {
                     return (pg.raw_price && pg.raw_price <= 8000);
+                }
+                if (f === 'under10k') {
+                    return (pg.raw_price && pg.raw_price <= 10000);
                 }
                 if (f === 'under15k') {
                     return (pg.raw_price && pg.raw_price <= 15000);
@@ -1248,12 +1374,15 @@
             const headerEl = document.getElementById('listHeader');
             if (headerEl) {
                 let defaultHeader = 'Nearby PGs';
-                if (currentSelectedPropertyType === 'flat-apartment') defaultHeader = 'Nearby Flats & Houses';
+                if (currentSelectedPropertyType === 'roommate') defaultHeader = 'Nearby Flatmates & Roommates';
+                else if (currentSelectedPropertyType === 'flat-apartment') defaultHeader = 'Nearby Flats & Houses';
                 else if (currentSelectedPropertyType === 'commercial') defaultHeader = 'Nearby Commercial Spaces';
                 
                 headerEl.textContent = filtered.length > 0 ? defaultHeader : (
-                    currentSelectedPropertyType === 'flat-apartment' ? 'No Flats Found' : (
-                        currentSelectedPropertyType === 'commercial' ? 'No Commercial Spaces Found' : 'No PGs Found'
+                    currentSelectedPropertyType === 'roommate' ? 'No Roommates Found' : (
+                        currentSelectedPropertyType === 'flat-apartment' ? 'No Flats Found' : (
+                            currentSelectedPropertyType === 'commercial' ? 'No Commercial Spaces Found' : 'No PGs Found'
+                        )
                     )
                 );
             }
@@ -1269,15 +1398,17 @@
 
             const drawerTitle = document.getElementById('drawerTitle');
             if (drawerTitle) {
-                drawerTitle.textContent = currentSelectedPropertyType === 'flat-apartment' ? 'Nearby Flats' : (currentSelectedPropertyType === 'commercial' ? 'Nearby Commercial' : 'Nearby PGs');
+                drawerTitle.textContent = currentSelectedPropertyType === 'roommate' ? 'Nearby Flatmates' : (currentSelectedPropertyType === 'flat-apartment' ? 'Nearby Flats' : (currentSelectedPropertyType === 'commercial' ? 'Nearby Commercial' : 'Nearby PGs'));
             }
 
             container.innerHTML = '';
 
             if (filtered.length === 0) {
-                let emptyTitle = currentSelectedPropertyType === 'flat-apartment' 
-                    ? 'No Flats & Houses found' 
-                    : (currentSelectedPropertyType === 'commercial' ? 'No Commercial Spaces found' : 'No PGs found');
+                let emptyTitle = currentSelectedPropertyType === 'roommate'
+                    ? 'No Roommates & Flatmates found'
+                    : (currentSelectedPropertyType === 'flat-apartment' 
+                        ? 'No Flats & Houses found' 
+                        : (currentSelectedPropertyType === 'commercial' ? 'No Commercial Spaces found' : 'No PGs found'));
                 container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-center"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3"><i class="fas fa-search text-gray-400 text-2xl"></i></div><h3 class="font-bold text-slate-900 mb-1">${emptyTitle}</h3><p class="text-xs text-slate-500">Try changing filters or range radius</p></div>`;
                 return;
             }
@@ -1288,17 +1419,29 @@
                 card.id = `card-pg-${pg.id}`;
 
                 let typeBadge = '';
-                if (pg.is_flat) {
+                if (pg.is_roommate) {
+                    typeBadge = `<span class="text-[9px] font-bold bg-purple-50 text-[#4c30dd] px-1.5 py-0.5 rounded border border-purple-100"><i class="fas fa-users text-[8px] mr-0.5"></i> ${pg.poster_name || 'Roommate'}</span>`;
+                } else if (pg.is_flat) {
                     typeBadge = `<span class="text-[9px] font-bold bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded border border-indigo-100"><i class="fas fa-building text-[8px] mr-0.5"></i> Flat</span>`;
                 } else if (pg.is_commercial) {
                     typeBadge = `<span class="text-[9px] font-bold bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-100"><i class="fas fa-store text-[8px] mr-0.5"></i> Commercial</span>`;
                 }
 
+                const pricePrefix = pg.price !== '0' && pg.price ? '₹' : '';
+                const priceText = pg.price !== '0' && pg.price ? pg.price : 'Budget Open';
+                const priceSuffix = pg.is_roommate ? 'budget' : '/mo';
+
+                const viewBtnClass = pg.is_roommate 
+                    ? 'roommate-card-view-btn text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 tap-effect no-underline'
+                    : 'bg-brand hover:bg-brand-dark text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 tap-effect no-underline';
+
+                const viewBtnLabel = pg.is_roommate ? 'Connect' : 'View';
+
                 card.innerHTML = `
                     <div class="relative flex-shrink-0">
                         <img src="${pg.image}" loading="lazy" decoding="async" class="w-24 h-24 rounded-xl object-cover bg-gray-100" alt="${pg.name}">
                         <div class="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur rounded-md px-1.5 py-0.5 flex items-center gap-1 shadow-xs">
-                            <i class="fas fa-star text-yellow-400 text-[9px]"></i>
+                            <i class="fas ${pg.is_roommate ? 'fa-shield-check text-emerald-500' : 'fa-star text-yellow-400'} text-[9px]"></i>
                             <span class="text-[10px] font-bold text-slate-900">${pg.rating}</span>
                         </div>
                     </div>
@@ -1317,13 +1460,13 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-between gap-2">
-                            <div><span class="text-base font-extrabold text-slate-900">₹${pg.price}</span><span class="text-[10px] text-slate-500 font-medium">/mo</span></div>
+                            <div><span class="text-base font-extrabold ${pg.is_roommate ? 'text-[#4c30dd]' : 'text-slate-900'}">${pricePrefix}${priceText}</span><span class="text-[10px] text-slate-500 font-medium"> ${priceSuffix}</span></div>
                             <div class="flex items-center gap-1.5">
                                 <button class="bg-slate-900 hover:bg-brand text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 tap-effect" onclick="event.stopPropagation(); handleRouteClick(${pg.lat}, ${pg.lng})">
                                     <i class="fas fa-route"></i> Route
                                 </button>
-                                <a href="${pg.detail_url}" class="bg-brand hover:bg-brand-dark text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 tap-effect no-underline">
-                                    View
+                                <a href="${pg.detail_url}" class="${viewBtnClass}">
+                                    ${viewBtnLabel}
                                 </a>
                             </div>
                         </div>
@@ -1766,7 +1909,7 @@
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const typeParam = urlParams.get('type');
-                if (typeParam && (typeParam === 'flat-apartment' || typeParam === 'commercial' || typeParam === 'pg-hostel')) {
+                if (typeParam && (typeParam === 'flat-apartment' || typeParam === 'commercial' || typeParam === 'roommate' || typeParam === 'pg-hostel')) {
                     currentSelectedPropertyType = typeParam;
                 }
 
@@ -1788,26 +1931,36 @@
             const tabPg = document.getElementById('locTab-pg-hostel');
             const tabFlat = document.getElementById('locTab-flat-apartment');
             const tabComm = document.getElementById('locTab-commercial');
+            const tabRoommate = document.getElementById('locTab-roommate');
             const divider1 = document.getElementById('divider-pg-flat');
             const divider2 = document.getElementById('divider-flat-comm');
+            const divider3 = document.getElementById('divider-comm-roommate');
 
-            [tabPg, tabFlat, tabComm].forEach(btn => {
-                if (btn) btn.classList.remove('active-loc-tab');
+            [tabPg, tabFlat, tabComm, tabRoommate].forEach(btn => {
+                if (btn) btn.classList.remove('active-loc-tab', 'active-roommate-tab');
             });
 
             if (currentSelectedPropertyType === 'flat-apartment') {
                 if (tabFlat) tabFlat.classList.add('active-loc-tab');
                 if (divider1) divider1.style.opacity = '0';
                 if (divider2) divider2.style.opacity = '0';
+                if (divider3) divider3.style.opacity = '1';
             } else if (currentSelectedPropertyType === 'commercial') {
                 if (tabComm) tabComm.classList.add('active-loc-tab');
                 if (divider1) divider1.style.opacity = '1';
                 if (divider2) divider2.style.opacity = '0';
+                if (divider3) divider3.style.opacity = '0';
+            } else if (currentSelectedPropertyType === 'roommate') {
+                if (tabRoommate) tabRoommate.classList.add('active-loc-tab', 'active-roommate-tab');
+                if (divider1) divider1.style.opacity = '1';
+                if (divider2) divider2.style.opacity = '1';
+                if (divider3) divider3.style.opacity = '0';
             } else {
                 currentSelectedPropertyType = 'pg-hostel';
                 if (tabPg) tabPg.classList.add('active-loc-tab');
                 if (divider1) divider1.style.opacity = '0';
                 if (divider2) divider2.style.opacity = '1';
+                if (divider3) divider3.style.opacity = '1';
             }
 
             renderSubFilterChips(currentSelectedPropertyType);

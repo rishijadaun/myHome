@@ -11,9 +11,9 @@
     <link rel="manifest" href="{{ asset('manifest.json') }}">
 
     <!-- SEO Meta Tags -->
-    <title>@yield('title', 'Explore PGs Near You on Interactive Map | StayNest')</title>
-    <meta name="description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, hostels, and co-living spaces on an interactive GPS map. Filter by budget, gender, amenities, and get instant directions with zero brokerage.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'PG on map, find PG near me, interactive PG map, PG locator India, hostel map, student housing near me, StayNest map')">
+    <title>@yield('title', 'Explore PGs, Flats & Flatmates Near You on Interactive Map | StayNest')</title>
+    <meta name="description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, flats, commercial spaces, and verified flatmates on an interactive GPS map with zero brokerage.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'explore near me, PG near me, flatmate near me, find PG on map, interactive PG map, flats near me, StayNest map')">
     <meta name="robots" content="@yield('robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1')">
     <link rel="canonical" href="@yield('canonical', url()->current())">
     <meta name="author" content="StayNest Technologies">
@@ -21,8 +21,8 @@
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:locale" content="en_IN">
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:title" content="@yield('title', 'Explore PGs Near You on Interactive Map | StayNest')">
-    <meta property="og:description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, hostels, and co-living spaces on an interactive GPS map with zero brokerage.')">
+    <meta property="og:title" content="@yield('title', 'Explore PGs, Flats & Flatmates Near You on Interactive Map | StayNest')">
+    <meta property="og:description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, flats, commercial spaces, and verified flatmates on an interactive GPS map with zero brokerage.')">
     <meta property="og:url" content="@yield('canonical', url()->current())">
     <meta property="og:site_name" content="StayNest">
     <meta property="og:image" content="@yield('meta_image', asset('images/app-banner.png'))">

@@ -136,7 +136,7 @@
 @media (min-width: 768px) {
   #sidebar {
     transform: none !important;
-    width: 420px;
+    width: 520px;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
@@ -280,6 +280,7 @@ input[type='range']::-moz-range-thumb {
 }
 
 @media (max-width: 767.98px) {
+
   .hidden-on-mobile,
   .mobile-hidden,
   .hidden.md\:block,
@@ -296,6 +297,7 @@ input[type='range']::-moz-range-thumb {
 }
 
 @media (min-width: 768px) {
+
   .md\:hidden,
   .md\:hidden.flex,
   .md\:hidden.grid,
@@ -310,17 +312,17 @@ input[type='range']::-moz-range-thumb {
   [class*="md:hidden"] {
     display: none !important;
   }
-  
+
   .hidden.md\:block,
   [class*="hidden"][class*="md:block"] {
     display: block !important;
   }
-  
+
   .hidden.md\:flex,
   [class*="hidden"][class*="md:flex"] {
     display: flex !important;
   }
-  
+
   .hidden.md\:grid,
   [class*="hidden"][class*="md:grid"] {
     display: grid !important;

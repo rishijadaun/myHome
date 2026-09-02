@@ -27,11 +27,11 @@
             <i class="fas fa-search text-lg sm:text-xl {{ request()->routeIs('user.search') ? 'text-brand' : 'text-gray-400' }}"></i>
             <span class="text-[9px] sm:text-[10px] font-medium truncate {{ request()->routeIs('user.search') ? 'text-brand font-bold' : 'text-gray-500' }}">Search</span>
         </a>
-        <a href="{{ route('user.location') }}" class="flex flex-col items-center justify-center gap-0.5 tap-effect -translate-y-3.5 px-0.5">
+        <a href="{{ route('user.location') }}" class="flex flex-col items-center justify-center gap-0.5 tap-effect -translate-y-3.5 px-0.5" title="Explore Near Me">
             <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center text-white shadow-lg shadow-brand/40 border-2 border-white">
                 <i class="fas fa-map-marker-alt text-lg sm:text-xl text-white"></i>
             </div>
-            <span class="text-[9px] sm:text-[10px] font-medium text-gray-500">Map</span>
+            <span class="text-[9px] sm:text-[10px] font-medium text-gray-500">Near Me</span>
         </a>
         <a href="{{ route('user.saved') }}" class="flex flex-col items-center justify-center gap-1 tap-effect px-0.5">
             <i class="fas fa-heart text-lg sm:text-xl {{ request()->routeIs('user.saved') ? 'text-brand' : 'text-gray-400' }}"></i>

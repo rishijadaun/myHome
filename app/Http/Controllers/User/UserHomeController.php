@@ -8,6 +8,7 @@ use App\Models\Notification;
 use App\Models\Property;
 use App\Models\PropertyReport;
 use App\Models\Review;
+use App\Models\RoommatePost;
 use App\Models\User;
 use App\Services\ContentModerationService;
 use Illuminate\Http\Request;
@@ -1151,6 +1152,78 @@ class UserHomeController extends Controller
             ];
         });
 
+        $rawRoommates = RoommatePost::where('status', 'active')->with(['user.profile'])->latest('created_at')->get();
+        $bhkLabels = RoommatePost::bhkOptions();
+
+        $roommates = $rawRoommates->map(function ($r) use ($bhkLabels) {
+            $coords = self::resolveRoommateCoords($r->city, $r->locality, $r->id);
+            $posterImg = $r->poster_avatar_url ?: ($r->user?->profile?->avatar_url ?: asset('images/avatar-placeholder.png'));
+            $budget = (float)($r->budget_max ?: ($r->budget_min ?: 0));
+
+            $tags = [];
+            if ($r->bhk_type && isset($bhkLabels[$r->bhk_type])) {
+                $tags[] = $bhkLabels[$r->bhk_type];
+            }
+            if ($r->furnishing) {
+                $tags[] = ucfirst(str_replace('_', ' ', $r->furnishing));
+            }
+            if ($r->gender_preference) {
+                $tags[] = ucfirst($r->gender_preference) . ' Preferred';
+            }
+            if ($r->post_type === 'have_room') {
+                $tags[] = 'Have a Room';
+            } else {
+                $tags[] = 'Looking for Room';
+            }
+            if (is_array($r->lifestyle)) {
+                foreach ($r->lifestyle as $k => $v) {
+                    if ($v && count($tags) < 6) {
+                        $tags[] = ucfirst(str_replace('_', ' ', $k));
+                    }
+                }
+            }
+
+            return [
+                'id' => 'rm-' . $r->id,
+                'raw_id' => $r->id,
+                'name' => $r->title,
+                'poster_name' => $r->poster_name,
+                'slug' => $r->slug,
+                'price' => number_format($budget),
+                'raw_price' => $budget,
+                'rating' => 'Verified',
+                'reviews_count' => 0,
+                'lat' => (float)$coords['lat'],
+                'lng' => (float)$coords['lng'],
+                'image' => $posterImg,
+                'gender' => strtolower($r->gender_preference ?: ($r->poster_gender ?: 'any')),
+                'gender_label' => strtoupper($r->gender_preference ?: 'ANY'),
+                'poster_gender' => strtolower($r->poster_gender ?: 'other'),
+                'bhk_type' => $r->bhk_type,
+                'post_type' => $r->post_type,
+                'furnishing' => $r->furnishing,
+                'property_type_slug' => 'roommate',
+                'property_type_name' => 'Roommate / Flatmate',
+                'is_roommate' => true,
+                'is_flat' => false,
+                'is_commercial' => false,
+                'is_pg' => false,
+                'location_text' => ($r->locality ? $r->locality . ', ' : '') . ($r->city ?? 'Noida'),
+                'address' => $r->locality ?: $r->city,
+                'city' => $r->city ?? 'Noida',
+                'tags' => $tags,
+                'amenities' => is_array($r->amenities) ? array_keys(array_filter($r->amenities)) : [],
+                'room_types' => [$r->bhk_type],
+                'has_single_room' => $r->bhk_type === 'single_room',
+                'has_food' => false,
+                'has_ac' => is_array($r->amenities) && !empty($r->amenities['ac']),
+                'has_wifi' => is_array($r->amenities) && !empty($r->amenities['wifi']),
+                'has_attached_bath' => false,
+                'has_gym' => is_array($r->lifestyle) && !empty($r->lifestyle['gym_person']),
+                'detail_url' => route('user.roommate.show', ['slug' => $r->slug]),
+            ];
+        });
+
         $cities = City::where('is_active', 1)->select('id', 'name', 'slug', 'latitude', 'longitude')->orderBy('name')->get();
         $selectedType = $request->query('type', 'pg-hostel');
 
@@ -1158,12 +1231,77 @@ class UserHomeController extends Controller
             return response()->json([
                 'success' => true,
                 'count' => $properties->count(),
+                'roommates_count' => $roommates->count(),
                 'selected_type' => $selectedType,
-                'properties' => $properties
+                'properties' => $properties,
+                'roommates' => $roommates
             ]);
         }
 
-        return view('user.location', compact('properties', 'cities', 'selectedType'));
+        return view('user.location', compact('properties', 'roommates', 'cities', 'selectedType'));
+    }
+
+    public static function resolveRoommateCoords($city, $locality, $id = ''): array
+    {
+        $locStr = strtolower(trim(($locality ?? '') . ' ' . ($city ?? '')));
+        
+        if (str_contains($locStr, 'sector 62') || str_contains($locStr, 'electronic city noida') || str_contains($locStr, '201309')) {
+            $lat = 28.6280; $lng = 77.3649;
+        } elseif (str_contains($locStr, 'sector 18') || str_contains($locStr, 'atta market')) {
+            $lat = 28.5708; $lng = 77.3260;
+        } elseif (str_contains($locStr, 'knowledge park') || str_contains($locStr, 'pari chowk') || str_contains($locStr, 'greater noida')) {
+            $lat = 28.4744; $lng = 77.5030;
+        } elseif (str_contains($locStr, 'indiranagar')) {
+            $lat = 12.9784; $lng = 77.6408;
+        } elseif (str_contains($locStr, 'koramangala')) {
+            $lat = 12.9352; $lng = 77.6245;
+        } elseif (str_contains($locStr, 'hsr')) {
+            $lat = 12.9121; $lng = 77.6446;
+        } elseif (str_contains($locStr, 'whitefield')) {
+            $lat = 12.9698; $lng = 77.7500;
+        } elseif (str_contains($locStr, 'cyber city') || str_contains($locStr, 'dlf phase') || str_contains($locStr, 'sector 29 gurgaon')) {
+            $lat = 28.4906; $lng = 77.0898;
+        } elseif (str_contains($locStr, 'south ex') || str_contains($locStr, 'saket') || str_contains($locStr, 'hauz khas')) {
+            $lat = 28.5742; $lng = 77.2242;
+        } elseif (str_contains($locStr, 'hinjewadi') || str_contains($locStr, 'kothrud') || str_contains($locStr, 'viman nagar')) {
+            $lat = 18.5913; $lng = 73.7389;
+        } elseif (str_contains($locStr, 'hitec city') || str_contains($locStr, 'gachibowli') || str_contains($locStr, 'madhapur')) {
+            $lat = 17.4474; $lng = 78.3762;
+        } elseif (str_contains($locStr, 'bandra') || str_contains($locStr, 'andheri') || str_contains($locStr, 'powai')) {
+            $lat = 19.0596; $lng = 72.8295;
+        } else {
+            $cityName = strtolower(trim($city ?? ''));
+            $cityDefaults = [
+                'noida' => [28.6280, 77.3649],
+                'greater noida' => [28.4744, 77.5030],
+                'delhi' => [28.6139, 77.2090],
+                'new delhi' => [28.6139, 77.2090],
+                'gurgaon' => [28.4595, 77.0266],
+                'gurugram' => [28.4595, 77.0266],
+                'bangalore' => [12.9716, 77.5946],
+                'bengaluru' => [12.9716, 77.5946],
+                'pune' => [18.5204, 73.8567],
+                'hyderabad' => [17.3850, 78.4867],
+                'mumbai' => [19.0760, 72.8777],
+                'chennai' => [13.0827, 80.2707],
+                'kolkata' => [22.5726, 88.3639],
+                'jaipur' => [26.9124, 75.7873],
+                'lucknow' => [26.8467, 80.9462],
+                'indore' => [22.7196, 75.8577],
+            ];
+            $coords = $cityDefaults[$cityName] ?? [28.6280, 77.3649];
+            $lat = $coords[0];
+            $lng = $coords[1];
+        }
+
+        $hash = abs(crc32($id ?: $locStr));
+        $offsetLat = (($hash % 100) - 50) * 0.00015;
+        $offsetLng = ((($hash / 100) % 100) - 50) * 0.00015;
+
+        return [
+            'lat' => $lat + $offsetLat,
+            'lng' => $lng + $offsetLng
+        ];
     }
 
     /**

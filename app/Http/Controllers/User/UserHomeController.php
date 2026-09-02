@@ -22,16 +22,18 @@ class UserHomeController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Single-pass query for approved listings with aggregated review metrics to eliminate N+1 queries
-        $allApproved = Property::where('status', 'active')
-            ->where('verification_status', 'verified')
-            ->where('is_active', 1)
-            ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType'])
-            ->withCount(['approvedReviews as approved_reviews_count'])
-            ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating')
-            ->latest('created_at')
-            ->take(150)
-            ->get();
+        // 1. Single-pass query for approved listings with aggregated review metrics (Cached for 5 mins for instant TTFB)
+        $allApproved = \Illuminate\Support\Facades\Cache::remember('home_approved_listings_v3', 300, function () {
+            return Property::where('status', 'active')
+                ->where('verification_status', 'verified')
+                ->where('is_active', 1)
+                ->with(['primaryImage', 'images', 'city', 'area', 'amenities', 'propertyType'])
+                ->withCount(['approvedReviews as approved_reviews_count'])
+                ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating')
+                ->latest('created_at')
+                ->take(150)
+                ->get();
+        });
 
         // 2. Classify by Property Type
         $pgProperties = $allApproved->filter(function ($p) {
@@ -49,7 +51,9 @@ class UserHomeController extends Controller
             return in_array($slug, ['commercial', 'shop', 'office', 'retail', 'showroom', 'warehouse']);
         });
 
-        $totalRoommates = \App\Models\RoommatePost::where('status', 'active')->count();
+        $totalRoommates = \Illuminate\Support\Facades\Cache::remember('home_total_roommates_count_v3', 300, function () {
+            return \App\Models\RoommatePost::where('status', 'active')->count();
+        });
 
         // Dynamic Counts for Category Switcher Cards
         $propertyTypeCounts = [
@@ -141,13 +145,14 @@ class UserHomeController extends Controller
             })->take(12);
         });
 
-        // 8. Roommates & Flatmates Section: Strictly 8 recent listings
-        $roommatePosts = \App\Models\RoommatePost::where('status', 'active')
-            ->with(['user.profile'])
-            ->latest('created_at')
-            ->take(8)
-            ->get();
-        $totalRoommates = \App\Models\RoommatePost::where('status', 'active')->count();
+        // 8. Roommates & Flatmates Section: Strictly 8 recent listings (Cached 5 mins)
+        $roommatePosts = \Illuminate\Support\Facades\Cache::remember('home_roommate_posts_v3', 300, function () {
+            return \App\Models\RoommatePost::where('status', 'active')
+                ->with(['user.profile'])
+                ->latest('created_at')
+                ->take(8)
+                ->get();
+        });
 
         return view('user.home', compact(
             'pgProperties',

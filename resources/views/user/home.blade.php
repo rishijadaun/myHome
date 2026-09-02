@@ -2622,7 +2622,7 @@
                 <div class="absolute -left-10 -bottom-16 w-64 h-64 bg-teal-500/25 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div class="relative group w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[420px] select-none">
-                    <img src="{{ file_exists(public_path('images/app-image.png')) ? asset('images/app-image.png') : asset('images/app-image.webp') }}" alt="StayNest Mobile App Dual Screen Preview" loading="lazy" decoding="async" class="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)] transition duration-500 group-hover:scale-[1.02]">
+                    <img src="{{ file_exists(public_path('images/app-image.jpg')) ? asset('images/app-image.png') : asset('images/app-image.webp') }}" alt="StayNest Mobile App Dual Screen Preview" loading="lazy" decoding="async" class="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)] transition duration-500 group-hover:scale-[1.02]">
                 </div>
             </div>
 

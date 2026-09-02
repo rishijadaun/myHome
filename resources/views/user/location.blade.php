@@ -516,6 +516,52 @@
                 </div>
             </div>
 
+            <!-- Skeleton Shimmer Loader for Sidebar Listings -->
+            <div id="sidebarSkeletonLoader" class="hidden flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-3 bg-gray-50/50">
+                <div class="bg-white rounded-2xl p-3 border border-gray-100 shadow-xs flex gap-3">
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-gray-200 skeleton-shimmer flex-shrink-0"></div>
+                    <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                        <div>
+                            <div class="h-3 w-16 bg-gray-200 rounded-md skeleton-shimmer mb-1.5"></div>
+                            <div class="h-4 w-3/4 bg-gray-200 rounded-lg skeleton-shimmer mb-1.5"></div>
+                            <div class="h-3 w-1/2 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                            <div class="h-5 w-20 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                            <div class="h-4 w-12 bg-gray-100 rounded-md skeleton-shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-3 border border-gray-100 shadow-xs flex gap-3">
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-gray-200 skeleton-shimmer flex-shrink-0"></div>
+                    <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                        <div>
+                            <div class="h-3 w-20 bg-gray-200 rounded-md skeleton-shimmer mb-1.5"></div>
+                            <div class="h-4 w-2/3 bg-gray-200 rounded-lg skeleton-shimmer mb-1.5"></div>
+                            <div class="h-3 w-1/2 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                            <div class="h-5 w-24 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                            <div class="h-4 w-14 bg-gray-100 rounded-md skeleton-shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-3 border border-gray-100 shadow-xs flex gap-3">
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-gray-200 skeleton-shimmer flex-shrink-0"></div>
+                    <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                        <div>
+                            <div class="h-3 w-14 bg-gray-200 rounded-md skeleton-shimmer mb-1.5"></div>
+                            <div class="h-4 w-4/5 bg-gray-200 rounded-lg skeleton-shimmer mb-1.5"></div>
+                            <div class="h-3 w-1/3 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                            <div class="h-5 w-20 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                            <div class="h-4 w-12 bg-gray-100 rounded-md skeleton-shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-3 bg-gray-50/50" id="pgListContainer"></div>
         </aside>
 
@@ -980,6 +1026,7 @@
         }
 
         function switchLocationPropertyType(type) {
+            showLocationSkeleton();
             currentSelectedPropertyType = type;
             activeFilter = 'all';
 
@@ -1238,9 +1285,29 @@
             }
         }
 
+        function showLocationSkeleton() {
+            const list = document.getElementById('pgListContainer');
+            const skeleton = document.getElementById('sidebarSkeletonLoader');
+            if (list && skeleton) {
+                list.classList.add('hidden');
+                skeleton.classList.remove('hidden');
+            }
+        }
+
+        function hideLocationSkeleton() {
+            const list = document.getElementById('pgListContainer');
+            const skeleton = document.getElementById('sidebarSkeletonLoader');
+            if (list && skeleton) {
+                skeleton.classList.add('hidden');
+                list.classList.remove('hidden');
+            }
+        }
+
         function renderSidebarCards() {
             const container = document.getElementById('pgListContainer');
             if (!container) return;
+
+            hideLocationSkeleton();
 
             const filtered = currentPGList.filter(pg => {
                 if (activeFilter === 'all') return true;
@@ -1484,10 +1551,13 @@
         }
 
         function filterPGs(tag, btn) {
+            showLocationSkeleton();
             activeFilter = tag;
             document.querySelectorAll('[onclick^="filterPGs"]').forEach(chip => chip.classList.remove('chip-active'));
             if (btn) btn.classList.add('chip-active');
-            renderSidebarCards();
+            setTimeout(() => {
+                renderSidebarCards();
+            }, 60);
         }
 
         function handleRouteClick(pgLat, pgLng) {

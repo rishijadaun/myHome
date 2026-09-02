@@ -62,6 +62,24 @@
             </div>
         </div>
 
+        <!-- ================= SKELETON PLACEHOLDER GRID ================= -->
+        <div id="savedSkeletonGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+            @for ($i = 0; $i < 4; $i++)
+            <div class="bg-white rounded-3xl p-3 sm:p-4 border border-gray-100 shadow-xs space-y-3">
+                <div class="h-44 sm:h-48 w-full bg-gray-200 rounded-2xl skeleton-shimmer"></div>
+                <div class="space-y-2">
+                    <div class="h-3 w-1/3 bg-gray-200 rounded skeleton-shimmer"></div>
+                    <div class="h-5 w-3/4 bg-gray-200 rounded-lg skeleton-shimmer"></div>
+                    <div class="h-3 w-1/2 bg-gray-100 rounded skeleton-shimmer"></div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <div class="h-6 w-20 bg-gray-200 rounded-md skeleton-shimmer"></div>
+                    <div class="h-8 w-24 bg-gray-200 rounded-xl skeleton-shimmer"></div>
+                </div>
+            </div>
+            @endfor
+        </div>
+
         <!-- ================= 3. POPULATED SAVED PROPERTIES GRID ================= -->
         <div id="savedListContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
             <!-- Dynamically injected via JavaScript -->
@@ -74,14 +92,17 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        renderSavedPage();
+        setTimeout(renderSavedPage, 60);
     });
 
     function renderSavedPage() {
+        const skeletonBox = document.getElementById('savedSkeletonGrid');
         const lockedBox = document.getElementById('savedGuestLockedState');
         const emptyBox = document.getElementById('savedEmptyState');
         const listContainer = document.getElementById('savedListContainer');
         const countBadge = document.getElementById('savedCountBadge');
+
+        if (skeletonBox) skeletonBox.classList.add('hidden');
 
         // Check if user is logged in
         if (!isUserLoggedIn()) {

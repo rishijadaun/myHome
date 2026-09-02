@@ -70,6 +70,25 @@
     <!-- 3. Bookings Cards Feed -->
     <div id="bookingsContainer" class="space-y-4 sm:space-y-6">
         
+        <!-- Skeleton Shimmer Placeholder for Tab Transitions -->
+        <div id="bookingsSkeletonLoader" class="hidden space-y-4 sm:space-y-5">
+            @for ($i = 0; $i < 3; $i++)
+            <div class="bg-white rounded-3xl p-4 sm:p-6 border border-gray-100 shadow-xs flex flex-col md:flex-row items-stretch md:items-center gap-3.5 sm:gap-6">
+                <div class="w-24 h-24 sm:w-28 sm:h-28 md:w-44 md:h-36 rounded-2xl bg-gray-200 skeleton-shimmer flex-shrink-0"></div>
+                <div class="flex-1 space-y-2.5">
+                    <div class="h-3.5 w-24 bg-gray-200 rounded skeleton-shimmer"></div>
+                    <div class="h-5 w-1/2 bg-gray-200 rounded-lg skeleton-shimmer"></div>
+                    <div class="h-3 w-1/3 bg-gray-100 rounded skeleton-shimmer"></div>
+                    <div class="flex gap-2 pt-2">
+                        <div class="h-7 w-20 bg-gray-100 rounded-xl skeleton-shimmer"></div>
+                        <div class="h-7 w-24 bg-gray-100 rounded-xl skeleton-shimmer"></div>
+                    </div>
+                </div>
+                <div class="h-10 w-28 bg-gray-200 rounded-2xl skeleton-shimmer self-end md:self-center"></div>
+            </div>
+            @endfor
+        </div>
+
         <!-- ================= UPCOMING LIST ================= -->
         <div id="section-UPCOMING" class="booking-section space-y-4 sm:space-y-5">
             @forelse($upcoming as $bk)
@@ -726,12 +745,21 @@
             }
         }
 
-        // Switch List Sections
+        // Switch List Sections with Smooth Skeleton Transition
+        const skeletonLoader = document.getElementById('bookingsSkeletonLoader');
         document.querySelectorAll('.booking-section').forEach(sec => sec.classList.add('hidden'));
-        const activeSec = document.getElementById(`section-${status}`);
-        if (activeSec) {
-            activeSec.classList.remove('hidden');
+        
+        if (skeletonLoader) {
+            skeletonLoader.classList.remove('hidden');
         }
+
+        setTimeout(() => {
+            if (skeletonLoader) skeletonLoader.classList.add('hidden');
+            const activeSec = document.getElementById(`section-${status}`);
+            if (activeSec) {
+                activeSec.classList.remove('hidden');
+            }
+        }, 120);
     }
 
     // Details Modal using dataset attributes

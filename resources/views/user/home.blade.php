@@ -785,8 +785,8 @@
                         @endphp
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                <div class="relative h-28 sm:h-36 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                     @if($pg->is_sale)
                                         <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                             <i class="fas fa-tag text-[8px]"></i> For Sale
@@ -867,8 +867,8 @@
                         $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                        <div class="relative h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                             @if($pg->is_sale)
                                 <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                     <i class="fas fa-tag text-[9px]"></i> For Sale

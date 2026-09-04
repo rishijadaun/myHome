@@ -165,7 +165,7 @@ class PropertySubmissionController extends Controller
             'verified_at' => now()->timestamp,
         ], now()->addMinutes(30));
 
-        return $this->success('Email verified successfully! You can now submit your listing for admin approval.', [
+        return $this->success('Email verified successfully! You can now submit your listing for approval.', [
             'email' => $email,
             'verification_token' => $token,
             'is_verified' => true,
@@ -569,7 +569,7 @@ class PropertySubmissionController extends Controller
                     'user_id' => $adminUser->id,
                     'user_type' => 'admin',
                     'title' => 'New Listing Submitted for Review',
-                    'message' => "New property \"{$property->name}\" in {$city->name} ({$propertyType->name}) is awaiting admin approval.",
+                    'message' => "New property \"{$property->name}\" in {$city->name} ({$propertyType->name}) is awaiting  approval.",
                     'type' => 'property_submission',
                     'is_read' => 0,
                     'action_url' => '/admin/pgs',

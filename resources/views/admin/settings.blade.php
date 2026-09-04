@@ -229,7 +229,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Admin Email Address *</label>
-                    <input type="email" name="email" value="{{ $adminUser?->email ?? 'admin@staynest.com' }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 font-mono">
+                    <input type="email" name="email" value="{{ $adminUser?->email ?? 'admin@gmail.com' }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 font-mono">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Admin Phone Number</label>

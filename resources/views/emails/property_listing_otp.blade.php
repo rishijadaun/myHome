@@ -31,7 +31,7 @@
 
     <!-- Preheader text -->
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-        Your StayNest property listing verification OTP is {{ $otp }}. Enter this 6-digit code to submit your listing for admin approval.
+        Your StayNest property listing verification OTP is {{ $otp }}. Enter this 6-digit code to submit your listing for approval.
         &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy;
     </div>
 
@@ -71,7 +71,7 @@
                             </p>
 
                             <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 22px; color: #475569;">
-                                Thank you for listing your property on <strong>StayNest</strong>. To verify your identity as the property owner and submit your listing for admin approval, please use the 6-digit verification code below:
+                                Thank you for listing your property on <strong>StayNest</strong>. To verify your identity as the property owner and submit your listing for  approval, please use the 6-digit verification code below:
                             </p>
 
                             <!-- OTP Box -->

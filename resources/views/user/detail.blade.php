@@ -321,7 +321,7 @@
                         <span>Admin / Owner Preview Mode</span>
                         <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500 text-white">Status: {{ ucfirst($property->verification_status ?? 'Pending') }}</span>
                     </h4>
-                    <p class="text-xs text-amber-800">This property is <strong>not visible to public users</strong> because it is pending admin approval. Only administrators and property owners can view this preview.</p>
+                    <p class="text-xs text-amber-800">This property is <strong>not visible to public users</strong> because it is pending  approval. Only administrators and property owners can view this preview.</p>
                 </div>
             </div>
             @if(Auth::check() && Auth::user()->roles()->whereIn('slug', ['super_admin', 'admin'])->exists())

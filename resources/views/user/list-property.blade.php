@@ -1510,7 +1510,7 @@
                         <div class="bg-amber-50 rounded-2xl p-5 border border-amber-200 flex items-start gap-3">
                             <i class="fas fa-shield-check text-amber-600 text-xl mt-0.5"></i>
                             <div class="text-xs text-amber-900 space-y-1">
-                                <div class="font-bold text-sm text-amber-950">Review & Admin Approval Workflow</div>
+                                <div class="font-bold text-sm text-amber-950">Review &  Approval Workflow</div>
                                 <div>Upon submission, your listing will be reviewed by the StayNest admin team within 24 hours to ensure quality and prevent spam. Once verified, it will be instantly published live to thousands of searchers.</div>
                             </div>
                         </div>
@@ -1521,7 +1521,7 @@
                             </button>
                             <button type="submit" id="submitBtn" class="bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-slate-900 text-white font-bold px-10 py-4 rounded-2xl shadow-xl shadow-brand/30 transition flex items-center gap-3">
                                 <span id="submitSpinner" class="hidden"><i class="fas fa-spinner fa-spin"></i></span>
-                                <i class="fas fa-paper-plane"></i> Submit for Admin Approval
+                                <i class="fas fa-paper-plane"></i> Submit for  Approval
                             </button>
                         </div>
                     </div>
@@ -1779,7 +1779,7 @@
         <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
             <i class="fas fa-check-circle"></i>
         </div>
-        <h3 id="successModalHeading" class="text-xl font-extrabold text-gray-900 mb-2">Submitted for Admin Approval!</h3>
+        <h3 id="successModalHeading" class="text-xl font-extrabold text-gray-900 mb-2">Submitted for  Approval!</h3>
         <p id="successModalMessage" class="text-xs sm:text-sm text-gray-600 mb-4">
             Your listing has been submitted successfully and assigned to our review team.
         </p>

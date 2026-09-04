@@ -197,9 +197,11 @@ Route::name('user.')->group(function () {
     Route::get('/find-roommate/{slug}/messages', [RoommateController::class, 'getMessages'])->name('roommate.messages');
     Route::post('/find-roommate/{slug}/message', [RoommateController::class, 'sendMessage'])->name('roommate.message');
     Route::post('/find-roommate/{slug}/chat/bot-reply', [RoommateController::class, 'getBotReply'])->name('roommate.botReply');
-    // Also accept /flatmate as an alias
+    // Also accept /flatmate, /flatmates, /roommate, /roommates as SEO alias redirects
     Route::get('/flatmate', fn() => redirect()->route('user.roommate.index', [], 301));
+    Route::get('/flatmates', fn() => redirect()->route('user.roommate.index', [], 301));
     Route::get('/roommate', fn() => redirect()->route('user.roommate.index', [], 301));
+    Route::get('/roommates', fn() => redirect()->route('user.roommate.index', [], 301));
     // ──────────────────────────────────────────────────────────────────
 
     Route::view('/saved', 'user.saved')->name('saved');

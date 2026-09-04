@@ -3,6 +3,7 @@
     $headerProfileLabel = 'Login';
     $headerProfileIcon = 'fa-user';
     $headerRoleBadge = null;
+    $isTenantLoggedIn = false;
 
     if (Auth::check()) {
         $authUser = Auth::user();
@@ -23,6 +24,7 @@
             $headerProfileLabel = mb_strlen($rawProfileName) > 20 ? mb_substr($rawProfileName, 0, 20) . '..' : $rawProfileName;
             $headerProfileIcon = 'fa-user-check';
             $headerRoleBadge = 'TENANT';
+            $isTenantLoggedIn = true;
         }
     }
 @endphp
@@ -68,6 +70,7 @@
                 <a href="{{ route('user.saved') }}" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center tap-effect shadow-xs" title="Saved">
                     <i class="fas fa-heart text-sm"></i>
                 </a>
+                @if($isTenantLoggedIn)
                 <button type="button" 
                         id="mobRoommateChatBtn" 
                         onclick="handleGlobalChatClick()" 
@@ -76,6 +79,7 @@
                     <i class="fab fa-whatsapp text-lg text-emerald-600"></i>
                     <span id="mobWaUnreadBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full ring-2 ring-white">0</span>
                 </button>
+                @endif
                 @auth
                     @php
                         $userActiveBkCount = \App\Models\Booking::where('user_id', auth()->id())->where('booking_status', '!=', 'cancelled')->where('broker_approval', '!=', 'rejected')->count();
@@ -139,6 +143,7 @@
                 <a href="{{ route('user.saved') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition" title="Saved Properties">
                     <i class="fas fa-heart text-red-500"></i>
                 </a>
+                @if($isTenantLoggedIn)
                 <button type="button" 
                         id="deskRoommateChatBtn" 
                         onclick="handleGlobalChatClick()" 
@@ -147,6 +152,7 @@
                     <i class="fab fa-whatsapp text-xl text-emerald-600 group-hover:scale-110 transition-transform"></i>
                     <span id="deskWaUnreadBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full ring-2 ring-white">0</span>
                 </button>
+                @endif
                 @auth
                     @if($userActiveBkCount > 0)
                         <a href="{{ route('user.bookings') }}" class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition relative" title="My Bookings">

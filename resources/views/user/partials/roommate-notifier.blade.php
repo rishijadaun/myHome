@@ -116,6 +116,9 @@ async function checkGlobalUnreadMessages() {
     @guest
         return;
     @endguest
+    @if(!auth()->user()?->isTenant())
+        return;
+    @endif
 
     try {
         const res = await fetch('{{ route("user.roommate.unreadStats") }}', {
@@ -258,12 +261,14 @@ function handleGlobalChatClick() {
 // Start periodic unread checks on page load
 document.addEventListener('DOMContentLoaded', function() {
     @auth
-        // Initial check after 800ms
-        setTimeout(checkGlobalUnreadMessages, 800);
+        @if(auth()->user()->isTenant())
+            // Initial check after 800ms
+            setTimeout(checkGlobalUnreadMessages, 800);
 
-        // Periodic check every 15s
-        if (roommateUnreadInterval) clearInterval(roommateUnreadInterval);
-        roommateUnreadInterval = setInterval(checkGlobalUnreadMessages, 15000);
+            // Periodic check every 15s
+            if (roommateUnreadInterval) clearInterval(roommateUnreadInterval);
+            roommateUnreadInterval = setInterval(checkGlobalUnreadMessages, 15000);
+        @endif
     @endauth
 });
 </script>

@@ -1468,22 +1468,31 @@
                                         <div class="error-msg hidden" id="err-ownerPhone">Please enter a valid 10-digit Indian mobile number.</div>
                                     </div>
                                     <div>
-                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                                            Email Address
-                                            @if($isLockedToAuth)
-                                                <span class="text-[10px] text-emerald-700 font-bold ml-1">(Auto-Filled & Locked)</span>
-                                            @endif
-                                        </label>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <label class="block text-xs sm:text-sm font-semibold text-gray-700">
+                                                Email Address (Gmail / Email) *
+                                                @if($isLockedToAuth)
+                                                    <span class="text-[10px] text-emerald-700 font-bold ml-1">(Auto-Filled & Verified)</span>
+                                                @else
+                                                    <!-- <span class="text-[10px] text-brand font-bold ml-1">(6-digit OTP will be sent here)</span> -->
+                                                @endif
+                                            </label>
+                                            <span id="emailVerifyBadge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 items-center gap-1">
+                                                <i class="fas fa-check-circle text-emerald-600"></i> Verified
+                                            </span>
+                                        </div>
                                         <div class="relative">
-                                            <input type="email" id="ownerEmail" name="owner_email" 
+                                            <input type="email" id="ownerEmail" name="owner_email" required 
                                                    value="{{ $isLockedToAuth ? $authEmail : '' }}"
                                                    {{ $isLockedToAuth ? 'readonly' : '' }}
-                                                   placeholder="rajesh@example.com" 
+                                                   placeholder="rajesh@gmail.com" 
+                                                   oninput="clearError(this); if (typeof resetEmailVerification === 'function') resetEmailVerification();"
                                                    class="w-full {{ $isLockedToAuth ? 'bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border-gray-200 select-none' : 'bg-gray-50 text-gray-900' }} border border-gray-200 rounded-xl px-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 transition">
                                             @if($isLockedToAuth)
                                                 <span class="absolute right-4 top-3.5 text-gray-400 text-xs" title="Locked to logged-in profile"><i class="fas fa-lock"></i></span>
                                             @endif
                                         </div>
+                                        <div class="error-msg hidden" id="err-ownerEmail">Please enter a valid Gmail / Email address to receive your OTP.</div>
                                     </div>
                                 </div>
 
@@ -1711,6 +1720,55 @@
                     <span>Confirm & Save Location</span>
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= EMAIL OTP VERIFICATION MODAL ================= -->
+<div id="listingOtpModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300 border border-gray-100">
+        <!-- Close Button -->
+        <button type="button" onclick="closeOtpModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 text-gray-400 hover:text-gray-700 hover:bg-gray-200 flex items-center justify-center transition">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="w-16 h-16 bg-brand-light/30 text-brand rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm border border-brand/20">
+            <i class="fas fa-envelope-circle-check"></i>
+        </div>
+
+        <h3 class="text-xl font-extrabold text-gray-900 mb-1.5">Verify Your Email ID</h3>
+        <p class="text-xs text-gray-600 mb-4 leading-relaxed">
+            We've sent a 6-digit verification code to<br/>
+            <span id="otpModalTargetEmail" class="font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded-md inline-block mt-1">owner@gmail.com</span>
+        </p>
+
+        <!-- OTP Input Box -->
+        <div class="mb-5">
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-2">Enter 6-Digit OTP</label>
+            <div class="flex justify-center gap-2 sm:gap-2.5" id="otpInputContainer">
+                <input type="text" maxlength="1" class="otp-digit w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black rounded-xl border-2 border-gray-200 focus:border-brand focus:ring-4 focus:ring-brand/20 focus:outline-none transition bg-gray-50 text-gray-900" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                <input type="text" maxlength="1" class="otp-digit w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black rounded-xl border-2 border-gray-200 focus:border-brand focus:ring-4 focus:ring-brand/20 focus:outline-none transition bg-gray-50 text-gray-900" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="otp-digit w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black rounded-xl border-2 border-gray-200 focus:border-brand focus:ring-4 focus:ring-brand/20 focus:outline-none transition bg-gray-50 text-gray-900" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="otp-digit w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black rounded-xl border-2 border-gray-200 focus:border-brand focus:ring-4 focus:ring-brand/20 focus:outline-none transition bg-gray-50 text-gray-900" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="otp-digit w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black rounded-xl border-2 border-gray-200 focus:border-brand focus:ring-4 focus:ring-brand/20 focus:outline-none transition bg-gray-50 text-gray-900" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="otp-digit w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black rounded-xl border-2 border-gray-200 focus:border-brand focus:ring-4 focus:ring-brand/20 focus:outline-none transition bg-gray-50 text-gray-900" inputmode="numeric" pattern="[0-9]*">
+            </div>
+            <div id="otpModalError" class="text-xs text-rose-600 font-bold mt-2.5 hidden"></div>
+        </div>
+
+        <!-- Verify & Submit Button -->
+        <button type="button" id="btnVerifyOtpAndSubmit" onclick="submitOtpVerification()" class="w-full bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-slate-900 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition flex items-center justify-center gap-2 cursor-pointer text-sm">
+            <span id="otpVerifySpinner" class="hidden"><i class="fas fa-spinner fa-spin"></i></span>
+            <i class="fas fa-shield-check"></i>
+            <span>Verify & Submit for Approval</span>
+        </button>
+
+        <!-- Timer & Resend -->
+        <div class="mt-4 flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
+            <span id="otpCountdownText"><i class="fas fa-clock text-gray-400 mr-1"></i> Resend in <strong id="otpTimerSeconds" class="text-brand">60</strong>s</span>
+            <button type="button" id="btnResendOtp" onclick="resendListingOtp()" disabled class="text-xs font-bold text-gray-400 cursor-not-allowed transition hover:underline">
+                Resend OTP
+            </button>
         </div>
     </div>
 </div>
@@ -3900,6 +3958,255 @@
         updateLivePreview();
     }
 
+    let isEmailVerified = {{ $isLoggedIn ? 'true' : 'false' }};
+    let currentVerificationToken = null;
+    let pendingSubmissionPayload = null;
+    let otpCountdownTimer = null;
+    let otpRemainingSeconds = 60;
+
+    function resetEmailVerification() {
+        const isAuthUser = {{ $isLoggedIn ? 'true' : 'false' }};
+        if (!isAuthUser) {
+            isEmailVerified = false;
+            currentVerificationToken = null;
+            const badge = document.getElementById('emailVerifyBadge');
+            if (badge) badge.classList.add('hidden');
+        }
+    }
+
+    function openOtpModal(targetEmail) {
+        const modal = document.getElementById('listingOtpModal');
+        const emailLabel = document.getElementById('otpModalTargetEmail');
+        const errEl = document.getElementById('otpModalError');
+        if (emailLabel) emailLabel.innerText = targetEmail;
+        if (errEl) { errEl.classList.add('hidden'); errEl.innerText = ''; }
+
+        // Clear digits
+        document.querySelectorAll('.otp-digit').forEach(inp => inp.value = '');
+
+        if (modal) {
+            modal.classList.remove('hidden');
+            const firstInp = document.querySelector('.otp-digit');
+            if (firstInp) setTimeout(() => firstInp.focus(), 150);
+        }
+        startOtpTimer();
+    }
+
+    function closeOtpModal() {
+        const modal = document.getElementById('listingOtpModal');
+        if (modal) modal.classList.add('hidden');
+        if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+    }
+
+    function startOtpTimer() {
+        if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+        otpRemainingSeconds = 60;
+        const timerEl = document.getElementById('otpTimerSeconds');
+        const resendBtn = document.getElementById('btnResendOtp');
+        const countdownText = document.getElementById('otpCountdownText');
+
+        if (resendBtn) {
+            resendBtn.disabled = true;
+            resendBtn.className = 'text-xs font-bold text-gray-400 cursor-not-allowed transition';
+        }
+        if (countdownText) countdownText.classList.remove('hidden');
+
+        otpCountdownTimer = setInterval(() => {
+            otpRemainingSeconds--;
+            if (timerEl) timerEl.innerText = otpRemainingSeconds;
+
+            if (otpRemainingSeconds <= 0) {
+                clearInterval(otpCountdownTimer);
+                if (resendBtn) {
+                    resendBtn.disabled = false;
+                    resendBtn.className = 'text-xs font-bold text-brand hover:underline cursor-pointer transition';
+                }
+                if (countdownText) countdownText.classList.add('hidden');
+            }
+        }, 1000);
+    }
+
+    function setupOtpDigitInputs() {
+        const container = document.getElementById('otpInputContainer');
+        if (!container) return;
+
+        const inputs = container.querySelectorAll('.otp-digit');
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                const val = input.value.replace(/\D/g, '');
+                input.value = val ? val[0] : '';
+                if (input.value && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                // Auto trigger verification if all 6 filled
+                const allFilled = Array.from(inputs).every(i => i.value.length === 1);
+                if (allFilled) {
+                    submitOtpVerification();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasteData = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+                if (pasteData) {
+                    for (let i = 0; i < inputs.length; i++) {
+                        inputs[i].value = pasteData[i] || '';
+                    }
+                    const nextEmpty = Array.from(inputs).find(i => !i.value);
+                    if (nextEmpty) nextEmpty.focus();
+                    else inputs[inputs.length - 1].focus();
+
+                    if (pasteData.length >= 6) {
+                        submitOtpVerification();
+                    }
+                }
+            });
+        });
+    }
+
+    async function sendListingOtp(email, ownerName, propertyTitle) {
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('submitSpinner');
+        if (submitBtn) submitBtn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+
+        try {
+            const res = await fetch('/api/v1/properties/send-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({
+                    email: email,
+                    owner_name: ownerName,
+                    property_title: propertyTitle
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                openOtpModal(email);
+                return true;
+            } else {
+                const msg = data.message || (data.errors ? Object.values(data.errors).flat().join('\n') : 'Failed to send OTP.');
+                alert('⚠️ Verification Notice:\n' + msg);
+                return false;
+            }
+        } catch(err) {
+            console.error('Send OTP error:', err);
+            alert('A network error occurred while sending the OTP code. Please try again.');
+            return false;
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+            if (spinner) spinner.classList.add('hidden');
+        }
+    }
+
+    async function resendListingOtp() {
+        const ownerEmailEl = document.getElementById('ownerEmail');
+        const ownerNameEl = document.getElementById('ownerName');
+        const nameEl = document.getElementById('propName');
+
+        const email = ownerEmailEl?.value.trim();
+        const name = ownerNameEl?.value.trim() || 'Property Owner';
+        const title = nameEl?.value.trim() || 'your listing';
+
+        if (!email) {
+            alert('Please enter your email address first.');
+            return;
+        }
+
+        const resendBtn = document.getElementById('btnResendOtp');
+        if (resendBtn) {
+            resendBtn.disabled = true;
+            resendBtn.innerText = 'Sending...';
+        }
+
+        const success = await sendListingOtp(email, name, title);
+        if (resendBtn) {
+            resendBtn.innerText = 'Resend OTP';
+        }
+    }
+
+    async function submitOtpVerification() {
+        const ownerEmailEl = document.getElementById('ownerEmail');
+        const email = ownerEmailEl?.value.trim();
+        const errEl = document.getElementById('otpModalError');
+        const verifyBtn = document.getElementById('btnVerifyOtpAndSubmit');
+        const spinner = document.getElementById('otpVerifySpinner');
+
+        const digits = Array.from(document.querySelectorAll('.otp-digit')).map(i => i.value).join('');
+
+        if (digits.length !== 6) {
+            if (errEl) {
+                errEl.innerText = 'Please enter all 6 digits of the OTP code.';
+                errEl.classList.remove('hidden');
+            }
+            return;
+        }
+
+        if (errEl) errEl.classList.add('hidden');
+        if (verifyBtn) verifyBtn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+
+        try {
+            const res = await fetch('/api/v1/properties/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({
+                    email: email,
+                    otp: digits
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                isEmailVerified = true;
+                currentVerificationToken = data.data.verification_token;
+
+                const badge = document.getElementById('emailVerifyBadge');
+                if (badge) badge.classList.remove('hidden');
+
+                closeOtpModal();
+
+                // If we have a pending payload, submit it immediately!
+                if (pendingSubmissionPayload) {
+                    pendingSubmissionPayload.verification_token = currentVerificationToken;
+                    pendingSubmissionPayload.otp = digits;
+                    await executePropertySubmission(pendingSubmissionPayload);
+                }
+            } else {
+                const msg = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Invalid OTP entered.');
+                if (errEl) {
+                    errEl.innerText = msg;
+                    errEl.classList.remove('hidden');
+                }
+            }
+        } catch(err) {
+            console.error('Verify OTP error:', err);
+            if (errEl) {
+                errEl.innerText = 'A network error occurred while verifying the code. Please try again.';
+                errEl.classList.remove('hidden');
+            }
+        } finally {
+            if (verifyBtn) verifyBtn.disabled = false;
+            if (spinner) spinner.classList.add('hidden');
+        }
+    }
+
     function initLoggedInContact() {
         const isAuthUser = {{ $isLoggedIn ? 'true' : 'false' }};
         const isAdminUser = {{ $isAdmin ? 'true' : 'false' }};
@@ -3920,18 +4227,12 @@
 
                 if (name && ownerNameInput && !ownerNameInput.value) {
                     ownerNameInput.value = name;
-                    ownerNameInput.readOnly = true;
-                    ownerNameInput.className = 'w-full bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none transition select-none';
                 }
                 if (phone && ownerPhoneInput && !ownerPhoneInput.value) {
                     ownerPhoneInput.value = phone;
-                    ownerPhoneInput.readOnly = true;
-                    ownerPhoneInput.className = 'w-full bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border border-gray-200 rounded-xl pl-14 pr-10 py-3 text-sm focus:outline-none transition select-none';
                 }
                 if (email && ownerEmailInput && !ownerEmailInput.value) {
                     ownerEmailInput.value = email;
-                    ownerEmailInput.readOnly = true;
-                    ownerEmailInput.className = 'w-full bg-gray-100/80 text-gray-800 font-semibold cursor-not-allowed border border-gray-200 rounded-xl px-4 pr-10 py-3 text-sm focus:outline-none transition select-none';
                 }
             }
         } catch(e) {}
@@ -4011,6 +4312,38 @@
             }
         }
 
+        // Step 4 Owner Validations
+        const ownerNameVal = ownerNameEl?.value.trim() || '';
+        const ownerPhoneVal = (ownerPhoneEl?.value || '').replace(/\D/g, '');
+        const ownerEmailVal = ownerEmailEl?.value.trim() || '';
+
+        if (!ownerNameVal || ownerNameVal.length < 2) {
+            goToStep(4);
+            showError('ownerName', 'Please enter the owner or landlord full name.');
+            ownerNameEl?.focus();
+            return;
+        }
+
+        if (ownerPhoneVal.length < 10) {
+            goToStep(4);
+            showError('ownerPhone', 'Please enter a valid 10-digit Indian mobile number.');
+            ownerPhoneEl?.focus();
+            return;
+        }
+
+        const isAuthUser = {{ $isLoggedIn ? 'true' : 'false' }};
+        const isAdminUser = {{ $isAdmin ? 'true' : 'false' }};
+
+        // For guests (not logged in), email is strictly required for OTP
+        if (!isAuthUser && !isAdminUser) {
+            if (!ownerEmailVal || !ownerEmailVal.includes('@') || !ownerEmailVal.includes('.')) {
+                goToStep(4);
+                showError('ownerEmail', 'Please enter a valid Gmail / Email address to receive the verification OTP.');
+                ownerEmailEl?.focus();
+                return;
+            }
+        }
+
         // Moderation Check
         const modCheck = checkClientModeration();
         if (!modCheck.passed) {
@@ -4022,8 +4355,7 @@
         const genderRadio = document.querySelector('input[name="gender_preference"]:checked');
         const noticeSelect = document.querySelector('select[name="notice_period_days"]');
 
-        const phoneRaw = (ownerPhoneEl?.value || '').replace(/\D/g, '');
-        const finalPhone = phoneRaw.length >= 10 ? phoneRaw.slice(-10) : '9876543210';
+        const finalPhone = ownerPhoneVal.length >= 10 ? ownerPhoneVal.slice(-10) : '9876543210';
 
         // Collect checked amenities
         const amenities = [];
@@ -4131,14 +4463,28 @@
             is_fully_booked: isFullyBooked ? 1 : 0,
             description: descriptionVal,
             house_rules: rulesVal,
-            owner_name: ownerNameEl?.value.trim() || 'Property Manager',
+            owner_name: ownerNameVal,
             owner_phone: finalPhone,
-            owner_email: ownerEmailEl?.value.trim() || null,
+            owner_email: ownerEmailVal || null,
             amenities: amenities,
             room_sharing: roomSharing,
-            photos: uploadedPhotos
+            photos: uploadedPhotos,
+            verification_token: currentVerificationToken
         };
 
+        // GUEST OTP VERIFICATION FLOW
+        if (!isAuthUser && !isAdminUser && !editPropertyId) {
+            if (!isEmailVerified || !currentVerificationToken) {
+                pendingSubmissionPayload = payload;
+                await sendListingOtp(ownerEmailVal, ownerNameVal, payload.name);
+                return;
+            }
+        }
+
+        await executePropertySubmission(payload);
+    }
+
+    async function executePropertySubmission(payload) {
         const submitBtn = document.getElementById('submitBtn');
         const spinner = document.getElementById('submitSpinner');
 
@@ -4183,7 +4529,7 @@
                 if (successModal) successModal.classList.remove('hidden');
             } else {
                 const errorMsg = data.message || (data.errors ? Object.values(data.errors).flat().join('\n') : 'Submission failed.');
-                alert('⚠️ Submission Blocked / Failed:\n' + errorMsg);
+                alert('⚠️ Submission Notice:\n' + errorMsg);
             }
         } catch (err) {
             console.error('Submission error:', err);
@@ -4193,5 +4539,10 @@
             if (spinner) spinner.classList.add('hidden');
         }
     }
+
+    // Call on DOM readiness
+    document.addEventListener('DOMContentLoaded', function() {
+        setupOtpDigitInputs();
+    });
 </script>
 @endpush

@@ -23,7 +23,7 @@ class UserHomeController extends Controller
     public function index(Request $request)
     {
         // 1. Single-pass query for approved listings with aggregated review metrics (Cached for 5 mins for instant TTFB)
-        $allApproved = \Illuminate\Support\Facades\Cache::remember('home_approved_listings_v3', 300, function () {
+        $allApproved = \Illuminate\Support\Facades\Cache::remember('home_approved_listings_v4', 300, function () {
             return Property::where('status', 'active')
                 ->where('verification_status', 'verified')
                 ->where('is_active', 1)
@@ -31,9 +31,38 @@ class UserHomeController extends Controller
                 ->withCount(['approvedReviews as approved_reviews_count'])
                 ->withAvg(['approvedReviews as dynamic_rating' => fn($q) => $q->where('status', 'approved')], 'rating')
                 ->latest('created_at')
-                ->take(150)
+                ->take(250)
                 ->get();
         });
+
+        // Resolve user location coordinates for distance-based sorting (defaulting to Noida Sector 62: 28.6280, 77.3649)
+        $userLat = (float) ($request->query('lat') ?: $request->cookie('staynest_user_lat') ?: $request->cookie('user_cached_lat') ?: 28.6280);
+        $userLng = (float) ($request->query('lng') ?: $request->cookie('staynest_user_lng') ?: $request->cookie('user_cached_lng') ?: 77.3649);
+
+        $cityName = trim($request->query('city') ?: $request->cookie('staynest_city') ?: session('user_city', ''));
+        if ($cityName && !$request->has('lat')) {
+            $matchedCity = City::where('name', 'like', "%{$cityName}%")->first();
+            if ($matchedCity && $matchedCity->latitude && $matchedCity->longitude) {
+                $userLat = (float) $matchedCity->latitude;
+                $userLng = (float) $matchedCity->longitude;
+            }
+        }
+
+        $calcDist = function ($p) use ($userLat, $userLng) {
+            $pLat = (float) ($p->map_latitude ?? 0);
+            $pLng = (float) ($p->map_longitude ?? 0);
+            if ($pLat == 0 || $pLng == 0) {
+                return 999999;
+            }
+            $earthRadius = 6371; // km
+            $dLat = deg2rad($pLat - $userLat);
+            $dLon = deg2rad($pLng - $userLng);
+            $a = sin($dLat / 2) * sin($dLat / 2) +
+                 cos(deg2rad($userLat)) * cos(deg2rad($pLat)) *
+                 sin($dLon / 2) * sin($dLon / 2);
+            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+            return $earthRadius * $c;
+        };
 
         // 2. Classify by Property Type
         $pgProperties = $allApproved->filter(function ($p) {
@@ -63,13 +92,17 @@ class UserHomeController extends Controller
             'roommate' => $totalRoommates,
         ];
 
-        // 3. PG Sections (Main Priority) - Strictly 8 curated stays for optimal Core Web Vitals
-        $nearMeProperties = $pgProperties->take(8);
+        // 3. PG Sections (Main Priority) - Proximity sorted
+        $pgSorted = $pgProperties->sortBy($calcDist)->values();
+        $nearMeProperties = $pgSorted->take(16);
 
         // Recommended for You: Strictly 4 list only on home page
         $recommendedProperties = $pgProperties->filter(function ($p) {
             return (bool) $p->is_recommended || (bool) $p->featured;
-        })->take(4)->values();
+        })->sortBy($calcDist)->take(4)->values();
+        if ($recommendedProperties->isEmpty()) {
+            $recommendedProperties = $pgSorted->take(4);
+        }
 
         $girlsProperties = $pgProperties->filter(function ($p) {
             $pref = strtolower($p->gender_preference ?? '');
@@ -77,9 +110,9 @@ class UserHomeController extends Controller
         })->sortByDesc(function ($p) {
             $pref = strtolower($p->gender_preference ?? '');
             return in_array($pref, ['girls', 'female', 'women']) ? 1 : 0;
-        })->take(4);
+        })->sortBy($calcDist)->take(4)->values();
         if ($girlsProperties->isEmpty()) {
-            $girlsProperties = $pgProperties->take(4);
+            $girlsProperties = $pgSorted->take(4);
         }
 
         $boysProperties = $pgProperties->filter(function ($p) {
@@ -88,25 +121,33 @@ class UserHomeController extends Controller
         })->sortByDesc(function ($p) {
             $pref = strtolower($p->gender_preference ?? '');
             return in_array($pref, ['boys', 'male']) ? 1 : 0;
-        })->take(4);
+        })->sortBy($calcDist)->take(4)->values();
         if ($boysProperties->isEmpty()) {
-            $boysProperties = $pgProperties->take(4);
+            $boysProperties = $pgSorted->take(4);
         }
 
         $recentProperties = $pgProperties->take(4);
 
-        // 4. Flat / House Sections: Strictly 4 list only on home page
-        $flatNearMe = $flatProperties->take(4);
+        // 4. Flat / House Sections: Proximity sorted
+        $flatSorted = $flatProperties->sortBy($calcDist)->values();
+        $flatNearMe = $flatSorted->take(8);
         $flatRecommended = $flatProperties->filter(function ($p) {
             return (bool) $p->is_recommended || (bool) $p->featured;
-        })->take(4)->values();
+        })->sortBy($calcDist)->take(4)->values();
+        if ($flatRecommended->isEmpty()) {
+            $flatRecommended = $flatSorted->take(4);
+        }
         $flatFeatured = $flatRecommended;
 
-        // 5. Commercial Sections: Strictly 4 list only on home page
-        $commercialNearMe = $commercialProperties->take(4);
+        // 5. Commercial Sections: Proximity sorted
+        $commercialSorted = $commercialProperties->sortBy($calcDist)->values();
+        $commercialNearMe = $commercialSorted->take(8);
         $commercialRecommended = $commercialProperties->filter(function ($p) {
             return (bool) $p->is_recommended || (bool) $p->featured;
-        })->take(4)->values();
+        })->sortBy($calcDist)->take(4)->values();
+        if ($commercialRecommended->isEmpty()) {
+            $commercialRecommended = $commercialSorted->take(4);
+        }
         $commercialFeatured = $commercialRecommended;
 
         // 6. Selected Active Property Type (default 'pg-hostel')
@@ -1293,7 +1334,7 @@ class UserHomeController extends Controller
 
         $hash = abs(crc32($id ?: $locStr));
         $offsetLat = (($hash % 100) - 50) * 0.00015;
-        $offsetLng = ((($hash / 100) % 100) - 50) * 0.00015;
+        $offsetLng = (((int)($hash / 100) % 100) - 50) * 0.00015;
 
         return [
             'lat' => $lat + $offsetLat,

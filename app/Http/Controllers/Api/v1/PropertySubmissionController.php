@@ -16,12 +16,16 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserRole;
+use App\Mail\PropertyListingOtpMail;
 use App\Services\ContentModerationService;
 use App\Services\ImageProcessingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class PropertySubmissionController extends Controller
@@ -79,6 +83,96 @@ class PropertySubmissionController extends Controller
     }
 
     /**
+     * Send 6-digit OTP to owner's Gmail / Email address for unauthenticated property listing
+     */
+    public function sendOtp(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:150'],
+            'owner_name' => ['nullable', 'string', 'max:100'],
+            'property_title' => ['nullable', 'string', 'max:200'],
+        ], [
+            'email.required' => 'Please enter your Gmail / Email ID to receive the verification OTP.',
+            'email.email' => 'Please enter a valid email address (e.g., yourname@gmail.com).',
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+        $ownerName = trim($validated['owner_name'] ?? 'Property Owner');
+        $propertyTitle = trim($validated['property_title'] ?? 'your property listing');
+
+        // Generate 6-digit numeric OTP
+        $otp = (string) rand(100000, 999999);
+
+        // Store OTP in Cache for 15 minutes
+        $cacheKey = 'listing_otp_' . md5($email);
+        Cache::put($cacheKey, [
+            'email' => $email,
+            'otp' => $otp,
+            'owner_name' => $ownerName,
+            'property_title' => $propertyTitle,
+            'created_at' => now()->timestamp,
+        ], now()->addMinutes(15));
+
+        // Attempt sending OTP email via high-deliverability Mailable
+        try {
+            Mail::to($email)->send(new PropertyListingOtpMail($otp, $ownerName, $propertyTitle));
+        } catch (\Throwable $e) {
+            Log::error('Property Listing OTP email delivery failed: ' . $e->getMessage());
+            if (config('mail.default') === 'smtp' && config('app.debug')) {
+                return $this->error('Failed to send verification email via SMTP: ' . $e->getMessage() . '. Please verify Gmail SMTP credentials in .env.', [], 500);
+            }
+        }
+
+        return $this->success("6-digit verification code has been sent to {$email}! Please check your Gmail / Email inbox.", [
+            'email' => $email,
+            'expires_in' => '15 minutes',
+        ]);
+    }
+
+    /**
+     * Verify the 6-digit OTP sent to the owner's email
+     */
+    public function verifyOtp(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email', 'max:150'],
+            'otp' => ['required', 'string', 'size:6'],
+        ], [
+            'email.required' => 'Email address is required.',
+            'otp.required' => 'Please enter the 6-digit verification code.',
+            'otp.size' => 'Verification code must be exactly 6 digits.',
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+        $inputOtp = trim($validated['otp']);
+
+        $cacheKey = 'listing_otp_' . md5($email);
+        $cachedData = Cache::get($cacheKey);
+
+        if (!$cachedData || $cachedData['email'] !== $email || $cachedData['otp'] !== $inputOtp) {
+            return $this->error('Invalid or expired verification code. Please check the code or request a new OTP.', [
+                'otp' => ['The verification code is incorrect or has expired.']
+            ], 422);
+        }
+
+        // Generate signed verification token
+        $token = hash_hmac('sha256', $email . '|' . $inputOtp . '|' . config('app.key'), config('app.key'));
+        
+        // Cache verified state for 30 minutes
+        Cache::put('listing_verified_' . md5($email), [
+            'token' => $token,
+            'email' => $email,
+            'verified_at' => now()->timestamp,
+        ], now()->addMinutes(30));
+
+        return $this->success('Email verified successfully! You can now submit your listing for admin approval.', [
+            'email' => $email,
+            'verification_token' => $token,
+            'is_verified' => true,
+        ]);
+    }
+
+    /**
      * Submit Property / PG Listing API (Requires Admin Approval)
      */
     public function submit(Request $request)
@@ -119,6 +213,8 @@ class PropertySubmissionController extends Controller
             'owner_name' => ['required', 'string', 'min:2', 'max:100'],
             'owner_phone' => ['required', 'string', 'min:10', 'max:15'],
             'owner_email' => ['nullable', 'email', 'max:150'],
+            'otp' => ['nullable', 'string', 'max:10'],
+            'verification_token' => ['nullable', 'string', 'max:100'],
         ], [
             'name.required' => 'Please enter a property or PG title.',
             'name.min' => 'Property title must be at least 3 characters long.',
@@ -150,14 +246,52 @@ class PropertySubmissionController extends Controller
             );
         }
 
+        // =========================================================================
+        // EMAIL OTP VERIFICATION ENFORCEMENT FOR GUEST / UNAUTHENTICATED USERS
+        // =========================================================================
+        $authUser = $request->user() ?? Auth::user();
+        $isAdmin = $authUser && ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || ($authUser->role ?? '') === 'admin');
+
+        if (!$authUser && !$isAdmin) {
+            $guestEmail = strtolower(trim($validated['owner_email'] ?? ''));
+            $guestOtp = trim($validated['otp'] ?? '');
+            $guestToken = trim($validated['verification_token'] ?? '');
+
+            if (empty($guestEmail)) {
+                return $this->error('Email address is required so we can send your verification OTP and confirm your listing.', [
+                    'owner_email' => ['Please provide a valid Gmail / Email address.']
+                ], 422);
+            }
+
+            $isVerified = false;
+
+            // Check cached verification token
+            if (!empty($guestToken)) {
+                $cachedTokenData = Cache::get('listing_verified_' . md5($guestEmail));
+                if ($cachedTokenData && hash_equals($cachedTokenData['token'], $guestToken)) {
+                    $isVerified = true;
+                }
+            }
+
+            // Or check direct OTP match
+            if (!$isVerified && !empty($guestOtp)) {
+                $cachedOtpData = Cache::get('listing_otp_' . md5($guestEmail));
+                if ($cachedOtpData && $cachedOtpData['email'] === $guestEmail && $cachedOtpData['otp'] === $guestOtp) {
+                    $isVerified = true;
+                }
+            }
+
+            if (!$isVerified) {
+                return $this->error('Email verification required. Please enter the 6-digit OTP sent to your Gmail / Email before submitting.', [
+                    'otp' => ['Email OTP verification is required to prevent spam and verify ownership.']
+                ], 422);
+            }
+        }
+
         try {
             DB::beginTransaction();
 
             // 1. Identify or Create Owner / Broker User
-            $authUser = $request->user() ?? Auth::user();
-            $isAdmin = $authUser && ($authUser->roles()->whereIn('slug', ['super_admin', 'admin'])->exists() || ($authUser->role ?? '') === 'admin');
-
-            // If guest OR if logged in as Admin submitting on behalf of a landlord/owner:
             if (!$authUser || $isAdmin) {
                 $rawPhone = !empty($validated['owner_phone']) ? preg_replace('/\D/', '', $validated['owner_phone']) : null;
                 $phone = $rawPhone ? (strlen($rawPhone) >= 10 ? substr($rawPhone, -10) : $rawPhone) : null;
@@ -184,6 +318,10 @@ class PropertySubmissionController extends Controller
                         'password_hash' => Hash::make(Str::random(12)),
                         'status' => 'active',
                         'is_active' => 1,
+                        'email_verified_at' => now(),
+                        'phone_verified_at' => now(),
+                        'kyc_verified_at' => now(),
+                        'version' => 1,
                     ]);
 
                     $nameParts = explode(' ', $validated['owner_name'] ?? 'Property Owner', 2);
@@ -192,6 +330,9 @@ class PropertySubmissionController extends Controller
                         'user_id' => $ownerUser->id,
                         'first_name' => $nameParts[0] ?? 'Property',
                         'last_name' => $nameParts[1] ?? 'Owner',
+                        'full_name' => trim($validated['owner_name'] ?? 'Property Owner'),
+                        'is_active' => true,
+                        'version' => 1,
                     ]);
 
                     $brokerRole = Role::where('slug', 'broker')->first();
@@ -203,7 +344,21 @@ class PropertySubmissionController extends Controller
                             'id' => (string) Str::uuid(),
                             'is_primary' => 1,
                             'is_active' => 1,
+                            'version' => 1,
                         ]);
+                    }
+                } elseif ($ownerUser && $email) {
+                    $ownerUser->email_verified_at = now();
+                    $ownerUser->is_active = 1;
+                    $ownerUser->save();
+                }
+
+                // If guest user submitted and verified OTP, log them into session
+                if (!$authUser && $ownerUser) {
+                    Auth::login($ownerUser);
+                    if ($email) {
+                        Cache::forget('listing_otp_' . md5($email));
+                        Cache::forget('listing_verified_' . md5($email));
                     }
                 }
 
@@ -407,16 +562,33 @@ class PropertySubmissionController extends Controller
             $this->syncPropertyRooms($property, $validated['room_sharing'] ?? []);
 
             // 8. Create Notification for Admin
-            Notification::create([
-                'id' => (string) Str::uuid(),
-                'user_id' => 'c9b37298-8dab-11f1-a4cf-1062e5a5cd6c', // Admin ID
-                'user_type' => 'admin',
-                'title' => 'New Listing Submitted for Review',
-                'message' => "New property \"{$property->name}\" in {$city->name} ({$propertyType->name}) is awaiting admin approval.",
-                'type' => 'property_submission',
-                'is_read' => 0,
-                'action_url' => '/admin/pgs',
-            ]);
+            $adminUser = User::whereHas('roles', fn($q) => $q->whereIn('slug', ['super_admin', 'admin']))->first() ?: User::where('email', 'admin@staynest.com')->first();
+            if ($adminUser) {
+                Notification::create([
+                    'id' => (string) Str::uuid(),
+                    'user_id' => $adminUser->id,
+                    'user_type' => 'admin',
+                    'title' => 'New Listing Submitted for Review',
+                    'message' => "New property \"{$property->name}\" in {$city->name} ({$propertyType->name}) is awaiting admin approval.",
+                    'type' => 'property_submission',
+                    'is_read' => 0,
+                    'action_url' => '/admin/pgs',
+                ]);
+            }
+
+            // 8.1 Notify the Property Owner
+            if ($assignedBrokerId) {
+                Notification::create([
+                    'id' => (string) Str::uuid(),
+                    'user_id' => $assignedBrokerId,
+                    'user_type' => 'broker',
+                    'title' => 'Listing Submitted for Admin Review ⏳',
+                    'message' => "Your listing \"{$property->name}\" has been submitted for admin review. It will go live upon 24h verification.",
+                    'type' => 'property_submission',
+                    'is_read' => 0,
+                    'action_url' => '/broker/pgs',
+                ]);
+            }
 
             DB::commit();
 

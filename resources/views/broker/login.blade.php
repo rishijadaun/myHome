@@ -246,12 +246,13 @@
 
             <!-- Modal Step 2: Verify OTP & Save New Password -->
             <div id="bForgotStep2" class="space-y-4 hidden">
-                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-                    <div class="text-xs font-bold text-gray-800">OTP Sent Successfully!</div>
-                    <div class="text-xs text-gray-600 mt-0.5">Enter code sent to <span id="bForgotTargetDisplay" class="font-bold text-gray-900"></span></div>
-                    <div id="bDemoOtpBadge" class="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 bg-white border border-emerald-300 rounded text-[11px] font-mono font-bold text-emerald-800">
-                        <span>Demo OTP:</span>
-                        <span id="bDemoOtpVal" class="tracking-widest">123456</span>
+                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-600 text-xs mt-0.5">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-gray-800">OTP Sent to Gmail</div>
+                        <div class="text-xs text-gray-600 mt-0.5">Enter the 6-digit code sent to <span id="bForgotTargetDisplay" class="font-bold text-gray-900"></span>. Check inbox or spam folder.</div>
                     </div>
                 </div>
 
@@ -570,10 +571,6 @@
 
                 brokerResetLoginCache = loginVal;
                 document.getElementById('bForgotTargetDisplay').innerText = result.data?.target || loginVal;
-                if (result.data?.demo_otp) {
-                    document.getElementById('bDemoOtpVal').innerText = result.data.demo_otp;
-                    document.getElementById('bDemoOtpBadge').classList.remove('hidden');
-                }
 
                 document.getElementById('bForgotStep1').classList.add('hidden');
                 document.getElementById('bForgotStep2').classList.remove('hidden');

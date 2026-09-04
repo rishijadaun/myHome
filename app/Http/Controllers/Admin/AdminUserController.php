@@ -159,10 +159,17 @@ class AdminUserController extends Controller
 
         // 5. Send Notification
         $role = Role::find($validated['role_id']);
+        $notifUserType = 'user';
+        if ($role && in_array($role->slug, ['broker', 'commercial_owner', 'landlord', 'owner'])) {
+            $notifUserType = 'broker';
+        } elseif ($role && in_array($role->slug, ['super_admin', 'admin'])) {
+            $notifUserType = 'admin';
+        }
+
         Notification::create([
             'id' => (string) Str::uuid(),
             'user_id' => $user->id,
-            'user_type' => $role ? $role->slug : 'tenant',
+            'user_type' => $notifUserType,
             'title' => 'Welcome to StayNest 🎉',
             'message' => 'Your account has been created by StayNest administrator.',
             'type' => 'account_created',
@@ -276,11 +283,20 @@ class AdminUserController extends Controller
     public function resetPassword(Request $request, $id)
     {
         $validated = $request->validate([
-            'new_password' => ['required', 'string', 'min:6', 'max:100'],
+            'new_password' => ['nullable', 'string', 'min:6', 'max:100'],
+            'password' => ['nullable', 'string', 'min:6', 'max:100'],
         ]);
 
+        $newPassword = $validated['new_password'] ?? $validated['password'] ?? null;
+        if (!$newPassword) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please provide a valid new password with minimum 6 characters.',
+            ], 422);
+        }
+
         $user = User::findOrFail($id);
-        $user->password_hash = Hash::make($validated['new_password']);
+        $user->password_hash = Hash::make($newPassword);
         $user->save();
 
         $name = $user->profile ? $user->profile->full_name : $user->email;

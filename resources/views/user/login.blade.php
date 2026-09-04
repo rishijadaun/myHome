@@ -23,7 +23,7 @@
         </div>
 
         <!-- Mobile Logo Header -->
-        <div class="text-center mb-6">
+        <div class="text-center mb-6" id="mob-header-box">
             <h1 class="text-2xl font-extrabold text-gray-900" id="mob-auth-title">Welcome Back</h1>
             <p class="text-sm text-gray-500 mt-1" id="mob-auth-subtitle">Sign in with email or phone</p>
         </div>
@@ -41,7 +41,7 @@
         </div>
 
         <!-- Mobile Tabs Switcher -->
-        <div class="flex gap-2 bg-gray-100 rounded-xl p-1 mb-6">
+        <div id="mob-tabs-switcher" class="flex gap-2 bg-gray-100 rounded-xl p-1 mb-6">
             <button onclick="switchTab('login')" id="loginTab" class="flex-1 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg tap-effect transition-all shadow-sm">Login</button>
             <button onclick="switchTab('signup')" id="signupTab" class="flex-1 py-2.5 text-gray-600 text-sm font-medium rounded-lg tap-effect transition-all">Sign Up</button>
         </div>
@@ -124,15 +124,43 @@
                 <form onsubmit="handleSignupRequest(event, 'mob')" novalidate>
                     <div class="space-y-3.5">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">I am registering as:</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <label class="flex items-center gap-2 p-2.5 bg-white border border-gray-200 rounded-xl cursor-pointer">
-                                    <input type="radio" name="mob_role" value="tenant" checked class="text-brand focus:ring-brand">
-                                    <span class="text-xs font-bold text-gray-800">🧑 Tenant</span>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-gray-800 tracking-wide">Account Type <span class="text-red-500">*</span></label>
+                                <span class="text-[10px] text-gray-400 font-medium">Select your role</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100/90 rounded-2xl border border-slate-200/80">
+                                <!-- Tenant Option -->
+                                <label id="mob_role_card_tenant" onclick="selectRole('mob', 'tenant')" class="relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 select-none bg-white shadow-xs border-2 border-brand ring-2 ring-brand/15">
+                                    <input type="radio" name="mob_role" value="tenant" checked class="sr-only">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base shrink-0 shadow-2xs">
+                                        <span>🧑</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-bold text-xs text-gray-900 leading-tight">Tenant</span>
+                                            <span id="mob_role_badge_tenant" class="w-3.5 h-3.5 rounded-full bg-brand text-white flex items-center justify-center text-[8px] shadow-xs">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                        </div>
+                                        <p class="text-[9.5px] text-gray-500 truncate mt-0.5">Looking for PG or Flatmate</p>
+                                    </div>
                                 </label>
-                                <label class="flex items-center gap-2 p-2.5 bg-white border border-gray-200 rounded-xl cursor-pointer">
-                                    <input type="radio" name="mob_role" value="broker" class="text-brand focus:ring-brand">
-                                    <span class="text-xs font-bold text-gray-800">🏢 PG Owner</span>
+
+                                <!-- PG Owner Option -->
+                                <label id="mob_role_card_broker" onclick="selectRole('mob', 'broker')" class="relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 select-none bg-transparent border-2 border-transparent hover:bg-white/60">
+                                    <input type="radio" name="mob_role" value="broker" class="sr-only">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base shrink-0 shadow-2xs">
+                                        <span>🏢</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-bold text-xs text-gray-700 leading-tight">PG Owner</span>
+                                            <span id="mob_role_badge_broker" class="w-3.5 h-3.5 rounded-full border border-gray-300 text-transparent flex items-center justify-center text-[8px]">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                        </div>
+                                        <p class="text-[9.5px] text-gray-500 truncate mt-0.5">List & Manage</p>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -276,14 +304,17 @@
         <div id="forgotForm" class="space-y-4 hidden">
             <!-- Step 1: Request OTP -->
             <div id="mob_forgot_step1" class="space-y-4">
-                <div class="bg-brand-light/70 border border-brand/20 rounded-2xl p-4">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center text-brand shrink-0 mt-0.5">
-                            <i class="fas fa-shield-keyhole"></i>
+                <div class="mb-2">
+                    <button type="button" onclick="switchTab('login')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-brand transition mb-3 group">
+                        <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-0.5"></i> Back to Login
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center text-base shrink-0 shadow-2xs">
+                            <i class="fas fa-key"></i>
                         </div>
                         <div>
-                            <div class="font-bold text-gray-900 text-sm">Account Recovery</div>
-                            <div class="text-xs text-gray-600 mt-0.5">Enter your registered email or mobile number to receive a 6-digit verification code.</div>
+                            <h2 class="text-xl font-bold text-gray-900">Reset Password</h2>
+                            <p class="text-xs text-gray-500 mt-0.5">Enter your email or phone to receive a 6-digit OTP code.</p>
                         </div>
                     </div>
                 </div>
@@ -323,14 +354,12 @@
             <div id="mob_forgot_step2" class="space-y-4 hidden">
                 <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
                     <div class="flex items-start gap-3">
-                        <i class="fas fa-paper-plane text-emerald-600 text-lg shrink-0 mt-0.5"></i>
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-600 mt-0.5">
+                            <i class="fas fa-envelope-open-text text-sm"></i>
+                        </div>
                         <div>
-                            <div class="font-bold text-gray-900 text-xs">Verification Code Sent!</div>
-                            <div class="text-xs text-gray-600 mt-0.5">Enter code sent to <span id="mob_forgot_target_display" class="font-bold text-gray-900"></span></div>
-                            <div id="mob_demo_otp_banner" class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-emerald-300 rounded-lg text-[11px] font-mono font-bold text-emerald-800">
-                                <span>Demo OTP:</span>
-                                <span id="mob_demo_otp_val" class="tracking-widest">123456</span>
-                            </div>
+                            <div class="font-bold text-gray-900 text-xs">Verification Code Sent via Gmail</div>
+                            <div class="text-xs text-gray-600 mt-0.5">We've sent a 6-digit OTP code to <span id="mob_forgot_target_display" class="font-bold text-gray-900"></span>. Please check your inbox or spam folder.</div>
                         </div>
                     </div>
                 </div>
@@ -488,7 +517,7 @@
                 </a>
 
                 <div class="w-full max-w-md">
-                    <div class="text-center mb-6">
+                    <div class="text-center mb-6" id="desk-header-box">
                         <h2 id="desktop-title" class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
                         <p id="desktop-subtitle" class="text-gray-500 text-sm">Sign in with email or phone</p>
                     </div>
@@ -506,7 +535,7 @@
                     </div>
 
                     <!-- Desktop Tabs Switcher -->
-                    <div class="flex gap-2 bg-gray-100 rounded-xl p-1 mb-6">
+                    <div id="desk-tabs-switcher" class="flex gap-2 bg-gray-100 rounded-xl p-1 mb-6">
                         <button onclick="switchTab('login')" id="loginTabD" class="flex-1 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg tap-effect transition-all shadow-sm">Login</button>
                         <button onclick="switchTab('signup')" id="signupTabD" class="flex-1 py-2.5 text-gray-600 text-sm font-medium rounded-lg tap-effect transition-all">Sign Up</button>
                     </div>
@@ -589,15 +618,43 @@
                             <form onsubmit="handleSignupRequest(event, 'desk')" novalidate>
                                 <div class="space-y-3">
                                     <div>
-                                        <label class="block text-xs font-semibold text-gray-700 mb-1.5">Account Type:</label>
-                                        <div class="grid grid-cols-2 gap-2">
-                                            <label class="flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-brand transition">
-                                                <input type="radio" name="desk_role" value="tenant" checked class="text-brand focus:ring-brand">
-                                                <span class="text-xs font-bold text-gray-800">🧑 Tenant</span>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="block text-xs font-bold text-gray-800 tracking-wide">Account Type <span class="text-red-500">*</span></label>
+                                            <span class="text-[10px] text-gray-400 font-medium">Select your role</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2.5 p-1 bg-slate-100/90 rounded-2xl border border-slate-200/80">
+                                            <!-- Tenant Option -->
+                                            <label id="desk_role_card_tenant" onclick="selectRole('desk', 'tenant')" class="relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 select-none bg-white shadow-xs border-2 border-brand ring-2 ring-brand/15">
+                                                <input type="radio" name="desk_role" value="tenant" checked class="sr-only">
+                                                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base shrink-0 shadow-2xs">
+                                                    <span>🧑</span>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="font-bold text-xs text-gray-900 leading-tight">Tenant</span>
+                                                        <span id="desk_role_badge_tenant" class="w-3.5 h-3.5 rounded-full bg-brand text-white flex items-center justify-center text-[8px] shadow-xs">
+                                                            <i class="fas fa-check"></i>
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-[9.5px] text-gray-500 truncate mt-0.5">Looking for PG or Flatmate</p>
+                                                </div>
                                             </label>
-                                            <label class="flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-brand transition">
-                                                <input type="radio" name="desk_role" value="broker" class="text-brand focus:ring-brand">
-                                                <span class="text-xs font-bold text-gray-800">🏢 PG Owner</span>
+
+                                            <!-- PG Owner Option -->
+                                            <label id="desk_role_card_broker" onclick="selectRole('desk', 'broker')" class="relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 select-none bg-transparent border-2 border-transparent hover:bg-white/60">
+                                                <input type="radio" name="desk_role" value="broker" class="sr-only">
+                                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base shrink-0 shadow-2xs">
+                                                    <span>🏢</span>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="font-bold text-xs text-gray-700 leading-tight">PG Owner</span>
+                                                        <span id="desk_role_badge_broker" class="w-3.5 h-3.5 rounded-full border border-gray-300 text-transparent flex items-center justify-center text-[8px]">
+                                                            <i class="fas fa-check"></i>
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-[9.5px] text-gray-500 truncate mt-0.5">List & Manage</p>
+                                                </div>
                                             </label>
                                         </div>
                                     </div>
@@ -741,14 +798,17 @@
                     <div id="forgotFormD" class="space-y-4 hidden">
                         <!-- Step 1: Request OTP -->
                         <div id="desk_forgot_step1" class="space-y-4">
-                            <div class="bg-brand-light/70 border border-brand/20 rounded-2xl p-4">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center text-brand shrink-0 mt-0.5">
-                                        <i class="fas fa-shield-keyhole"></i>
+                            <div class="mb-3">
+                                <button type="button" onclick="switchTab('login')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-brand transition mb-3 group">
+                                    <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-0.5"></i> Back to Login
+                                </button>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-lg shrink-0 shadow-2xs">
+                                        <i class="fas fa-key"></i>
                                     </div>
                                     <div>
-                                        <div class="font-bold text-gray-900 text-sm">Account Recovery</div>
-                                        <div class="text-xs text-gray-600 mt-0.5">Enter your registered email or  mobile number to receive a 6-digit verification code.</div>
+                                        <h2 class="text-2xl font-bold text-gray-900">Reset Password</h2>
+                                        <p class="text-xs text-gray-500 mt-0.5">Enter your registered email or mobile number to receive a 6-digit verification code.</p>
                                     </div>
                                 </div>
                             </div>
@@ -788,14 +848,12 @@
                         <div id="desk_forgot_step2" class="space-y-4 hidden">
                             <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
                                 <div class="flex items-start gap-3">
-                                    <i class="fas fa-paper-plane text-emerald-600 text-lg shrink-0 mt-0.5"></i>
+                                    <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-600 mt-0.5">
+                                        <i class="fas fa-envelope-open-text text-base"></i>
+                                    </div>
                                     <div>
-                                        <div class="font-bold text-gray-900 text-sm">Verification Code Sent!</div>
-                                        <div class="text-xs text-gray-600 mt-0.5">Enter code sent to <span id="desk_forgot_target_display" class="font-bold text-gray-900"></span></div>
-                                        <div id="desk_demo_otp_banner" class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-800">
-                                            <span>Demo OTP:</span>
-                                            <span id="desk_demo_otp_val" class="tracking-widest">123456</span>
-                                        </div>
+                                        <div class="font-bold text-gray-900 text-sm">Verification Code Sent via Gmail</div>
+                                        <div class="text-xs text-gray-600 mt-0.5">We've sent a 6-digit OTP code to <span id="desk_forgot_target_display" class="font-bold text-gray-900"></span>. Please check your inbox or spam folder.</div>
                                     </div>
                                 </div>
                             </div>
@@ -920,6 +978,36 @@
             desk: { email: '', timer: null, timeLeft: 0 }
         };
 
+        function selectRole(mode, role) {
+            const isTenant = (role === 'tenant');
+            const radioInputs = document.querySelectorAll(`input[name="${mode}_role"]`);
+            radioInputs.forEach(r => {
+                if (r.value === role) r.checked = true;
+            });
+
+            const tenantCard = document.getElementById(`${mode}_role_card_tenant`);
+            const brokerCard = document.getElementById(`${mode}_role_card_broker`);
+            const tenantBadge = document.getElementById(`${mode}_role_badge_tenant`);
+            const brokerBadge = document.getElementById(`${mode}_role_badge_broker`);
+
+            const activeClasses = 'bg-white shadow-xs border-2 border-brand ring-2 ring-brand/15';
+            const inactiveClasses = 'bg-transparent border-2 border-transparent hover:bg-white/60';
+
+            if (isTenant) {
+                if (tenantCard) tenantCard.className = `relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 select-none ${activeClasses}`;
+                if (brokerCard) brokerCard.className = `relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 select-none ${inactiveClasses}`;
+                
+                if (tenantBadge) tenantBadge.className = 'w-3.5 h-3.5 rounded-full bg-brand text-white flex items-center justify-center text-[8px] shadow-xs';
+                if (brokerBadge) brokerBadge.className = 'w-3.5 h-3.5 rounded-full border border-gray-300 text-transparent flex items-center justify-center text-[8px]';
+            } else {
+                if (brokerCard) brokerCard.className = `relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 select-none ${activeClasses}`;
+                if (tenantCard) tenantCard.className = `relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 select-none ${inactiveClasses}`;
+                
+                if (brokerBadge) brokerBadge.className = 'w-3.5 h-3.5 rounded-full bg-brand text-white flex items-center justify-center text-[8px] shadow-xs';
+                if (tenantBadge) tenantBadge.className = 'w-3.5 h-3.5 rounded-full border border-gray-300 text-transparent flex items-center justify-center text-[8px]';
+            }
+        }
+
         function switchTab(tab) {
             hideError('mob');
             hideError('desk');
@@ -943,8 +1031,26 @@
             document.getElementById('signupTab').className = inactiveClass;
             document.getElementById('loginTabD').className = inactiveClass;
             document.getElementById('signupTabD').className = inactiveClass;
+
+            // 3. Handle Header and Tabs visibility (Hide when in Reset Password)
+            const mobTabs = document.getElementById('mob-tabs-switcher');
+            const deskTabs = document.getElementById('desk-tabs-switcher');
+            const mobHeader = document.getElementById('mob-header-box');
+            const deskHeader = document.getElementById('desk-header-box');
+
+            if (tab === 'forgot') {
+                if (mobTabs) mobTabs.classList.add('hidden');
+                if (deskTabs) deskTabs.classList.add('hidden');
+                if (mobHeader) mobHeader.classList.add('hidden');
+                if (deskHeader) deskHeader.classList.add('hidden');
+            } else {
+                if (mobTabs) mobTabs.classList.remove('hidden');
+                if (deskTabs) deskTabs.classList.remove('hidden');
+                if (mobHeader) mobHeader.classList.remove('hidden');
+                if (deskHeader) deskHeader.classList.remove('hidden');
+            }
             
-            // 3. Activate selected tab
+            // 4. Activate selected tab
             if (tab === 'login') {
                 document.getElementById('loginForm').classList.remove('hidden');
                 document.getElementById('loginFormD').classList.remove('hidden');
@@ -972,11 +1078,6 @@
                 // Show Step 1 by default
                 backToForgotStep1('mob');
                 backToForgotStep1('desk');
-
-                document.getElementById('mob-auth-title').innerText = 'Reset Password';
-                document.getElementById('mob-auth-subtitle').innerText = 'Recover access to your account';
-                document.getElementById('desktop-title').innerText = 'Reset Password';
-                document.getElementById('desktop-subtitle').innerText = 'Recover access to your StayNest account';
             }
         }
 
@@ -1694,11 +1795,6 @@
 
                 // Update Step 2 UI
                 document.getElementById(`${mode}_forgot_target_display`).innerText = result.data?.target || loginVal;
-                
-                if (result.data?.demo_otp) {
-                    document.getElementById(`${mode}_demo_otp_val`).innerText = result.data.demo_otp;
-                    document.getElementById(`${mode}_demo_otp_banner`).classList.remove('hidden');
-                }
 
                 // Switch to Step 2
                 document.getElementById(`${mode}_forgot_step1`).classList.add('hidden');
@@ -1856,10 +1952,7 @@
                 });
                 const result = await response.json();
                 if (response.ok && result.success !== false) {
-                    if (result.data?.demo_otp) {
-                        document.getElementById(`${mode}_demo_otp_val`).innerText = result.data.demo_otp;
-                    }
-                    showSuccess(mode, 'A new 6-digit OTP code has been sent!');
+                    showSuccess(mode, 'A new 6-digit OTP code has been sent to your Gmail inbox!');
                     startResendTimer(mode);
                 } else {
                     showError(mode, result.message || 'Failed to resend OTP.');

@@ -46,6 +46,8 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
     // ---------------- 3. PROPERTY SUBMISSION & TYPES (DYNAMIC) ----------------
     Route::get('property-types', [PropertySubmissionController::class, 'types']);
+    Route::post('properties/send-otp', [PropertySubmissionController::class, 'sendOtp'])->middleware('throttle:6,1');
+    Route::post('properties/verify-otp', [PropertySubmissionController::class, 'verifyOtp'])->middleware('throttle:10,1');
     Route::post('properties/submit', [PropertySubmissionController::class, 'submit'])->middleware('throttle:property-submission');
     Route::get('properties/details/{id}', [PropertySubmissionController::class, 'details']);
     Route::post('properties/{id}/update', [PropertySubmissionController::class, 'update'])->middleware('throttle:property-submission');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\ApiResponse;
 use App\Mail\EmailVerificationOtpMail;
+use App\Mail\PasswordResetOtpMail;
 use App\Models\LoginHistory;
 use App\Models\Role;
 use App\Models\User;
@@ -540,6 +541,13 @@ class AuthController extends Controller
             ], 404);
         }
 
+        $targetEmail = $user->email;
+        if (empty($targetEmail)) {
+            return $this->error('No email address is linked to this account for password recovery. Please contact support.', [
+                'login' => ['No email found for account recovery.']
+            ], 422);
+        }
+
         // Generate secure 6-digit OTP
         $otp = (string) rand(100000, 999999);
 
@@ -548,7 +556,7 @@ class AuthController extends Controller
             'otp' => $otp,
             'user_id' => $user->id,
             'login' => $loginInput,
-            'email' => $user->email,
+            'email' => $targetEmail,
             'phone' => $user->phone,
             'created_at' => now()->timestamp,
         ];
@@ -557,30 +565,31 @@ class AuthController extends Controller
         Cache::put("pwd_reset_target_" . md5(strtolower($loginInput)), $cacheData, now()->addMinutes(15));
 
         // Also track in password_reset_tokens table
-        if (!empty($user->email)) {
-            DB::table('password_reset_tokens')->updateOrInsert(
-                ['email' => $user->email],
-                ['token' => Hash::make($otp), 'created_at' => now()]
-            );
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $targetEmail],
+            ['token' => Hash::make($otp), 'created_at' => now()]
+        );
+
+        // Dispatch live email to user Gmail/Email address
+        try {
+            $userName = $user->profile?->first_name ?: ($user->name ?: 'User');
+            Mail::to($targetEmail)->send(new PasswordResetOtpMail($otp, $userName));
+        } catch (\Throwable $e) {
+            Log::error('Password reset OTP delivery failed: ' . $e->getMessage());
+            if (config('mail.default') === 'smtp' && config('app.debug')) {
+                return $this->error('Failed to send email via SMTP: ' . $e->getMessage() . '. Please verify Gmail SMTP credentials in .env.', [], 500);
+            }
         }
 
         // Mask recipient for security and display
-        $maskedTarget = '';
-        if (str_contains($loginInput, '@') && !empty($user->email)) {
-            $parts = explode('@', $user->email);
-            $namePart = $parts[0];
-            $maskedName = strlen($namePart) > 2 ? substr($namePart, 0, 2) . str_repeat('*', max(3, strlen($namePart) - 2)) : $namePart . '***';
-            $maskedTarget = $maskedName . '@' . ($parts[1] ?? 'example.com');
-        } elseif (!empty($user->phone)) {
-            $cleanPhone = preg_replace('/[^0-9]/', '', $user->phone);
-            $last4 = substr($cleanPhone, -4);
-            $maskedTarget = '+91 ******' . $last4;
-        } else {
-            $maskedTarget = 'your registered contact info';
-        }
+        $parts = explode('@', $targetEmail);
+        $namePart = $parts[0];
+        $maskedName = strlen($namePart) > 2 ? substr($namePart, 0, 2) . str_repeat('*', max(3, strlen($namePart) - 2)) : $namePart . '***';
+        $maskedTarget = $maskedName . '@' . ($parts[1] ?? 'gmail.com');
 
-        return $this->success('Verification code sent successfully!', [
+        return $this->success('A 6-digit verification code has been sent to your Gmail/Email address.', [
             'target' => $maskedTarget,
+            'email' => $targetEmail,
             'expires_in' => '15 minutes',
         ]);
     }

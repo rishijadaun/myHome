@@ -786,7 +786,7 @@
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                     @if($pg->is_sale)
                                         <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                             <i class="fas fa-tag text-[8px]"></i> For Sale
@@ -868,7 +868,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                             @if($pg->is_sale)
                                 <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                     <i class="fas fa-tag text-[9px]"></i> For Sale
@@ -988,7 +988,7 @@
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -1057,7 +1057,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -1152,7 +1152,7 @@
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -1223,7 +1223,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -1319,7 +1319,7 @@
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -1390,7 +1390,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -1481,7 +1481,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-32 sm:h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -1598,7 +1598,7 @@
                                 <div class="swiper-slide !h-auto">
                                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                         <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                             @if($pg->is_sale)
                                                 <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                                     <i class="fas fa-tag text-[8px]"></i> For Sale
@@ -1677,7 +1677,7 @@
                             @endphp
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                     @if($pg->is_sale)
                                         <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                             <i class="fas fa-tag text-[9px]"></i> For Sale
@@ -1794,7 +1794,7 @@
                             <div class="swiper-slide !h-auto">
                                 <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                     <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                         <div class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                             <i class="fas fa-{{ $tagMeta['icon'] ?? 'building' }} text-[8px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Flat' }}
                                         </div>
@@ -1862,7 +1862,7 @@
                         @endphp
                         <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                             <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                 <div class="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                     <i class="fas fa-{{ $tagMeta['icon'] ?? 'building' }} text-[9px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Flat / House' }}
                                 </div>
@@ -1956,7 +1956,7 @@
                                 <div class="swiper-slide !h-auto">
                                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                         <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                             <div class="absolute top-2 left-2 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                                 <i class="fas fa-store text-[8px]"></i> Shop
                                             </div>
@@ -2025,7 +2025,7 @@
                             @endphp
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                     @if($pg->is_sale)
                                         <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                             <i class="fas fa-tag text-[9px]"></i> For Sale
@@ -2142,7 +2142,7 @@
                             <div class="swiper-slide !h-auto">
                                 <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                     <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                         <div class="absolute top-2 left-2 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                             <i class="fas fa-{{ $tagMeta['icon'] ?? 'store' }} text-[8px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Shop' }}
                                         </div>
@@ -2210,7 +2210,7 @@
                         @endphp
                         <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                             <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                 <div class="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                     <i class="fas fa-{{ $tagMeta['icon'] ?? 'store' }} text-[9px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Commercial' }}
                                 </div>
@@ -2807,7 +2807,7 @@ function getHaversineDistanceKm(lat1, lon1, lat2, lon2) {
 
 function formatDistance(distKm) {
     if (distKm < 1) {
-        const meters = Math.max(100, Math.round(distKm * 1000));
+        const meters = Math.max(10, Math.round(distKm * 1000));
         return meters + ' m away';
     } else if (distKm < 10) {
         return distKm.toFixed(1) + ' km away';
@@ -2826,12 +2826,12 @@ function updateAllDistances(userLat, userLng) {
         localStorage.setItem('staynest_user_lng', userLng);
     } catch (e) {}
 
-    const MAX_ALLOWED_DISTANCE_KM = 5.0; // Strictly below 5 km
+    const MAX_ALLOWED_DISTANCE_KM = 5.0; // Primary 5 km radius
+    const MAX_FALLBACK_DISTANCE_KM = 35.0; // Fallback radius for metro area
 
     // 1. Process Mobile Slides
     const mobileSlides = document.querySelectorAll('.nearMeSwiper .swiper-slide');
-    let visibleMobileCount = 0;
-    const mobileItems = [];
+    const allMobileItems = [];
 
     mobileSlides.forEach(slide => {
         const badge = slide.querySelector('.pg-distance-badge');
@@ -2842,14 +2842,8 @@ function updateAllDistances(userLat, userLng) {
 
         if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
             const distKm = getHaversineDistanceKm(userLat, userLng, lat, lng);
-            if (distKm <= MAX_ALLOWED_DISTANCE_KM) {
-                slide.style.display = '';
-                if (textSpan) textSpan.textContent = formatDistance(distKm);
-                mobileItems.push({ element: slide, distance: distKm });
-                visibleMobileCount++;
-            } else {
-                slide.style.display = 'none';
-            }
+            if (textSpan) textSpan.textContent = formatDistance(distKm);
+            allMobileItems.push({ element: slide, distance: distKm });
         } else {
             slide.style.display = 'none';
         }
@@ -2857,24 +2851,29 @@ function updateAllDistances(userLat, userLng) {
 
     const MAX_HOME_DISPLAY = 8; // Strictly show maximum 8 listings on home page
 
-    // Sort mobile slides by nearest distance (closest first) and limit to max 8
+    // Filter by primary radius or fallback radius
+    let qualifyingMobile = allMobileItems.filter(item => item.distance <= MAX_ALLOWED_DISTANCE_KM);
+    if (qualifyingMobile.length === 0) {
+        qualifyingMobile = allMobileItems.filter(item => item.distance <= MAX_FALLBACK_DISTANCE_KM);
+    }
+
     const mobileWrapper = document.getElementById('nearMeSwiperWrapper');
-    if (mobileWrapper && mobileItems.length > 0) {
-        mobileItems.sort((a, b) => a.distance - b.distance);
-        mobileItems.forEach((item, idx) => {
-            if (idx < MAX_HOME_DISPLAY) {
-                item.element.style.display = '';
-                mobileWrapper.appendChild(item.element);
-            } else {
-                item.element.style.display = 'none';
-            }
-        });
+    if (mobileWrapper) {
+        allMobileItems.forEach(item => item.element.style.display = 'none');
+        if (qualifyingMobile.length > 0) {
+            qualifyingMobile.sort((a, b) => a.distance - b.distance);
+            qualifyingMobile.forEach((item, idx) => {
+                if (idx < MAX_HOME_DISPLAY) {
+                    item.element.style.display = '';
+                    mobileWrapper.appendChild(item.element);
+                }
+            });
+        }
     }
 
     // 2. Process Desktop Grid Cards
     const desktopCards = document.querySelectorAll('#nearMeDesktopGrid > a.pg-card');
-    let visibleDesktopCount = 0;
-    const desktopItems = [];
+    const allDesktopItems = [];
 
     desktopCards.forEach(card => {
         const badge = card.querySelector('.pg-distance-badge');
@@ -2885,38 +2884,37 @@ function updateAllDistances(userLat, userLng) {
 
         if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
             const distKm = getHaversineDistanceKm(userLat, userLng, lat, lng);
-            if (distKm <= MAX_ALLOWED_DISTANCE_KM) {
-                card.style.display = '';
-                if (textSpan) textSpan.textContent = formatDistance(distKm);
-                desktopItems.push({ element: card, distance: distKm });
-                visibleDesktopCount++;
-            } else {
-                card.style.display = 'none';
-            }
+            if (textSpan) textSpan.textContent = formatDistance(distKm);
+            allDesktopItems.push({ element: card, distance: distKm });
         } else {
             card.style.display = 'none';
         }
     });
 
-    // Sort desktop cards by nearest distance (closest first) and limit to max 8
-    const desktopGrid = document.getElementById('nearMeDesktopGrid');
-    if (desktopGrid && desktopItems.length > 0) {
-        desktopItems.sort((a, b) => a.distance - b.distance);
-        desktopItems.forEach((item, idx) => {
-            if (idx < MAX_HOME_DISPLAY) {
-                item.element.style.display = '';
-                desktopGrid.appendChild(item.element);
-            } else {
-                item.element.style.display = 'none';
-            }
-        });
+    let qualifyingDesktop = allDesktopItems.filter(item => item.distance <= MAX_ALLOWED_DISTANCE_KM);
+    if (qualifyingDesktop.length === 0) {
+        qualifyingDesktop = allDesktopItems.filter(item => item.distance <= MAX_FALLBACK_DISTANCE_KM);
     }
 
-    // 3. Toggle Empty State for < 5 km
+    const desktopGrid = document.getElementById('nearMeDesktopGrid');
+    if (desktopGrid) {
+        allDesktopItems.forEach(item => item.element.style.display = 'none');
+        if (qualifyingDesktop.length > 0) {
+            qualifyingDesktop.sort((a, b) => a.distance - b.distance);
+            qualifyingDesktop.forEach((item, idx) => {
+                if (idx < MAX_HOME_DISPLAY) {
+                    item.element.style.display = '';
+                    desktopGrid.appendChild(item.element);
+                }
+            });
+        }
+    }
+
+    // 3. Toggle Empty State
     const emptyState = document.getElementById('nearMe5kmEmptyState');
     const mobileContainer = document.getElementById('nearMeMobileContainer');
     if (emptyState) {
-        if (visibleMobileCount === 0 && visibleDesktopCount === 0) {
+        if (qualifyingMobile.length === 0 && qualifyingDesktop.length === 0) {
             emptyState.classList.remove('hidden');
             if (desktopGrid) desktopGrid.style.display = 'none';
             if (mobileContainer) mobileContainer.style.display = 'none';

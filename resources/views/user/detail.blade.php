@@ -2024,13 +2024,21 @@
     let detailSwiperInstance = null;
 
     function syncThumbnails(realIdx) {
+        const container = document.getElementById('thumbScrollContainer');
         document.querySelectorAll('.thumb-btn').forEach((btn) => {
             const idx = parseInt(btn.getAttribute('data-thumb-idx'));
             if (idx === realIdx) {
                 btn.classList.add('border-brand', 'ring-2', 'ring-brand/30', 'shadow-md', 'opacity-100', 'scale-102');
                 btn.classList.remove('border-gray-200', 'opacity-70');
-                if (typeof btn.scrollIntoView === 'function') {
-                    btn.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+                if (container) {
+                    const containerRect = container.getBoundingClientRect();
+                    const btnRect = btn.getBoundingClientRect();
+                    if (btnRect.left < containerRect.left || btnRect.right > containerRect.right) {
+                        container.scrollBy({
+                            left: btnRect.left - containerRect.left - (container.offsetWidth / 2) + (btn.offsetWidth / 2),
+                            behavior: 'smooth'
+                        });
+                    }
                 }
             } else {
                 btn.classList.remove('border-brand', 'ring-2', 'ring-brand/30', 'shadow-md', 'opacity-100', 'scale-102');
@@ -2088,7 +2096,15 @@
                     t.classList.remove('text-gray-500', 'border-transparent', 'font-semibold');
                     
                     if (shouldScrollNav && stickyNavContainer) {
-                        t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                        const scrollWrapper = stickyNavContainer.querySelector('div') || stickyNavContainer;
+                        const navRect = scrollWrapper.getBoundingClientRect();
+                        const tabRect = t.getBoundingClientRect();
+                        if (tabRect.left < navRect.left || tabRect.right > navRect.right) {
+                            scrollWrapper.scrollBy({
+                                left: tabRect.left - navRect.left - (scrollWrapper.offsetWidth / 2) + (t.offsetWidth / 2),
+                                behavior: 'smooth'
+                            });
+                        }
                     }
                 } else {
                     t.classList.remove('text-brand', 'font-bold', 'border-brand');

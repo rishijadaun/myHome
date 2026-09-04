@@ -63,9 +63,12 @@
 }
 
 @keyframes pulse-new {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -91,6 +94,7 @@
 }
 
 @media (max-width: 767.98px) {
+
   .hidden-on-mobile,
   .mobile-hidden,
   .hidden.md\:block,
@@ -107,6 +111,7 @@
 }
 
 @media (min-width: 768px) {
+
   .md\:hidden,
   .md\:hidden.flex,
   .md\:hidden.grid,
@@ -121,17 +126,17 @@
   [class*="md:hidden"] {
     display: none !important;
   }
-  
+
   .hidden.md\:block,
   [class*="hidden"][class*="md:block"] {
     display: block !important;
   }
-  
+
   .hidden.md\:flex,
   [class*="hidden"][class*="md:flex"] {
     display: flex !important;
   }
-  
+
   .hidden.md\:grid,
   [class*="hidden"][class*="md:grid"] {
     display: grid !important;

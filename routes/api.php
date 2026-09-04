@@ -18,6 +18,8 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
     // ---------------- 1. AUTHENTICATION (USER & BROKER) ----------------
     Route::prefix('auth')->group(function () {
+        Route::post('register/request-otp', [AuthController::class, 'requestRegisterOtp'])->middleware('throttle:6,1');
+        Route::post('register/verify-otp', [AuthController::class, 'verifyRegisterOtp'])->middleware('throttle:10,1');
         Route::post('register', [AuthController::class, 'register'])->middleware('throttle:register');
         Route::post('login', [AuthController::class, 'login'])->middleware('throttle:login');
         
@@ -62,6 +64,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::post('email/update', [UserController::class, 'updateEmail'])->middleware('throttle:5,1');
         Route::post('email/request-otp', [UserController::class, 'requestEmailOtp'])->middleware('throttle:5,1');
         Route::post('email/verify-otp', [UserController::class, 'verifyEmailOtp'])->middleware('throttle:10,1');
+        Route::post('phone/update', [UserController::class, 'updatePhone'])->middleware('throttle:5,1');
         Route::post('saved/toggle', [UserController::class, 'toggleSaved']);
         Route::post('delete-account', [UserController::class, 'deleteAccount']);
     });

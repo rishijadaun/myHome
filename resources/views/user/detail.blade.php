@@ -277,26 +277,29 @@
         opacity: 1;
     }
     .slider-nav-btn {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.92) !important;
         backdrop-filter: blur(8px);
-        color: #1f2937;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        display: flex;
+        color: #1f2937 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        display: flex !important;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 20;
+        z-index: 30 !important;
+        margin-top: 0 !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
     }
     .slider-nav-btn:hover {
-        background: #ffffff;
-        color: #4bb59d;
-        transform: scale(1.08);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        background: #ffffff !important;
+        color: #4bb59d !important;
+        transform: translateY(-50%) scale(1.1) !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     }
     .slider-nav-btn::after {
         display: none !important;
@@ -380,11 +383,11 @@
                 </div>
                 @if($propImages->count() > 1)
                     <div class="swiper-pagination"></div>
-                    <div class="swiper-button-prev slider-nav-btn !left-3 sm:!left-5 !top-1/2 !-translate-y-1/2 hidden sm:flex">
-                        <i class="fas fa-chevron-left text-xs sm:text-sm"></i>
+                    <div class="swiper-button-prev slider-nav-btn !left-3 sm:!left-5 hidden sm:flex" aria-label="Previous Slide">
+                        <i class="fas fa-chevron-left text-sm"></i>
                     </div>
-                    <div class="swiper-button-next slider-nav-btn !right-3 sm:!right-5 !top-1/2 !-translate-y-1/2 hidden sm:flex">
-                        <i class="fas fa-chevron-right text-xs sm:text-sm"></i>
+                    <div class="swiper-button-next slider-nav-btn !right-3 sm:!right-5 hidden sm:flex" aria-label="Next Slide">
+                        <i class="fas fa-chevron-right text-sm"></i>
                     </div>
                 @endif
             </div>
@@ -419,12 +422,12 @@
             </div>
         </div>
 
-        <!-- Thumbnail Strip with Tight Spacing & Active Indicator -->
+        <!-- Thumbnail Strip (Only when > 1 image) -->
         @if($propImages->count() > 1)
-            <div class="flex items-center gap-2 sm:gap-3 mt-3.5 overflow-x-auto no-scrollbar py-1">
+            <div id="thumbScrollContainer" class="flex items-center gap-2 sm:gap-3 mt-3.5 overflow-x-auto scroll-smooth no-scrollbar py-1">
                 @foreach($propImages as $idx => $tImg)
                     <button type="button" onclick="goToSlide({{ $idx }})" data-thumb-idx="{{ $idx }}" class="thumb-btn flex-shrink-0 w-20 sm:w-24 md:w-28 aspect-[4/3] rounded-2xl overflow-hidden border-2 {{ $idx === 0 ? 'border-brand ring-2 ring-brand/30 shadow-md opacity-100 scale-102' : 'border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-400' }} cursor-pointer transition-all duration-200 group">
-                        <img src="{{ $tImg->image_url }}" alt="{{ $propName }} thumbnail {{ $idx + 1 }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <img src="{{ $tImg->thumbnail_url ?? $tImg->image_url }}" alt="{{ $propName }} thumbnail {{ $idx + 1 }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     </button>
                 @endforeach
             </div>
@@ -1615,7 +1618,7 @@
                         <input type="text" name="reporter_name" value="{{ auth()->user()?->name ?? '' }}" placeholder="Name (optional)" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs focus:ring-2 focus:ring-brand/50">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-gray-600 mb-1">Phone (10 Digits)</label>
+                        <label class="block text-[11px] font-semibold text-gray-600 mb-1">Phone Number</label>
                         <div class="relative">
                             <span class="absolute left-3 top-2 text-xs font-semibold text-gray-400">+91</span>
                             <input type="tel" name="reporter_phone" id="reporter_phone" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" value="{{ auth()->user()?->phone ? substr(preg_replace('/[^0-9]/', '', auth()->user()->phone), -10) : '' }}" placeholder="9876543210" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 pl-10 pr-3 text-xs focus:ring-2 focus:ring-brand/50">
@@ -2026,6 +2029,9 @@
             if (idx === realIdx) {
                 btn.classList.add('border-brand', 'ring-2', 'ring-brand/30', 'shadow-md', 'opacity-100', 'scale-102');
                 btn.classList.remove('border-gray-200', 'opacity-70');
+                if (typeof btn.scrollIntoView === 'function') {
+                    btn.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+                }
             } else {
                 btn.classList.remove('border-brand', 'ring-2', 'ring-brand/30', 'shadow-md', 'opacity-100', 'scale-102');
                 btn.classList.add('border-gray-200', 'opacity-70');
@@ -2166,6 +2172,34 @@
         if (detailSwiperInstance) {
             detailSwiperInstance.slideToLoop(index);
             syncThumbnails(index);
+        }
+    }
+
+    function slidePrev() {
+        if (detailSwiperInstance) {
+            detailSwiperInstance.slidePrev();
+        }
+    }
+
+    function slideNext() {
+        if (detailSwiperInstance) {
+            detailSwiperInstance.slideNext();
+        }
+    }
+
+    function scrollThumbs(direction) {
+        const container = document.getElementById('thumbScrollContainer');
+        if (container) {
+            const scrollAmount = 240;
+            container.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+        if (direction === 'left') {
+            slidePrev();
+        } else {
+            slideNext();
         }
     }
 

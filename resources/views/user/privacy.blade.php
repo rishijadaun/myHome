@@ -1,8 +1,8 @@
 @extends('user.layouts.app')
 
-@section('title', 'Privacy Policy - Zero Brokerage PG Network | StayNest')
-@section('meta_description', 'Learn how StayNest protects your personal data, contact information, accommodation preferences, and KYC verification records.')
-@section('meta_keywords', 'StayNest privacy policy, data security, student PG privacy, tenant KYC protection')
+@section('title', 'Privacy Policy - Zero Brokerage PG & Roommate Network | StayNest')
+@section('meta_description', 'Learn how StayNest protects your personal data, contact information, roommate matchmaking preferences, broker partner KYC documents, and bank records.')
+@section('meta_keywords', 'StayNest privacy policy, data security, student PG privacy, tenant KYC protection, broker KYC security')
 @section('canonical', route('user.privacy'))
 @section('robots', 'index, follow, max-snippet:-1, max-image-preview:large')
 
@@ -12,7 +12,7 @@
   "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "Privacy Policy - StayNest",
-  "description": "Learn how StayNest protects your personal data, contact information, accommodation preferences, and KYC verification records.",
+  "description": "Learn how StayNest protects your personal data, contact information, roommate matchmaking preferences, broker partner KYC documents, and bank records.",
   "url": "{{ route('user.privacy') }}"
 }
 </script>
@@ -27,7 +27,7 @@
             <i class="fas fa-shield-halved"></i>
         </div>
         <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Privacy Policy</h1>
-        <p class="text-slate-500 text-xs md:text-sm">Last updated: August 2026 • We respect your personal data</p>
+        <p class="text-slate-500 text-xs md:text-sm">Last updated: September 2026 • We respect & safeguard your personal data</p>
     </div>
 
     <!-- Privacy Highlights Grid -->
@@ -44,14 +44,14 @@
                 <i class="fas fa-user-shield"></i>
             </div>
             <div class="font-bold text-xs text-slate-900">Zero Spam</div>
-            <p class="text-[11px] text-slate-500 mt-0.5">Never sold to marketers</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Never sold to telemarketers</p>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center card-hover">
             <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base mx-auto mb-2">
-                <i class="fas fa-map-pin"></i>
+                <i class="fas fa-id-card-clip"></i>
             </div>
-            <div class="font-bold text-xs text-slate-900">Safe GPS</div>
-            <p class="text-[11px] text-slate-500 mt-0.5">Used only for PG search</p>
+            <div class="font-bold text-xs text-slate-900">KYC Vault</div>
+            <p class="text-[11px] text-slate-500 mt-0.5">Encrypted partner records</p>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-center card-hover">
             <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-base mx-auto mb-2">
@@ -72,7 +72,7 @@
                 Our Commitment to Your Privacy
             </h2>
             <p class="text-slate-600">
-                At <strong>StayNest</strong>, accessible from staynest.in and our mobile application, one of our main priorities is the privacy of our visitors and registered users. This Privacy Policy document describes what information is collected and recorded by StayNest and how we use it responsibly.
+                At <strong>StayNest</strong>, accessible from our official domain and mobile web applications across India (including Noida, Delhi NCR, and Bangalore), one of our core commitments is the complete confidentiality and security of our visitors, tenants, flatmates, and partner brokers. This Privacy Policy details what information is collected, how it is processed, and the measures we take to protect your privacy.
             </p>
         </section>
 
@@ -83,31 +83,37 @@
                 Information We Collect
             </h2>
             <p class="text-slate-600">
-                We collect only the essential information needed to help you discover suitable accommodation or list your property:
+                We collect only the essential information needed to facilitate verified accommodation bookings, roommate matchmaking, and partner broker payouts:
             </p>
             <ul class="space-y-2.5 text-slate-600 pl-2">
                 <li class="flex items-start gap-2.5">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
                     <div>
-                        <strong class="text-slate-900">Account Details:</strong> Full name, verified mobile number, email address, and profile photo when signing up.
+                        <strong class="text-slate-900">User & Tenant Account Data:</strong> Full name, verified mobile number, email address, gender, occupation/student status, and profile photo.
                     </div>
                 </li>
                 <li class="flex items-start gap-2.5">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
                     <div>
-                        <strong class="text-slate-900">Search & Preference Data:</strong> Preferred cities (e.g. Bangalore, Noida, Pune), budget constraints, room sharing preferences, and food choices.
+                        <strong class="text-slate-900">Roommate & Accommodation Preferences:</strong> Preferred target localities, budget boundaries, room sharing types (Single, Double, Triple), dietary habits (Veg/Non-Veg), smoking/drinking preferences, and sleep schedules.
                     </div>
                 </li>
                 <li class="flex items-start gap-2.5">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
                     <div>
-                        <strong class="text-slate-900">Location Coordinates (GPS):</strong> Approximate or precise GPS location when you choose to use the "Near Me" or interactive PG Route Map feature.
+                        <strong class="text-slate-900">Partner Broker & Host Verification (KYC Documents):</strong> Government ID proofs (Aadhar / PAN cards), State RERA registration certificates, cancelled cheques / bank passbook details, and business GSTIN records for regulatory compliance and verified partner badge issuance.
                     </div>
                 </li>
                 <li class="flex items-start gap-2.5">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
                     <div>
-                        <strong class="text-slate-900">Property Listing Data:</strong> For hosts—property address, rent pricing, photographs, amenities checklist, and proof of property ownership.
+                        <strong class="text-slate-900">Location Coordinates (GPS):</strong> Approximate or precise GPS location when you choose to use the interactive "Explore Near Me" map or route calculators.
+                    </div>
+                </li>
+                <li class="flex items-start gap-2.5">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <div>
+                        <strong class="text-slate-900">Banking & Settlement Data:</strong> Bank account numbers, IFSC codes, and UPI IDs for direct daily automated rental collections and broker commissions.
                     </div>
                 </li>
             </ul>
@@ -117,54 +123,56 @@
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">3</span>
-                How We Use Your Information
+                Broker Partner KYC Document Protection & Locking Policy
             </h2>
-            <p class="text-slate-600">
-                We process your data for clear, legitimate purposes including:
-            </p>
-            <ul class="space-y-2 text-slate-600 pl-2">
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Enabling direct communication between verified tenants and property owners.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Calculating walking or driving travel times from your target college or office to shortlisted PGs.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Sending booking status notifications, rent reminders, and customer care updates.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Preventing duplicate listings, fraudulent hosts, or malicious activities.</span>
-                </li>
-            </ul>
+            <div class="p-4 bg-teal-50 border border-teal-100 rounded-2xl text-teal-950 space-y-2">
+                <div class="flex items-center gap-2 font-bold">
+                    <i class="fas fa-shield-halved text-teal-700"></i> Encrypted KYC Vault & Anti-Tamper Locking
+                </div>
+                <p class="text-xs text-teal-900 leading-relaxed">
+                    All partner KYC documents uploaded to StayNest are stored in restricted server directories protected by firewall authentication. Once an administrator verifies and approves a document, it is <strong>strictly locked</strong> to prevent unauthorized alterations or identity substitution. Re-upload is only enabled when explicitly authorized by an administrator for compliance updates.
+                </p>
+            </div>
         </section>
 
         <!-- Section 4 -->
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">4</span>
-                Data Protection & Security
+                How We Use Your Information
             </h2>
-            <p class="text-slate-600">
-                StayNest implements industry-standard technical and organizational security measures, including HTTPS encryption, restricted database access, and regular security audits. While no electronic transmission is 100% immune from risks, we continuously upgrade our defenses to safeguard your personal credentials.
-            </p>
+            <ul class="space-y-2 text-slate-600 pl-2">
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span>Connecting prospective tenants directly with verified PG owners and brokers without intermediary brokerage fees.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span>Matching compatible flatmates based on shared habits, gender preferences, and college/office proximity.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span>Processing automated daily rent settlements and payout transfers to verified partner bank accounts.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span>Sending instant booking confirmations, visit alerts, and WhatsApp customer service updates.</span>
+                </li>
+            </ul>
         </section>
 
         <!-- Section 5 -->
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">5</span>
-                Zero Spam & Third-Party Sharing Rules
+                Zero Spam & Privacy Guarantees
             </h2>
             <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-emerald-950">
                 <div class="flex items-center gap-2 font-bold mb-1">
-                    <i class="fas fa-shield-check text-emerald-600"></i> Strict Anti-Spam Policy
+                    <i class="fas fa-shield-check text-emerald-600"></i> Strict Anti-Telemarketing Rule
                 </div>
                 <p class="text-xs text-emerald-800 leading-relaxed">
-                    StayNest does not sell, rent, or trade your phone number or email to third-party telemarketers or external advertisers. Your contact information is only shared with the host of a specific property when you explicitly tap "Contact Host" or schedule an inspection.
+                    StayNest does <strong>not</strong> sell, rent, or trade your phone number, email, or roommate listings to third-party telemarketers or external advertisers. Your contact details are only shared with a property host when you explicitly schedule a visit or initiate direct booking.
                 </p>
             </div>
         </section>
@@ -173,42 +181,27 @@
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">6</span>
-                Your Rights & Data Control
+                Your Data Rights & Deletion Requests
             </h2>
             <p class="text-slate-600">
-                You have complete authority over your personal information. You can:
+                You retain complete authority over your personal information. You can:
             </p>
             <ul class="space-y-2 text-slate-600 pl-2">
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>View and edit your personal profile anytime from the Profile dashboard.</span>
+                    <span>View, update, or edit your personal profile and preferences anytime from your Dashboard.</span>
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Remove saved properties or delete search history from your device.</span>
+                    <span>Pause or deactivate active roommate search listings when a match is finalized.</span>
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Request permanent deletion of your account and associated listings by writing to privacy@staynest.com.</span>
+                    <span>Request permanent deletion of your account and records by writing to our grievance team at <strong>privacy@staynest.com</strong>.</span>
                 </li>
             </ul>
         </section>
 
-        <!-- Section 7 -->
-        <section class="space-y-3">
-            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
-                <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">7</span>
-                Grievance Officer & Contact
-            </h2>
-            <p class="text-slate-600">
-                In accordance with the Information Technology Act (India) and applicable data protection norms, if you have any questions or grievances regarding data processing, please contact our Data Protection Officer:
-            </p>
-            <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 text-xs space-y-1.5">
-                <p class="font-bold text-slate-900">Data Protection Officer - StayNest</p>
-                <p class="text-slate-600">Email: <a href="mailto:privacy@staynest.com" class="text-brand font-semibold hover:underline">privacy@staynest.com</a></p>
-                <p class="text-slate-600">Address: StayNest Tech Park, Koramangala 4th Block, Bangalore, Karnataka 560034</p>
-            </div>
-        </section>
 
     </div>
 

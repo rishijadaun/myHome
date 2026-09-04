@@ -373,7 +373,7 @@
                         <div class="swiper-slide !h-auto">
                             <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#0a2e24">
                                 <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-                                     alt="Zero Brokerage" class="absolute inset-0 w-full h-full object-cover opacity-40">
+                                     alt="Zero Brokerage" class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" fetchpriority="high" decoding="async">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(10,46,36,0.97) 0%,rgba(26,107,85,0.75) 50%,rgba(0,0,0,0.35) 100%)"></div>
                                 <div class="absolute top-0 right-0 w-64 h-64 rounded-full" style="background:radial-gradient(circle,rgba(75,181,157,0.25) 0%,transparent 70%);transform:translate(30%,-30%)"></div>
                                 
@@ -420,7 +420,7 @@
                         <div class="swiper-slide !h-auto">
                             <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#0f0a2a">
                                 <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-                                     alt="Co-Living" class="absolute inset-0 w-full h-full object-cover opacity-35">
+                                     alt="Co-Living" class="absolute inset-0 w-full h-full object-cover opacity-35" loading="lazy" decoding="async">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(15,10,42,0.97) 0%,rgba(49,46,129,0.75) 50%,rgba(0,0,0,0.3) 100%)"></div>
                                 <div class="absolute top-0 right-0 w-64 h-64 rounded-full" style="background:radial-gradient(circle,rgba(99,102,241,0.3) 0%,transparent 70%);transform:translate(30%,-30%)"></div>
                                 
@@ -464,7 +464,7 @@
                         <div class="swiper-slide !h-auto">
                             <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#1a0a00">
                                 <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-                                     alt="Girls PG" class="absolute inset-0 w-full h-full object-cover opacity-40">
+                                     alt="Girls PG" class="absolute inset-0 w-full h-full object-cover opacity-40" loading="lazy" decoding="async">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(26,10,0,0.97) 0%,rgba(154,58,0,0.65) 50%,rgba(0,0,0,0.3) 100%)"></div>
                                 <div class="absolute top-0 right-0 w-64 h-64 rounded-full" style="background:radial-gradient(circle,rgba(251,146,60,0.25) 0%,transparent 70%);transform:translate(30%,-30%)"></div>
                                 
@@ -508,7 +508,7 @@
                         <div class="swiper-slide !h-auto">
                             <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#071b38">
                                 <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-                                     alt="Boys PG" class="absolute inset-0 w-full h-full object-cover opacity-35">
+                                     alt="Boys PG" class="absolute inset-0 w-full h-full object-cover opacity-35" loading="lazy" decoding="async">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(7,27,56,0.97) 0%,rgba(30,64,175,0.75) 50%,rgba(15,23,42,0.3) 100%)"></div>
                                 <div class="absolute top-0 right-0 w-64 h-64 rounded-full" style="background:radial-gradient(circle,rgba(59,130,246,0.3) 0%,transparent 70%);transform:translate(30%,-30%)"></div>
                                 
@@ -552,7 +552,7 @@
                         <div class="swiper-slide !h-auto">
                             <div class="relative overflow-hidden rounded-3xl h-[260px] sm:h-[300px] md:h-[320px] w-full flex flex-col justify-end p-5 sm:py-8 sm:px-14 md:py-9 md:px-16 lg:px-20" style="background:#06241b">
                                 <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-                                     alt="Find Flatmates and Roommates" class="absolute inset-0 w-full h-full object-cover opacity-35">
+                                     alt="Find Flatmates and Roommates" class="absolute inset-0 w-full h-full object-cover opacity-35" loading="lazy" decoding="async">
                                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(6,36,27,0.97) 0%,rgba(16,77,59,0.80) 50%,rgba(10,30,24,0.3) 100%)"></div>
                                 <div class="absolute top-0 right-0 w-64 h-64 rounded-full" style="background:radial-gradient(circle,rgba(52,211,153,0.3) 0%,transparent 70%);transform:translate(30%,-30%)"></div>
                                 
@@ -786,7 +786,7 @@
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                                 <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                     @if($pg->is_sale)
                                         <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                             <i class="fas fa-tag text-[8px]"></i> For Sale
@@ -868,7 +868,7 @@
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
                         <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                             @if($pg->is_sale)
                                 <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                     <i class="fas fa-tag text-[9px]"></i> For Sale
@@ -987,8 +987,8 @@
                         @endphp
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                <div class="relative h-28 sm:h-36 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -1056,8 +1056,8 @@
                         $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                        <div class="relative h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -1151,8 +1151,8 @@
                         @endphp
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                <div class="relative h-28 sm:h-36 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -1222,8 +1222,8 @@
                         $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                        <div class="relative h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -1318,8 +1318,8 @@
                         @endphp
                         <div class="swiper-slide !h-auto">
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                <div class="relative h-28 sm:h-36 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                     <div class="absolute top-2 left-2 {{ $tagMeta['solid_badge'] }} text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                         <i class="fas fa-{{ $tagMeta['icon'] }} text-[8px]"></i> {{ $tagMeta['label'] }}
                                     </div>
@@ -1389,8 +1389,8 @@
                         $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                        <div class="relative h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -1480,8 +1480,8 @@
                         $reviewCount = $pg->dynamic_reviews_count;
                     @endphp
                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                        <div class="relative h-32 sm:h-44 overflow-hidden">
-                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="relative h-32 sm:h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2.5 left-2.5 {{ $tagMeta['solid_badge'] }} text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                 <i class="fas fa-{{ $tagMeta['icon'] }} text-[9px]"></i> {{ $tagMeta['label'] }}
                             </div>
@@ -1597,8 +1597,8 @@
                                 @endphp
                                 <div class="swiper-slide !h-auto">
                                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                        <div class="relative h-28 sm:h-36 overflow-hidden">
-                                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                        <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                             @if($pg->is_sale)
                                                 <div class="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                                     <i class="fas fa-tag text-[8px]"></i> For Sale
@@ -1676,8 +1676,8 @@
                                 $reviewCount = $pg->dynamic_reviews_count;
                             @endphp
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                <div class="relative h-44 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                     @if($pg->is_sale)
                                         <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                             <i class="fas fa-tag text-[9px]"></i> For Sale
@@ -1793,8 +1793,8 @@
                             @endphp
                             <div class="swiper-slide !h-auto">
                                 <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                    <div class="relative h-28 sm:h-36 overflow-hidden">
-                                        <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                         <div class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                             <i class="fas fa-{{ $tagMeta['icon'] ?? 'building' }} text-[8px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Flat' }}
                                         </div>
@@ -1861,8 +1861,8 @@
                             $reviewCount = $pg->dynamic_reviews_count;
                         @endphp
                         <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                            <div class="relative h-44 overflow-hidden">
-                                <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <div class="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                     <i class="fas fa-{{ $tagMeta['icon'] ?? 'building' }} text-[9px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Flat / House' }}
                                 </div>
@@ -1955,8 +1955,8 @@
                                 @endphp
                                 <div class="swiper-slide !h-auto">
                                     <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                        <div class="relative h-28 sm:h-36 overflow-hidden">
-                                            <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                        <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                             <div class="absolute top-2 left-2 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                                 <i class="fas fa-store text-[8px]"></i> Shop
                                             </div>
@@ -2024,8 +2024,8 @@
                                 $reviewCount = $pg->dynamic_reviews_count;
                             @endphp
                             <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                <div class="relative h-44 overflow-hidden">
-                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                     @if($pg->is_sale)
                                         <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm uppercase tracking-wider">
                                             <i class="fas fa-tag text-[9px]"></i> For Sale
@@ -2141,8 +2141,8 @@
                             @endphp
                             <div class="swiper-slide !h-auto">
                                 <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                                    <div class="relative h-28 sm:h-36 overflow-hidden">
-                                        <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                    <div class="relative h-28 sm:h-36 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                         <div class="absolute top-2 left-2 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                             <i class="fas fa-{{ $tagMeta['icon'] ?? 'store' }} text-[8px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Shop' }}
                                         </div>
@@ -2209,8 +2209,8 @@
                             $reviewCount = $pg->dynamic_reviews_count;
                         @endphp
                         <a href="{{ $slugUrl }}" class="pg-card tap-ripple" data-property-id="{{ $pg->id }}">
-                            <div class="relative h-44 overflow-hidden">
-                                <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="relative h-44 overflow-hidden bg-gray-100 skeleton-shimmer">
+                                    <img src="{{ $displayImg }}" alt="{{ $pg->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('skeleton-shimmer')">name }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <div class="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                                     <i class="fas fa-{{ $tagMeta['icon'] ?? 'store' }} text-[9px]"></i> {{ $tagMeta['label'] !== 'No Tag' ? $tagMeta['label'] : 'Commercial' }}
                                 </div>
@@ -2312,7 +2312,7 @@
                                 <!-- Top Media Banner (0 padding, full bleed, no room badge) -->
                                 <div class="relative h-36 sm:h-44 w-full p-0 m-0 overflow-hidden bg-gradient-to-br from-slate-950 to-[#1b104a] flex flex-col items-center justify-center text-center {{ $rAvatar ? 'skeleton-shimmer' : '' }}">
                                     @if($rAvatar)
-                                        <img src="{{ $rAvatar }}" alt="{{ $r->poster_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 block p-0 m-0" loading="lazy" onload="this.parentElement.classList.remove('skeleton-shimmer')">
+                                        <img src="{{ $rAvatar }}" alt="{{ $r->poster_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 block p-0 m-0" loading="lazy" decoding="async" onload="this.parentElement.classList.remove('skeleton-shimmer')">
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
                                     @else
                                         <div class="relative z-10 w-14 h-14 sm:w-16 sm:h-16 bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -2557,7 +2557,7 @@
     {{-- ============================= 9. HOST YOUR PG CTA ============================= --}}
     <section class="mt-8 sm:mt-10 mb-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-gray-900 rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
+            <div class="rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl bg-[#2e2f59]" style="background-color: #2e2f59;">
                 <div>
                     <p class="text-xs font-bold text-brand uppercase tracking-widest mb-1.5">For Property Owners</p>
                     <h2 class="text-xl sm:text-3xl font-extrabold text-white mb-2 leading-tight">List your PG and fill<br class="sm:hidden"> beds faster</h2>
@@ -2565,10 +2565,10 @@
                 </div>
                 <div class="flex items-center gap-3 flex-shrink-0">
                     <a href="{{ route('user.list-property') }}" class="bg-brand hover:bg-brand-dark text-white font-bold px-6 py-3 rounded-2xl text-sm tap-ripple transition shadow-lg shadow-brand/30">
-                        List Free
+                        Post Property For Free
                     </a>
                     <a href="{{ route('user.pricing') }}" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-3 rounded-2xl text-sm tap-ripple transition border border-white/20">
-                        Pricing
+                        Pricing Plans
                     </a>
                 </div>
             </div>
@@ -2621,7 +2621,7 @@
                 <div class="absolute -right-16 -top-16 w-72 h-72 bg-brand/25 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute -left-10 -bottom-16 w-64 h-64 bg-teal-500/25 rounded-full blur-3xl pointer-events-none"></div>
 
-                <div class="relative group w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[420px] select-none">
+                <div class="relative group w-full select-none">
                     <img src="{{ file_exists(public_path('images/app-image.jpg')) ? asset('images/app-image.png') : asset('images/app-image.webp') }}" alt="StayNest Mobile App Dual Screen Preview" loading="lazy" decoding="async" class="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)] transition duration-500 group-hover:scale-[1.02]">
                 </div>
             </div>

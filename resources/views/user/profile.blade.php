@@ -72,6 +72,7 @@
 
     <!-- ===================== MAIN PROFILE GRID CONTAINER ===================== -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <!-- ================= LEFT COLUMN: SUMMARY & ADDRESS SHORTCUT ================= -->
@@ -89,7 +90,7 @@
                             <span class="text-[11px] font-semibold text-gray-500">Saved</span>
                         </a>
                         <button type="button" onclick="openAddressModal()" class="bg-gray-50 hover:bg-brand-light p-3 rounded-2xl border border-gray-100 transition tap-effect">
-                            <span class="block text-xl font-black text-brand" id="statAddresses">2</span>
+                            <span class="block text-xl font-black text-brand" id="statAddresses">0</span>
                             <span class="text-[11px] font-semibold text-gray-500">Addresses</span>
                         </button>
                     </div>
@@ -103,22 +104,29 @@
                                 <i class="fas fa-map-location-dot"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-gray-900 text-sm">Saved Addresses</h3>
+                                <h3 class="font-bold text-gray-900 text-sm">Saved Address</h3>
                             </div>
                         </div>
-                        <button type="button" onclick="openAddressModal()" class="text-xs font-bold text-brand hover:underline">
-                             Update Address
+                        <button type="button" onclick="openAddressModal()" id="addrHeaderBtn" class="text-xs font-bold text-brand hover:underline">
+                             + Add Address
                         </button>
                     </div>
 
-                    <!-- Display Current Default Address -->
-                    <div id="savedAddressPreview" class="bg-gray-50 rounded-2xl p-3.5 border border-gray-200/80 mb-3 space-y-1.5">
+                    <!-- Empty State (Shown when no address saved) -->
+                    <div id="noAddressState" class="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-200 text-center mb-3">
+                        <i class="fas fa-location-dot text-xl text-gray-300 mb-1"></i>
+                        <p class="text-xs font-bold text-gray-600">No Address Saved</p>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Add your location for live distance calculation to PGs &amp; properties.</p>
+                    </div>
+
+                    <!-- Display Current Saved Address (Hidden until an address is actually saved) -->
+                    <div id="savedAddressPreview" class="hidden bg-gray-50 rounded-2xl p-3.5 border border-gray-200/80 mb-3 space-y-1.5">
                         <div class="flex items-center justify-between">
                             <span class="bg-brand text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase" id="addrBadgeTag">🏠 HOME</span>
                             <button type="button" onclick="openAddressModal()" class="text-xs text-gray-400 hover:text-brand"><i class="fas fa-pen text-[10px]"></i> Edit</button>
                         </div>
-                        <p class="text-xs font-bold text-gray-900 leading-snug" id="addrPreviewLine1">Flat 402, B-Block, Tulip Heights</p>
-                        <p class="text-[11px] text-gray-500 truncate" id="addrPreviewLine2">Sector 62, Near Electronic City Metro, Noida, 201309</p>
+                        <p class="text-xs font-bold text-gray-900 leading-snug" id="addrPreviewLine1"></p>
+                        <p class="text-[11px] text-gray-500 truncate" id="addrPreviewLine2"></p>
                     </div>
 
                     <button type="button" onclick="openAddressModal()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-sm transition tap-effect">
@@ -190,7 +198,7 @@
                                     {{ $user?->profile?->last_name ?? '-' }}
                                 </p>
                             </div>
-                            <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
+                            <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between {{ empty($user?->phone) ? 'sm:col-span-2' : '' }}">
                                 <div>
                                     <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Registered Email</span>
                                     <p class="text-sm font-bold text-gray-900 mt-1" id="viewEmail">
@@ -198,20 +206,28 @@
                                     </p>
                                 </div>
                                 <button type="button" onclick="openEmailOtpModal()" class="text-xs font-bold text-brand hover:text-brand-dark bg-brand-light px-2.5 py-1 rounded-lg tap-effect">
-                                    Change (OTP)
+                                    Change Email ID
                                 </button>
                             </div>
-                            <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
+                            @if(!empty($user?->phone))
+                            <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between" id="mobileNumberViewCard">
                                 <div>
                                     <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Mobile Number</span>
-                                    <p class="text-sm font-bold text-gray-900 mt-1" id="viewPhone">
-                                        {{ $user?->phone ?? 'Not set' }}
-                                    </p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <p class="text-sm font-bold text-gray-900" id="viewPhone">
+                                            {{ $user->phone }}
+                                        </p>
+                                        <span id="phoneStatusBadge" class="bg-teal-100 text-teal-700 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md flex items-center gap-1">
+                                            <i class="fas fa-circle-check text-[8px]"></i> Active
+                                        </span>
+                                    </div>
                                 </div>
-                                <span class="text-[10px] bg-gray-200/80 text-gray-600 font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
-                                    <i class="fas fa-lock text-[8px]"></i> Locked
-                                </span>
+                                <!-- <button type="button" onclick="openPhoneModal()" class="text-xs font-bold text-brand hover:text-brand-dark bg-brand-light hover:bg-brand/20 px-3 py-1.5 rounded-xl transition tap-effect flex items-center gap-1">
+                                    <i class="fas fa-pen-to-square text-[10px]"></i>
+                                    <span id="phoneBtnLabel">Change</span>
+                                </button> -->
                             </div>
+                            @endif
                             <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100">
                                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Date of Birth &amp; Age</span>
                                 <p class="text-sm font-bold text-gray-900 mt-1" id="viewDob">
@@ -256,9 +272,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Email & Mobile (Disabled with explanation) -->
+                                <!-- Email & Mobile -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
+                                    <div class="{{ empty($user?->phone) ? 'sm:col-span-2' : '' }}">
                                         <div class="flex items-center justify-between mb-1.5">
                                             <label class="block text-xs font-bold text-gray-700">Email Address</label>
                                             <button type="button" onclick="openEmailOtpModal()" class="text-[11px] font-bold text-brand hover:underline">
@@ -273,15 +289,22 @@
                                         <p class="text-[10px] text-gray-400 mt-1">Email can only be changed via OTP security check.</p>
                                     </div>
 
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">Mobile Number</label>
+                                    @if(!empty($user?->phone))
+                                    <div id="mobileNumberEditContainer">
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="block text-xs font-bold text-gray-700">Mobile Number</label>
+                                            <span class="text-[10px] font-extrabold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                                <i class="fas fa-lock text-[9px]"></i> Locked
+                                            </span>
+                                        </div>
                                         <div class="relative">
-                                            <input type="tel" id="editPhone" value="{{ $user?->phone ?? '' }}" readonly 
-                                                class="w-full bg-gray-100 border border-gray-200 rounded-2xl py-3 pl-4 pr-10 text-sm font-semibold text-gray-600 cursor-not-allowed select-none">
+                                            <input type="tel" id="editPhone" value="{{ $user->phone }}" readonly disabled
+                                                class="w-full bg-gray-100 border border-gray-200 rounded-2xl py-3 pl-4 pr-10 text-sm font-medium text-gray-500 cursor-not-allowed select-none">
                                             <span class="absolute right-3.5 top-3.5 text-gray-400 text-xs"><i class="fas fa-lock"></i></span>
                                         </div>
-                                        <p class="text-[10px] text-amber-600 mt-1"><i class="fas fa-shield-halved"></i> Mobile number is permanently linked & cannot be edited.</p>
+                                        <p class="text-[10px] text-gray-400 mt-1">Mobile number updates are locked.</p>
                                     </div>
+                                    @endif
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -570,31 +593,31 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">House / Flat No. <span class="text-red-500">*</span></label>
-                        <input type="text" id="addrHouse" placeholder="e.g. Flat 402, 4th Floor" required
+                        <input type="text" id="addrHouse" placeholder="e.g. Flat 101, 2nd Floor" required
                             class="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Building / Apartment <span class="text-red-500">*</span></label>
-                        <input type="text" id="addrBuilding" placeholder="e.g. Tulip Heights" required
+                        <input type="text" id="addrBuilding" placeholder="e.g. Apartment / Society Name" required
                             class="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">Street / Locality / Sector <span class="text-red-500">*</span></label>
-                    <input type="text" id="addrStreet" placeholder="e.g. Sector 62, Electronic City" required
+                    <input type="text" id="addrStreet" placeholder="e.g. Locality, Area or Street" required
                         class="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Landmark</label>
-                        <input type="text" id="addrLandmark" placeholder="e.g. Near Metro Station"
+                        <input type="text" id="addrLandmark" placeholder="e.g. Near Metro Station / Park"
                             class="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Pincode <span class="text-red-500">*</span></label>
-                        <input type="text" id="addrPincode" placeholder="e.g. 201309" required maxlength="6"
+                        <input type="text" id="addrPincode" placeholder="e.g. 6-digit Pincode" required maxlength="6"
                             class="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40">
                     </div>
                 </div>
@@ -609,7 +632,7 @@
 </div>
 
 <!-- ========================================================================= -->
-<!-- 4. EMAIL UPDATE WITH DATABASE CHECK MODAL                                 -->
+<!-- 4. EMAIL UPDATE WITH GMAIL / EMAIL OTP VERIFICATION MODAL                -->
 <!-- ========================================================================= -->
 <div id="emailOtpModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 transition-all duration-300">
     <div onclick="closeEmailOtpModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"></div>
@@ -623,7 +646,7 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-gray-900 text-sm leading-tight">Update Registered Email</h3>
-                    <p class="text-[11px] text-gray-400">Checks database availability instantly</p>
+                    <p class="text-[11px] text-gray-400" id="emailModalSubtitle">Requires 6-digit Gmail / Email OTP verification</p>
                 </div>
             </div>
             <button type="button" onclick="closeEmailOtpModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition">
@@ -637,24 +660,65 @@
             <span id="emailOtpErrorMsg" class="font-medium"></span>
         </div>
 
-        <!-- Single Submit Form -->
-        <form onsubmit="handleUpdateEmailSubmit(event)" class="space-y-4">
+        <!-- Step 1: Request OTP -->
+        <form id="emailStep1Form" onsubmit="handleRequestEmailOtp(event)" class="space-y-4">
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1.5">New Email Address <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <input type="email" id="newEmailInput" placeholder="e.g. user@example.com" required
-                        class="w-full bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/40">
+                    <input type="email" id="newEmailInput" placeholder="e.g. yourname@gmail.com" required
+                        class="w-full bg-white border border-gray-200 rounded-2xl py-3 pl-4 pr-10 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500">
+                    <span class="absolute right-3.5 top-3.5 text-gray-400 text-xs"><i class="fas fa-envelope"></i></span>
                 </div>
-                <p class="text-[10px] text-gray-400 mt-1">We will check if this email is already registered in the database.</p>
+                <p class="text-[10px] text-gray-400 mt-1">We will send a 6-digit verification code to this email to verify ownership.</p>
             </div>
 
             <div class="pt-2 flex items-center justify-end gap-2.5">
                 <button type="button" onclick="closeEmailOtpModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-xl text-xs transition tap-effect">
                     Cancel
                 </button>
-                <button type="submit" id="submitEmailBtn" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-md hover:shadow-brand/20 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition tap-effect flex items-center gap-1.5">
-                    <i class="fas fa-check"></i>
-                    <span>Submit & Update Email</span>
+                <button type="submit" id="sendEmailOtpBtn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition tap-effect flex items-center gap-1.5 shadow-md shadow-purple-500/20">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Send Verification OTP</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Step 2: Enter & Verify OTP -->
+        <form id="emailStep2Form" onsubmit="handleVerifyEmailOtp(event)" class="hidden space-y-4">
+            <div class="bg-purple-50/80 border border-purple-100 rounded-2xl p-3.5 flex items-center justify-between">
+                <div class="flex items-center gap-2 min-w-0">
+                    <i class="fas fa-paper-plane text-purple-600 text-xs flex-shrink-0"></i>
+                    <div class="min-w-0">
+                        <p class="text-[10px] font-bold text-purple-900 uppercase">OTP Sent To</p>
+                        <p class="text-xs font-bold text-gray-900 truncate" id="targetEmailDisplay"></p>
+                    </div>
+                </div>
+                <button type="button" onclick="backToEmailStep1()" class="text-xs font-bold text-purple-600 hover:underline flex-shrink-0">
+                    Change
+                </button>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1.5 text-center">Enter 6-Digit OTP Code <span class="text-red-500">*</span></label>
+                <div class="relative max-w-xs mx-auto">
+                    <input type="text" id="emailOtpCodeInput" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" placeholder="------" required
+                        class="w-full bg-gray-50 border-2 border-purple-200 rounded-2xl py-3 px-4 text-center font-mono text-xl font-extrabold tracking-[0.4em] text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-600 focus:bg-white transition">
+                </div>
+                <div class="flex items-center justify-between mt-2 text-[11px]">
+                    <span class="text-gray-400">Didn't receive code?</span>
+                    <button type="button" id="resendEmailOtpBtn" onclick="handleResendEmailOtp()" disabled class="font-bold text-purple-600 disabled:text-gray-400 disabled:no-underline hover:underline cursor-pointer disabled:cursor-not-allowed">
+                        Resend Code <span id="resendCountdown">(60s)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-2 flex items-center justify-end gap-2.5">
+                <button type="button" onclick="backToEmailStep1()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-xl text-xs transition tap-effect">
+                    Back
+                </button>
+                <button type="submit" id="verifyEmailOtpBtn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition tap-effect flex items-center gap-1.5 shadow-md shadow-purple-500/20">
+                    <i class="fas fa-shield-check"></i>
+                    <span>Verify OTP & Update Email</span>
                 </button>
             </div>
         </form>
@@ -810,7 +874,8 @@ function renderProfileView() {
     if (document.getElementById('viewFirstName')) document.getElementById('viewFirstName').innerText = currentProfileData.first_name || '-';
     if (document.getElementById('viewLastName')) document.getElementById('viewLastName').innerText = currentProfileData.last_name || '-';
     if (document.getElementById('viewEmail')) document.getElementById('viewEmail').innerText = currentProfileData.email || 'Not set';
-    if (document.getElementById('viewPhone')) document.getElementById('viewPhone').innerText = currentProfileData.phone || 'Not set';
+    if (document.getElementById('viewPhone')) document.getElementById('viewPhone').innerText = currentProfileData.phone || '';
+
     if (document.getElementById('viewGender')) {
         document.getElementById('viewGender').innerText = currentProfileData.gender 
             ? (currentProfileData.gender.charAt(0).toUpperCase() + currentProfileData.gender.slice(1).toLowerCase()) 
@@ -859,6 +924,7 @@ function toggleEditProfile(isEditing) {
         // Pre-fill inputs with current values
         if (document.getElementById('editFirstName')) document.getElementById('editFirstName').value = currentProfileData.first_name || '';
         if (document.getElementById('editLastName')) document.getElementById('editLastName').value = currentProfileData.last_name || '';
+        if (document.getElementById('editPhone')) document.getElementById('editPhone').value = currentProfileData.phone || '';
         if (document.getElementById('editGender')) {
             document.getElementById('editGender').value = currentProfileData.gender 
                 ? (currentProfileData.gender.charAt(0).toUpperCase() + currentProfileData.gender.slice(1).toLowerCase()) 
@@ -932,7 +998,7 @@ async function handleProfileSubmit(e) {
 
             renderProfileView();
             toggleEditProfile(false);
-            showToast('Profile Updated! 🎉', 'Your personal details, DOB, and profession have been saved.');
+            showToast('Profile Updated! 🎉', 'Your personal details and preferences have been saved.');
         } else {
             showToast('Error', data.message || 'Could not update profile. Please try again.');
         }
@@ -1145,19 +1211,57 @@ function togglePass(inputId, btn) {
     }
 }
 
-// ===================== EMAIL UPDATE WITH DATABASE CHECK LOGIC =====================
+// ===================== EMAIL UPDATE WITH GMAIL / EMAIL OTP VERIFICATION =====================
+let pendingEmailToVerify = '';
+let emailOtpTimerInterval = null;
+
 function openEmailOtpModal() {
     hideEmailError();
     const modal = document.getElementById('emailOtpModal');
+    if (!modal) return;
+    
+    // Reset to step 1
+    const step1 = document.getElementById('emailStep1Form');
+    const step2 = document.getElementById('emailStep2Form');
+    if (step1) step1.classList.remove('hidden');
+    if (step2) step2.classList.add('hidden');
+
+    const emailInput = document.getElementById('newEmailInput');
+    if (emailInput) {
+        emailInput.value = '';
+        setTimeout(() => emailInput.focus(), 100);
+    }
+    const otpInput = document.getElementById('emailOtpCodeInput');
+    if (otpInput) otpInput.value = '';
+
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-    document.getElementById('newEmailInput').value = '';
 }
 
 function closeEmailOtpModal() {
+    if (emailOtpTimerInterval) {
+        clearInterval(emailOtpTimerInterval);
+        emailOtpTimerInterval = null;
+    }
     const modal = document.getElementById('emailOtpModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+function backToEmailStep1() {
+    hideEmailError();
+    if (emailOtpTimerInterval) {
+        clearInterval(emailOtpTimerInterval);
+        emailOtpTimerInterval = null;
+    }
+    const step1 = document.getElementById('emailStep1Form');
+    const step2 = document.getElementById('emailStep2Form');
+    if (step1) step1.classList.remove('hidden');
+    if (step2) step2.classList.add('hidden');
+    const emailInput = document.getElementById('newEmailInput');
+    if (emailInput) emailInput.focus();
 }
 
 function showEmailError(msg) {
@@ -1174,25 +1278,48 @@ function hideEmailError() {
     if (alertBox) alertBox.classList.add('hidden');
 }
 
-async function handleUpdateEmailSubmit(e) {
+function startOtpCountdown(seconds = 60) {
+    if (emailOtpTimerInterval) clearInterval(emailOtpTimerInterval);
+    const resendBtn = document.getElementById('resendEmailOtpBtn');
+    const countdownSpan = document.getElementById('resendCountdown');
+    if (!resendBtn || !countdownSpan) return;
+
+    let remaining = seconds;
+    resendBtn.disabled = true;
+    countdownSpan.innerText = `(${remaining}s)`;
+
+    emailOtpTimerInterval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(emailOtpTimerInterval);
+            emailOtpTimerInterval = null;
+            resendBtn.disabled = false;
+            countdownSpan.innerText = '';
+        } else {
+            countdownSpan.innerText = `(${remaining}s)`;
+        }
+    }, 1000);
+}
+
+async function handleRequestEmailOtp(e) {
     e.preventDefault();
     hideEmailError();
 
     const newEmail = document.getElementById('newEmailInput').value.trim();
-    
+
     if (!newEmail || !newEmail.includes('@') || !newEmail.includes('.')) {
-        showEmailError('Please enter a valid email address (e.g. user@example.com).');
+        showEmailError('Please enter a valid email address (e.g. user@gmail.com).');
         return;
     }
 
-    if (newEmail.toLowerCase() === currentProfileData.email.toLowerCase()) {
+    if (currentProfileData.email && newEmail.toLowerCase() === currentProfileData.email.toLowerCase()) {
         showEmailError('This is already your current registered email address. Please enter a different email.');
         return;
     }
 
-    const btn = document.getElementById('submitEmailBtn');
+    const btn = document.getElementById('sendEmailOtpBtn');
     const origHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5"></i> Checking database...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5"></i> Sending OTP...';
     btn.disabled = true;
 
     try {
@@ -1204,7 +1331,7 @@ async function handleUpdateEmailSubmit(e) {
         };
         if (token) headers['Authorization'] = 'Bearer ' + token;
 
-        const response = await fetch('/api/v1/user/email/update', {
+        const response = await fetch('{{ route("user.profile.email.request-otp") }}', {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({ new_email: newEmail })
@@ -1213,7 +1340,7 @@ async function handleUpdateEmailSubmit(e) {
         const result = await response.json();
 
         if (!response.ok || result.success === false) {
-            let errMsg = result.message || 'Email update failed.';
+            let errMsg = result.message || 'Failed to send verification OTP.';
             if (result.errors) {
                 const first = Object.values(result.errors)[0];
                 if (first) errMsg = Array.isArray(first) ? first[0] : first;
@@ -1224,15 +1351,140 @@ async function handleUpdateEmailSubmit(e) {
             return;
         }
 
-        // Email successfully updated in database
-        currentProfileData.email = newEmail;
+        // Store target email & switch to Step 2
+        pendingEmailToVerify = newEmail;
+        document.getElementById('targetEmailDisplay').innerText = newEmail;
+
+        document.getElementById('emailStep1Form').classList.add('hidden');
+        document.getElementById('emailStep2Form').classList.remove('hidden');
+
+        const otpInput = document.getElementById('emailOtpCodeInput');
+        if (otpInput) {
+            otpInput.value = '';
+            setTimeout(() => otpInput.focus(), 100);
+        }
+
+        startOtpCountdown(60);
+        showToast('Verification OTP Sent 📧', result.message || `A 6-digit code was sent to ${newEmail}`);
+
+    } catch(err) {
+        showEmailError('Network connection error. Please try again.');
+    } finally {
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+    }
+}
+
+async function handleResendEmailOtp() {
+    if (!pendingEmailToVerify) {
+        backToEmailStep1();
+        return;
+    }
+
+    hideEmailError();
+    const btn = document.getElementById('resendEmailOtpBtn');
+    btn.disabled = true;
+
+    try {
+        const token = localStorage.getItem('staynest_token');
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const response = await fetch('{{ route("user.profile.email.request-otp") }}', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ new_email: pendingEmailToVerify })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || result.success === false) {
+            let errMsg = result.message || 'Failed to resend verification OTP.';
+            if (result.errors) {
+                const first = Object.values(result.errors)[0];
+                if (first) errMsg = Array.isArray(first) ? first[0] : first;
+            }
+            showEmailError(errMsg);
+            btn.disabled = false;
+            return;
+        }
+
+        startOtpCountdown(60);
+        showToast('OTP Resent 📨', `A fresh 6-digit code was sent to ${pendingEmailToVerify}`);
+
+    } catch(err) {
+        showEmailError('Network error. Please try again.');
+        btn.disabled = false;
+    }
+}
+
+async function handleVerifyEmailOtp(e) {
+    e.preventDefault();
+    hideEmailError();
+
+    const otp = (document.getElementById('emailOtpCodeInput').value || '').trim();
+
+    if (!/^\d{6}$/.test(otp)) {
+        showEmailError('Please enter the valid 6-digit numeric OTP sent to your email.');
+        return;
+    }
+
+    if (!pendingEmailToVerify) {
+        showEmailError('Session expired. Please start email verification again.');
+        backToEmailStep1();
+        return;
+    }
+
+    const btn = document.getElementById('verifyEmailOtpBtn');
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5"></i> Verifying...';
+    btn.disabled = true;
+
+    try {
+        const token = localStorage.getItem('staynest_token');
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const response = await fetch('{{ route("user.profile.email.verify-otp") }}', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                new_email: pendingEmailToVerify,
+                otp: otp
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || result.success === false) {
+            let errMsg = result.message || 'OTP verification failed.';
+            if (result.errors) {
+                const first = Object.values(result.errors)[0];
+                if (first) errMsg = Array.isArray(first) ? first[0] : first;
+            }
+            showEmailError(errMsg);
+            btn.innerHTML = origHtml;
+            btn.disabled = false;
+            return;
+        }
+
+        // Email successfully verified & updated in database
+        currentProfileData.email = pendingEmailToVerify;
         localStorage.setItem('staynest_user', JSON.stringify(currentProfileData));
         renderProfileView();
 
         btn.innerHTML = origHtml;
         btn.disabled = false;
         closeEmailOtpModal();
-        showToast('Registered Email Updated ✨', `Your email was successfully changed to ${newEmail}`);
+        showToast('Email Verified & Updated! ✨', `Your registered email address is now ${currentProfileData.email}`);
 
     } catch(err) {
         showEmailError('Network connection error. Please try again.');
@@ -1268,13 +1520,6 @@ function detectCurrentLocation() {
                 const accuracy = Math.round(pos.coords.accuracy || 1);
 
                 status.innerText = `Detected GPS: ${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E (±${accuracy}m)`;
-                
-                // Auto-fill address details (Sector 62, Noida)
-                document.getElementById('addrHouse').value = 'Flat 402, 4th Floor';
-                document.getElementById('addrBuilding').value = 'Tulip Heights';
-                document.getElementById('addrStreet').value = 'Sector 62, Electronic City Hub';
-                document.getElementById('addrLandmark').value = 'Near Metro Gate No. 2';
-                document.getElementById('addrPincode').value = '201309';
 
                 try {
                     localStorage.setItem('staynest_user_lat', lat);
@@ -1283,29 +1528,17 @@ function detectCurrentLocation() {
                     localStorage.setItem('user_cached_lng', lng);
                 } catch(e) {}
 
-                showToast('GPS Location Detected', 'Address auto-filled with high accuracy GPS!');
+                showToast('GPS Location Detected', 'Coordinates fetched. Please enter your building/street details.');
             },
             (err) => {
                 btn.innerHTML = 'Locate Me 🎯';
-                status.innerText = 'Using Sector 62, Noida (28.6280° N, 77.3649° E) as default.';
-                document.getElementById('addrHouse').value = 'Flat 402, 4th Floor';
-                document.getElementById('addrBuilding').value = 'Tulip Heights';
-                document.getElementById('addrStreet').value = 'Sector 62, Noida';
-                document.getElementById('addrLandmark').value = 'Near Electronic City Metro';
-                document.getElementById('addrPincode').value = '201309';
-
-                try {
-                    localStorage.setItem('staynest_user_lat', 28.6280);
-                    localStorage.setItem('staynest_user_lng', 77.3649);
-                    localStorage.setItem('user_cached_lat', 28.6280);
-                    localStorage.setItem('user_cached_lng', 77.3649);
-                } catch(e) {}
+                status.innerText = 'Unable to detect GPS. Please fill address manually.';
             },
             { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
     } else {
         btn.innerHTML = 'Locate Me 🎯';
-        status.innerText = 'Geolocation not supported by browser. Using Sector 62, Noida.';
+        status.innerText = 'Geolocation not supported by browser. Please fill address manually.';
     }
 }
 
@@ -1319,8 +1552,8 @@ function handleSaveAddress(e) {
     const pincode = document.getElementById('addrPincode').value.trim();
 
     // Determine exact coordinates based on address text / city
-    let userLat = 28.6280;
-    let userLng = 77.3649;
+    let userLat = parseFloat(localStorage.getItem('staynest_user_lat')) || 28.6280;
+    let userLng = parseFloat(localStorage.getItem('staynest_user_lng')) || 77.3649;
 
     const fullAddrStr = `${house} ${bldg} ${street} ${landmark} ${pincode}`.toLowerCase();
     if (fullAddrStr.includes('bangalore') || fullAddrStr.includes('bengaluru') || fullAddrStr.includes('indiranagar') || pincode.startsWith('560')) {
@@ -1332,16 +1565,12 @@ function handleSaveAddress(e) {
     } else if (fullAddrStr.includes('gurugram') || fullAddrStr.includes('gurgaon') || pincode.startsWith('122')) {
         userLat = 28.4595;
         userLng = 77.0266;
-    } else {
-        // Sector 62, Noida coordinates
-        userLat = 28.6280;
-        userLng = 77.3649;
     }
 
     const savedAddr = {
         tag: tag,
-        line1: `${house}, ${bldg}`,
-        line2: `${street}, ${landmark ? landmark + ', ' : ''}${pincode}`,
+        line1: `${house}${bldg ? ', ' + bldg : ''}`,
+        line2: `${street}${landmark ? ', ' + landmark : ''}${pincode ? ' - ' + pincode : ''}`,
         lat: userLat,
         lng: userLng
     };
@@ -1353,44 +1582,48 @@ function handleSaveAddress(e) {
     localStorage.setItem('user_cached_lat', userLat);
     localStorage.setItem('user_cached_lng', userLng);
     localStorage.setItem('user_cached_address', `${house}, ${bldg}, ${street}, ${pincode}`);
-    localStorage.setItem('user_cached_city', 'Noida');
-    localStorage.setItem('user_cached_area', street || 'Sector 62');
+    localStorage.setItem('user_cached_area', street || '');
     localStorage.setItem('user_cached_pin', pincode);
 
     renderSavedAddress(savedAddr);
     closeAddressModal();
-    showToast('Address Confirmed & Saved', `Location locked to ${street || 'Sector 62, Noida'} for live distance calculation.`);
+    showToast('Address Saved! 📍', `Your location has been saved for live distance calculation.`);
 }
 
 function loadSavedAddress() {
     let addrStr = localStorage.getItem('staynest_default_address');
-    if (!addrStr) {
-        // Default initialized verified address for logged in profile
-        const defaultAddr = {
-            tag: 'HOME',
-            line1: 'Flat 402, B-Block, Tulip Heights',
-            line2: 'Sector 62, Near Electronic City Metro, Noida, 201309',
-            lat: 28.6280,
-            lng: 77.3649
-        };
-        localStorage.setItem('staynest_default_address', JSON.stringify(defaultAddr));
-        localStorage.setItem('staynest_user_lat', 28.6280);
-        localStorage.setItem('staynest_user_lng', 77.3649);
-        localStorage.setItem('staynest_user_address_locked', 'true');
-        addrStr = JSON.stringify(defaultAddr);
-    }
-
     if (addrStr) {
         try {
-            renderSavedAddress(JSON.parse(addrStr));
+            const parsed = JSON.parse(addrStr);
+            if (parsed && (parsed.line1 || parsed.line2)) {
+                renderSavedAddress(parsed);
+                return;
+            }
         } catch(e) {}
     }
+    renderSavedAddress(null);
 }
 
 function renderSavedAddress(addr) {
-    document.getElementById('addrBadgeTag').innerText = `📍 ${addr.tag}`;
-    document.getElementById('addrPreviewLine1').innerText = addr.line1;
-    document.getElementById('addrPreviewLine2').innerText = addr.line2;
+    const previewEl = document.getElementById('savedAddressPreview');
+    const noAddrEl = document.getElementById('noAddressState');
+    const headerBtn = document.getElementById('addrHeaderBtn');
+    const statAddr = document.getElementById('statAddresses');
+
+    if (previewEl && addr && (addr.line1 || addr.line2)) {
+        if (document.getElementById('addrBadgeTag')) document.getElementById('addrBadgeTag').innerText = `📍 ${addr.tag || 'HOME'}`;
+        if (document.getElementById('addrPreviewLine1')) document.getElementById('addrPreviewLine1').innerText = addr.line1 || '';
+        if (document.getElementById('addrPreviewLine2')) document.getElementById('addrPreviewLine2').innerText = addr.line2 || '';
+        previewEl.classList.remove('hidden');
+        if (noAddrEl) noAddrEl.classList.add('hidden');
+        if (headerBtn) headerBtn.innerText = 'Update Address';
+        if (statAddr) statAddr.innerText = '1';
+    } else {
+        if (previewEl) previewEl.classList.add('hidden');
+        if (noAddrEl) noAddrEl.classList.remove('hidden');
+        if (headerBtn) headerBtn.innerText = '+ Add Address';
+        if (statAddr) statAddr.innerText = '0';
+    }
 }
 
 function showToast(title, msg) {

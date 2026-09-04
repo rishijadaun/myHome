@@ -74,11 +74,6 @@
                     <span class="font-semibold">18+</span>
                     <span class="text-slate-500">Cities Covered</span>
                 </div>
-                <div class="flex items-center gap-2 text-slate-300 border-l border-white/10 pl-6">
-                    <i class="fas fa-star text-amber-400 text-[10px]"></i>
-                    <span class="font-semibold">4.8/5</span>
-                    <span class="text-slate-500">Avg. Rating</span>
-                </div>
             </div>
 
             @php

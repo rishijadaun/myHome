@@ -172,9 +172,9 @@
             <a href="{{ route('broker.pgs') }}" class="bg-white text-brand px-5 py-3 rounded-xl font-bold text-sm tap-effect shadow-md hover:bg-gray-50 transition flex items-center gap-1.5 cursor-pointer">
                 <i class="fas fa-plus"></i> Add New PG
             </a>
-            <a href="{{ route('broker.earnings') }}" class="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-5 py-3 rounded-xl font-semibold text-sm tap-effect transition flex items-center gap-1.5 cursor-pointer">
+            <!-- <a href="{{ route('broker.earnings') }}" class="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-5 py-3 rounded-xl font-semibold text-sm tap-effect transition flex items-center gap-1.5 cursor-pointer">
                 <i class="fas fa-file-invoice"></i> View Payouts
-            </a>
+            </a> -->
         </div>
     </div>
 

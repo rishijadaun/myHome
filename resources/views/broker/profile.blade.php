@@ -5,26 +5,40 @@
 @section('content')
 @php
     $brokerName = $profile->full_name ?: ($profile->first_name ? trim($profile->first_name . ' ' . ($profile->last_name ?? '')) : ($broker->email ?? 'Partner Broker'));
-    $firstName = $profile->first_name ?: 'Partner';
+    $firstName = $profile->first_name ?: '';
     $lastName = $profile->last_name ?: '';
     
-    $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName ?: 'B', 0, 1));
-    if (empty(trim($initials))) $initials = 'BR';
+    $initials = strtoupper(substr($firstName ?: ($broker->email ?? 'P'), 0, 1) . substr($lastName ?: '', 0, 1));
+    if (empty(trim($initials))) $initials = 'PG';
     
-    $companyName = $profile->company_name ?: 'StayNest Partner Broker';
-    $isKycVerified = !empty($broker->kyc_verified_at) || ($broker->status === 'active' && !empty($profile->preferences['documents']['id_proof']['status']) && $profile->preferences['documents']['id_proof']['status'] === 'verified');
-    $joinedDate = $broker->created_at ? $broker->created_at->format('F Y') : 'March 2025';
+    $companyName = $profile->company_name ?: '';
+    $joinedDate = $broker->created_at ? $broker->created_at->format('F Y') : now()->format('F Y');
     
-    $officeAddress = $preferences['office_address'] ?? 'Tower B, 4th Floor, Sector 62, Noida, UP 201309';
-    $operatingCity = $preferences['operating_city'] ?? 'Noida / Delhi NCR';
-    $operatingArea = $preferences['operating_area'] ?? 'Sector 62, Electronic City';
-    $gstin = $preferences['gstin'] ?? '09AAAAA0000A1Z5';
-    $reraNumber = $preferences['rera_number'] ?? 'UPRERAAGT12490';
-    $bio = $profile->bio ?? 'Experienced PG & Co-living space partner managing premium student and executive stays.';
-    
+    $officeAddress = $preferences['office_address'] ?? '';
+    $operatingCity = $preferences['operating_city'] ?? '';
+    $operatingArea = $preferences['operating_area'] ?? '';
+    $gstin = $preferences['gstin'] ?? '';
+    $reraNumber = $preferences['rera_number'] ?? '';
+    $bio = $profile->bio ?? '';
+        
     $bank = $bankDetails ?? [];
     $docs = $documents ?? [];
     $notifs = $notifications ?? [];
+
+    $idProof = $docs['id_proof'] ?? null;
+    $licenseProof = $docs['license_proof'] ?? null;
+    $bankProof = $docs['bank_proof'] ?? null;
+
+    $idProofStatus = $idProof['status'] ?? 'not_uploaded';
+    $licenseProofStatus = $licenseProof['status'] ?? 'not_uploaded';
+    $bankProofStatus = $bankProof['status'] ?? 'not_uploaded';
+
+    $hasAnyRejected = ($idProofStatus === 'rejected') || ($licenseProofStatus === 'rejected') || ($bankProofStatus === 'rejected') || ($broker->status === 'suspended');
+    $hasAnyPending = ($idProofStatus === 'pending_review') || ($licenseProofStatus === 'pending_review') || ($bankProofStatus === 'pending_review');
+    $hasAnyUploaded = (!empty($idProof) && !empty($idProof['file_path'])) || (!empty($licenseProof) && !empty($licenseProof['file_path'])) || (!empty($bankProof) && !empty($bankProof['file_path']));
+    
+    // Broker is verified if admin has approved / kyc_verified_at is present and no documents are rejected
+    $isKycVerified = !empty($broker->kyc_verified_at) && !$hasAnyRejected;
 @endphp
 
 <!-- Sticky Desktop Header -->
@@ -116,9 +130,17 @@
                                 <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 shadow-xs">
                                     <i class="fas fa-check-circle text-emerald-600"></i> Verified Partner
                                 </span>
-                            @else
-                                <span class="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                            @elseif($hasAnyRejected)
+                                <span class="inline-flex items-center gap-1 text-xs font-bold text-rose-700 bg-rose-50 px-3 py-1 rounded-full border border-rose-200 shadow-xs">
+                                    <i class="fas fa-circle-exclamation text-rose-600"></i> KYC Action Required
+                                </span>
+                            @elseif($hasAnyPending || $hasAnyUploaded)
+                                <span class="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 shadow-xs">
                                     <i class="fas fa-clock text-amber-600"></i> KYC Pending Review
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full border border-gray-200 shadow-xs">
+                                    <i class="fas fa-file-arrow-up text-gray-500"></i> KYC Incomplete
                                 </span>
                             @endif
                         </div>
@@ -219,11 +241,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">First Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="first_name" value="{{ old('first_name', $profile->first_name ?: 'Vikram') }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                <input type="text" name="first_name" value="{{ old('first_name', $profile->first_name ?? '') }}" placeholder="e.g. Rahul" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Last Name</label>
-                                <input type="text" name="last_name" value="{{ old('last_name', $profile->last_name ?: 'Singh') }}" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                <input type="text" name="last_name" value="{{ old('last_name', $profile->last_name ?? '') }}" placeholder="e.g. Sharma" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
                             </div>
                         </div>
 
@@ -256,7 +278,7 @@
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Registered Office Address</label>
-                            <textarea name="office_address" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">{{ old('office_address', $officeAddress) }}</textarea>
+                            <textarea name="office_address" rows="2" placeholder="e.g. Tower B, 4th Floor, Sector 62, Noida, UP" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">{{ old('office_address', $officeAddress) }}</textarea>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -305,22 +327,22 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Account Holder Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="account_holder_name" value="{{ old('account_holder_name', $bank['account_holder_name'] ?? $brokerName) }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                <input type="text" name="account_holder_name" value="{{ old('account_holder_name', $bank['account_holder_name'] ?? ($brokerName !== 'Partner Broker' ? $brokerName : '')) }}" placeholder="Enter account holder name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Bank Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="bank_name" value="{{ old('bank_name', $bank['bank_name'] ?? 'HDFC Bank') }}" placeholder="e.g. HDFC Bank, ICICI, SBI" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                <input type="text" name="bank_name" value="{{ old('bank_name', $bank['bank_name'] ?? '') }}" placeholder="e.g. HDFC Bank, ICICI, SBI" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Account Number <span class="text-red-500">*</span></label>
-                                <input type="text" name="account_number" value="{{ old('account_number', $bank['account_number'] ?? '50100234567890') }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                <input type="text" name="account_number" value="{{ old('account_number', $bank['account_number'] ?? '') }}" placeholder="Enter bank account number" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">IFSC Code <span class="text-red-500">*</span></label>
-                                <input type="text" name="ifsc_code" value="{{ old('ifsc_code', $bank['ifsc_code'] ?? 'HDFC0001234') }}" placeholder="e.g. HDFC0001234" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                <input type="text" name="ifsc_code" value="{{ old('ifsc_code', $bank['ifsc_code'] ?? '') }}" placeholder="e.g. HDFC0001234" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
                             </div>
                         </div>
 
@@ -334,7 +356,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Instant Payout UPI ID (Optional)</label>
-                                <input type="text" name="upi_id" value="{{ old('upi_id', $bank['upi_id'] ?? 'vikram@hdfcbank') }}" placeholder="e.g. yourname@okhdfcbank" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
+                                <input type="text" name="upi_id" value="{{ old('upi_id', $bank['upi_id'] ?? '') }}" placeholder="e.g. yourname@okhdfcbank" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white transition">
                             </div>
                         </div>
 
@@ -366,124 +388,175 @@
                             <p class="text-xs text-gray-500">Government compliance and regulatory documents for verified broker badge</p>
                         </div>
                         @if($isKycVerified)
-                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5 shadow-xs">
                                 <i class="fas fa-badge-check"></i> ALL VERIFIED
                             </span>
-                        @else
-                            <span class="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 flex items-center gap-1.5">
+                        @elseif($hasAnyRejected)
+                            <span class="text-xs font-bold text-rose-700 bg-rose-50 px-3 py-1 rounded-full border border-rose-200 flex items-center gap-1.5 shadow-xs">
+                                <i class="fas fa-circle-exclamation"></i> ACTION REQUIRED
+                            </span>
+                        @elseif($hasAnyPending || $hasAnyUploaded)
+                            <span class="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 flex items-center gap-1.5 shadow-xs">
                                 <i class="fas fa-hourglass-half"></i> PENDING VERIFICATION
+                            </span>
+                        @else
+                            <span class="text-xs font-bold text-gray-600 bg-gray-100 px-3 py-1 rounded-full border border-gray-200 flex items-center gap-1.5">
+                                <i class="fas fa-file-arrow-up"></i> DOCUMENTS REQUIRED
                             </span>
                         @endif
                     </div>
 
                     <!-- 3 Document Cards -->
+                    @php
+                        $docItems = [
+                            'id_proof' => [
+                                'title' => 'Government ID Proof (Aadhar / PAN)',
+                                'desc' => 'National Identity proof for partner verification',
+                                'icon' => 'fa-id-card',
+                                'doc' => $docs['id_proof'] ?? null,
+                                'default_name' => 'aadhar_card.pdf'
+                            ],
+                            'license_proof' => [
+                                'title' => 'RERA License / Property Deed Certificate',
+                                'desc' => 'State RERA agent license or PG property deed agreement',
+                                'icon' => 'fa-file-contract',
+                                'doc' => $docs['license_proof'] ?? null,
+                                'default_name' => 'rera_cert.pdf'
+                            ],
+                            'bank_proof' => [
+                                'title' => 'Cancelled Cheque / Bank Passbook',
+                                'desc' => 'Proof of bank account ownership for payouts',
+                                'icon' => 'fa-money-check-alt',
+                                'doc' => $docs['bank_proof'] ?? null,
+                                'default_name' => 'cheque.pdf'
+                            ],
+                        ];
+                    @endphp
+
                     <div class="grid grid-cols-1 gap-4">
+                        @foreach($docItems as $type => $item)
+                            @php
+                                $d = $item['doc'];
+                                $isUploaded = !empty($d) && !empty($d['file_path']);
+                                $dStatus = $d['status'] ?? 'not_uploaded';
+                                $allowReupload = !empty($d['allow_reupload']);
+                                
+                                $cardBorder = 'border-gray-200';
+                                $cardBg = 'bg-gray-50';
+                                if ($dStatus === 'verified') {
+                                    if ($allowReupload) {
+                                        $cardBorder = 'border-amber-300';
+                                        $cardBg = 'bg-amber-50/20';
+                                    } else {
+                                        $cardBorder = 'border-emerald-200';
+                                        $cardBg = 'bg-emerald-50/20';
+                                    }
+                                } elseif ($dStatus === 'rejected') {
+                                    $cardBorder = 'border-rose-200';
+                                    $cardBg = 'bg-rose-50/30';
+                                } elseif ($dStatus === 'pending_review' || $isUploaded) {
+                                    $cardBorder = 'border-amber-200';
+                                    $cardBg = 'bg-amber-50/20';
+                                }
+                            @endphp
 
-                        <!-- 1. ID Proof Card -->
-                        @php $idProof = $docs['id_proof'] ?? null; @endphp
-                        <div class="p-5 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-brand text-xl shadow-xs">
-                                    <i class="fas fa-id-card"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <h4 class="font-bold text-gray-900 text-sm">Government ID Proof (Aadhar / PAN)</h4>
-                                        @if($idProof && ($idProof['status'] ?? '') === 'verified')
-                                            <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">VERIFIED</span>
-                                        @elseif($idProof)
-                                            <span class="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">PENDING REVIEW</span>
-                                        @else
-                                            <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">NOT UPLOADED</span>
+                            <div class="p-5 rounded-2xl border {{ $cardBorder }} {{ $cardBg }} flex flex-col md:flex-row md:items-center justify-between gap-4 transition shadow-xs">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-brand text-xl shadow-xs shrink-0">
+                                        <i class="fas {{ $item['icon'] }}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <h4 class="font-bold text-gray-900 text-sm">{{ $item['title'] }}</h4>
+                                            @if($dStatus === 'verified')
+                                                @if($allowReupload)
+                                                    <span class="text-[10px] font-extrabold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">
+                                                        <i class="fas fa-unlock text-[9px]"></i> RE-UPLOAD AUTHORIZED
+                                                    </span>
+                                                @else
+                                                    <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1">
+                                                        <i class="fas fa-check-circle text-[9px]"></i> VERIFIED & LOCKED
+                                                    </span>
+                                                @endif
+                                            @elseif($dStatus === 'rejected')
+                                                <span class="text-[10px] font-extrabold text-rose-700 bg-rose-100 px-2 py-0.5 rounded border border-rose-300">
+                                                    REJECTED
+                                                </span>
+                                            @elseif($isUploaded)
+                                                <span class="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
+                                                    PENDING REVIEW
+                                                </span>
+                                            @else
+                                                <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">
+                                                    NOT UPLOADED
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <p class="text-xs text-gray-500 mt-0.5">
+                                            {{ $isUploaded ? 'File: ' . ($d['name'] ?? $item['default_name']) . ' • Uploaded ' . ($d['uploaded_at'] ?? 'recently') : $item['desc'] }}
+                                        </p>
+
+                                        @if(!empty($d['doc_number']))
+                                            <div class="text-[11px] text-gray-600 mt-1 font-mono">
+                                                Document No: <span class="font-bold text-gray-800 bg-white px-2 py-0.5 rounded border border-gray-200">{{ $d['doc_number'] }}</span>
+                                            </div>
+                                        @endif
+
+                                        @if(!empty($d['rejection_reason']))
+                                            <div class="text-xs text-rose-700 font-semibold mt-2 bg-rose-50 p-2.5 rounded-xl border border-rose-200 flex items-start gap-2">
+                                                <i class="fas fa-circle-exclamation text-rose-600 text-xs shrink-0 mt-0.5"></i>
+                                                <span><strong>Admin Rejection Reason:</strong> {{ $d['rejection_reason'] }}</span>
+                                            </div>
+                                        @endif
+
+                                        @if($dStatus === 'verified' && $allowReupload)
+                                            <div class="text-xs text-amber-900 font-semibold mt-2 bg-amber-50 p-2.5 rounded-xl border border-amber-300 flex items-start gap-2">
+                                                <i class="fas fa-unlock-alt text-amber-600 mt-0.5 shrink-0 text-sm"></i>
+                                                <div>
+                                                    <div><strong>Re-upload Permission Granted:</strong> Admin has unlocked this verified document. You may upload a replaced version below.</div>
+                                                    @if(!empty($d['reupload_note']))
+                                                        <div class="text-[11px] text-amber-800 mt-0.5"><strong>Admin Note:</strong> {{ $d['reupload_note'] }}</div>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         @endif
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-0.5">
-                                        {{ $idProof ? 'File: ' . ($idProof['name'] ?? 'aadhar_card.pdf') . ' • Uploaded ' . ($idProof['uploaded_at'] ?? 'recently') : 'National Identity proof for partner verification' }}
-                                    </p>
                                 </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                @if($idProof && !empty($idProof['file_path']))
-                                    <a href="{{ $idProof['file_path'] }}" target="_blank" class="px-3.5 py-2 bg-white border border-gray-200 text-gray-700 hover:text-brand rounded-xl text-xs font-semibold tap-effect flex items-center gap-1.5 transition">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                @endif
-                                <button type="button" onclick="openDocUploadModal('id_proof', 'Aadhar / PAN Card')" class="px-4 py-2 bg-brand text-white hover:bg-brand-dark rounded-xl text-xs font-bold tap-effect flex items-center gap-1.5 shadow-xs transition cursor-pointer">
-                                    <i class="fas fa-upload"></i> {{ $idProof ? 'Replace' : 'Upload' }}
-                                </button>
-                            </div>
-                        </div>
 
-                        <!-- 2. RERA / Broker License Deed -->
-                        @php $licenseProof = $docs['license_proof'] ?? null; @endphp
-                        <div class="p-5 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-brand text-xl shadow-xs">
-                                    <i class="fas fa-file-contract"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <h4 class="font-bold text-gray-900 text-sm">RERA License / Property Deed Certificate</h4>
-                                        @if($licenseProof && ($licenseProof['status'] ?? '') === 'verified')
-                                            <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">VERIFIED</span>
-                                        @elseif($licenseProof)
-                                            <span class="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">PENDING REVIEW</span>
+                                <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+                                    @if($isUploaded)
+                                        <a href="{{ $d['file_path'] }}" target="_blank" class="px-3.5 py-2 bg-white border border-gray-200 text-gray-700 hover:text-brand rounded-xl text-xs font-semibold tap-effect flex items-center gap-1.5 transition shadow-xs">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    @endif
+
+                                    @if($dStatus === 'verified')
+                                        @if(!$allowReupload)
+                                            <span class="px-3.5 py-2 bg-emerald-50 text-emerald-700 font-bold rounded-xl text-xs flex items-center gap-1.5 border border-emerald-200 shadow-xs" title="Document is verified and locked against edits">
+                                                <i class="fas fa-lock text-emerald-600"></i> Locked
+                                            </span>
                                         @else
-                                            <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">NOT UPLOADED</span>
+                                            <button type="button" onclick="openDocUploadModal('{{ $type }}', '{{ addslashes($item['title']) }}')" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold tap-effect flex items-center gap-1.5 shadow-xs transition cursor-pointer">
+                                                <i class="fas fa-upload"></i> Re-upload
+                                            </button>
                                         @endif
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-0.5">
-                                        {{ $licenseProof ? 'File: ' . ($licenseProof['name'] ?? 'rera_cert.pdf') . ' • Uploaded ' . ($licenseProof['uploaded_at'] ?? 'recently') : 'State RERA agent license or PG property deed agreement' }}
-                                    </p>
+                                    @elseif($dStatus === 'rejected')
+                                        <button type="button" onclick="openDocUploadModal('{{ $type }}', '{{ addslashes($item['title']) }}')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold tap-effect flex items-center gap-1.5 shadow-xs transition cursor-pointer">
+                                            <i class="fas fa-upload"></i> Re-upload
+                                        </button>
+                                    @elseif($isUploaded)
+                                        <button type="button" onclick="openDocUploadModal('{{ $type }}', '{{ addslashes($item['title']) }}')" class="px-4 py-2 bg-brand text-white hover:bg-brand-dark rounded-xl text-xs font-bold tap-effect flex items-center gap-1.5 shadow-xs transition cursor-pointer">
+                                            <i class="fas fa-upload"></i> Replace
+                                        </button>
+                                    @else
+                                        <button type="button" onclick="openDocUploadModal('{{ $type }}', '{{ addslashes($item['title']) }}')" class="px-4 py-2 bg-brand text-white hover:bg-brand-dark rounded-xl text-xs font-bold tap-effect flex items-center gap-1.5 shadow-xs transition cursor-pointer">
+                                            <i class="fas fa-upload"></i> Upload
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                @if($licenseProof && !empty($licenseProof['file_path']))
-                                    <a href="{{ $licenseProof['file_path'] }}" target="_blank" class="px-3.5 py-2 bg-white border border-gray-200 text-gray-700 hover:text-brand rounded-xl text-xs font-semibold tap-effect flex items-center gap-1.5 transition">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                @endif
-                                <button type="button" onclick="openDocUploadModal('license_proof', 'RERA / Broker License')" class="px-4 py-2 bg-brand text-white hover:bg-brand-dark rounded-xl text-xs font-bold tap-effect flex items-center gap-1.5 shadow-xs transition cursor-pointer">
-                                    <i class="fas fa-upload"></i> {{ $licenseProof ? 'Replace' : 'Upload' }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 3. Bank Account Cheque Proof -->
-                        @php $bankProof = $docs['bank_proof'] ?? null; @endphp
-                        <div class="p-5 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-brand text-xl shadow-xs">
-                                    <i class="fas fa-money-check-alt"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <h4 class="font-bold text-gray-900 text-sm">Cancelled Cheque / Bank Passbook</h4>
-                                        @if($bankProof && ($bankProof['status'] ?? '') === 'verified')
-                                            <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">VERIFIED</span>
-                                        @elseif($bankProof)
-                                            <span class="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">PENDING REVIEW</span>
-                                        @else
-                                            <span class="text-[10px] font-extrabold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">NOT UPLOADED</span>
-                                        @endif
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-0.5">
-                                        {{ $bankProof ? 'File: ' . ($bankProof['name'] ?? 'cheque.pdf') . ' • Uploaded ' . ($bankProof['uploaded_at'] ?? 'recently') : 'Proof of bank account ownership for payouts' }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                @if($bankProof && !empty($bankProof['file_path']))
-                                    <a href="{{ $bankProof['file_path'] }}" target="_blank" class="px-3.5 py-2 bg-white border border-gray-200 text-gray-700 hover:text-brand rounded-xl text-xs font-semibold tap-effect flex items-center gap-1.5 transition">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                @endif
-                                <button type="button" onclick="openDocUploadModal('bank_proof', 'Cancelled Cheque / Passbook')" class="px-4 py-2 bg-brand text-white hover:bg-brand-dark rounded-xl text-xs font-bold tap-effect flex items-center gap-1.5 shadow-xs transition cursor-pointer">
-                                    <i class="fas fa-upload"></i> {{ $bankProof ? 'Replace' : 'Upload' }}
-                                </button>
-                            </div>
-                        </div>
-
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -652,8 +725,12 @@
                         </div>
                         @if($isKycVerified)
                             <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-extrabold text-[10px]">VERIFIED</span>
-                        @else
+                        @elseif($hasAnyRejected)
+                            <span class="text-rose-700 bg-rose-100 px-2 py-0.5 rounded font-extrabold text-[10px]">ACTION NEEDED</span>
+                        @elseif($hasAnyPending || $hasAnyUploaded)
                             <span class="text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-extrabold text-[10px]">PENDING</span>
+                        @else
+                            <span class="text-gray-500 bg-gray-200 px-2 py-0.5 rounded font-extrabold text-[10px]">INCOMPLETE</span>
                         @endif
                     </div>
 
@@ -1076,7 +1153,9 @@
 
             if (data.success) {
                 showToast(data.message);
-                setTimeout(() => window.location.reload(), 1200);
+                setTimeout(() => {
+                    window.location.href = window.location.pathname + '?tab=kyc';
+                }, 1000);
             } else {
                 showToast(data.message || 'Document upload failed.', 'error');
             }
@@ -1088,6 +1167,21 @@
             showToast('Upload error. Please try a valid file.', 'error');
         });
     }
+
+    // Auto Activate Tab from URL Query Param or Hash
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        const hash = window.location.hash.replace('#', '');
+        if (tabParam) {
+            const target = tabParam.startsWith('tab-') ? tabParam : 'tab-' + tabParam;
+            if (document.getElementById(target)) {
+                switchTab(target);
+            }
+        } else if (hash && document.getElementById(hash)) {
+            switchTab(hash);
+        }
+    });
 </script>
 @endpush
 @endsection

@@ -43,9 +43,7 @@
         @auth
             return true;
         @else
-            const token = localStorage.getItem('staynest_token');
-            const userStr = localStorage.getItem('staynest_user');
-            return !!(token || userStr);
+            return false;
         @endauth
     };
 

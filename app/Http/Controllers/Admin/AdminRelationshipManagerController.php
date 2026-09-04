@@ -66,19 +66,18 @@ class AdminRelationshipManagerController extends Controller
         $rmId = (string) Str::uuid();
         $avatarUrl = $validated['avatar_url'] ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
 
-        // Handle Avatar File Upload
+        // Handle Avatar File Upload with WebP conversion
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
-            $uploadPath = public_path('uploads/rm_avatars');
-            if (!File::isDirectory($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true, true);
+            $prefix = 'rm_' . Str::slug($rmId) . '_';
+            $processed = app(\App\Services\ImageProcessingService::class)->processUpload($file, 'rm_avatars', $prefix, [
+                'max_width' => 500,
+                'max_height' => 500,
+                'quality' => 85,
+            ]);
+            if ($processed) {
+                $avatarUrl = $processed['relative_url'];
             }
-            $ext = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'webp']) 
-                ? strtolower($file->getClientOriginalExtension()) 
-                : ($file->extension() ?: 'jpg');
-            $filename = 'rm_' . Str::slug($rmId) . '_' . time() . '_' . Str::random(6) . '.' . $ext;
-            $file->move($uploadPath, $filename);
-            $avatarUrl = '/uploads/rm_avatars/' . $filename;
         }
 
         $manager = RelationshipManager::create([
@@ -178,19 +177,18 @@ class AdminRelationshipManagerController extends Controller
 
         $avatarUrl = $manager->avatar_url;
 
-        // Handle Avatar File Upload
+        // Handle Avatar File Upload with WebP conversion
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
-            $uploadPath = public_path('uploads/rm_avatars');
-            if (!File::isDirectory($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true, true);
+            $prefix = 'rm_' . Str::slug($manager->id) . '_';
+            $processed = app(\App\Services\ImageProcessingService::class)->processUpload($file, 'rm_avatars', $prefix, [
+                'max_width' => 500,
+                'max_height' => 500,
+                'quality' => 85,
+            ]);
+            if ($processed) {
+                $avatarUrl = $processed['relative_url'];
             }
-            $ext = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'webp']) 
-                ? strtolower($file->getClientOriginalExtension()) 
-                : ($file->extension() ?: 'jpg');
-            $filename = 'rm_' . Str::slug($manager->id) . '_' . time() . '_' . Str::random(6) . '.' . $ext;
-            $file->move($uploadPath, $filename);
-            $avatarUrl = '/uploads/rm_avatars/' . $filename;
         } elseif ($request->filled('avatar_url')) {
             $avatarUrl = $request->input('avatar_url');
         }

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
     <meta name="mobile-web-app-capable" content="yes">
@@ -99,6 +100,7 @@
                 @endif
 
                 <form id="brokerLoginForm" onsubmit="handleBrokerLogin(event)" class="space-y-4" novalidate>
+                    @csrf
                     
                     <!-- Login (Email or Phone) -->
                     <div>
@@ -324,7 +326,7 @@
     </div>
 
     <script>
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
         let brokerResetLoginCache = '';
 
         // Toggle Password Visibility
@@ -727,7 +729,7 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify({ login, password, remember })
+                    body: JSON.stringify({ _token: csrfToken, login, password, remember })
                 });
 
                 const data = await response.json();

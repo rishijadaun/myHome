@@ -53,9 +53,14 @@ class AppServiceProvider extends ServiceProvider
                     ? \App\Models\PropertyReport::count()
                     : 0;
 
+                $pendingKycCount = $brokerRole ? $brokerRole->users()->where(function ($q) {
+                    $q->whereNull('users.kyc_verified_at');
+                })->count() : 0;
+
                 $view->with('adminSidebarStats', [
                     'properties' => \App\Models\Property::count(),
                     'pendingBrokers' => $pendingBrokersCount,
+                    'pendingKyc' => $pendingKycCount,
                     'bookings' => \App\Models\Booking::count(),
                     'users' => \App\Models\User::count(),
                     'pendingReviews' => $pendingReviewsCount,

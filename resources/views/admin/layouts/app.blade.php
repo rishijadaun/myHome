@@ -82,11 +82,18 @@
                     <span class="text-sm font-medium">All Properties</span>
                     <span class="ml-auto bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['properties'] ?? 0 }}</span>
                 </a>
-                <a href="{{ route('admin.brokers') }}" class="sidebar-link {{ request()->routeIs('admin.brokers') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+                <a href="{{ route('admin.brokers') }}" class="sidebar-link {{ request()->routeIs('admin.brokers*') && !request()->routeIs('admin.broker-kyc*') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
                     <i class="fas fa-user-tie w-5 text-center"></i>
                     <span class="text-sm font-medium">Brokers</span>
                     @if(($adminSidebarStats['pendingBrokers'] ?? 0) > 0)
                         <span class="ml-auto bg-yellow-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $adminSidebarStats['pendingBrokers'] }}</span>
+                    @endif
+                </a>
+                <a href="{{ route('admin.broker-kyc.index') }}" class="sidebar-link {{ request()->routeIs('admin.broker-kyc*') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+                    <i class="fas fa-id-card-clip w-5 text-center text-teal-600"></i>
+                    <span class="text-sm font-medium">Broker KYC</span>
+                    @if(($adminSidebarStats['pendingKyc'] ?? 0) > 0)
+                        <span class="ml-auto bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">{{ $adminSidebarStats['pendingKyc'] }}</span>
                     @endif
                 </a>
                 <a href="{{ route('admin.bookings') }}" class="sidebar-link {{ request()->routeIs('admin.bookings') ? 'active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition">

@@ -390,17 +390,17 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-1 mb-0.5">
-                                <span class="text-[10px] font-extrabold text-red-600 uppercase tracking-wider" id="addressTypeLabel">Verified Home Address</span>
+                                <span class="text-[10px] font-extrabold text-red-600 uppercase tracking-wider" id="addressTypeLabel">Current Location</span>
                                 <span id="gpsLiveBadge" class="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-100/90 px-1.5 py-0.2 rounded-md">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> VERIFIED HOME
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> GPS ACTIVE
                                 </span>
                             </div>
-                            <div id="userAddressDisplay" class="text-xs font-bold text-slate-800 leading-tight line-clamp-2 cursor-pointer hover:text-brand transition" onclick="goToMyLocation()">Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309</div>
+                            <div id="userAddressDisplay" class="text-xs font-bold text-slate-800 leading-tight line-clamp-2 cursor-pointer hover:text-brand transition" onclick="goToMyLocation()">Detecting your location...</div>
                             
                             <!-- Switch buttons -->
                             <div class="flex items-center gap-2 mt-2 pt-1.5 border-t border-red-100/80">
                                 <button type="button" onclick="useProfileHomeAddress()" id="btnUseHome" class="text-[10px] font-extrabold text-brand bg-white border border-brand/40 px-2 py-0.5 rounded-md hover:bg-brand hover:text-white transition shadow-xs">
-                                    <i class="fas fa-house-user mr-0.5"></i> Profile Home
+                                    <i class="fas fa-house-user mr-0.5"></i> Saved Address
                                 </button>
                                 <button type="button" onclick="useDeviceGPS()" id="btnUseGps" class="text-[10px] font-bold text-gray-600 bg-white border border-gray-200 px-2 py-0.5 rounded-md hover:bg-gray-100 transition shadow-xs">
                                     <i class="fas fa-crosshairs mr-0.5"></i> Auto GPS
@@ -637,10 +637,9 @@
             map = L.map('map', { zoomControl: false }).setView(indiaCenter, 5);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; OpenStreetMap &copy; CARTO',
-                subdomains: 'abcd'
+                attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
             window.markersLayer = L.layerGroup().addTo(map);
@@ -651,14 +650,14 @@
             const btnMobile = document.getElementById('layersBtnMobile');
             
             if (currentLayer === 'standard') {
-                map.eachLayer((layer) => { if (layer._url && layer._url.includes('cartocdn')) map.removeLayer(layer); });
+                map.eachLayer((layer) => { if (layer._url && (layer._url.includes('openstreetmap') || layer._url.includes('cartocdn'))) map.removeLayer(layer); });
                 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 18 }).addTo(map);
                 currentLayer = 'satellite';
                 btn?.classList.add('active');
                 btnMobile?.classList.add('active');
             } else {
                 map.eachLayer((layer) => { if (layer._url && layer._url.includes('arcgisonline')) map.removeLayer(layer); });
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd' }).addTo(map);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
                 currentLayer = 'standard';
                 btn?.classList.remove('active');
                 btnMobile?.classList.remove('active');
@@ -1658,14 +1657,25 @@
         }
         setInterval(cycleAIPlaceholders, 3200);
 
-        const profileHomeData = {
-            tag: 'HOME',
-            line1: 'Flat 402, B-Block, Tulip Heights',
-            line2: 'Sector 62, Near Electronic City Metro, Noida, 201309',
-            fullAddress: 'Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309',
-            lat: 28.6280,
-            lng: 77.3649
-        };
+        function getSavedProfileAddress() {
+            try {
+                const saved = localStorage.getItem('staynest_default_address');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.line1 || parsed.line2 || parsed.fullAddress) {
+                        return {
+                            tag: parsed.tag || 'HOME',
+                            line1: parsed.line1 || '',
+                            line2: parsed.line2 || '',
+                            fullAddress: parsed.fullAddress || [parsed.line1, parsed.line2].filter(Boolean).join(', '),
+                            lat: parsed.lat ? parseFloat(parsed.lat) : null,
+                            lng: parsed.lng ? parseFloat(parsed.lng) : null
+                        };
+                    }
+                }
+            } catch(e) {}
+            return null;
+        }
 
         async function fetchUserAddress(lat, lng) {
             try {
@@ -1708,53 +1718,62 @@
         }
 
         function useProfileHomeAddress() {
-            userLocation = [profileHomeData.lat, profileHomeData.lng];
-            userAddress = profileHomeData.fullAddress;
+            const savedAddr = getSavedProfileAddress();
+            if (savedAddr) {
+                userAddress = savedAddr.fullAddress;
+                const addrEl = document.getElementById('userAddressDisplay');
+                if (addrEl) addrEl.textContent = userAddress;
 
-            // Check if user has saved custom address in localStorage from profile
-            try {
-                const saved = localStorage.getItem('staynest_default_address');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (parsed.line1 && parsed.line2) {
-                        userAddress = `${parsed.line1}, ${parsed.line2}`;
-                    }
+                const typeLabel = document.getElementById('addressTypeLabel');
+                if (typeLabel) typeLabel.textContent = `Verified ${savedAddr.tag || 'Home'} Address`;
+
+                const badge = document.getElementById('gpsLiveBadge');
+                if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> VERIFIED ${savedAddr.tag || 'HOME'}`;
+
+                const btnHome = document.getElementById('btnUseHome');
+                const btnGps = document.getElementById('btnUseGps');
+                if (btnHome) {
+                    btnHome.className = 'text-[10px] font-extrabold text-brand bg-white border border-brand/40 px-2 py-0.5 rounded-md shadow-xs';
                 }
-            } catch(e) {}
+                if (btnGps) {
+                    btnGps.className = 'text-[10px] font-bold text-gray-600 bg-white border border-gray-200 px-2 py-0.5 rounded-md hover:bg-gray-100 transition shadow-xs';
+                }
 
-            const addrEl = document.getElementById('userAddressDisplay');
-            if (addrEl) addrEl.textContent = userAddress;
+                if (savedAddr.lat && savedAddr.lng) {
+                    userLocation = [savedAddr.lat, savedAddr.lng];
+                    try {
+                        localStorage.setItem('user_cached_lat', savedAddr.lat);
+                        localStorage.setItem('user_cached_lng', savedAddr.lng);
+                        localStorage.setItem('user_cached_address', userAddress);
+                        localStorage.setItem('staynest_user_lat', savedAddr.lat);
+                        localStorage.setItem('staynest_user_lng', savedAddr.lng);
+                        localStorage.setItem('staynest_user_address_locked', 'true');
+                    } catch(e) {}
 
-            const typeLabel = document.getElementById('addressTypeLabel');
-            if (typeLabel) typeLabel.textContent = 'Verified Home Address';
-
-            const badge = document.getElementById('gpsLiveBadge');
-            if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> VERIFIED HOME`;
-
-            const btnHome = document.getElementById('btnUseHome');
-            const btnGps = document.getElementById('btnUseGps');
-            if (btnHome) {
-                btnHome.className = 'text-[10px] font-extrabold text-brand bg-white border border-brand/40 px-2 py-0.5 rounded-md shadow-xs';
-            }
-            if (btnGps) {
-                btnGps.className = 'text-[10px] font-bold text-gray-600 bg-white border border-gray-200 px-2 py-0.5 rounded-md hover:bg-gray-100 transition shadow-xs';
-            }
-
-            try {
-                localStorage.setItem('user_cached_lat', profileHomeData.lat);
-                localStorage.setItem('user_cached_lng', profileHomeData.lng);
-                localStorage.setItem('user_cached_address', userAddress);
-                localStorage.setItem('staynest_user_lat', profileHomeData.lat);
-                localStorage.setItem('staynest_user_lng', profileHomeData.lng);
-                localStorage.setItem('staynest_user_address_locked', 'true');
-            } catch(e) {}
-
-            renderUserMarker();
-            highlightUserRadius(userLocation[0], userLocation[1], currentSearchRadiusKm);
-            generatePGsForRegion(userLocation[0], userLocation[1], "Sector 62, Noida");
-            map.flyTo(userLocation, 15, { duration: 1.2 });
-            if (window.userMarker) {
-                setTimeout(() => window.userMarker.openPopup(), 1200);
+                    renderUserMarker();
+                    highlightUserRadius(userLocation[0], userLocation[1], currentSearchRadiusKm);
+                    generatePGsForRegion(userLocation[0], userLocation[1], savedAddr.tag || "Saved Home");
+                    map.flyTo(userLocation, 15, { duration: 1.2 });
+                    if (window.userMarker) {
+                        setTimeout(() => window.userMarker.openPopup(), 1200);
+                    }
+                } else {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(userAddress)}&limit=1`)
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res && res[0]) {
+                                const lat = parseFloat(res[0].lat);
+                                const lon = parseFloat(res[0].lon);
+                                userLocation = [lat, lon];
+                                renderUserMarker();
+                                highlightUserRadius(lat, lon, currentSearchRadiusKm);
+                                generatePGsForRegion(lat, lon, "Saved Home");
+                                map.flyTo(userLocation, 15, { duration: 1.2 });
+                            }
+                        }).catch(() => {});
+                }
+            } else {
+                useDeviceGPS();
             }
         }
 
@@ -1789,19 +1808,67 @@
                         }
                     },
                     (error) => {
-                        alert("Could not retrieve device GPS. Switching to Verified Profile Home Address.");
-                        useProfileHomeAddress();
+                        const savedAddr = getSavedProfileAddress();
+                        if (savedAddr) {
+                            useProfileHomeAddress();
+                        } else {
+                            if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> EXPLORE`;
+                            if (typeLabel) typeLabel.textContent = 'Nearby Stays';
+                            const addrEl = document.getElementById('userAddressDisplay');
+                            if (addrEl) addrEl.textContent = 'Search city or locality above, or enable GPS.';
+                            if (rawDatabaseProperties && rawDatabaseProperties.length > 0) {
+                                const p0 = rawDatabaseProperties[0];
+                                userLocation = [p0.lat, p0.lng];
+                                renderUserMarker();
+                                generatePGsForRegion(p0.lat, p0.lng, p0.city || 'Nearby');
+                                map.flyTo(userLocation, 13, { duration: 1.2 });
+                            } else {
+                                focusIndiaMap();
+                            }
+                        }
                     },
                     { timeout: 8000, enableHighAccuracy: true, maximumAge: 0 }
                 );
             } else {
-                useProfileHomeAddress();
+                const savedAddr = getSavedProfileAddress();
+                if (savedAddr) {
+                    useProfileHomeAddress();
+                } else if (rawDatabaseProperties && rawDatabaseProperties.length > 0) {
+                    const p0 = rawDatabaseProperties[0];
+                    userLocation = [p0.lat, p0.lng];
+                    generatePGsForRegion(p0.lat, p0.lng, p0.city || 'Nearby');
+                    map.flyTo(userLocation, 13, { duration: 1.2 });
+                } else {
+                    focusIndiaMap();
+                }
             }
         }
 
         function initUserLocation() {
-            // Default to verified profile home location (Sector 62, Noida)
-            useProfileHomeAddress();
+            const savedAddr = getSavedProfileAddress();
+            if (savedAddr) {
+                useProfileHomeAddress();
+            } else {
+                const cachedLat = parseFloat(localStorage.getItem('user_cached_lat'));
+                const cachedLng = parseFloat(localStorage.getItem('user_cached_lng'));
+                const cachedAddr = localStorage.getItem('user_cached_address');
+                if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0 && cachedAddr) {
+                    userLocation = [cachedLat, cachedLng];
+                    userAddress = cachedAddr;
+                    const addrEl = document.getElementById('userAddressDisplay');
+                    if (addrEl) addrEl.textContent = userAddress;
+                    const typeLabel = document.getElementById('addressTypeLabel');
+                    if (typeLabel) typeLabel.textContent = 'Recent Location';
+                    const badge = document.getElementById('gpsLiveBadge');
+                    if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> RECENT`;
+                    renderUserMarker();
+                    highlightUserRadius(userLocation[0], userLocation[1], currentSearchRadiusKm);
+                    generatePGsForRegion(userLocation[0], userLocation[1], "Recent Location");
+                    map.flyTo(userLocation, 14, { duration: 1.2 });
+                } else {
+                    useDeviceGPS();
+                }
+            }
         }
 
         function goToMyLocation() {
@@ -1811,7 +1878,7 @@
                     setTimeout(() => window.userMarker.openPopup(), 1200);
                 }
             } else {
-                useProfileHomeAddress();
+                useDeviceGPS();
             }
         }
 

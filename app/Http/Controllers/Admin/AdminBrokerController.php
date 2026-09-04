@@ -227,8 +227,16 @@ class AdminBrokerController extends Controller
      */
     public function show($id)
     {
+        if (empty($id) || $id === 'null' || $id === 'undefined') {
+            return response()->json(['success' => false, 'message' => 'Invalid broker ID provided.'], 400);
+        }
+
         $broker = User::with(['profile', 'properties.city', 'properties.primaryImage', 'wallet', 'relationshipManager'])
-            ->findOrFail($id);
+            ->find($id);
+
+        if (!$broker) {
+            return response()->json(['success' => false, 'message' => 'Broker partner not found.'], 404);
+        }
 
         $operatingCities = $broker->properties->pluck('city.name')->filter()->unique()->values()->implode(', ');
         if (empty($operatingCities)) {
@@ -277,11 +285,39 @@ class AdminBrokerController extends Controller
      */
     public function approve(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        if (empty($id) || $id === 'null' || $id === 'undefined') {
+            return response()->json(['success' => false, 'message' => 'Invalid broker ID provided.'], 400);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Broker not found.'], 404);
+        }
+
         $user->status = 'active';
         $user->is_active = true;
         $user->kyc_verified_at = now();
         $user->save();
+
+        // Also update uploaded documents status to verified
+        $profile = UserProfile::firstOrCreate(['user_id' => $user->id]);
+        $preferences = $profile->preferences ?? [];
+        if (!is_array($preferences)) {
+            $preferences = json_decode($preferences, true) ?? [];
+        }
+        $docs = $preferences['documents'] ?? [];
+        foreach (['id_proof', 'license_proof', 'bank_proof', 'other'] as $key) {
+            if (isset($docs[$key]) && is_array($docs[$key])) {
+                $docs[$key]['status'] = 'verified';
+                $docs[$key]['allow_reupload'] = false;
+                $docs[$key]['reviewed_at'] = now()->toDateTimeString();
+                unset($docs[$key]['rejection_reason']);
+                unset($docs[$key]['reupload_note']);
+            }
+        }
+        $preferences['documents'] = $docs;
+        $profile->preferences = $preferences;
+        $profile->save();
 
         Notification::create([
             'id' => (string) Str::uuid(),
@@ -307,7 +343,15 @@ class AdminBrokerController extends Controller
      */
     public function reject(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        if (empty($id) || $id === 'null' || $id === 'undefined') {
+            return response()->json(['success' => false, 'message' => 'Invalid broker ID provided.'], 400);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Broker not found.'], 404);
+        }
+
         $user->status = 'suspended';
         $user->is_active = false;
         $user->save();
@@ -336,7 +380,14 @@ class AdminBrokerController extends Controller
      */
     public function toggleStatus(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        if (empty($id) || $id === 'null' || $id === 'undefined') {
+            return response()->json(['success' => false, 'message' => 'Invalid broker ID provided.'], 400);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Broker not found.'], 404);
+        }
 
         if ($user->status === 'active') {
             $user->status = 'suspended';
@@ -363,7 +414,15 @@ class AdminBrokerController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        if (empty($id) || $id === 'null' || $id === 'undefined') {
+            return response()->json(['success' => false, 'message' => 'Invalid broker ID provided.'], 400);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Broker not found.'], 404);
+        }
+
         $name = $user->profile ? $user->profile->full_name : $user->email;
         $user->delete();
 

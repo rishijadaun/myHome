@@ -28,53 +28,16 @@ class BrokerProfileController extends Controller
             return redirect()->route('broker.login');
         }
 
-        // Ensure UserProfile exists with rich defaults if needed
+        // Ensure UserProfile exists
         $profile = UserProfile::firstOrCreate(
             ['user_id' => $broker->id],
             [
-                'first_name' => 'Vikram',
-                'last_name' => 'Singh',
-                'full_name' => 'Vikram Singh',
-                'company_name' => 'Singh Real Estate & PG Management',
-                'bio' => 'Experienced PG & Co-living space partner managing premium student and executive stays in Noida and Bangalore.',
-                'preferences' => [
-                    'office_address' => 'Tower B, 4th Floor, Sector 62, Noida, UP 201309',
-                    'operating_city' => 'Noida',
-                    'operating_area' => 'Sector 62, Electronic City',
-                    'gstin' => '09AAAAA0000A1Z5',
-                    'rera_number' => 'UPRERAAGT12490',
-                    'bank_details' => [
-                        'account_holder_name' => 'Vikram Singh',
-                        'bank_name' => 'HDFC Bank',
-                        'account_number' => '50100234567890',
-                        'ifsc_code' => 'HDFC0001234',
-                        'account_type' => 'current',
-                        'upi_id' => 'vikram@hdfcbank',
-                    ],
-                    'documents' => [
-                        'id_proof' => [
-                            'name' => 'Aadhar_Card_Vikram.pdf',
-                            'file_path' => '/uploads/broker_docs/sample_aadhar.pdf',
-                            'status' => 'verified',
-                            'uploaded_at' => '2025-03-10 11:30:00',
-                            'doc_number' => 'XXXX-XXXX-4892'
-                        ],
-                        'license_proof' => [
-                            'name' => 'RERA_Registration_Certificate.pdf',
-                            'file_path' => '/uploads/broker_docs/sample_rera.pdf',
-                            'status' => 'verified',
-                            'uploaded_at' => '2025-03-11 15:45:00',
-                            'doc_number' => 'UPRERAAGT12490'
-                        ],
-                        'bank_proof' => [
-                            'name' => 'Cancelled_Cheque_HDFC.pdf',
-                            'file_path' => '/uploads/broker_docs/sample_cheque.pdf',
-                            'status' => 'verified',
-                            'uploaded_at' => '2025-03-12 09:15:00',
-                            'doc_number' => '50100234567890'
-                        ]
-                    ]
-                ],
+                'first_name' => null,
+                'last_name' => null,
+                'full_name' => null,
+                'company_name' => null,
+                'bio' => null,
+                'preferences' => [],
                 'notification_settings' => [
                     'whatsapp_alerts' => true,
                     'sms_alerts' => true,
@@ -261,19 +224,14 @@ class BrokerProfileController extends Controller
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
-            $uploadPath = public_path('uploads/avatars');
-            
-            if (!File::isDirectory($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true, true);
-            }
+            $prefix = 'broker_' . Str::slug($broker->id) . '_';
+            $processed = app(\App\Services\ImageProcessingService::class)->processUpload($file, 'avatars', $prefix, [
+                'max_width' => 600,
+                'max_height' => 600,
+                'quality' => 85,
+            ]);
 
-            $ext = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'webp']) 
-                ? strtolower($file->getClientOriginalExtension()) 
-                : ($file->extension() ?: 'jpg');
-            $filename = 'broker_' . Str::slug($broker->id) . '_' . time() . '_' . Str::random(6) . '.' . $ext;
-            $file->move($uploadPath, $filename);
-
-            $avatarUrl = '/uploads/avatars/' . $filename;
+            $avatarUrl = $processed ? $processed['relative_url'] : '/uploads/avatars/default.webp';
 
             $profile = UserProfile::firstOrCreate(['user_id' => $broker->id]);
             $profile->avatar_url = $avatarUrl;
@@ -384,6 +342,33 @@ class BrokerProfileController extends Controller
             'doc_number' => ['nullable', 'string', 'max:100'],
         ]);
 
+        $profile = UserProfile::firstOrCreate(['user_id' => $broker->id]);
+        $preferences = $profile->preferences ?? [];
+        if (!is_array($preferences)) {
+            $preferences = json_decode($preferences, true) ?? [];
+        }
+
+        if (!isset($preferences['documents']) || !is_array($preferences['documents'])) {
+            $preferences['documents'] = [];
+        }
+
+        // Check if document is verified and locked from re-upload
+        $existingDoc = $preferences['documents'][$validated['doc_type']] ?? null;
+        if (!empty($existingDoc) && is_array($existingDoc)) {
+            $isVerified = ($existingDoc['status'] ?? '') === 'verified';
+            $allowReupload = !empty($existingDoc['allow_reupload']);
+
+            if ($isVerified && !$allowReupload) {
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This document is already verified and locked. Re-upload is not permitted unless authorized by an administrator.'
+                    ], 403);
+                }
+                return redirect()->route('broker.profile')->with('error', 'This document is verified and locked. Contact administrator to request re-upload permission.');
+            }
+        }
+
         $file = $request->file('document');
         $uploadPath = public_path('uploads/broker_docs');
 
@@ -400,26 +385,23 @@ class BrokerProfileController extends Controller
 
         $docUrl = '/uploads/broker_docs/' . $filename;
 
-        $profile = UserProfile::firstOrCreate(['user_id' => $broker->id]);
-        $preferences = $profile->preferences ?? [];
-        if (!is_array($preferences)) {
-            $preferences = json_decode($preferences, true) ?? [];
-        }
-
-        if (!isset($preferences['documents']) || !is_array($preferences['documents'])) {
-            $preferences['documents'] = [];
-        }
-
         $preferences['documents'][$validated['doc_type']] = [
             'name' => $originalName,
             'file_path' => $docUrl,
-            'doc_number' => $validated['doc_number'] ?? null,
+            'doc_number' => $validated['doc_number'] ?? ($existingDoc['doc_number'] ?? null),
             'status' => 'pending_review',
+            'allow_reupload' => false, // Reset permission once uploaded
             'uploaded_at' => now()->toDateTimeString(),
         ];
 
         $profile->preferences = $preferences;
         $profile->save();
+
+        // If overall KYC was verified, reset verification until admin reviews the new upload
+        if (!empty($broker->kyc_verified_at)) {
+            $broker->kyc_verified_at = null;
+            $broker->save();
+        }
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([

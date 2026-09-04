@@ -104,6 +104,29 @@
 
 @push('styles')
 <style>
+    .roommate-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .roommate-card:hover {
+        border-color: #4c30dd !important;
+        box-shadow: 0 10px 25px -4px rgba(76, 48, 221, 0.2) !important;
+        transform: translateY(-3px);
+    }
+    .roommate-btn-view {
+        background-color: #4c30dd !important;
+        color: #ffffff !important;
+        border-radius: 4px !important;
+        font-weight: 700 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 8px rgba(76, 48, 221, 0.35) !important;
+    }
+    .roommate-btn-view:hover {
+        background-color: #3d24c0 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(76, 48, 221, 0.5) !important;
+    }
     .drawer-btn {
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -215,11 +238,11 @@
                 </span>
             </button>
 
-            <!-- Post Roommate CTA Button -->
-            <a href="{{ route('user.roommate.create') }}" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 h-11 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-brand text-white rounded-2xl text-xs sm:text-sm font-bold tap-effect shadow-md shadow-brand/25 flex-shrink-0 transition no-underline">
-                <i class="fas fa-plus-circle text-sm"></i>
-                <span class="hidden sm:inline">Post Roommate</span>
-                <span class="sm:hidden">Post</span>
+            <!-- Map View CTA Button (Navigate to Explore Near Me with Roommates Tab) -->
+            <a href="{{ route('user.location', ['type' => 'roommate']) }}" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 h-11 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-brand text-white rounded-2xl text-xs sm:text-sm font-bold tap-effect shadow-md shadow-brand/25 flex-shrink-0 transition no-underline" title="Explore Roommates Near You on Map">
+                <i class="fas fa-map-location-dot text-sm"></i>
+                <span class="hidden sm:inline">Map View</span>
+                <span class="sm:hidden">Map</span>
             </a>
 
             <!-- Reset Filter Button (Desktop) -->
@@ -510,70 +533,83 @@
         @forelse($posts as $index => $post)
             @php
                 $genderPref = strtolower($post->gender_preference ?? 'any');
-                $posterGender = strtolower($post->poster_gender ?? 'male');
-                $bhkLabel = $bhkOptions[$post->bhk_type] ?? $post->bhk_type;
+                $bhkLabels = [
+                    '1rk' => '1 RK Flat',
+                    '1bhk' => '1 BHK Flat',
+                    '2bhk' => '2 BHK Flat',
+                    '3bhk' => '3 BHK Flat',
+                    '4bhk_plus' => '4+ BHK Villa',
+                    'shared_room' => 'Shared Room',
+                    'single_room' => 'Single Room',
+                    'studio' => 'Studio Room',
+                ];
+                $bhkLabel = $bhkLabels[$post->bhk_type] ?? ($bhkOptions[$post->bhk_type] ?? (str_ends_with(strtolower($post->bhk_type), 'bhk') ? strtoupper($post->bhk_type) : ucwords(str_replace('_', ' ', $post->bhk_type))));
                 $slugUrl = route('user.roommate.show', $post->slug);
                 $locationText = ($post->locality ? $post->locality . ', ' : '') . ($post->city ?: 'City Center');
                 $displayAvatar = $post->poster_avatar_url;
-                $hasAC = !empty($post->amenities['ac']);
-                $hasFridge = !empty($post->amenities['fridge']);
-                $hasWifi = !empty($post->amenities['wifi']);
-                $hasGeyser = !empty($post->amenities['geyser']);
             @endphp
-            <div class="property-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-lift group flex flex-col justify-between w-full">
+            <div class="roommate-card overflow-hidden flex flex-col justify-between h-full group">
                 <div>
-                    <!-- Top Media / Profile Banner Container -->
-                    <div class="relative h-36 sm:h-44 md:h-48 overflow-hidden w-full bg-gradient-to-br from-slate-950 via-teal-950 to-gray-900 flex flex-col items-center justify-center p-3 text-center {{ $displayAvatar ? 'skeleton-shimmer' : '' }}">
+                    <!-- Top Media Banner (0 padding, full bleed, no room badge) -->
+                    <div class="relative h-44 sm:h-52 w-full p-0 m-0 overflow-hidden bg-gradient-to-br from-slate-950 to-[#1b104a] flex flex-col items-center justify-center text-center {{ $displayAvatar ? 'skeleton-shimmer' : '' }}">
                         @if($displayAvatar)
-                            <img src="{{ $displayAvatar }}" alt="{{ $post->poster_name }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90" loading="lazy" onload="this.parentElement.classList.remove('skeleton-shimmer')">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                            <img src="{{ $displayAvatar }}" alt="{{ $post->poster_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 block p-0 m-0" loading="lazy" decoding="async" onload="this.parentElement.classList.remove('skeleton-shimmer')">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
                         @else
-                            {{-- Decorative abstract background glow --}}
-                            <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-brand/20 blur-xl"></div>
-                            <div class="absolute -left-6 -top-6 w-24 h-24 rounded-full bg-teal-500/20 blur-xl"></div>
-                            
                             {{-- Central Profile Avatar Tile --}}
-                            <div class="relative z-10 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <div class="relative z-10 w-14 h-14 sm:w-16 sm:h-16 bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                                 <span class="text-3xl sm:text-4xl">{{ $post->gender_icon }}</span>
                             </div>
                         @endif
 
-                        <!-- Top-Left Status Badge -->
-                        <div class="absolute top-2 left-2 bg-emerald-500/90 text-white text-[8px] font-black px-2 py-0.5 rounded-lg z-20 uppercase">ROOM</div>
+                        <!-- Top-Right Gender Preference (Pink for Girls, Blue for Boys, Purple for Any) -->
+                        <div class="absolute top-2.5 right-2.5 {{ in_array($genderPref, ['female', 'girls']) ? 'bg-pink-600' : (in_array($genderPref, ['male', 'boys']) ? 'bg-blue-600' : 'bg-[#4c30dd]') }} text-white text-[9px] font-extrabold px-2.5 py-0.5 shadow-xs z-20" style="{{ !in_array($genderPref, ['female', 'girls', 'male', 'boys']) ? 'background-color: #4c30dd !important;' : '' }}">
+                            {{ in_array($genderPref, ['female', 'girls']) ? '👩 Girls Only' : (in_array($genderPref, ['male', 'boys']) ? '👨 Boys Only' : '🧑 Any') }}
+                        </div>
 
-                        <!-- Bottom-Left Move-in Badge -->
-                        <div class="absolute bottom-2 left-2 bg-black/65 backdrop-blur-md text-white text-[8px] px-2 py-0.5 rounded-lg z-20">
+                        <!-- Bottom-Left Move-in Date -->
+                        <div class="absolute bottom-2 left-2.5 bg-black/75 backdrop-blur-md text-white text-[9px] font-medium px-2 py-0.5 z-20">
+                            <i class="fas fa-calendar-day text-[#a594fd] text-[8px] mr-1"></i>
                             <span>{{ $post->move_in_date ? $post->move_in_date->format('d M') : 'Immediate' }}</span>
                         </div>
                     </div>
 
-                    <!-- Content Body -->
-                    <div class="p-2.5 sm:p-3.5 md:p-4">
+                    <!-- Content Details -->
+                    <div class="p-3 sm:p-4">
                         <div class="flex items-center justify-between gap-1 mb-1">
-                            <a href="{{ $slugUrl }}" class="font-extrabold text-xs sm:text-sm md:text-base text-gray-900 group-hover:text-brand transition truncate block">
+                            <a href="{{ $slugUrl }}" class="font-extrabold text-sm sm:text-base text-gray-900 group-hover:text-[#4c30dd] transition truncate block no-underline">
                                 {{ $post->poster_name }}
                             </a>
+                            <i class="fas fa-circle-check text-xs flex-shrink-0" style="color: #4c30dd !important;" title="Verified Member"></i>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-gray-500 truncate flex items-center gap-1">
-                            <i class="fas fa-map-marker-alt text-brand text-[10px] shrink-0"></i>
+
+                        <p class="text-[10px] sm:text-xs text-gray-500 truncate flex items-center gap-1 mb-2">
+                            <i class="fas fa-map-marker-alt text-[10px] shrink-0" style="color: #4c30dd !important;"></i>
                             <span class="truncate">{{ $locationText }}</span>
                         </p>
-                        <div class="mt-1.5 flex items-center gap-1.5 flex-wrap">
-                            <span class="text-[10px] sm:text-[11px] font-extrabold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-[9px] sm:text-[11px] font-extrabold px-2 py-0.5" style="background-color: #f3f0ff !important; color: #4c30dd !important; border: 1px solid rgba(76, 48, 221, 0.25) !important;">
                                 {{ $bhkLabel }}
                             </span>
+                            @if($post->profession)
+                                <span class="text-[9px] sm:text-[10px] font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 truncate max-w-[100px]">
+                                    {{ $post->profession }}
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
 
-                <!-- Card Footer (Rent & Direct CTA) -->
-                <div class="p-2.5 sm:p-3.5 md:p-4 pt-0 border-t border-gray-50 flex items-center justify-between gap-1 mt-auto">
+                <!-- Card Footer with High Visibility #4c30dd View Button -->
+                <div class="p-3 sm:p-4 pt-0 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
                     <div>
-                        <span class="text-[9px] text-gray-400 uppercase font-bold block">Rent</span>
-                        <span class="text-xs sm:text-sm md:text-base font-black text-gray-900">{{ $post->budget_range }}</span>
+                        <span class="text-[8px] sm:text-[9px] text-gray-400 uppercase font-bold block">Rent Budget</span>
+                        <span class="text-xs sm:text-sm font-black text-gray-900">{{ $post->budget_range }}</span>
                     </div>
-                    <a href="{{ $slugUrl }}" class="bg-gray-900 hover:bg-brand text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition tap-effect flex items-center gap-1 no-underline shadow-xs">
+                    <a href="{{ $slugUrl }}" class="roommate-btn-view px-3.5 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold tap-effect flex items-center gap-1.5 no-underline">
                         <span>View</span>
+                        <i class="fas fa-arrow-right text-[9px]"></i>
                     </a>
                 </div>
             </div>

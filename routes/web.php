@@ -3,6 +3,7 @@
 use App\Http\Controllers\User\UserHomeController;
 use App\Http\Controllers\User\RoommateController;
 use App\Http\Controllers\User\UserProfileController;
+use App\Http\Controllers\User\UserBookingController;
 
 Route::get('/', [UserHomeController::class, 'index'])->name('user.home');
 
@@ -17,6 +18,7 @@ use App\Http\Controllers\Admin\AdminContactController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminBookingController;
 use App\Http\Controllers\Admin\AdminRoommateController;
+use App\Http\Controllers\Admin\AdminBrokerKycController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Guest Admin Routes
@@ -77,6 +79,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/brokers/{id}/assign-rm', [AdminRelationshipManagerController::class, 'assignBroker'])->name('brokers.assign-rm');
         Route::post('/brokers/bulk-assign-rm', [AdminRelationshipManagerController::class, 'bulkAssign'])->name('brokers.bulk-assign-rm');
         Route::post('/brokers/auto-assign-rm', [AdminRelationshipManagerController::class, 'autoAssignByZone'])->name('brokers.auto-assign-rm');
+
+        // Manage Partner Broker KYC & Verification Center
+        Route::get('/broker-kyc', [AdminBrokerKycController::class, 'index'])->name('broker-kyc.index');
+        Route::get('/broker-kyc/{id}', [AdminBrokerKycController::class, 'show'])->name('broker-kyc.show');
+        Route::post('/broker-kyc/{id}/approve', [AdminBrokerKycController::class, 'approve'])->name('broker-kyc.approve');
+        Route::post('/broker-kyc/{id}/reject', [AdminBrokerKycController::class, 'reject'])->name('broker-kyc.reject');
+        Route::post('/broker-kyc/{id}/verify-doc', [AdminBrokerKycController::class, 'verifyDoc'])->name('broker-kyc.verify-doc');
+        Route::post('/broker-kyc/{id}/toggle-reupload', [AdminBrokerKycController::class, 'toggleReupload'])->name('broker-kyc.toggle-reupload');
+        Route::post('/broker-kyc/bulk-action', [AdminBrokerKycController::class, 'bulkAction'])->name('broker-kyc.bulk-action');
 
         // Relationship Managers Team Management
         Route::get('/relationship-managers', [AdminRelationshipManagerController::class, 'index'])->name('relationship-managers.index');
@@ -163,10 +174,13 @@ Route::prefix('broker')->name('broker.')->group(function () {
     });
 });
 
-use App\Http\Controllers\User\UserBookingController;
-
 Route::get('/explore-near-me', [UserHomeController::class, 'location'])->name('user.location');
 Route::permanentRedirect('/location', '/explore-near-me');
+Route::view('/login', 'user.login')->name('login');
+
+// Google OAuth Login & Callback Routes
+Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 // Public User Routes
 Route::name('user.')->group(function () {
@@ -245,6 +259,9 @@ Route::name('user.')->group(function () {
     })->name('profile');
     Route::post('/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('profile.avatar');
     Route::post('/profile/update', [UserProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/phone', [UserProfileController::class, 'updatePhone'])->name('profile.phone');
+    Route::post('/profile/email/request-otp', [UserProfileController::class, 'requestEmailOtp'])->name('profile.email.request-otp')->middleware('throttle:6,1');
+    Route::post('/profile/email/verify-otp', [UserProfileController::class, 'verifyEmailOtp'])->name('profile.email.verify-otp')->middleware('throttle:10,1');
     Route::view('/pricing', 'user.pricing')->name('pricing');
     Route::view('/about-us', 'user.about')->name('about_us');
     Route::view('/about-us', 'user.about')->name('about');

@@ -18,6 +18,14 @@
             <i class="fas fa-users-cog text-brand"></i> RM Team ({{ $relationshipManagers->count() }})
         </button>
 
+        <!-- KYC Document Verifications Center Link -->
+        <a 
+            href="{{ route('admin.broker-kyc.index') }}" 
+            class="bg-teal-50 hover:bg-teal-100 text-teal-800 px-4 py-2.5 rounded-xl text-xs font-bold tap-effect flex items-center gap-2 border border-teal-200 transition cursor-pointer"
+        >
+            <i class="fas fa-id-card-clip text-teal-600"></i> KYC Verifications
+        </a>
+
         <!-- Auto-Assign by Zone Button -->
         <button 
             onclick="triggerAutoAssignRm()" 

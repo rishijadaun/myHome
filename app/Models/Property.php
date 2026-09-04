@@ -154,18 +154,6 @@ class Property extends Model
         ];
     }
 
-    public function getDisplayImageUrlAttribute(): string
-    {
-        if ($this->primaryImage && !empty($this->primaryImage->image_url)) {
-            return $this->primaryImage->image_url;
-        }
-        $first = $this->images->first();
-        if ($first && !empty($first->image_url)) {
-            return $first->image_url;
-        }
-        return 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
-    }
-
     public function getGenderTypeMetaAttribute(): array
     {
         $typeSlug = strtolower($this->propertyType?->slug ?? '');
@@ -255,6 +243,38 @@ class Property extends Model
             return '₹' . number_format(round($price / $sqft)) . '/sq ft';
         }
         return null;
+    }
+
+    /**
+     * Get primary or fallback display image URL.
+     */
+    public function getDisplayImageUrlAttribute(): string
+    {
+        if ($this->relationLoaded('primaryImage') && $this->primaryImage) {
+            return $this->primaryImage->image_url;
+        }
+        if ($this->relationLoaded('images') && $this->images->isNotEmpty()) {
+            return $this->images->first()->image_url;
+        }
+        return $this->primaryImage?->image_url 
+            ?? $this->images?->first()?->image_url 
+            ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80';
+    }
+
+    /**
+     * Get responsive WebP thumbnail URL for cards and grid layouts.
+     */
+    public function getDisplayThumbnailUrlAttribute(): string
+    {
+        if ($this->relationLoaded('primaryImage') && $this->primaryImage) {
+            return $this->primaryImage->thumbnail_url;
+        }
+        if ($this->relationLoaded('images') && $this->images->isNotEmpty()) {
+            return $this->images->first()->thumbnail_url;
+        }
+        return $this->primaryImage?->thumbnail_url 
+            ?? $this->images?->first()?->thumbnail_url 
+            ?? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=450&q=80';
     }
 
     protected function casts(): array

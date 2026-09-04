@@ -63,8 +63,8 @@ class UserHomeController extends Controller
             'roommate' => $totalRoommates,
         ];
 
-        // 3. PG Sections (Main Priority)
-        $nearMeProperties = $pgProperties->take(20);
+        // 3. PG Sections (Main Priority) - Strictly 8 curated stays for optimal Core Web Vitals
+        $nearMeProperties = $pgProperties->take(8);
 
         // Recommended for You: Strictly 4 list only on home page
         $recommendedProperties = $pgProperties->filter(function ($p) {
@@ -95,18 +95,18 @@ class UserHomeController extends Controller
 
         $recentProperties = $pgProperties->take(4);
 
-        // 4. Flat / House Sections: Strictly 8 list only on home page
-        $flatNearMe = $flatProperties->take(8);
+        // 4. Flat / House Sections: Strictly 4 list only on home page
+        $flatNearMe = $flatProperties->take(4);
         $flatRecommended = $flatProperties->filter(function ($p) {
             return (bool) $p->is_recommended || (bool) $p->featured;
-        })->take(8)->values();
+        })->take(4)->values();
         $flatFeatured = $flatRecommended;
 
-        // 5. Commercial Sections: Strictly new 8 list only on home page
-        $commercialNearMe = $commercialProperties->take(8);
+        // 5. Commercial Sections: Strictly 4 list only on home page
+        $commercialNearMe = $commercialProperties->take(4);
         $commercialRecommended = $commercialProperties->filter(function ($p) {
             return (bool) $p->is_recommended || (bool) $p->featured;
-        })->take(8)->values();
+        })->take(4)->values();
         $commercialFeatured = $commercialRecommended;
 
         // 6. Selected Active Property Type (default 'pg-hostel')

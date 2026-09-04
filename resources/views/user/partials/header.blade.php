@@ -19,7 +19,8 @@
             $headerRoleBadge = 'BROKER';
         } else {
             $headerProfileUrl = route('user.profile');
-            $headerProfileLabel = $authUser->profile?->first_name ?? 'My Profile';
+            $rawProfileName = $authUser->profile?->first_name ?? $authUser->name ?? 'My Profile';
+            $headerProfileLabel = mb_strlen($rawProfileName) > 20 ? mb_substr($rawProfileName, 0, 20) . '..' : $rawProfileName;
             $headerProfileIcon = 'fa-user-check';
             $headerRoleBadge = 'TENANT';
         }
@@ -221,58 +222,73 @@
 <script>
     // Check Client-Side Token State on Page Load
     document.addEventListener('DOMContentLoaded', function() {
-        const token = localStorage.getItem('staynest_token');
-        const userStr = localStorage.getItem('staynest_user');
-        
-        if (token && userStr) {
-            try {
-                const user = JSON.parse(userStr);
-                const guestBox = document.getElementById('clientGuestState');
-                const authBox = document.getElementById('clientAuthState');
-                const nameLabel = document.getElementById('clientUserName');
-                const roleBadge = document.getElementById('clientRoleBadge');
-                const profileIcon = document.getElementById('clientProfileIcon');
-                const clientProfileLink = document.getElementById('clientProfileLink');
-                const mobProfileLink = document.getElementById('mobProfileLink');
-                const bottomNavProfileLink = document.getElementById('bottomNavProfileLink');
-                const postPropertyBtn = document.getElementById('headerPostPropertyBtn');
-                
-                let targetUrl = "{{ route('user.profile') }}";
-                let displayTitle = user.first_name || "My Profile";
-                let badgeText = "TENANT";
-                let iconClass = "fa-user-check";
+        @if(!Auth::check())
+            // Server session is not authenticated (logged out / guest)
+            // Clear any stale tokens/user profile from localStorage to prevent showing old user name
+            localStorage.removeItem('staynest_token');
+            localStorage.removeItem('staynest_user');
+            
+            const guestBox = document.getElementById('clientGuestState');
+            const authBox = document.getElementById('clientAuthState');
+            if (guestBox) guestBox.classList.remove('hidden');
+            if (authBox) authBox.classList.add('hidden');
+        @else
+            // User is authenticated on the server
+            const token = localStorage.getItem('staynest_token');
+            const userStr = localStorage.getItem('staynest_user');
+            
+            if (token && userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    const nameLabel = document.getElementById('clientUserName');
+                    const roleBadge = document.getElementById('clientRoleBadge');
+                    const profileIcon = document.getElementById('clientProfileIcon');
+                    const clientProfileLink = document.getElementById('clientProfileLink');
+                    const mobProfileLink = document.getElementById('mobProfileLink');
+                    const bottomNavProfileLink = document.getElementById('bottomNavProfileLink');
+                    const postPropertyBtn = document.getElementById('headerPostPropertyBtn');
+                    
+                    let targetUrl = "{{ route('user.profile') }}";
+                    let rawName = user.first_name || user.name || "My Profile";
+                    let displayTitle = rawName;
+                    let badgeText = "TENANT";
+                    let iconClass = "fa-user-check";
 
-                const role = (user.role || '').toLowerCase();
-                if (role === 'admin' || role === 'super_admin') {
-                    targetUrl = "{{ route('admin.dashboard') }}";
-                    displayTitle = "Dashboard";
-                    badgeText = "ADMIN";
-                    iconClass = "fa-shield-halved";
-                } else if (role === 'broker') {
-                    targetUrl = "{{ route('broker.dashboard') }}";
-                    displayTitle = "Dashboard";
-                    badgeText = "BROKER";
-                    iconClass = "fa-gauge-high";
-                } else {
-                    // Tenant login: Hide Post Property Free button
-                    if (postPropertyBtn) {
-                        postPropertyBtn.style.display = 'none';
+                    const role = (user.role || '').toLowerCase();
+                    if (role === 'admin' || role === 'super_admin') {
+                        targetUrl = "{{ route('admin.dashboard') }}";
+                        displayTitle = "Dashboard";
+                        badgeText = "ADMIN";
+                        iconClass = "fa-shield-halved";
+                    } else if (role === 'broker') {
+                        targetUrl = "{{ route('broker.dashboard') }}";
+                        displayTitle = "Dashboard";
+                        badgeText = "BROKER";
+                        iconClass = "fa-gauge-high";
+                    } else {
+                        // Tenant login: Hide Post Property Free button
+                        if (postPropertyBtn) {
+                            postPropertyBtn.style.display = 'none';
+                        }
                     }
-                }
 
-                if (clientProfileLink) clientProfileLink.href = targetUrl;
-                if (mobProfileLink) mobProfileLink.href = targetUrl;
-                if (bottomNavProfileLink) bottomNavProfileLink.href = targetUrl;
+                    if (displayTitle && displayTitle.length > 20) {
+                        displayTitle = displayTitle.substring(0, 20) + '..';
+                    }
 
-                if (guestBox && authBox) {
-                    guestBox.classList.add('hidden');
-                    authBox.classList.remove('hidden');
-                    if (nameLabel) nameLabel.innerText = displayTitle;
+                    if (clientProfileLink) clientProfileLink.href = targetUrl;
+                    if (mobProfileLink) mobProfileLink.href = targetUrl;
+                    if (bottomNavProfileLink) bottomNavProfileLink.href = targetUrl;
+
+                    if (nameLabel) {
+                        nameLabel.innerText = displayTitle;
+                        nameLabel.title = rawName;
+                    }
                     if (roleBadge) roleBadge.innerText = badgeText;
                     if (profileIcon) profileIcon.className = 'fas ' + iconClass;
-                }
-            } catch(e) {}
-        }
+                } catch(e) {}
+            }
+        @endif
     });
 
     async function performLogout() {

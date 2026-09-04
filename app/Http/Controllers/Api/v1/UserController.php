@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\ApiResponse;
+use App\Mail\EmailVerificationOtpMail;
 use App\Models\Booking;
 use App\Models\Notification;
 use App\Models\PropertyVisit;
@@ -300,10 +301,23 @@ class UserController extends Controller
             'created_at' => now()->timestamp,
         ], now()->addMinutes(10));
 
-        return $this->success('Verification code sent to your new email address! Please verify with the 6-digit OTP.', [
+        // Attempt sending email OTP via high-deliverability Mailable
+        try {
+            $recipientName = $user->profile?->first_name ?: ($user->name ?: 'Resident');
+            \Illuminate\Support\Facades\Mail::to($newEmail)->send(new EmailVerificationOtpMail($otp, $recipientName));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Email OTP delivery failed: ' . $e->getMessage());
+            if (config('mail.default') === 'smtp' && config('app.debug')) {
+                return $this->error('Failed to send email via SMTP: ' . $e->getMessage() . '. Please check .env credentials.', [], 500);
+            }
+        }
+
+        $payload = [
             'new_email' => $newEmail,
             'expires_in' => '10 minutes',
-        ]);
+        ];
+
+        return $this->success('Verification code sent to your new email address! Please verify with the 6-digit OTP.', $payload);
     }
 
     /**
@@ -369,6 +383,39 @@ class UserController extends Controller
         return $this->success('Registered email updated successfully in database!', [
             'user' => [
                 'id' => $user->id,
+                'email' => $user->email,
+                'phone' => $user->phone,
+            ]
+        ]);
+    }
+
+    /**
+     * Update Registered Mobile Number in Database
+     */
+    public function updatePhone(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'phone' => ['required', 'string', 'min:10', 'max:20', 'unique:users,phone,' . $user->id],
+        ], [
+            'phone.required' => 'Please enter your mobile number.',
+            'phone.min'      => 'Mobile number must be at least 10 digits.',
+            'phone.unique'   => 'This phone number is already in use by another account.',
+        ]);
+
+        $cleanPhone = trim($validated['phone']);
+        $digitsOnly = preg_replace('/[^0-9]/', '', $cleanPhone);
+        if (strlen($digitsOnly) === 10) {
+            $cleanPhone = $digitsOnly;
+        }
+
+        $user->phone = $cleanPhone;
+        $user->save();
+
+        return $this->success('Mobile number updated successfully in database!', [
+            'user' => [
+                'id'    => $user->id,
                 'email' => $user->email,
                 'phone' => $user->phone,
             ]

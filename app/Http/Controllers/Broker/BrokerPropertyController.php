@@ -9,6 +9,7 @@ use App\Models\Notification;
 use App\Models\Property;
 use App\Models\PropertyImage;
 use App\Models\PropertyType;
+use App\Services\ImageProcessingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -319,16 +320,13 @@ class BrokerPropertyController extends Controller
             'total_reviews' => 0,
         ]);
 
-        // Handle Image Upload or URL
+        // Handle Image Upload with WebP Conversion & Thumbnail Generation
         $imageUrl = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $ext = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'webp']) 
-                ? strtolower($file->getClientOriginalExtension()) 
-                : ($file->extension() ?: 'jpg');
-            $fileName = 'pg_' . time() . '_' . Str::random(8) . '.' . $ext;
-            $file->move(public_path('uploads/property_images'), $fileName);
-            $imageUrl = asset('uploads/property_images/' . $fileName);
+            $processed = app(ImageProcessingService::class)->processUpload($request->file('image'), 'property_images', 'pg_');
+            if ($processed) {
+                $imageUrl = $processed['relative_url'];
+            }
         } elseif (!empty($validated['image_url'])) {
             $imageUrl = $validated['image_url'];
         }

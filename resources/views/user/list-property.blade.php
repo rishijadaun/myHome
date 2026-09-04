@@ -247,6 +247,55 @@
         color: white;
         font-size: 10px;
     }
+
+    /* ===================== STEPPER PROGRESS BAR & NODES ===================== */
+    .stepper-progress-track {
+        position: absolute;
+        left: 20px;
+        right: 20px;
+        top: 24px;
+        height: 4px;
+        background-color: #e2e8f0;
+        border-radius: 9999px;
+        z-index: 1;
+        pointer-events: none;
+    }
+    @media (min-width: 640px) {
+        .stepper-progress-track {
+            left: 48px;
+            right: 48px;
+        }
+    }
+    .stepper-progress-fill {
+        height: 100%;
+        background-color: #4bb59d;
+        border-radius: 9999px;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .stepper-node {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .stepper-node.active, .stepper-node.completed {
+        background-color: #4bb59d !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(75, 181, 157, 0.35) !important;
+    }
+    .stepper-node.inactive {
+        background-color: #f1f5f9 !important;
+        color: #334155 !important;
+        border: 1px solid #e2e8f0 !important;
+    }
 </style>
 @endpush
 
@@ -329,43 +378,43 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Stepper Navigation -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
-            <div class="flex items-center justify-between max-w-4xl mx-auto relative">
-                <!-- Progress Line -->
-                <div class="absolute left-0 top-1/3 -translate-y-1/2 w-full h-1 bg-gray-100 z-0">
-                    <div id="progress-bar-fill" class="h-full bg-brand transition-all duration-500" style="width: 25%;"></div>
+        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 p-5 sm:p-7 mb-8">
+            <div class="flex items-start justify-between max-w-4xl mx-auto relative">
+                <!-- Progress Line Behind Circles (Always visible) -->
+                <div class="stepper-progress-track">
+                    <div id="progress-bar-fill" class="stepper-progress-fill" style="width: 29%;"></div>
                 </div>
 
                 <!-- Step 1 -->
-                <div class="relative z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(1)">
-                    <div id="step-node-1" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-brand text-white shadow-md transition-all">
+                <div class="relative z-10 flex flex-col items-center cursor-pointer flex-1 text-center" onclick="goToStep(1)">
+                    <div id="step-node-1" class="stepper-node active">
                         1
                     </div>
-                    <span class="text-xs font-semibold text-gray-800 mt-2 hidden sm:block">Listing Type & Location</span>
+                    <span id="step-label-1" class="block text-xs sm:text-sm font-bold text-slate-800 mt-3 text-center tracking-tight">Listing Type &amp; Location</span>
                 </div>
 
                 <!-- Step 2 -->
-                <div class="relative z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(2)">
-                    <div id="step-node-2" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-600 transition-all">
+                <div class="relative z-10 flex flex-col items-center cursor-pointer flex-1 text-center" onclick="goToStep(2)">
+                    <div id="step-node-2" class="stepper-node inactive">
                         2
                     </div>
-                    <span class="text-xs font-semibold text-gray-500 mt-2 hidden sm:block">Rooms & Amenities</span>
+                    <span id="step-label-2" class="block text-xs sm:text-sm font-bold text-slate-500 mt-3 text-center tracking-tight">Rooms &amp; Amenities</span>
                 </div>
 
                 <!-- Step 3 -->
-                <div class="relative z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(3)">
-                    <div id="step-node-3" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-600 transition-all">
+                <div class="relative z-10 flex flex-col items-center cursor-pointer flex-1 text-center" onclick="goToStep(3)">
+                    <div id="step-node-3" class="stepper-node inactive">
                         3
                     </div>
-                    <span class="text-xs font-semibold text-gray-500 mt-2 hidden sm:block">Pricing & Photos</span>
+                    <span id="step-label-3" class="block text-xs sm:text-sm font-bold text-slate-500 mt-3 text-center tracking-tight">Pricing &amp; Photos</span>
                 </div>
 
                 <!-- Step 4 -->
-                <div class="relative z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(4)">
-                    <div id="step-node-4" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-600 transition-all">
+                <div class="relative z-10 flex flex-col items-center cursor-pointer flex-1 text-center" onclick="goToStep(4)">
+                    <div id="step-node-4" class="stepper-node inactive">
                         4
                     </div>
-                    <span class="text-xs font-semibold text-gray-500 mt-2 hidden sm:block">Owner & Submit</span>
+                    <span id="step-label-4" class="block text-xs sm:text-sm font-bold text-slate-500 mt-3 text-center tracking-tight">Owner &amp; Submit</span>
                 </div>
             </div>
         </div>
@@ -471,22 +520,22 @@
                             <!-- Zepto / Blinkit Style Selected Location Summary Card (as in Location & Profile) -->
                             <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl p-4 sm:p-5 border border-emerald-200/80 mb-6 shadow-xs relative overflow-hidden">
                                 <div class="flex items-center justify-between mb-3">
-                                    <span class="bg-brand text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase" id="addrBadgeTag">📍 VERIFIED HOME ADDRESS</span>
+                                    <span class="bg-brand text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase" id="addrBadgeTag">📍 PROPERTY LOCATION</span>
                                     <button type="button" onclick="openLocationModal(false)" class="text-xs font-bold text-brand hover:text-brand-dark flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-brand/30 shadow-2xs">
                                         <i class="fas fa-pen text-[10px]"></i> Edit Map
                                     </button>
                                 </div>
-                                <p class="text-xs sm:text-sm font-bold text-gray-900 leading-snug" id="locSummaryLine1">Sector 62, Noida</p>
-                                <p class="text-xs text-gray-600 mt-0.5 truncate" id="locSummaryLine2">Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309</p>
+                                <p class="text-xs sm:text-sm font-bold text-gray-900 leading-snug" id="locSummaryLine1">Location Not Set</p>
+                                <p class="text-xs text-gray-600 mt-0.5 truncate" id="locSummaryLine2">Click 'Use Current GPS Location' or 'Edit Map' to pinpoint property location</p>
                                 
                                 <div class="mt-4 pt-3 border-t border-emerald-200/60 flex flex-col sm:flex-row items-center justify-between gap-2.5">
                                     <button type="button" id="useCurrentGpsBtn" onclick="useCurrentGpsDirect(this)" class="w-full sm:flex-1 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-slate-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-brand/20 transition tap-effect">
                                         <i class="fas fa-crosshairs" id="useCurrentGpsIcon"></i>
                                         <span id="useCurrentGpsText">Use Current GPS Location</span>
                                     </button>
-                                    <button type="button" onclick="useVerifiedHomeAddressDirect()" class="w-full sm:w-auto bg-white border border-brand/40 hover:bg-brand-light text-brand font-extrabold py-2.5 px-3.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs transition tap-effect whitespace-nowrap">
+                                    <button type="button" id="useVerifiedHomeBtn" onclick="useVerifiedHomeAddressDirect()" class="w-full sm:w-auto bg-white border border-brand/40 hover:bg-brand-light text-brand font-extrabold py-2.5 px-3.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs transition tap-effect whitespace-nowrap">
                                         <i class="fas fa-house-user"></i>
-                                        <span>Verified Home (Sector 62)</span>
+                                        <span id="verifiedHomeBtnText">Use Saved Address</span>
                                     </button>
                                 </div>
                             </div>
@@ -712,8 +761,8 @@
                                 </div>
                             </div>
 
-                            <!-- Entire Property Fully Booked Toggle -->
-                            <div class="mt-4 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/90 flex items-center justify-between">
+                            <!-- Entire Property Fully Booked Toggle (Visible only in Edit Listing mode) -->
+                            <div id="fullyBookedToggleContainer" class="hidden mt-4 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/90 flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm flex-shrink-0 shadow-sm">
                                         <i class="fas fa-lock"></i>
@@ -1216,11 +1265,11 @@
                                     <p class="text-xs text-gray-500 mt-0.5">Select multiple photos at once. Click any photo to set it as Cover.</p>
                                 </div>
                                 <span id="photoCountBadge" class="bg-brand/10 text-brand text-xs font-bold px-3 py-1 rounded-full">
-                                    0 Photos Added
+                                    0 / 10 Photos Added
                                 </span>
                             </div>
 
-                            <!-- Dropzone Box (Allows Multiple file selection) -->
+                            <!-- Dropzone Box (Allows Multiple file selection, Maximum 10 photos) -->
                             <div onclick="document.getElementById('photoInput').click()" 
                                  ondragover="event.preventDefault(); this.classList.add('border-brand', 'bg-brand-50/20');"
                                  ondragleave="this.classList.remove('border-brand', 'bg-brand-50/20');"
@@ -1230,8 +1279,8 @@
                                 <div class="w-14 h-14 bg-brand/10 text-brand rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                 </div>
-                                <div class="text-sm font-bold text-gray-800 mb-1">Click to select multiple photos or drag & drop</div>
-                                <div class="text-xs text-gray-500">Supports JPG, PNG, WEBP (Add as many photos as you want, max 5MB each)</div>
+                                <div class="text-sm font-bold text-gray-800 mb-1">Click to select photos or drag & drop</div>
+                                <div class="text-xs text-gray-500">Supports JPG, PNG, WEBP (Maximum 10 photos only, max 5MB each)</div>
                             </div>
 
                             <!-- Or Add Photo via URL -->
@@ -1619,7 +1668,7 @@
 
                 <div class="bg-slate-900/90 text-white px-3 py-1.5 flex items-center justify-between text-[11px]">
                     <span id="mapStatusText">💡 Drag pin or click map to set location</span>
-                    <span id="mapCoordinatesBadge" class="text-gray-300 font-mono text-[10px]">Lat: 28.6280, Lng: 77.3649</span>
+                    <span id="mapCoordinatesBadge" class="text-gray-300 font-mono text-[10px]">Lat: --, Lng: --</span>
                 </div>
             </div>
 
@@ -2080,44 +2129,51 @@
         loadCachedLocationToForm();
     }
 
-    // Load verified home address / current location (like in location & profile pages)
+    // Load verified saved home address / current location if exists
     function loadCachedLocationToForm() {
-        let city = 'Noida';
-        let area = 'Sector 62';
-        let fullAddress = 'Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309';
-        let pincode = '201309';
-        let landmark = 'Near Electronic City Metro';
-        let lat = 28.6280;
-        let lng = 77.3649;
-        let tag = 'VERIFIED HOME ADDRESS';
+        let city = '';
+        let area = '';
+        let fullAddress = '';
+        let pincode = '';
+        let landmark = '';
+        let lat = null;
+        let lng = null;
+        let tag = null;
 
         // Check if staynest_default_address is saved from Profile or Location page
         try {
             const saved = localStorage.getItem('staynest_default_address');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                if (parsed.line1 || parsed.line2) {
-                    fullAddress = [parsed.line1, parsed.line2].filter(Boolean).join(', ');
-                    tag = parsed.tag === 'HOME' ? 'VERIFIED HOME ADDRESS' : (parsed.tag ? `VERIFIED ${parsed.tag}` : 'VERIFIED HOME ADDRESS');
+                if (parsed.line1 || parsed.line2 || parsed.fullAddress) {
+                    fullAddress = parsed.fullAddress || [parsed.line1, parsed.line2].filter(Boolean).join(', ');
+                    tag = parsed.tag === 'HOME' ? 'SAVED HOME ADDRESS' : (parsed.tag ? `SAVED ${parsed.tag}` : 'SAVED ADDRESS');
+                    if (parsed.lat) lat = parseFloat(parsed.lat);
+                    if (parsed.lng) lng = parseFloat(parsed.lng);
+                    if (parsed.city) city = parsed.city;
+                    if (parsed.area) area = parsed.area;
+                    if (parsed.pincode) pincode = parsed.pincode;
+                    if (parsed.landmark) landmark = parsed.landmark;
                 }
             }
         } catch(e) {}
 
-        const cachedCity = localStorage.getItem('user_cached_city');
-        const cachedArea = localStorage.getItem('user_cached_area');
-        const cachedAddr = localStorage.getItem('user_cached_address');
-        const cachedPin = localStorage.getItem('user_cached_pin');
-        const cachedLat = parseFloat(localStorage.getItem('user_cached_lat'));
-        const cachedLng = parseFloat(localStorage.getItem('user_cached_lng'));
+        if (!fullAddress) {
+            const cachedCity = localStorage.getItem('user_cached_city');
+            const cachedArea = localStorage.getItem('user_cached_area');
+            const cachedAddr = localStorage.getItem('user_cached_address');
+            const cachedPin = localStorage.getItem('user_cached_pin');
+            const cachedLat = parseFloat(localStorage.getItem('user_cached_lat'));
+            const cachedLng = parseFloat(localStorage.getItem('user_cached_lng'));
 
-        // Prevent ISP broadband Delhi fallback from overriding verified Noida address
-        if (cachedCity && cachedCity !== 'Delhi' && cachedCity !== 'Connaught Place') city = cachedCity;
-        if (cachedArea && cachedArea !== 'Connaught Place' && cachedArea !== 'Delhi') area = cachedArea;
-        if (cachedAddr && !cachedAddr.includes('Connaught Place')) fullAddress = cachedAddr;
-        if (cachedPin) pincode = cachedPin;
-        if (!isNaN(cachedLat) && cachedLat !== 0 && cachedLat > 28.5 && cachedLat < 28.7 && cachedLng > 77.3 && cachedLng < 77.5) {
-            lat = cachedLat;
-            lng = cachedLng;
+            if (cachedCity) city = cachedCity;
+            if (cachedArea) area = cachedArea;
+            if (cachedAddr) fullAddress = cachedAddr;
+            if (cachedPin) pincode = cachedPin;
+            if (!isNaN(cachedLat) && cachedLat !== 0) {
+                lat = cachedLat;
+                lng = cachedLng;
+            }
         }
 
         const pCity = document.getElementById('propCity');
@@ -2128,27 +2184,33 @@
         const pLat = document.getElementById('propLatitude');
         const pLng = document.getElementById('propLongitude');
 
-        if (pCity && !pCity.value.trim()) pCity.value = city;
-        if (pArea && !pArea.value.trim()) pArea.value = area;
-        if (pAddr && !pAddr.value.trim()) pAddr.value = fullAddress;
-        if (pPin && !pPin.value.trim()) pPin.value = pincode;
-        if (pLand && !pLand.value.trim()) pLand.value = landmark;
-        if (pLat && !pLat.value) pLat.value = lat;
-        if (pLng && !pLng.value) pLng.value = lng;
+        if (fullAddress) {
+            if (pCity && !pCity.value.trim() && city) pCity.value = city;
+            if (pArea && !pArea.value.trim() && area) pArea.value = area;
+            if (pAddr && !pAddr.value.trim()) pAddr.value = fullAddress;
+            if (pPin && !pPin.value.trim() && pincode) pPin.value = pincode;
+            if (pLand && !pLand.value.trim() && landmark) pLand.value = landmark;
+            if (pLat && !pLat.value && lat) pLat.value = lat;
+            if (pLng && !pLng.value && lng) pLng.value = lng;
 
-        // Populate Modal Fields
-        const mCity = document.getElementById('modalCity');
-        const mArea = document.getElementById('modalArea');
-        const mAddr = document.getElementById('modalAddress');
-        const mPin = document.getElementById('modalPincode');
-        const mLand = document.getElementById('modalLandmark');
-        if (mCity) mCity.value = city;
-        if (mArea) mArea.value = area;
-        if (mAddr) mAddr.value = fullAddress;
-        if (mPin) mPin.value = pincode;
-        if (mLand) mLand.value = landmark;
+            // Populate Modal Fields
+            const mCity = document.getElementById('modalCity');
+            const mArea = document.getElementById('modalArea');
+            const mAddr = document.getElementById('modalAddress');
+            const mPin = document.getElementById('modalPincode');
+            const mLand = document.getElementById('modalLandmark');
+            if (mCity && city) mCity.value = city;
+            if (mArea && area) mArea.value = area;
+            if (mAddr) mAddr.value = fullAddress;
+            if (mPin && pincode) mPin.value = pincode;
+            if (mLand && landmark) mLand.value = landmark;
 
-        updateLocationSummaryCard(city, area, fullAddress, pincode, tag);
+            updateLocationSummaryCard(city, area, fullAddress, pincode, tag);
+            const homeBtnText = document.getElementById('verifiedHomeBtnText');
+            if (homeBtnText) homeBtnText.innerText = area ? `Saved Home (${area})` : 'Use Saved Address';
+        } else {
+            updateLocationSummaryCard('', '', '', '', null);
+        }
     }
 
     // Smart Address & Metro Location Resolver (Accurately identifies Noida, Gurgaon, Bangalore, etc.)
@@ -2379,30 +2441,52 @@
         );
     }
 
-    // Direct 1-Click Switch to Verified Home Address (Sector 62, Noida - identical to Location page)
+    // Direct 1-Click Switch to Saved Profile Address
     function useVerifiedHomeAddressDirect() {
-        const homeData = {
-            tag: 'VERIFIED HOME ADDRESS',
-            line1: 'Sector 62, Noida',
-            fullAddress: 'Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309',
-            city: 'Noida',
-            area: 'Sector 62',
-            pincode: '201309',
-            landmark: 'Near Electronic City Metro',
-            lat: 28.6280,
-            lng: 77.3649
-        };
+        let homeData = null;
 
-        // Check if user has custom address in staynest_default_address
         try {
             const saved = localStorage.getItem('staynest_default_address');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                if (parsed.line1 || parsed.line2) {
-                    homeData.fullAddress = [parsed.line1, parsed.line2].filter(Boolean).join(', ');
+                if (parsed.line1 || parsed.line2 || parsed.fullAddress) {
+                    homeData = {
+                        tag: parsed.tag === 'HOME' ? 'SAVED HOME ADDRESS' : (parsed.tag ? `SAVED ${parsed.tag}` : 'SAVED ADDRESS'),
+                        fullAddress: parsed.fullAddress || [parsed.line1, parsed.line2].filter(Boolean).join(', '),
+                        city: parsed.city || '',
+                        area: parsed.area || '',
+                        pincode: parsed.pincode || '',
+                        landmark: parsed.landmark || '',
+                        lat: parseFloat(parsed.lat) || 28.6280,
+                        lng: parseFloat(parsed.lng) || 77.3649
+                    };
                 }
             }
         } catch(e) {}
+
+        if (!homeData) {
+            const cachedAddr = localStorage.getItem('user_cached_address');
+            const cachedLat = parseFloat(localStorage.getItem('user_cached_lat'));
+            const cachedLng = parseFloat(localStorage.getItem('user_cached_lng'));
+            if (cachedAddr) {
+                homeData = {
+                    tag: 'CACHED LOCATION',
+                    fullAddress: cachedAddr,
+                    city: localStorage.getItem('user_cached_city') || '',
+                    area: localStorage.getItem('user_cached_area') || '',
+                    pincode: localStorage.getItem('user_cached_pin') || '',
+                    landmark: '',
+                    lat: (!isNaN(cachedLat) && cachedLat !== 0) ? cachedLat : 28.6280,
+                    lng: (!isNaN(cachedLng) && cachedLng !== 0) ? cachedLng : 77.3649
+                };
+            }
+        }
+
+        if (!homeData || !homeData.fullAddress) {
+            showZeptoToast('No Saved Address 📍', 'Please use GPS location or click Edit Map to set address.');
+            openLocationModal(false);
+            return;
+        }
 
         const pCity = document.getElementById('propCity');
         const pArea = document.getElementById('propArea');
@@ -2412,13 +2496,13 @@
         const pLat = document.getElementById('propLatitude');
         const pLng = document.getElementById('propLongitude');
 
-        if (pCity) { pCity.value = homeData.city; clearError(pCity); }
-        if (pArea) { pArea.value = homeData.area; clearError(pArea); }
+        if (pCity && homeData.city) { pCity.value = homeData.city; clearError(pCity); }
+        if (pArea && homeData.area) { pArea.value = homeData.area; clearError(pArea); }
         if (pAddr) { pAddr.value = homeData.fullAddress; clearError(pAddr); }
-        if (pPin) pPin.value = homeData.pincode;
-        if (pLand) pLand.value = homeData.landmark;
-        if (pLat) pLat.value = homeData.lat;
-        if (pLng) pLng.value = homeData.lng;
+        if (pPin && homeData.pincode) pPin.value = homeData.pincode;
+        if (pLand && homeData.landmark) pLand.value = homeData.landmark;
+        if (pLat && homeData.lat) pLat.value = homeData.lat;
+        if (pLng && homeData.lng) pLng.value = homeData.lng;
 
         // Populate Modal Fields (Zepto Style)
         const mCity = document.getElementById('modalCity');
@@ -2426,13 +2510,13 @@
         const mAddr = document.getElementById('modalAddress');
         const mPin = document.getElementById('modalPincode');
         const mLand = document.getElementById('modalLandmark');
-        if (mCity) mCity.value = homeData.city;
-        if (mArea) mArea.value = homeData.area;
+        if (mCity && homeData.city) mCity.value = homeData.city;
+        if (mArea && homeData.area) mArea.value = homeData.area;
         if (mAddr) mAddr.value = homeData.fullAddress;
-        if (mPin) mPin.value = homeData.pincode;
-        if (mLand) mLand.value = homeData.landmark;
+        if (mPin && homeData.pincode) mPin.value = homeData.pincode;
+        if (mLand && homeData.landmark) mLand.value = homeData.landmark;
 
-        if (propertyMap && propertyMarker) {
+        if (propertyMap && propertyMarker && homeData.lat && homeData.lng) {
             propertyMap.setView([homeData.lat, homeData.lng], 17);
             propertyMarker.setLatLng([homeData.lat, homeData.lng]);
             if (gpsAccuracyCircle) {
@@ -2446,24 +2530,24 @@
                     dashArray: '3, 3'
                 }).addTo(propertyMap);
             }
-            propertyMarker.bindPopup(`<strong>${homeData.area}, ${homeData.city}</strong><br>${homeData.fullAddress}<br><span style="font-size:10px; color:#059669; font-weight:700;">🎯 Verified Home Address</span>`).openPopup();
+            propertyMarker.bindPopup(`<strong>${homeData.area || 'Location'}, ${homeData.city || ''}</strong><br>${homeData.fullAddress}<br><span style="font-size:10px; color:#059669; font-weight:700;">🎯 Saved Address</span>`).openPopup();
         }
 
         try {
             localStorage.setItem('user_cached_lat', homeData.lat);
             localStorage.setItem('user_cached_lng', homeData.lng);
             localStorage.setItem('user_cached_address', homeData.fullAddress);
-            localStorage.setItem('user_cached_city', homeData.city);
-            localStorage.setItem('user_cached_area', homeData.area);
-            localStorage.setItem('user_cached_pin', homeData.pincode);
+            if (homeData.city) localStorage.setItem('user_cached_city', homeData.city);
+            if (homeData.area) localStorage.setItem('user_cached_area', homeData.area);
+            if (homeData.pincode) localStorage.setItem('user_cached_pin', homeData.pincode);
         } catch(e) {}
 
         const badge = document.getElementById('locPreciseBadge');
-        if (badge) badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 🎯 1m Live GPS Lock';
+        if (badge) badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 🎯 Saved Location Applied';
 
         updateLocationSummaryCard(homeData.city, homeData.area, homeData.fullAddress, homeData.pincode, homeData.tag);
         updateLivePreview();
-        showZeptoToast('Verified Home Loaded 🏠', 'Sector 62, Noida address applied to listing!');
+        showZeptoToast('Saved Address Loaded 🏠', `${homeData.area || homeData.city || 'Saved address'} applied to listing!`);
     }
 
     // ===================== ZEPTO / PROFILE STYLE LOCATION MODAL HANDLERS =====================
@@ -2547,11 +2631,12 @@
         const line2 = document.getElementById('locSummaryLine2');
         const tagEl = document.getElementById('addrBadgeTag');
 
-        if (tag && tagEl) {
-            tagEl.innerText = `📍 ${tag}`;
+        if (tagEl) {
+            tagEl.innerText = tag ? `📍 ${tag}` : '📍 PROPERTY LOCATION';
         }
-        if (line1) line1.innerText = [area, city].filter(Boolean).join(', ') || 'Sector 62, Noida';
-        if (line2) line2.innerText = address || 'Flat 402, B-Block, Tulip Heights, Sector 62, Near Electronic City Metro, Noida, 201309';
+        const title = [area, city].filter(Boolean).join(', ');
+        if (line1) line1.innerText = title || (address ? 'Location Selected' : 'Location Not Set');
+        if (line2) line2.innerText = address || 'Click "Use Current GPS Location" or "Edit Map" to set property address';
     }
 
     // Search locality / landmark directly on the map
@@ -2885,6 +2970,81 @@
         }
 
         return isValid;
+    }
+
+    function goToStep(step) {
+        if (step < 1 || step > 4) return;
+        
+        // If moving forward, validate current steps
+        if (step > currentStep) {
+            for (let s = currentStep; s < step; s++) {
+                if (!validateStep(s)) {
+                    return;
+                }
+            }
+        }
+
+        currentStep = step;
+
+        // 1. Show only target step pane, hide others
+        for (let i = 1; i <= 4; i++) {
+            const pane = document.getElementById(`step-pane-${i}`);
+            if (pane) {
+                if (i === step) {
+                    pane.classList.remove('hidden');
+                } else {
+                    pane.classList.add('hidden');
+                }
+            }
+        }
+
+        // 2. Update Progress Bar Fill Width
+        const fillEl = document.getElementById('progress-bar-fill');
+        if (fillEl) {
+            const widths = ['29%', '58%', '85%', '100%'];
+            fillEl.style.width = widths[step - 1];
+        }
+
+        // 3. Update Step Node Circles & Label Text
+        for (let i = 1; i <= 4; i++) {
+            const node = document.getElementById(`step-node-${i}`);
+            const label = document.getElementById(`step-label-${i}`);
+
+            if (i === step) {
+                // Active Step
+                if (node) {
+                    node.className = 'stepper-node active';
+                    node.innerHTML = `${i}`;
+                }
+                if (label) {
+                    label.className = 'block text-xs sm:text-sm font-bold text-slate-800 mt-3 text-center tracking-tight';
+                }
+            } else if (i < step) {
+                // Completed Step
+                if (node) {
+                    node.className = 'stepper-node completed';
+                    node.innerHTML = '<i class="fas fa-check text-sm"></i>';
+                }
+                if (label) {
+                    label.className = 'block text-xs sm:text-sm font-bold text-slate-700 mt-3 text-center tracking-tight';
+                }
+            } else {
+                // Upcoming Step
+                if (node) {
+                    node.className = 'stepper-node inactive';
+                    node.innerHTML = `${i}`;
+                }
+                if (label) {
+                    label.className = 'block text-xs sm:text-sm font-bold text-slate-500 mt-3 text-center tracking-tight';
+                }
+            }
+        }
+
+        // Scroll to top of listing form for seamless UX
+        const formEl = document.getElementById('propertyListingForm');
+        if (formEl) {
+            formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 
     let currentCategory = 'residential';
@@ -3314,18 +3474,36 @@
         }
     }
 
-    // Multiple Photo Uploads (Accumulates without clearing)
+    // Maximum 10 photos allowed
+    const MAX_PROPERTY_PHOTOS = 10;
+
+    // Multiple Photo Uploads (Enforces max 10 photos limit)
     function handlePhotoUpload(input) {
         if (input.files && input.files.length > 0) {
-            Array.from(input.files).forEach(file => {
+            const remainingSlots = MAX_PROPERTY_PHOTOS - uploadedPhotos.length;
+            if (remainingSlots <= 0) {
+                alert('You can upload a maximum of 10 photos only.');
+                input.value = '';
+                return;
+            }
+
+            const files = Array.from(input.files);
+            if (files.length > remainingSlots) {
+                alert(`You can only add ${remainingSlots} more photo(s). Only the first ${remainingSlots} photo(s) will be uploaded.`);
+            }
+
+            const filesToProcess = files.slice(0, remainingSlots);
+            filesToProcess.forEach(file => {
                 if (file.size > 5 * 1024 * 1024) {
                     alert(`File "${file.name}" is larger than 5MB.`);
                     return;
                 }
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    uploadedPhotos.push(e.target.result);
-                    renderPhotoPreviews();
+                    if (uploadedPhotos.length < MAX_PROPERTY_PHOTOS) {
+                        uploadedPhotos.push(e.target.result);
+                        renderPhotoPreviews();
+                    }
                 };
                 reader.readAsDataURL(file);
             });
@@ -3335,15 +3513,31 @@
 
     function handlePhotoDrop(e) {
         if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-            Array.from(e.dataTransfer.files).forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
+            const remainingSlots = MAX_PROPERTY_PHOTOS - uploadedPhotos.length;
+            if (remainingSlots <= 0) {
+                alert('You can upload a maximum of 10 photos only.');
+                return;
+            }
+
+            const imageFiles = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+            if (imageFiles.length > remainingSlots) {
+                alert(`You can only add ${remainingSlots} more photo(s). Only the first ${remainingSlots} photo(s) will be uploaded.`);
+            }
+
+            const filesToProcess = imageFiles.slice(0, remainingSlots);
+            filesToProcess.forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File "${file.name}" is larger than 5MB.`);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    if (uploadedPhotos.length < MAX_PROPERTY_PHOTOS) {
                         uploadedPhotos.push(ev.target.result);
                         renderPhotoPreviews();
-                    };
-                    reader.readAsDataURL(file);
-                }
+                    }
+                };
+                reader.readAsDataURL(file);
             });
         }
     }
@@ -3352,6 +3546,10 @@
         const urlInput = document.getElementById('photoUrlInput');
         const url = urlInput.value.trim();
         if (url) {
+            if (uploadedPhotos.length >= MAX_PROPERTY_PHOTOS) {
+                alert('You can upload a maximum of 10 photos only.');
+                return;
+            }
             uploadedPhotos.push(url);
             urlInput.value = '';
             renderPhotoPreviews();
@@ -3373,11 +3571,18 @@
         if (!grid) return;
 
         grid.innerHTML = '';
-        if (countBadge) countBadge.innerText = `${uploadedPhotos.length} Photo${uploadedPhotos.length === 1 ? '' : 's'} Added`;
+        if (countBadge) {
+            countBadge.innerText = `${uploadedPhotos.length} / ${MAX_PROPERTY_PHOTOS} Photos Added`;
+            if (uploadedPhotos.length >= MAX_PROPERTY_PHOTOS) {
+                countBadge.className = 'bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full';
+            } else {
+                countBadge.className = 'bg-brand/10 text-brand text-xs font-bold px-3 py-1 rounded-full';
+            }
+        }
         if (errPhotos && uploadedPhotos.length > 0) errPhotos.classList.add('hidden');
 
         if (uploadedPhotos.length === 0) {
-            grid.innerHTML = '<div class="col-span-2 sm:col-span-4 p-6 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 text-center text-xs text-gray-400"><i class="fas fa-images text-2xl text-gray-300 mb-2 block"></i>No photos uploaded yet. Select images above to add.</div>';
+            grid.innerHTML = '<div class="col-span-2 sm:col-span-4 p-6 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 text-center text-xs text-gray-400"><i class="fas fa-images text-2xl text-gray-300 mb-2 block"></i>No photos uploaded yet. Select images above to add (Max 10).</div>';
             document.getElementById('previewImage').src = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
             return;
         }
@@ -3414,6 +3619,12 @@
         if (!editId) return;
 
         editPropertyId = editId;
+
+        // Reveal "Mark Property as 100% Fully Booked" toggle in Edit Mode
+        const fullyBookedToggleBox = document.getElementById('fullyBookedToggleContainer');
+        if (fullyBookedToggleBox) {
+            fullyBookedToggleBox.classList.remove('hidden');
+        }
 
         // Update hero banner and submit buttons for Edit Mode
         const bannerTitle = document.querySelector('#listPropertyHeroBanner h1');
@@ -3630,10 +3841,12 @@
             });
         }
 
-        // Entire Property Fully Booked Toggle state
+        // Entire Property Fully Booked Toggle state (Shown ONLY on Edit Property Listing)
         const isFullyBooked = (p.available_beds !== undefined && Number(p.available_beds) === 0) || p.status === 'fully_booked';
         const fullyBookedToggle = document.getElementById('propIsFullyBooked');
         if (fullyBookedToggle) fullyBookedToggle.checked = isFullyBooked;
+        const fullyBookedContainer = document.getElementById('fullyBookedToggleContainer');
+        if (fullyBookedContainer) fullyBookedContainer.classList.remove('hidden');
 
         // Amenities
         if (p.amenities && Array.isArray(p.amenities)) {
@@ -3645,9 +3858,9 @@
             });
         }
 
-        // Photos
+        // Photos (Maximum 10 photos)
         if (p.photos && Array.isArray(p.photos) && p.photos.length > 0) {
-            uploadedPhotos = [...p.photos];
+            uploadedPhotos = [...p.photos].slice(0, MAX_PROPERTY_PHOTOS);
             renderPhotoPreviews();
         }
 

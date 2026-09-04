@@ -49,7 +49,9 @@ class UserProfile extends Model
 
     public function getFullNameAttribute(): string
     {
-        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+        $computed = trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+        if (!empty($computed)) return $computed;
+        return $this->attributes['full_name'] ?? '';
     }
 
     public function getTaglineAttribute(): string

@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserRole;
 use App\Services\ContentModerationService;
+use App\Services\ImageProcessingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -113,7 +114,7 @@ class PropertySubmissionController extends Controller
             'house_rules' => ['required', 'string', 'min:5', 'max:2000'],
             'amenities' => ['nullable', 'array'],
             'room_sharing' => ['nullable', 'array'],
-            'photos' => ['nullable', 'array'],
+            'photos' => ['nullable', 'array', 'max:10'],
             'photos.*' => ['nullable', 'string'],
             'owner_name' => ['required', 'string', 'min:2', 'max:100'],
             'owner_phone' => ['required', 'string', 'min:10', 'max:15'],
@@ -339,33 +340,22 @@ class PropertySubmissionController extends Controller
                 }
             }
 
-            // 7. Attach Images (Handle Base64 or URLs cleanly)
-            $uploadDir = public_path('uploads/properties');
-            if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-
+            // 7. Attach Images (Auto-convert to WebP & generate thumbnails, Max 10)
             $savedImageCount = 0;
+            $imageService = app(ImageProcessingService::class);
             if (!empty($validated['photos']) && is_array($validated['photos'])) {
-                foreach ($validated['photos'] as $idx => $photoData) {
+                $photosToProcess = array_slice($validated['photos'], 0, 10);
+                foreach ($photosToProcess as $idx => $photoData) {
                     if (empty($photoData) || !is_string($photoData)) continue;
 
                     $photoUrl = trim($photoData);
 
                     // Check if photo is Base64 data URL
-                    if (preg_match('/^data:image\/(\w+);base64,/', $photoUrl, $typeMatches)) {
-                        $extension = strtolower($typeMatches[1]);
-                        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
-                            $extension = 'jpg';
-                        }
-                        $base64Clean = substr($photoUrl, strpos($photoUrl, ',') + 1);
-                        $decodedData = base64_decode($base64Clean);
-
-                        if ($decodedData !== false) {
-                            $fileName = 'prop_' . substr(str_replace('-', '', $property->id), 0, 8) . '_' . time() . '_' . $idx . '.' . $extension;
-                            $filePath = $uploadDir . '/' . $fileName;
-                            file_put_contents($filePath, $decodedData);
-                            $photoUrl = '/uploads/properties/' . $fileName;
+                    if (preg_match('/^data:image\/(\w+);base64,/', $photoUrl)) {
+                        $prefix = 'prop_' . substr(str_replace('-', '', $property->id), 0, 8) . '_' . $idx . '_';
+                        $processed = $imageService->processBase64($photoUrl, 'properties', $prefix);
+                        if ($processed) {
+                            $photoUrl = $processed['relative_url'];
                         }
                     }
 
@@ -587,11 +577,13 @@ class PropertySubmissionController extends Controller
             'house_rules' => ['nullable', 'string', 'max:2000'],
             'amenities' => ['nullable', 'array'],
             'room_sharing' => ['nullable', 'array'],
-            'photos' => ['nullable', 'array'],
+            'photos' => ['nullable', 'array', 'max:10'],
+            'photos.*' => ['nullable', 'string'],
             'owner_name' => ['nullable', 'string', 'max:100'],
             'owner_phone' => ['nullable', 'string', 'max:15'],
             'owner_email' => ['nullable', 'email', 'max:150'],
             'status' => ['nullable', 'in:active,draft,inactive'],
+            'is_fully_booked' => ['nullable', 'boolean'],
         ], [
             'monthly_rent.min' => 'Monthly starting rent cannot be less than ₹100.',
             'total_beds.max' => 'Total bed capacity cannot exceed 5,000.',
@@ -674,7 +666,11 @@ class PropertySubmissionController extends Controller
             $property->maintenance_charges = $validated['maintenance_charges'] ?? $property->maintenance_charges;
             $property->notice_period_days = $validated['notice_period_days'] ?? $property->notice_period_days;
             $property->total_beds = $validated['total_beds'] ?? $property->total_beds;
-            $property->available_beds = $validated['available_beds'] ?? $property->available_beds;
+            if ($request->has('is_fully_booked') && ($request->boolean('is_fully_booked') || $request->input('is_fully_booked') == 1)) {
+                $property->available_beds = 0;
+            } else {
+                $property->available_beds = $validated['available_beds'] ?? $property->available_beds;
+            }
             
             $descriptionText = !empty($validated['description']) ? trim($validated['description']) : ($property->description ?: "Premium accommodation in {$city->name} with modern amenities.");
             $property->description = $descriptionText;
@@ -730,33 +726,22 @@ class PropertySubmissionController extends Controller
                 }
             }
 
-            // Sync Photos with Base64 handler
-            $uploadDir = public_path('uploads/properties');
-            if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-
+            // Sync Photos with WebP conversion & thumbnail generation (Max 10)
             if (!empty($validated['photos']) && is_array($validated['photos'])) {
                 PropertyImage::where('property_id', $property->id)->delete();
-                foreach ($validated['photos'] as $idx => $photoData) {
+                $imageService = app(ImageProcessingService::class);
+                $photosToProcess = array_slice($validated['photos'], 0, 10);
+                foreach ($photosToProcess as $idx => $photoData) {
                     if (empty($photoData) || !is_string($photoData)) continue;
 
                     $photoUrl = trim($photoData);
 
                     // Check if photo is Base64 data URL
-                    if (preg_match('/^data:image\/(\w+);base64,/', $photoUrl, $typeMatches)) {
-                        $extension = strtolower($typeMatches[1]);
-                        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
-                            $extension = 'jpg';
-                        }
-                        $base64Clean = substr($photoUrl, strpos($photoUrl, ',') + 1);
-                        $decodedData = base64_decode($base64Clean);
-
-                        if ($decodedData !== false) {
-                            $fileName = 'prop_' . substr(str_replace('-', '', $property->id), 0, 8) . '_' . time() . '_' . $idx . '.' . $extension;
-                            $filePath = $uploadDir . '/' . $fileName;
-                            file_put_contents($filePath, $decodedData);
-                            $photoUrl = '/uploads/properties/' . $fileName;
+                    if (preg_match('/^data:image\/(\w+);base64,/', $photoUrl)) {
+                        $prefix = 'prop_' . substr(str_replace('-', '', $property->id), 0, 8) . '_' . $idx . '_';
+                        $processed = $imageService->processBase64($photoUrl, 'properties', $prefix);
+                        if ($processed) {
+                            $photoUrl = $processed['relative_url'];
                         }
                     }
 

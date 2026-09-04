@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,11 +14,33 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return null;
+            }
+            if ($request->is('admin/*')) {
+                return route('admin.login');
+            }
+            if ($request->is('broker/*')) {
+                return route('broker.login');
+            }
+            return route('user.login');
+        });
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'broker' => \App\Http\Middleware\BrokerMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated. Please provide a valid Bearer token.',
+                    'errors' => [
+                        'auth' => ['You are not logged in or your session has expired.']
+                    ]
+                ], 401);
+            }
+        });
     })->create();

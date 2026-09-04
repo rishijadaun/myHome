@@ -221,7 +221,7 @@
                             <i class="fas fa-location-dot absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                             <input type="text" name="locality" id="postLocalityInput"
                                    value="{{ old('locality', $isEditMode ? $post->locality : '') }}"
-                                   placeholder="e.g. Sector 62, Near Metro Station"
+                                   placeholder="e.g. Sector 65, Near Metro Station"
                                    class="w-full bg-gray-50/80 border border-gray-200 rounded-2xl pl-9 pr-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:border-brand focus:bg-white transition-all">
                         </div>
                         @error('locality') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror

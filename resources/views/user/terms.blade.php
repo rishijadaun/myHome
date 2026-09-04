@@ -1,8 +1,8 @@
 @extends('user.layouts.app')
 
-@section('title', 'Terms & Conditions of Service - Zero Brokerage PG Network | StayNest')
-@section('meta_description', 'Read StayNest Terms and Conditions, platform usage policies, verified PG listing rules, tenant safety guidelines and cancellation policies.')
-@section('meta_keywords', 'StayNest terms of service, tenant agreement, PG booking policies, host cancellation policy')
+@section('title', 'Terms & Conditions of Service - Zero Brokerage PG & Roommate Network | StayNest')
+@section('meta_description', 'Read StayNest Terms and Conditions, platform usage policies, verified PG listing rules, roommate community safety guidelines, and broker partner settlement policies.')
+@section('meta_keywords', 'StayNest terms of service, tenant agreement, PG booking policies, host cancellation policy, roommate safety rules, broker KYC terms')
 @section('canonical', route('user.terms'))
 @section('robots', 'index, follow, max-snippet:-1, max-image-preview:large')
 
@@ -12,7 +12,7 @@
   "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "Terms of Service - StayNest",
-  "description": "Read StayNest Terms and Conditions, platform usage policies, verified PG listing rules, tenant safety guidelines and cancellation policies.",
+  "description": "Read StayNest Terms and Conditions, platform usage policies, verified PG listing rules, roommate community safety guidelines, and broker partner settlement policies.",
   "url": "{{ route('user.terms') }}"
 }
 </script>
@@ -27,12 +27,13 @@
             <i class="fas fa-file-contract"></i>
         </div>
         <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Terms & Conditions</h1>
-        <p class="text-slate-500 text-xs md:text-sm">Last updated: August 2026 • Effective immediately</p>
+        <p class="text-slate-500 text-xs md:text-sm">Last updated: September 2026 • Effective immediately across all StayNest services</p>
         
         <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs font-semibold">
             <span class="bg-brand-50 text-brand px-3 py-1 rounded-full border border-brand-100"><i class="fas fa-check-circle mr-1"></i> Zero Brokerage</span>
             <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full border border-blue-100"><i class="fas fa-shield-alt mr-1"></i> Verified Stays</span>
-            <span class="bg-purple-50 text-purple-600 px-3 py-1 rounded-full border border-purple-100"><i class="fas fa-lock mr-1"></i> Secure Deposits</span>
+            <span class="bg-purple-50 text-purple-600 px-3 py-1 rounded-full border border-purple-100"><i class="fas fa-users mr-1"></i> Safe Roommate Finder</span>
+            <span class="bg-teal-50 text-teal-700 px-3 py-1 rounded-full border border-teal-100"><i class="fas fa-id-card mr-1"></i> Partner KYC Compliance</span>
         </div>
     </div>
 
@@ -49,7 +50,7 @@
                 By accessing, browsing, or using the <strong>StayNest</strong> web application, mobile interfaces, or related services, you confirm that you have read, understood, and agreed to be legally bound by these Terms and Conditions and our Privacy Policy.
             </p>
             <p class="text-slate-600">
-                StayNest operates as a technology discovery and facilitation platform connecting paying guest (PG) seekers, hostel residents, and co-living tenants directly with verified property owners and caretakers.
+                StayNest operates as a technology discovery and facilitation platform connecting paying guest (PG) seekers, hostel residents, and co-living tenants directly with verified property owners, caretakers, and verified broker partners across India (including Noida, Delhi NCR, and Bangalore).
             </p>
         </section>
 
@@ -57,7 +58,7 @@
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">2</span>
-                User Eligibility & Account Security
+                User & Tenant Account Eligibility
             </h2>
             <p class="text-slate-600">
                 To register an account or initiate bookings on StayNest, you must be at least 18 years old or have parental/guardian authorization. When registering, you agree to:
@@ -69,7 +70,7 @@
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Maintain the confidentiality of your credentials and restrict unauthorized access to your account.</span>
+                    <span>Maintain the confidentiality of your account credentials and restrict unauthorized access to your devices.</span>
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
@@ -82,64 +83,64 @@
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">3</span>
-                PG Listings, In-Person Verification & Accuracy
+                Zero Brokerage Policy & Direct Interactions
             </h2>
-            <p class="text-slate-600">
-                StayNest makes rigorous efforts to verify listed PG amenities, photo galleries, room configurations, and rent amounts. However:
-            </p>
-            <ul class="space-y-2 text-slate-600 pl-2">
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Property owners are solely responsible for ensuring real-time bed availability and honoring posted rental tariffs.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Tenants are encouraged to schedule a physical or virtual visit prior to paying any move-in tokens or full deposits.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Photographs marked with "Verified by StayNest" represent inspections conducted at the time of cataloging.</span>
-                </li>
-            </ul>
+            <div class="p-4 bg-brand-50 border border-brand-100 rounded-2xl text-slate-700">
+                <div class="flex items-center gap-2 font-bold text-slate-900 mb-1">
+                    <i class="fas fa-handshake text-brand"></i> Zero Brokerage Guarantee for Tenants
+                </div>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    StayNest does <strong>not</strong> charge any brokerage fees, commissions, or placement surcharges from prospective tenants. Inquiries, visits, and tenancy contracts are arranged directly between the resident and the verified property host/owner.
+                </p>
+            </div>
         </section>
 
         <!-- Section 4 -->
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">4</span>
-                Zero Brokerage Policy & Direct Interactions
+                Partner Broker & Host KYC Compliance Rules
             </h2>
-            <div class="p-4 bg-brand-50 border border-brand-100 rounded-2xl text-slate-700">
-                <div class="flex items-center gap-2 font-bold text-slate-900 mb-1">
-                    <i class="fas fa-handshake text-brand"></i> Zero Brokerage Guarantee
-                </div>
-                <p class="text-xs text-slate-600">
-                    StayNest does not charge any brokerage fees, commissions, or tenant placement charges from tenants. All inquiries and contracts are direct between the resident and the property host.
-                </p>
-            </div>
+            <p class="text-slate-600">
+                Property brokers and PG managers listing inventory on StayNest must adhere to regulatory compliance:
+            </p>
+            <ul class="space-y-2 text-slate-600 pl-2">
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span><strong>Mandatory Verification:</strong> Hosts must provide legitimate Government ID Proof (Aadhar/PAN), State RERA Registration or Property Deed, and Bank Account Proof.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span><strong>Anti-Tamper Document Locking:</strong> Once verified by admin, documents are locked to maintain authentic audit trails. Modifications require administrative re-upload authorization.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span><strong>Accurate Inventories:</strong> Property partners must maintain real-time room/bed occupancies and honor published rental tariffs without hidden move-in surcharges.</span>
+                </li>
+            </ul>
         </section>
 
         <!-- Section 5 -->
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">5</span>
-                Security Deposits, Rent Schedules & Refunds
+                Roommate & Flatmate Finder Safety Rules
             </h2>
             <p class="text-slate-600">
-                Rental payments and security deposits are governed by the mutual tenancy agreement signed between the resident and the PG owner:
+                Our Roommate Finder connects students and working executives looking for shared living spaces. All participants agree to:
             </p>
             <ul class="space-y-2 text-slate-600 pl-2">
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Security deposits must be refunded upon move-out subject to notice period compliance and inspection for property damage.</span>
+                    <span>Honor stated gender preferences (e.g. Male only, Female only, or Any) and respect roommate lifestyle requirements.</span>
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Digital payments transacted via StayNest are routed through encrypted, RBI-compliant payment gateways.</span>
+                    <span>Strictly zero tolerance for harassment, offensive communication, misrepresentation, or discriminatory behavior.</span>
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Cancellation policies specific to each property are shown clearly prior to booking confirmation.</span>
+                    <span>Conduct in-person or video alignment before entering into shared lease or deposit agreements.</span>
                 </li>
             </ul>
         </section>
@@ -148,65 +149,47 @@
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">6</span>
-                House Rules, Curfews & Tenant Conduct
+                Rent Collections, Daily Settlements & Deposits
             </h2>
-            <p class="text-slate-600">
-                Each PG accommodation has community guidelines regarding gate timings, visitors, smoking/alcohol policies, and quiet hours. Residents agree to abide by the respective property’s house rules to ensure harmony for all roommates.
-            </p>
+            <ul class="space-y-2 text-slate-600 pl-2">
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span><strong>Daily Automated Settlements:</strong> Rent collected digitally via StayNest is deposited directly into the verified broker’s bank account within 24–48 hours of receipt.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span><strong>Deposit Refund:</strong> Security deposits are refundable upon move-out subject to standard notice period compliance and inspection of property premises.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
+                    <span><strong>Secure Gateways:</strong> All digital transactions are processed through encrypted, RBI-licensed payment gateways.</span>
+                </li>
+            </ul>
         </section>
 
         <!-- Section 7 -->
         <section class="space-y-3">
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
                 <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">7</span>
-                Prohibited Activities
+                Prohibited Activities & Account Termination
             </h2>
             <div class="space-y-2 text-slate-600 pl-2">
                 <div class="flex items-start gap-2">
                     <i class="fas fa-times-circle text-rose-500 mt-1 text-xs flex-shrink-0"></i>
-                    <span>Subletting accommodation to unauthorized third parties without owner consent.</span>
+                    <span>Unauthorized subletting of PG accommodations without written host consent.</span>
                 </div>
                 <div class="flex items-start gap-2">
                     <i class="fas fa-times-circle text-rose-500 mt-1 text-xs flex-shrink-0"></i>
-                    <span>Posting fraudulent property listings, deceptive rent prices, or fake reviews.</span>
+                    <span>Publishing deceptive photos, fraudulent pricing, or fake reviews.</span>
                 </div>
                 <div class="flex items-start gap-2">
                     <i class="fas fa-times-circle text-rose-500 mt-1 text-xs flex-shrink-0"></i>
-                    <span>Harassing other platform members, property hosts, or support personnel.</span>
+                    <span>Using the platform for any unlawful commercial spam or telemarketing.</span>
                 </div>
             </div>
         </section>
 
-        <!-- Section 8 -->
-        <section class="space-y-3">
-            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
-                <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">8</span>
-                Limitation of Liability
-            </h2>
-            <p class="text-slate-600">
-                To the maximum extent permitted by applicable Indian law, StayNest shall not be liable for any direct, indirect, incidental, or consequential damages arising from disputes between residents and property hosts, property damage, loss of personal belongings, or temporary amenity disruptions at the PG premises.
-            </p>
-        </section>
 
-        <!-- Section 9 -->
-        <section class="space-y-3">
-            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 pb-2 border-b border-gray-100">
-                <span class="w-7 h-7 rounded-lg bg-brand-light text-brand flex items-center justify-center text-xs font-bold">9</span>
-                Contact & Legal Inquiries
-            </h2>
-            <p class="text-slate-600">
-                For any legal inquiries, copyright notices, or questions regarding these Terms, please contact our grievance team at:
-            </p>
-            <div class="flex flex-wrap gap-4 pt-2">
-                <a href="mailto:legal@staynest.com" class="inline-flex items-center gap-2 text-brand font-bold hover:underline">
-                    <i class="fas fa-envelope"></i> legal@staynest.com
-                </a>
-                <span class="text-gray-300">•</span>
-                <a href="{{ route('user.contact') }}" class="inline-flex items-center gap-2 text-slate-700 font-semibold hover:text-brand transition">
-                    <i class="fas fa-headset"></i> Support Desk
-                </a>
-            </div>
-        </section>
 
     </div>
 

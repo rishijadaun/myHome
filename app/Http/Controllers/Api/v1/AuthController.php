@@ -519,25 +519,22 @@ class AuthController extends Controller
     public function forgotPasswordRequest(Request $request)
     {
         $validated = $request->validate([
-            'login' => ['required', 'string', 'min:3', 'max:150'],
+            'login' => ['required', 'string', 'email', 'min:5', 'max:150'],
         ], [
-            'login.required' => 'Please enter your registered email address or 10-digit mobile number.',
-            'login.min' => 'Identifier must be at least 3 characters long.',
-            'login.max' => 'Identifier cannot exceed 150 characters.',
+            'login.required' => 'Please enter your registered email address.',
+            'login.email' => 'Please enter a valid email address (e.g. name@example.com).',
+            'login.min' => 'Email address must be at least 5 characters long.',
+            'login.max' => 'Email address cannot exceed 150 characters.',
         ]);
 
         $loginInput = trim($validated['login']);
 
-        // Look up user by email or normalized phone
-        $user = User::where(function ($q) use ($loginInput) {
-            $q->where('email', strtolower($loginInput))
-              ->orWhere('phone', $loginInput)
-              ->orWhere('phone', '+91' . ltrim($loginInput, '0+91'));
-        })->first();
+        // Look up user by registered email
+        $user = User::where('email', strtolower($loginInput))->first();
 
         if (!$user) {
-            return $this->error('No registered account found matching that email or mobile number.', [
-                'login' => ['We could not find an account with this email/phone.']
+            return $this->error('No registered account found matching that email address.', [
+                'login' => ['We could not find an account with this email address.']
             ], 404);
         }
 
@@ -600,25 +597,22 @@ class AuthController extends Controller
     public function forgotPasswordVerify(Request $request)
     {
         $validated = $request->validate([
-            'login' => ['required', 'string', 'min:3', 'max:150'],
+            'login' => ['required', 'string', 'email', 'min:5', 'max:150'],
             'otp' => ['required', 'string', 'size:6'],
         ], [
-            'login.required' => 'Please provide your email or mobile number.',
-            'otp.required' => 'Please enter the 6-digit OTP.',
+            'login.required' => 'Please provide your registered email address.',
+            'login.email' => 'Please provide a valid email address.',
+            'otp.required' => 'Please enter the 6-digit OTP code.',
             'otp.size' => 'The OTP code must be exactly 6 digits.',
         ]);
 
         $loginInput = trim($validated['login']);
         $inputOtp = trim($validated['otp']);
 
-        $user = User::where(function ($q) use ($loginInput) {
-            $q->where('email', strtolower($loginInput))
-              ->orWhere('phone', $loginInput)
-              ->orWhere('phone', '+91' . ltrim($loginInput, '0+91'));
-        })->first();
+        $user = User::where('email', strtolower($loginInput))->first();
 
         if (!$user) {
-            return $this->error('Account not found.', ['login' => ['User record not found.']], 404);
+            return $this->error('Account not found.', ['login' => ['No registered account found with this email address.']], 404);
         }
 
         $cached = Cache::get("pwd_reset_{$user->id}") ?? Cache::get("pwd_reset_target_" . md5(strtolower($loginInput)));
@@ -643,12 +637,13 @@ class AuthController extends Controller
     public function forgotPasswordReset(Request $request)
     {
         $validated = $request->validate([
-            'login' => ['required', 'string', 'min:3', 'max:150'],
+            'login' => ['required', 'string', 'email', 'min:5', 'max:150'],
             'otp' => ['required', 'string', 'size:6'],
             'password' => ['required', 'string', 'min:6', 'max:100', 'confirmed'],
             'password_confirmation' => ['required_with:password', 'string', 'min:6', 'max:100'],
         ], [
-            'login.required' => 'Login identifier is required.',
+            'login.required' => 'Registered email address is required.',
+            'login.email' => 'Please provide a valid email address.',
             'otp.required' => 'Verification OTP is required.',
             'otp.size' => 'OTP must be exactly 6 digits.',
             'password.required' => 'New password is required.',
@@ -661,14 +656,10 @@ class AuthController extends Controller
         $loginInput = trim($validated['login']);
         $inputOtp = trim($validated['otp']);
 
-        $user = User::where(function ($q) use ($loginInput) {
-            $q->where('email', strtolower($loginInput))
-              ->orWhere('phone', $loginInput)
-              ->orWhere('phone', '+91' . ltrim($loginInput, '0+91'));
-        })->first();
+        $user = User::where('email', strtolower($loginInput))->first();
 
         if (!$user) {
-            return $this->error('User account not found.', ['login' => ['No account found.']], 404);
+            return $this->error('User account not found.', ['login' => ['No account found with this email address.']], 404);
         }
 
         $cached = Cache::get("pwd_reset_{$user->id}") ?? Cache::get("pwd_reset_target_" . md5(strtolower($loginInput)));

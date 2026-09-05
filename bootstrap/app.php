@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->statefulApi();
         $middleware->redirectGuestsTo(function (Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'broker' => \App\Http\Middleware\BrokerMiddleware::class,
+            'security.headers' => \App\Http\Middleware\SecurityHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

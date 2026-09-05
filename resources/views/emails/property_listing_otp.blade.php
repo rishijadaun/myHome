@@ -32,7 +32,6 @@
     <!-- Preheader text -->
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
         Your StayNest property listing verification OTP is {{ $otp }}. Enter this 6-digit code to submit your listing for approval.
-        &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy;
     </div>
 
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 30px 10px;">
@@ -54,7 +53,7 @@
                                             StayNest
                                         </h1>
                                         <p style="margin: 4px 0 0 0; font-size: 12px; color: #ccfbf1; font-weight: 600; letter-spacing: 0.5px;">
-                                            ZERO BROKERAGE PROPERTY NETWORK
+                                            Zero Brokerage Property Network
                                         </p>
                                     </td>
                                 </tr>

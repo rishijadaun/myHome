@@ -40,7 +40,7 @@ class EmailVerificationOtpMail extends Mailable
             replyTo: [
                 new Address($fromAddress, $fromName),
             ],
-            subject: "{$this->otp} is your StayNest verification code",
+            subject: "StayNest: Your Account Verification Code is {$this->otp}",
         );
     }
 
@@ -66,10 +66,7 @@ class EmailVerificationOtpMail extends Mailable
     {
         return new Headers(
             text: [
-                'X-Auto-Response-Suppress' => 'All',
-                'X-Priority'               => '3',
-                'X-Mailer'                 => 'StayNest Mailer',
-                'Precedence'               => 'bulk',
+                'X-Auto-Response-Suppress' => 'OOF, AutoReply',
                 'Auto-Submitted'           => 'auto-generated',
             ],
         );

@@ -29,10 +29,9 @@
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8fafc;">
 
-    <!-- Hidden Preheader Text for High Open Rate -->
+    <!-- Preheader Text -->
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
         Your StayNest verification code is {{ $otp }}. Use this 6-digit code to verify your email address.
-        &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy;
     </div>
 
     <!-- Main Wrapper Table -->
@@ -56,7 +55,7 @@
                                             StayNest
                                         </h1>
                                         <p style="margin: 4px 0 0 0; font-size: 12px; color: #ccfbf1; font-weight: 500; letter-spacing: 0.5px;">
-                                            VERIFIED RESIDENTIAL PLATFORM
+                                            Verified Residential Platform
                                         </p>
                                     </td>
                                 </tr>

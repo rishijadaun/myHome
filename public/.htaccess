@@ -55,6 +55,10 @@
 
 <IfModule mod_headers.c>
 
+    # Remove server information disclosure header
+    Header unset X-Powered-By
+    Header unset Server
+
     <FilesMatch "\.(css|js|svg|webp|avif|jpg|jpeg|png|gif|ico|woff|woff2|ttf)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>

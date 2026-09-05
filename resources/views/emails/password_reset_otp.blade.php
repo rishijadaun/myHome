@@ -29,10 +29,9 @@
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8fafc;">
 
-    <!-- Hidden Preheader Text for High Deliverability -->
+    <!-- Preheader Text -->
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
         Your StayNest password reset code is {{ $otp }}. Use this 6-digit code to reset your account password.
-        &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy;
     </div>
 
     <!-- Main Wrapper Table -->
@@ -56,7 +55,7 @@
                                             StayNest
                                         </h1>
                                         <p style="margin: 4px 0 0 0; font-size: 12px; color: #ccfbf1; font-weight: 500; letter-spacing: 0.5px;">
-                                            ACCOUNT SECURITY & RECOVERY
+                                            Account Security & Recovery
                                         </p>
                                     </td>
                                 </tr>
@@ -105,7 +104,7 @@
                             <p style="margin: 0; font-size: 13px; line-height: 20px; color: #64748b;">
                                 Warm regards,<br />
                                 <strong style="color: #1e293b;">Team StayNest</strong><br />
-                                <span style="font-size: 11px; color: #94a3b8;">Support: partners@staynest.com</span>
+                                <span style="font-size: 11px; color: #94a3b8;">Support: <a href="mailto:{{ config('mail.from.address') }}" style="color: #0f766e; text-decoration: none;">{{ config('mail.from.address') }}</a></span>
                             </p>
 
                         </td>
@@ -115,10 +114,10 @@
                     <tr>
                         <td align="center" style="background-color: #f1f5f9; padding: 20px 24px; border-top: 1px solid #e2e8f0;">
                             <p style="margin: 0 0 6px 0; font-size: 11px; color: #64748b;">
-                                © {{ date('Y') }} StayNest Technologies. All rights reserved.
+                                © {{ date('Y') }} <a href="{{ config('app.url') }}" style="color: #0f766e; text-decoration: none; font-weight: 600;">StayNest</a>. All rights reserved.
                             </p>
                             <p style="margin: 0; font-size: 10px; color: #94a3b8;">
-                                You are receiving this automated email because a password recovery request was triggered for your account.
+                                You are receiving this automated transactional email because a password recovery request was triggered for your account.
                             </p>
                         </td>
                     </tr>

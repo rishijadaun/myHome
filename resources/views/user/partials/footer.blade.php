@@ -74,6 +74,14 @@
                     <span class="font-semibold">18+</span>
                     <span class="text-slate-500">Cities Covered</span>
                 </div>
+                <div class="border-l border-white/10 pl-6">
+                    <a href="{{ route('user.roommate.index') }}" class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-brand/15 hover:bg-brand/25 text-brand border border-brand/30 hover:border-brand/50 font-semibold transition-all text-[11px] group shadow-xs">
+                        <i class="fas fa-users text-brand text-[10px] group-hover:scale-110 transition-transform"></i>
+                        <span>Find Flatmates</span>
+                        <span class="text-slate-400 font-normal">/ Roommates</span>
+                        <i class="fas fa-arrow-right text-[8px] text-brand/70 group-hover:translate-x-0.5 transition-transform"></i>
+                    </a>
+                </div>
             </div>
 
             @php

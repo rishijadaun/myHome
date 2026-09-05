@@ -1720,6 +1720,58 @@
             }
         }
 
+        function resolveAddressToCoordinates(addressStr) {
+            if (!addressStr) return [28.6280, 77.3649];
+            const q = addressStr.toLowerCase();
+
+            if (q.includes('sector 62') || q.includes('sec 62') || q.includes('201309') || q.includes('electronic city hub') || q.includes('electronic city noida')) {
+                return [28.6280, 77.3649];
+            }
+            if (q.includes('sector 18') || q.includes('sec 18') || q.includes('atta')) {
+                return [28.5708, 77.3260];
+            }
+            if (q.includes('knowledge park') || q.includes('pari chowk') || q.includes('greater noida')) {
+                return [28.4744, 77.5030];
+            }
+            if (q.includes('noida')) {
+                return [28.5744, 77.3560];
+            }
+            if (q.includes('cyber city') || q.includes('dlf') || q.includes('gurgaon') || q.includes('gurugram')) {
+                return [28.4595, 77.0266];
+            }
+            if (q.includes('koramangala') || q.includes('hsr') || q.includes('indiranagar') || q.includes('whitefield') || q.includes('electronic city bangalore') || q.includes('bangalore') || q.includes('bengaluru')) {
+                return [12.9716, 77.5946];
+            }
+            if (q.includes('lajpat nagar') || q.includes('connaught') || q.includes('saket') || q.includes('hauz khas') || q.includes('delhi')) {
+                return [28.6139, 77.2090];
+            }
+            if (q.includes('bandra') || q.includes('andheri') || q.includes('powai') || q.includes('mumbai')) {
+                return [19.0760, 72.8777];
+            }
+            if (q.includes('hinjewadi') || q.includes('viman nagar') || q.includes('kothrud') || q.includes('pune')) {
+                return [18.5204, 73.8567];
+            }
+            if (q.includes('hitec city') || q.includes('gachibowli') || q.includes('madhapur') || q.includes('hyderabad')) {
+                return [17.3850, 78.4867];
+            }
+            if (q.includes('chennai')) {
+                return [13.0827, 80.2707];
+            }
+
+            if (typeof allCitiesList !== 'undefined' && Array.isArray(allCitiesList) && allCitiesList.length > 0) {
+                const matched = allCitiesList.find(c => c && c.name && q.includes(c.name.toLowerCase()));
+                if (matched && matched.latitude && matched.longitude) {
+                    return [parseFloat(matched.latitude), parseFloat(matched.longitude)];
+                }
+            }
+
+            if (typeof rawDatabaseProperties !== 'undefined' && Array.isArray(rawDatabaseProperties) && rawDatabaseProperties.length > 0) {
+                return [rawDatabaseProperties[0].lat, rawDatabaseProperties[0].lng];
+            }
+
+            return [28.6280, 77.3649];
+        }
+
         function useProfileHomeAddress() {
             const savedAddr = getSavedProfileAddress();
             if (savedAddr) {
@@ -1761,17 +1813,33 @@
                         setTimeout(() => window.userMarker.openPopup(), 1200);
                     }
                 } else {
-                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(userAddress)}&limit=1`)
+                    // 1. Immediately resolve with local coordinates fallback to ensure instant loading without waiting or failure
+                    const initialCoords = resolveAddressToCoordinates(userAddress);
+                    userLocation = initialCoords;
+                    renderUserMarker();
+                    highlightUserRadius(userLocation[0], userLocation[1], currentSearchRadiusKm);
+                    generatePGsForRegion(userLocation[0], userLocation[1], savedAddr.tag || "Saved Home");
+                    map.flyTo(userLocation, 15, { duration: 1.2 });
+
+                    // 2. Clean query to remove flat/apartment specific prefixes for OpenStreetMap Nominatim
+                    const cleanQuery = userAddress.replace(/^[^,]+,\s*(?:[0-9]+(?:st|nd|rd|th)?\s*floor,?\s*)?/i, '').trim() || userAddress;
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleanQuery)}&limit=1`)
                         .then(r => r.json())
                         .then(res => {
                             if (res && res[0]) {
                                 const lat = parseFloat(res[0].lat);
                                 const lon = parseFloat(res[0].lon);
                                 userLocation = [lat, lon];
+                                try {
+                                    localStorage.setItem('user_cached_lat', lat);
+                                    localStorage.setItem('user_cached_lng', lon);
+                                    localStorage.setItem('staynest_user_lat', lat);
+                                    localStorage.setItem('staynest_user_lng', lon);
+                                } catch(e) {}
                                 renderUserMarker();
                                 highlightUserRadius(lat, lon, currentSearchRadiusKm);
-                                generatePGsForRegion(lat, lon, "Saved Home");
-                                map.flyTo(userLocation, 15, { duration: 1.2 });
+                                generatePGsForRegion(lat, lon, savedAddr.tag || "Saved Home");
+                                map.flyTo(userLocation, 15, { duration: 0.8 });
                             }
                         }).catch(() => {});
                 }

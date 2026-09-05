@@ -41,7 +41,7 @@ class PropertyListingOtpMail extends Mailable
             replyTo: [
                 new Address($fromAddress, $fromName),
             ],
-            subject: "{$this->otp} is your StayNest property listing verification code",
+            subject: "StayNest: Your Property Listing Verification Code is {$this->otp}",
         );
     }
 
@@ -68,10 +68,7 @@ class PropertyListingOtpMail extends Mailable
     {
         return new Headers(
             text: [
-                'X-Auto-Response-Suppress' => 'All',
-                'X-Priority'               => '1',
-                'X-Mailer'                 => 'StayNest Mailer',
-                'Precedence'               => 'bulk',
+                'X-Auto-Response-Suppress' => 'OOF, AutoReply',
                 'Auto-Submitted'           => 'auto-generated',
             ],
         );

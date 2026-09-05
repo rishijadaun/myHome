@@ -32,14 +32,14 @@ class PasswordResetOtpMail extends Mailable
     public function envelope(): Envelope
     {
         $fromAddress = config('mail.from.address', 'imrishikrishna@gmail.com');
-        $fromName = config('mail.from.name', 'StayNest');
+        $fromName = config('mail.from.name', 'SpaceSeeks');
 
         return new Envelope(
             from: new Address($fromAddress, $fromName),
             replyTo: [
                 new Address($fromAddress, $fromName),
             ],
-            subject: "StayNest: Your Password Reset Verification Code is {$this->otp}",
+            subject: "SpaceSeeks: Your Password Reset Verification Code is {$this->otp}",
         );
     }
 

@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', '404 - Page Not Found | StayNest')
+@section('title', '404 - Page Not Found | SpaceSeeks')
 @section('robots', 'noindex, nofollow')
 
 @section('content')

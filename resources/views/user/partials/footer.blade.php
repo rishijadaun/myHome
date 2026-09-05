@@ -117,13 +117,9 @@
             {{-- COL 1-4: Brand Identity --}}
             <div class="col-span-4 space-y-6">
                 {{-- Logo --}}
-                <a href="{{ route('user.home') }}" class="inline-flex items-center gap-3 group" title="StayNest Home">
-                    <div class="w-11 h-11 bg-gradient-to-br from-brand to-brand-dark rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand/30 group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
-                        <i class="fas fa-home text-lg"></i>
-                    </div>
-                    <div>
-                        <span class="font-extrabold text-[22px] text-white tracking-tight leading-none block">Stay<span class="text-brand">Nest</span></span>
-                        <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest block mt-0.5">Zero Brokerage PG Network</span>
+                <a href="{{ route('user.home') }}" class="inline-flex items-center gap-3 group" title="SpaceSeeks Home">
+                    <div class="bg-white px-3.5 py-2 rounded-2xl shadow-md group-hover:scale-105 transition-transform duration-200">
+                        <img src="{{ asset('images/spaceseeks-logo.png') }}" alt="SpaceSeeks" class="h-8 w-auto object-contain">
                     </div>
                 </a>
 
@@ -312,7 +308,7 @@
                 </h5>
                 <ul class="space-y-2.5">
                     @foreach([
-                        ['About StayNest',   route('user.about')],
+                        ['About SpaceSeeks',   route('user.about')],
                         ['Contact Us',       route('user.contact')],
                         ['Terms of Service', route('user.terms')],
                         ['Privacy Policy',   route('user.privacy')],
@@ -543,7 +539,7 @@
         <div class="border-t border-white/[0.06] pt-6 flex items-center justify-between gap-4">
             {{-- Left: Copyright + made with --}}
             <div class="flex items-center gap-3 text-[11px] text-slate-500 flex-wrap">
-                <span>&copy; {{ date('Y') }} StayNest Technologies Pvt. Ltd. All rights reserved.</span>
+                <span>&copy; {{ date('Y') }} SpaceSeeks Technologies Pvt. Ltd. All rights reserved.</span>
                 <span class="text-white/10">|</span>
                 <span class="inline-flex items-center gap-1.5">
                     Made with <i class="fas fa-heart text-red-500 text-[9px] animate-pulse"></i> for India <span>🇮🇳</span>

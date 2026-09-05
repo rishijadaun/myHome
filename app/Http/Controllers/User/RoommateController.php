@@ -889,7 +889,7 @@ class RoommateController extends Controller
                   . "💡 *Tip:* Propose your preferred day & time (e.g. *\"Can I visit tomorrow at 6 PM?\"*) in this chat. {$post->poster_name} will confirm the visit time with you!";
             $suggestions = ['Can I visit tomorrow evening? 🌆', 'Can I visit this weekend? 🗓️', 'Is the room available? 🔑'];
         } else {
-            $text = "Hello *{$userName}*! 👋 I'm the StayNest Roommate Discussion Assistant.\n\n"
+            $text = "Hello *{$userName}*! 👋 I'm the SpaceSeeks Roommate Discussion Assistant.\n\n"
                   . "Your message has been delivered to *{$post->poster_name}*. While they get back to you, I can answer instant questions about:\n\n"
                   . "• 💰 *Rent:* {$post->budget_range}\n"
                   . "• 🏠 *Room:* {$bhkLabel} in {$locationStr}\n"
@@ -900,7 +900,7 @@ class RoommateController extends Controller
         }
 
         return [
-            'sender_name' => 'StayNest Assistant 🤖',
+            'sender_name' => 'SpaceSeeks Assistant 🤖',
             'message'     => $text,
             'time'        => date('h:i A'),
             'suggestions' => $suggestions,

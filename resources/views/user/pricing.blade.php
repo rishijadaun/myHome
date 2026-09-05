@@ -1,8 +1,8 @@
 @extends('user.layouts.app')
 
-@section('title', 'Pricing Plans - Zero Brokerage for Tenants & Transparent Landlord Tiers | StayNest')
-@section('meta_description', 'Explore StayNest pricing plans. 100% free with zero brokerage forever for tenants. Affordable verified listing plans and lead management for PG landlords.')
-@section('meta_keywords', 'StayNest pricing, PG listing subscription, Zero brokerage student PG, Landlord listing plans')
+@section('title', 'Pricing Plans - Zero Brokerage for Tenants & Transparent Landlord Tiers | SpaceSeeks')
+@section('meta_description', 'Explore SpaceSeeks pricing plans. 100% free with zero brokerage forever for tenants. Affordable verified listing plans and lead management for PG landlords.')
+@section('meta_keywords', 'SpaceSeeks pricing, PG listing subscription, Zero brokerage student PG, Landlord listing plans')
 @section('canonical', route('user.pricing'))
 
 @push('schema')
@@ -10,7 +10,7 @@
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "StayNest Pricing Plans",
+  "name": "SpaceSeeks Pricing Plans",
   "url": "{{ route('user.pricing') }}",
   "description": "Zero brokerage for tenants, flexible plans for PG owners.",
   "offers": [

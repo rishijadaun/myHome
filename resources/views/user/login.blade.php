@@ -1,7 +1,7 @@
 @extends('user.layouts.app')
 
-@section('title', 'Login & Sign Up - StayNest | Verified PG Network')
-@section('meta_description', 'Sign in or create your StayNest account to discover verified PGs, hostels & co-living spaces across India with zero brokerage.')
+@section('title', 'Login & Sign Up - SpaceSeeks | Verified PG Network')
+@section('meta_description', 'Sign in or create your SpaceSeeks account to discover verified PGs, hostels & co-living spaces across India with zero brokerage.')
 @section('robots', 'noindex, nofollow')
 
 @push('styles')
@@ -82,14 +82,8 @@
             <button onclick="window.history.back()" class="w-9 h-9 rounded-xl bg-white shadow-2xs border border-slate-200 flex items-center justify-center text-slate-700 tap-effect" aria-label="Go Back">
                 <i class="fas fa-arrow-left text-xs"></i>
             </button>
-            <a href="{{ route('user.home') }}" class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-[#057a55] rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-md shadow-emerald-900/20">
-                    <i class="fas fa-home text-xs"></i>
-                </div>
-                <div class="flex flex-col">
-                    <span class="font-extrabold text-base text-slate-900 tracking-tight leading-none">Stay<span class="text-[#057a55]">Nest</span></span>
-                    <span class="text-[8px] font-bold text-slate-400 tracking-widest uppercase mt-0.5">Verified PG Network</span>
-                </div>
+            <a href="{{ route('user.home') }}" class="flex items-center" title="SpaceSeeks Home">
+                <img src="{{ asset('images/spaceseeks-logo.png') }}" alt="SpaceSeeks" class="h-8 w-auto object-contain">
             </a>
             <a href="{{ route('user.home') }}" class="w-9 h-9 rounded-xl bg-white shadow-2xs border border-slate-200 flex items-center justify-center text-[#057a55] tap-effect" aria-label="Home">
                 <i class="fas fa-house-chimney text-xs"></i>
@@ -101,7 +95,7 @@
             <!-- Mobile Header -->
             <div class="text-center mb-5" id="mob-header-box">
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight" id="mob-auth-title">Welcome Back</h1>
-                <p class="text-xs text-slate-500 mt-1" id="mob-auth-subtitle">Sign in to your StayNest account</p>
+                <p class="text-xs text-slate-500 mt-1" id="mob-auth-subtitle">Sign in to your SpaceSeeks account</p>
             </div>
 
             <!-- Error Box -->
@@ -133,7 +127,7 @@
                                 <i class="fas fa-envelope auth-icon absolute left-3.5 top-3 text-slate-400 text-sm pointer-events-none transition-colors"></i>
                                 <input type="text" 
                                     id="mob_login_input" 
-                                    placeholder="admin@staynest.com" 
+                                    placeholder="name@example.com" 
                                     minlength="3" 
                                     maxlength="150" 
                                     required
@@ -276,7 +270,7 @@
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address (Gmail) <span class="text-red-500">*</span></label>
                                 <div class="auth-input-container">
                                     <i class="fas fa-envelope auth-icon absolute left-3 top-2.5 text-slate-400 text-xs pointer-events-none transition-colors"></i>
-                                    <input type="email" id="mob_signup_email" placeholder="admin@staynest.com" minlength="5" maxlength="150" required
+                                    <input type="email" id="mob_signup_email" placeholder="name@gmail.com" minlength="5" maxlength="150" required
                                         class="w-full rounded-xl py-2 pl-8 pr-3 text-xs text-slate-900 font-medium focus:outline-none placeholder:text-slate-400">
                                 </div>
                                 <p class="text-[10px] text-slate-400 mt-1">We will send a 6-digit OTP code to verify this Gmail address.</p>
@@ -338,7 +332,7 @@
                             <!-- Terms -->
                             <label class="flex items-start gap-2 pt-0.5 cursor-pointer select-none">
                                 <input type="checkbox" id="mob_signup_terms" required class="w-4 h-4 rounded border-slate-300 text-[#057a55] focus:ring-[#057a55] mt-0.5" checked>
-                                <span class="text-[11px] text-slate-600">I agree to StayNest <a href="{{ route('user.terms') }}" class="text-[#057a55] font-semibold hover:underline">Terms of Service</a> and <a href="{{ route('user.privacy') }}" class="text-[#057a55] font-semibold hover:underline">Privacy Policy</a></span>
+                                <span class="text-[11px] text-slate-600">I agree to SpaceSeeks <a href="{{ route('user.terms') }}" class="text-[#057a55] font-semibold hover:underline">Terms of Service</a> and <a href="{{ route('user.privacy') }}" class="text-[#057a55] font-semibold hover:underline">Privacy Policy</a></span>
                             </label>
 
                             <!-- Submit -->
@@ -363,7 +357,7 @@
                                 Sign Up with Google
                             </button>
 
-                            <p class="text-[10px] text-center text-slate-400 mt-2">By creating an account, you agree to receive important updates from StayNest.</p>
+                            <p class="text-[10px] text-center text-slate-400 mt-2">By creating an account, you agree to receive important updates from SpaceSeeks.</p>
                         </div>
                     </form>
                 </div>
@@ -437,7 +431,7 @@
                                     <i class="fas fa-envelope auth-icon absolute left-3.5 top-3 text-slate-400 text-sm pointer-events-none transition-colors"></i>
                                     <input type="email" 
                                         id="mob_forgot_login" 
-                                        placeholder="admin@staynest.com" 
+                                        placeholder="name@example.com" 
                                         minlength="5" 
                                         maxlength="150" 
                                         required
@@ -557,7 +551,7 @@
 
         <!-- Mobile Footer -->
         <div class="text-center text-[11px] text-slate-400 py-2">
-            &copy; {{ date('Y') }} StayNest. 100% Zero Brokerage Verified PGs.
+            &copy; {{ date('Y') }} SpaceSeeks. 100% Zero Brokerage Verified PGs.
         </div>
     </div>
 
@@ -575,13 +569,9 @@
 
                 <!-- Top Brand Header -->
                 <div class="relative z-10 flex items-center justify-between">
-                    <a href="{{ route('user.home') }}" class="inline-flex items-center gap-3 group">
-                        <div class="w-11 h-11 bg-emerald-500/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-emerald-300 font-bold text-xl border border-emerald-400/30 shadow-lg group-hover:scale-105 transition-transform">
-                            <i class="fas fa-home text-emerald-300"></i>
-                        </div>
-                        <div>
-                            <span class="font-extrabold text-2xl tracking-tight text-white">Stay<span class="text-emerald-400">Nest</span></span>
-                            <span class="block text-[9px] font-bold text-emerald-300/80 tracking-widest uppercase">Verified PG Network</span>
+                    <a href="{{ route('user.home') }}" class="inline-flex items-center gap-3 group" title="SpaceSeeks Home">
+                        <div class="bg-white/95 px-3.5 py-2 rounded-2xl shadow-xl group-hover:scale-105 transition-transform">
+                            <img src="{{ asset('images/spaceseeks-logo.png') }}" alt="SpaceSeeks" class="h-8 w-auto object-contain">
                         </div>
                     </a>
 
@@ -647,7 +637,7 @@
                     <div class="hidden xl:block xl:col-span-5">
                         <div class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-white/15 group">
                             <!-- Hero Bedroom Photo -->
-                            <img src="{{ asset('images/auth-bedroom.jpg') }}" alt="StayNest Verified PG Room" class="w-full h-[380px] 2xl:h-[420px] object-cover group-hover:scale-105 transition-transform duration-700">
+                            <img src="{{ asset('images/auth-bedroom.jpg') }}" alt="SpaceSeeks Verified PG Room" class="w-full h-[380px] 2xl:h-[420px] object-cover group-hover:scale-105 transition-transform duration-700">
 
                             <!-- Subtle gradient overlay -->
                             <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20 pointer-events-none"></div>
@@ -742,7 +732,7 @@
                         <!-- Desktop Header Box -->
                         <div class="text-center mb-6" id="desk-header-box">
                             <h2 id="desktop-title" class="text-2xl 2xl:text-3xl font-extrabold text-slate-900 tracking-tight">Welcome Back</h2>
-                            <p id="desktop-subtitle" class="text-slate-500 text-xs mt-1">Sign in to your StayNest account</p>
+                            <p id="desktop-subtitle" class="text-slate-500 text-xs mt-1">Sign in to your SpaceSeeks account</p>
                         </div>
 
                         <!-- Error Alert Box -->
@@ -774,7 +764,7 @@
                                             <i class="fas fa-envelope auth-icon absolute left-4 top-3.5 text-slate-400 text-sm pointer-events-none transition-colors"></i>
                                             <input type="text" 
                                                 id="desk_login_input" 
-                                                placeholder="admin@staynest.com" 
+                                                placeholder="name@example.com" 
                                                 minlength="3" 
                                                 maxlength="150" 
                                                 required
@@ -924,7 +914,7 @@
                                             <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address (Gmail) <span class="text-red-500">*</span></label>
                                             <div class="auth-input-container">
                                                 <i class="fas fa-envelope auth-icon absolute left-3.5 top-3 text-slate-400 text-xs pointer-events-none transition-colors"></i>
-                                                <input type="email" id="desk_signup_email" placeholder="admin@staynest.com" minlength="5" maxlength="150" required
+                                                <input type="email" id="desk_signup_email" placeholder="name@gmail.com" minlength="5" maxlength="150" required
                                                     class="w-full rounded-xl py-2.5 pl-9 pr-3 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none placeholder:text-slate-400">
                                             </div>
                                             <p class="text-[10px] text-slate-400 mt-1">We will send a 6-digit OTP code to verify this Gmail address.</p>
@@ -987,7 +977,7 @@
                                         <!-- Terms -->
                                         <label class="flex items-start gap-2 pt-0.5 cursor-pointer select-none">
                                             <input type="checkbox" id="desk_signup_terms" required class="w-4 h-4 rounded border-slate-300 text-[#057a55] focus:ring-[#057a55] mt-0.5" checked>
-                                            <span class="text-xs text-slate-600">I agree to StayNest <a href="{{ route('user.terms') }}" class="text-[#057a55] font-semibold hover:underline">Terms of Service</a> and <a href="{{ route('user.privacy') }}" class="text-[#057a55] font-semibold hover:underline">Privacy Policy</a></span>
+                                            <span class="text-xs text-slate-600">I agree to SpaceSeeks <a href="{{ route('user.terms') }}" class="text-[#057a55] font-semibold hover:underline">Terms of Service</a> and <a href="{{ route('user.privacy') }}" class="text-[#057a55] font-semibold hover:underline">Privacy Policy</a></span>
                                         </label>
 
                                         <!-- Submit -->
@@ -1015,7 +1005,7 @@
                                             </button>
                                         </div>
 
-                                        <p class="text-[10px] text-center text-slate-400 mt-2">By creating an account, you agree to receive important updates from StayNest.</p>
+                                        <p class="text-[10px] text-center text-slate-400 mt-2">By creating an account, you agree to receive important updates from SpaceSeeks.</p>
                                     </div>
                                 </form>
                             </div>
@@ -1089,7 +1079,7 @@
                                                 <i class="fas fa-envelope auth-icon absolute left-4 top-3.5 text-slate-400 text-sm pointer-events-none transition-colors"></i>
                                                 <input type="email" 
                                                     id="desk_forgot_login" 
-                                                    placeholder="admin@staynest.com" 
+                                                    placeholder="name@example.com" 
                                                     minlength="5" 
                                                     maxlength="150" 
                                                     required
@@ -1321,9 +1311,9 @@
                 document.getElementById('loginTabD').className = activeClass;
                 
                 document.getElementById('mob-auth-title').innerText = 'Welcome Back';
-                document.getElementById('mob-auth-subtitle').innerText = 'Sign in to your StayNest account';
+                document.getElementById('mob-auth-subtitle').innerText = 'Sign in to your SpaceSeeks account';
                 document.getElementById('desktop-title').innerText = 'Welcome Back';
-                document.getElementById('desktop-subtitle').innerText = 'Sign in to your StayNest account';
+                document.getElementById('desktop-subtitle').innerText = 'Sign in to your SpaceSeeks account';
 
                 if (deskTopLogin) deskTopLogin.classList.remove('hidden');
                 if (deskTopSignup) deskTopSignup.classList.add('hidden');
@@ -1334,9 +1324,9 @@
                 document.getElementById('signupTabD').className = activeClass;
                 
                 document.getElementById('mob-auth-title').innerText = 'Create Your Account';
-                document.getElementById('mob-auth-subtitle').innerText = 'Join StayNest to find & book verified stays';
+                document.getElementById('mob-auth-subtitle').innerText = 'Join SpaceSeeks to find & book verified stays';
                 document.getElementById('desktop-title').innerText = 'Create Your Account';
-                document.getElementById('desktop-subtitle').innerText = 'Join StayNest to find & book verified stays';
+                document.getElementById('desktop-subtitle').innerText = 'Join SpaceSeeks to find & book verified stays';
 
                 if (deskTopLogin) deskTopLogin.classList.add('hidden');
                 if (deskTopSignup) deskTopSignup.classList.remove('hidden');

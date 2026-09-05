@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'My Profile - StayNest')
+@section('title', 'My Profile - SpaceSeeks')
 @section('robots', 'noindex, nofollow')
 
 @section('content')
@@ -48,7 +48,7 @@
                         </span>
                     </div>
                     <p id="userTaglineHeading" class="text-sm font-semibold text-teal-100/90 mt-0.5">
-                        {{ $user?->profile?->tagline ?: ($isTenant ? 'Tenant Member · StayNest Verified' : 'StayNest Resident') }}
+                        {{ $user?->profile?->tagline ?: ($isTenant ? 'Tenant Member · SpaceSeeks Verified' : 'SpaceSeeks Resident') }}
                     </p>
                     <p id="userEmailHeading" class="text-xs text-teal-200/75 mt-0.5">{{ $user?->email ?? ($user?->phone ?? 'Registered User') }}</p>
                 </div>
@@ -82,11 +82,11 @@
                     <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4">Activity Overview</h3>
                     <div class="grid grid-cols-3 gap-3 text-center">
                         <a href="{{ route('user.bookings') }}" class="bg-gray-50 hover:bg-brand-light p-3 rounded-2xl border border-gray-100 transition tap-effect">
-                            <span class="block text-xl font-black text-gray-900" id="statBookings">3</span>
+                            <span class="block text-xl font-black text-gray-900" id="statBookings">{{ $bookingsCount ?? 0 }}</span>
                             <span class="text-[11px] font-semibold text-gray-500">Bookings</span>
                         </a>
                         <a href="{{ route('user.saved') }}" class="bg-gray-50 hover:bg-brand-light p-3 rounded-2xl border border-gray-100 transition tap-effect">
-                            <span class="block text-xl font-black text-gray-900" id="statSaved">5</span>
+                            <span class="block text-xl font-black text-gray-900" id="statSaved">0</span>
                             <span class="text-[11px] font-semibold text-gray-500">Saved</span>
                         </a>
                         <button type="button" onclick="openAddressModal()" class="bg-gray-50 hover:bg-brand-light p-3 rounded-2xl border border-gray-100 transition tap-effect">
@@ -866,7 +866,7 @@ function renderProfileView() {
     if (currentProfileData.age) parts.push(`${currentProfileData.age} years`);
     if (currentProfileData.gender) parts.push(currentProfileData.gender.charAt(0).toUpperCase() + currentProfileData.gender.slice(1).toLowerCase());
     if (currentProfileData.occupation) parts.push(currentProfileData.occupation);
-    const tagline = parts.length > 0 ? parts.join(' · ') : 'Tenant Member · StayNest Verified';
+    const tagline = parts.length > 0 ? parts.join(' · ') : 'Tenant Member · SpaceSeeks Verified';
     const tagEl = document.getElementById('userTaglineHeading');
     if (tagEl) tagEl.innerText = tagline;
 
@@ -1659,5 +1659,16 @@ function showToast(title, msg) {
         toast.classList.add('hidden');
     }, 3500);
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadSavedAddress();
+    if (typeof getSavedProperties === 'function') {
+        const savedList = getSavedProperties();
+        const statSavedEl = document.getElementById('statSaved');
+        if (statSavedEl) {
+            statSavedEl.innerText = savedList.length;
+        }
+    }
+});
 </script>
 @endsection

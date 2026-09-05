@@ -1,6 +1,6 @@
 {
-  "name": "StayNest - Zero Brokerage PG & Co-Living Discovery",
-  "short_name": "StayNest",
+  "name": "SpaceSeeks - Zero Brokerage PG & Co-Living Discovery",
+  "short_name": "SpaceSeeks",
   "description": "Discover 100% verified PGs, luxury hostels, and co-living spaces across India with zero brokerage.",
   "start_url": "/",
   "display": "standalone",
@@ -9,9 +9,28 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/images/favicon.png",
+      "src": "/images/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/images/favicon.png",

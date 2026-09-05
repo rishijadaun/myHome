@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Broker KYC & Document Verifications - StayNest Admin')
+@section('title', 'Broker KYC & Document Verifications - SpaceSeeks Admin')
 
 @section('content')
 <style>
@@ -584,7 +584,7 @@
         <div class="p-4 sm:p-5 border-t flex flex-col sm:flex-row items-center justify-between gap-3.5" style="background: #f8fafc; border-color: #e2e8f0;">
             <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 text-center sm:text-left">
                 <i class="fas fa-shield-halved text-teal-600 text-sm"></i>
-                <span>Approval activates verified badge & public listings on StayNest.</span>
+                <span>Approval activates verified badge & public listings on SpaceSeeks.</span>
             </div>
             <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
                 <button type="button" onclick="closeReviewModal()" class="px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold rounded-xl text-xs tap-effect transition cursor-pointer">

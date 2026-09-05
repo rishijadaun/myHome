@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>StayNest Property Listing Verification Code</title>
+    <title>SpaceSeeks Property Listing Verification Code</title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -31,7 +31,7 @@
 
     <!-- Preheader text -->
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-        Your StayNest property listing verification OTP is {{ $otp }}. Enter this 6-digit code to submit your listing for approval.
+        Your SpaceSeeks property listing verification OTP is {{ $otp }}. Enter this 6-digit code to submit your listing for approval.
     </div>
 
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 30px 10px;">
@@ -50,7 +50,7 @@
                                             🏢
                                         </div>
                                         <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.2;">
-                                            StayNest
+                                            SpaceSeeks
                                         </h1>
                                         <p style="margin: 4px 0 0 0; font-size: 12px; color: #ccfbf1; font-weight: 600; letter-spacing: 0.5px;">
                                             Zero Brokerage Property Network
@@ -70,7 +70,7 @@
                             </p>
 
                             <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 22px; color: #475569;">
-                                Thank you for listing your property on <strong>StayNest</strong>. To verify your identity as the property owner and submit your listing for  approval, please use the 6-digit verification code below:
+                                Thank you for listing your property on <strong>SpaceSeeks</strong>. To verify your identity as the property owner and submit your listing for  approval, please use the 6-digit verification code below:
                             </p>
 
                             <!-- OTP Box -->
@@ -94,18 +94,18 @@
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 8px; border-left: 4px solid #0d9488; padding: 14px 16px; margin-bottom: 24px;">
                                 <tr>
                                     <td style="font-size: 12px; line-height: 18px; color: #475569;">
-                                        <strong>✅ Next Steps:</strong> Once verified, your listing will be sent directly to the StayNest verification team. Upon 24h quality approval, it will go live to 50,000+ verified tenants with 0% brokerage!
+                                        <strong>✅ Next Steps:</strong> Once verified, your listing will be sent directly to the SpaceSeeks verification team. Upon 24h quality approval, it will go live to 50,000+ verified tenants with 0% brokerage!
                                     </td>
                                 </tr>
                             </table>
 
                             <p style="margin: 0; font-size: 13px; line-height: 20px; color: #64748b;">
-                                If you did not request to list a property on StayNest, you can safely ignore this email.
+                                If you did not request to list a property on SpaceSeeks, you can safely ignore this email.
                             </p>
 
                             <p style="margin: 24px 0 0 0; font-size: 13px; line-height: 20px; color: #334155; font-weight: 600;">
                                 Warm regards,<br />
-                                <span style="color: #0f766e;">StayNest Verification & Partner Support</span>
+                                <span style="color: #0f766e;">SpaceSeeks Verification & Partner Support</span>
                             </p>
 
                         </td>
@@ -115,10 +115,10 @@
                     <tr>
                         <td align="center" style="background-color: #f1f5f9; padding: 20px 24px; border-top: 1px solid #e2e8f0;">
                             <p style="margin: 0 0 6px 0; font-size: 11px; color: #64748b; line-height: 16px;">
-                                This is an automated transactional security message from <a href="{{ config('app.url') }}" style="color: #0f766e; text-decoration: none; font-weight: 600;">StayNest</a>.
+                                This is an automated transactional security message from <a href="{{ config('app.url') }}" style="color: #0f766e; text-decoration: none; font-weight: 600;">SpaceSeeks</a>.
                             </p>
                             <p style="margin: 0; font-size: 11px; color: #94a3b8; line-height: 16px;">
-                                &copy; {{ date('Y') }} StayNest. All rights reserved. Zero Brokerage Guarantee.
+                                &copy; {{ date('Y') }} SpaceSeeks. All rights reserved. Zero Brokerage Guarantee.
                             </p>
                         </td>
                     </tr>

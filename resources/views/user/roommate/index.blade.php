@@ -32,14 +32,14 @@
 
     // Dynamic SEO Titles
     if ($selectedCity) {
-        $seoTitle = 'Find Flatmates & Shared Rooms in ' . ucfirst($selectedCity) . ' — Zero Brokerage | StayNest';
+        $seoTitle = 'Find Flatmates & Shared Rooms in ' . ucfirst($selectedCity) . ' — Zero Brokerage | SpaceSeeks';
         $seoDesc = 'Browse ' . $totalActive . '+ verified roommate and flatmate profiles in ' . ucfirst($selectedCity) . '. Connect directly with verified flatmates via WhatsApp with zero brokerage.';
     } elseif ($searchQ) {
-        $seoTitle = 'Search Flatmates for "' . e($searchQ) . '" — Zero Brokerage | StayNest';
-        $seoDesc = 'Find top matching flatmates and shared rooms for "' . e($searchQ) . '" with zero brokerage on StayNest.';
+        $seoTitle = 'Search Flatmates for "' . e($searchQ) . '" — Zero Brokerage | SpaceSeeks';
+        $seoDesc = 'Find top matching flatmates and shared rooms for "' . e($searchQ) . '" with zero brokerage on SpaceSeeks.';
     } else {
-        $seoTitle = 'Find Flatmate & Roommate in India — 100% Verified, Zero Brokerage | StayNest';
-        $seoDesc = 'Discover verified flatmates, private rooms, and shared apartments across Delhi, Noida, Gurgaon, Bangalore, Mumbai, and Pune. Direct chat on StayNest.';
+        $seoTitle = 'Find Flatmate & Roommate in India — 100% Verified, Zero Brokerage | SpaceSeeks';
+        $seoDesc = 'Discover verified flatmates, private rooms, and shared apartments across Delhi, Noida, Gurgaon, Bangalore, Mumbai, and Pune. Direct chat on SpaceSeeks.';
     }
     $seoKeywords = 'flatmate in ' . ($selectedCity ?: 'India') . ', roommate in ' . ($selectedCity ?: 'India') . ', shared room, 2 bhk flatmate, girls pg flatmate, boys room, zero brokerage flatmate';
     $canonicalUrl = url()->current();

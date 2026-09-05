@@ -464,9 +464,9 @@ class AuthController extends Controller
             ]);
 
             $statusMsg = match ($user->status) {
-                'pending_verification' => 'Your account is pending verification and approval by StayNest Admin.',
-                'rejected' => 'Your account registration was rejected. Please contact StayNest support.',
-                'suspended' => 'Your account has been suspended by administrator. Please contact StayNest support.',
+                'pending_verification' => 'Your account is pending verification and approval by SpaceSeeks Admin.',
+                'rejected' => 'Your account registration was rejected. Please contact SpaceSeeks support.',
+                'suspended' => 'Your account has been suspended by administrator. Please contact SpaceSeeks support.',
                 default => 'Your account is currently inactive. Only active accounts are permitted to log in.',
             };
 

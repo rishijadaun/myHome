@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>StayNest Email Verification Code</title>
+    <title>SpaceSeeks Email Verification Code</title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -31,7 +31,7 @@
 
     <!-- Preheader Text -->
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-        Your StayNest verification code is {{ $otp }}. Use this 6-digit code to verify your email address.
+        Your SpaceSeeks verification code is {{ $otp }}. Use this 6-digit code to verify your email address.
     </div>
 
     <!-- Main Wrapper Table -->
@@ -52,7 +52,7 @@
                                             🏠
                                         </div>
                                         <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.2;">
-                                            StayNest
+                                            SpaceSeeks
                                         </h1>
                                         <p style="margin: 4px 0 0 0; font-size: 12px; color: #ccfbf1; font-weight: 500; letter-spacing: 0.5px;">
                                             Verified Residential Platform
@@ -72,7 +72,7 @@
                             </p>
 
                             <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 22px; color: #475569;">
-                                We received a request to update your registered email address on your <strong>StayNest</strong> account. Please use the 6-digit verification code below to confirm this change:
+                                We received a request to update your registered email address on your <strong>SpaceSeeks</strong> account. Please use the 6-digit verification code below to confirm this change:
                             </p>
 
                             <!-- OTP Box -->
@@ -96,7 +96,7 @@
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 8px; border-left: 4px solid #0d9488; padding: 14px 16px; margin-bottom: 24px;">
                                 <tr>
                                     <td style="font-size: 12px; line-height: 18px; color: #475569;">
-                                        <strong>🔒 Security Reminder:</strong> Never share this code with anyone. StayNest support staff will never ask for your OTP or password.
+                                        <strong>🔒 Security Reminder:</strong> Never share this code with anyone. SpaceSeeks support staff will never ask for your OTP or password.
                                     </td>
                                 </tr>
                             </table>
@@ -107,7 +107,7 @@
 
                             <p style="margin: 24px 0 0 0; font-size: 13px; line-height: 20px; color: #334155; font-weight: 600;">
                                 Best regards,<br />
-                                <span style="color: #0f766e;">The StayNest Security Team</span>
+                                <span style="color: #0f766e;">The SpaceSeeks Security Team</span>
                             </p>
 
                         </td>
@@ -117,10 +117,10 @@
                     <tr>
                         <td align="center" style="background-color: #f1f5f9; padding: 20px 24px; border-top: 1px solid #e2e8f0;">
                             <p style="margin: 0 0 6px 0; font-size: 11px; color: #64748b; line-height: 16px;">
-                                This is an automated transactional security message from <a href="{{ config('app.url') }}" style="color: #0f766e; text-decoration: none; font-weight: 600;">StayNest</a>.
+                                This is an automated transactional security message from <a href="{{ config('app.url') }}" style="color: #0f766e; text-decoration: none; font-weight: 600;">SpaceSeeks</a>.
                             </p>
                             <p style="margin: 0; font-size: 11px; color: #94a3b8; line-height: 16px;">
-                                &copy; {{ date('Y') }} StayNest Residential Services. All rights reserved.
+                                &copy; {{ date('Y') }} SpaceSeeks Residential Services. All rights reserved.
                             </p>
                         </td>
                     </tr>

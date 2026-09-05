@@ -118,7 +118,7 @@ class AdminBookingController extends Controller
                 'user_id' => $booking->user_id,
                 'user_type' => 'user',
                 'title' => 'Booking Confirmed by Admin 🎉',
-                'message' => "Your booking for {$booking->property?->name} (#{$booking->booking_id}) has been confirmed by StayNest Admin.",
+                'message' => "Your booking for {$booking->property?->name} (#{$booking->booking_id}) has been confirmed by SpaceSeeks Admin.",
                 'type' => 'booking_approved',
                 'is_read' => 0,
                 'action_url' => '/bookings',
@@ -153,7 +153,7 @@ class AdminBookingController extends Controller
     {
         $booking = Booking::findOrFail($id);
 
-        $reason = $request->input('reason', 'Cancelled by StayNest Administration.');
+        $reason = $request->input('reason', 'Cancelled by SpaceSeeks Administration.');
         $booking->booking_status = 'cancelled';
         $booking->broker_approval = 'rejected';
         $booking->cancellation_reason = $reason;
@@ -248,7 +248,7 @@ class AdminBookingController extends Controller
             fclose($handle);
         });
 
-        $filename = 'staynest_bookings_' . date('Y-m-d_His') . '.csv';
+        $filename = 'spaceseeks_bookings_' . date('Y-m-d_His') . '.csv';
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
 

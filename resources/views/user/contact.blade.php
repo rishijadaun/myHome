@@ -1,8 +1,8 @@
 @extends('user.layouts.app')
 
-@section('title', 'Contact Us - 24/7 Dedicated Support & Broker Partnerships | StayNest')
-@section('meta_description', 'Contact StayNest customer care, landlord onboarding, and broker partnership team. Call +91 98765 43210, WhatsApp us or submit your query online for fast resolution.')
-@section('meta_keywords', 'Contact StayNest, StayNest customer care, PG landlord helpline, Broker partnership inquiry, StayNest phone number')
+@section('title', 'Contact Us - 24/7 Dedicated Support & Broker Partnerships | SpaceSeeks')
+@section('meta_description', 'Contact SpaceSeeks customer care, landlord onboarding, and broker partnership team. Call +91 98765 43210, WhatsApp us or submit your query online for fast resolution.')
+@section('meta_keywords', 'Contact SpaceSeeks, SpaceSeeks customer care, PG landlord helpline, Broker partnership inquiry, SpaceSeeks phone number')
 @section('canonical', route('user.contact'))
 
 @push('schema')
@@ -10,14 +10,14 @@
 {
   "@context": "https://schema.org",
   "@type": "ContactPage",
-  "name": "Contact StayNest",
+  "name": "Contact SpaceSeeks",
   "url": "{{ route('user.contact') }}",
-  "description": "Get in touch with StayNest support, host onboarding, and broker partnerships.",
+  "description": "Get in touch with SpaceSeeks support, host onboarding, and broker partnerships.",
   "mainEntity": {
     "@type": "Organization",
-    "name": "StayNest",
+    "name": "SpaceSeeks",
     "telephone": "+91-98765-43210",
-    "email": "support@staynest.com",
+    "email": "support@spaceseeks.com",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "#123, 4th Cross, 80 Feet Road, 4th Block, Koramangala",
@@ -96,12 +96,12 @@
                 <div>
                     <h3 class="font-bold text-slate-900 text-base">Email Support</h3>
                     <p class="text-xs text-slate-500 mt-0.5">We reply within 24 hours</p>
-                    <a href="mailto:support@staynest.com" class="inline-block mt-2 font-bold text-blue-600 hover:text-blue-700 text-base transition truncate max-w-full">
-                        support@staynest.com
+                    <a href="mailto:support@spaceseeks.com" class="inline-block mt-2 font-bold text-blue-600 hover:text-blue-700 text-base transition truncate max-w-full">
+                        support@spaceseeks.com
                     </a>
                 </div>
             </div>
-            <a href="mailto:support@staynest.com" class="mt-4 w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-2.5 rounded-xl text-center text-xs tap-effect transition flex items-center justify-center gap-2">
+            <a href="mailto:support@spaceseeks.com" class="mt-4 w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-2.5 rounded-xl text-center text-xs tap-effect transition flex items-center justify-center gap-2">
                 <i class="fas fa-paper-plane text-[10px]"></i> Send Email
             </a>
         </div>
@@ -236,17 +236,17 @@
         <div class="text-center max-w-xl mx-auto mb-8">
             <span class="text-brand bg-brand-light text-xs font-bold px-3 py-1 rounded-full uppercase">Got Questions?</span>
             <h2 class="text-2xl font-bold text-slate-900 mt-2">Frequently Asked Questions</h2>
-            <p class="text-xs text-slate-500 mt-1">Quick answers to help you navigate StayNest seamlessly</p>
+            <p class="text-xs text-slate-500 mt-1">Quick answers to help you navigate SpaceSeeks seamlessly</p>
         </div>
 
         <div class="space-y-4 max-w-3xl mx-auto">
             <div class="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
                 <h4 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
-                    <span>Is there any brokerage fee for booking a PG on StayNest?</span>
+                    <span>Is there any brokerage fee for booking a PG on SpaceSeeks?</span>
                     <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
                 </h4>
                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                    No, StayNest is 100% brokerage-free for students and working professionals. You connect directly with verified property hosts and caretakers.
+                    No, SpaceSeeks is 100% brokerage-free for students and working professionals. You connect directly with verified property hosts and caretakers.
                 </p>
             </div>
 
@@ -262,7 +262,7 @@
 
             <div class="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
                 <h4 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
-                    <span>How can I list my PG or hostel on StayNest?</span>
+                    <span>How can I list my PG or hostel on SpaceSeeks?</span>
                     <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform"></i>
                 </h4>
                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
@@ -283,7 +283,7 @@
                     </div>
                     <div>
                         <span class="text-[10px] font-bold text-brand uppercase tracking-wider">Headquarters</span>
-                        <h3 class="font-bold text-slate-900 text-base">StayNest Technologies Pvt. Ltd.</h3>
+                        <h3 class="font-bold text-slate-900 text-base">SpaceSeeks Technologies Pvt. Ltd.</h3>
                     </div>
                 </div>
 
@@ -332,7 +332,7 @@
                     <h4 class="font-bold text-slate-900 text-sm">Zero Brokerage Guarantee</h4>
                 </div>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                    StayNest does not charge any brokerage or finding fee from tenants. Every interaction and booking on StayNest is completely transparent and direct.
+                    SpaceSeeks does not charge any brokerage or finding fee from tenants. Every interaction and booking on SpaceSeeks is completely transparent and direct.
                 </p>
             </div>
         </div> -->
@@ -525,7 +525,7 @@
             }
             const msgEl = document.getElementById('contact_message');
             if (msgEl && !msgEl.value) {
-                msgEl.placeholder = "Hello StayNest Team, I would like to partner with StayNest as a property broker. Here are my agency/property details...";
+                msgEl.placeholder = "Hello SpaceSeeks Team, I would like to partner with SpaceSeeks as a property broker. Here are my agency/property details...";
             }
         }
     });

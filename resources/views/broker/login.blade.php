@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#4bb59d">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Partner Broker Login - StayNest Portal</title>
+    <title>Partner Broker Login - SpaceSeeks Portal</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,9 +38,10 @@
             <div class="absolute bottom-0 left-0 w-72 h-72 bg-teal-400/10 rounded-full -ml-36 -mb-36 blur-2xl"></div>
 
             <div class="relative z-10">
-                <a href="{{ route('user.home') }}" class="flex items-center gap-2.5 mb-10 inline-flex group">
-                    <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white font-bold text-2xl group-hover:scale-105 transition shadow-lg"><i class="fas fa-home"></i></div>
-                    <span class="font-extrabold text-3xl tracking-tight text-white">StayNest</span>
+                <a href="{{ route('user.home') }}" class="mb-8 inline-flex group" title="SpaceSeeks Home">
+                    <div class="bg-white/95 px-4 py-2.5 rounded-2xl shadow-xl group-hover:scale-105 transition">
+                        <img src="{{ asset('images/spaceseeks-logo.png') }}" alt="SpaceSeeks" class="h-8 w-auto object-contain">
+                    </div>
                 </a>
                 
                 <!-- <div class="inline-block px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-xs font-bold uppercase tracking-wider mb-4 border border-white/20">
@@ -49,20 +53,8 @@
             </div>
 
             <div class="relative z-10 mt-10 space-y-4">
-                <!-- <div class="p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold text-sm">
-                            <i class="fas fa-shield-check text-emerald-300"></i>
-                        </div>
-                        <div>
-                            <div class="text-sm font-bold text-white">Verified Partner Portal</div>
-                            <div class="text-xs text-white/70">Secured with API OAuth & 256-bit encryption</div>
-                        </div>
-                    </div>
-                </div> -->
-
                 <div class="flex items-center justify-between text-xs text-white/70 font-medium">
-                    <span>© {{ date('Y') }} StayNest Technologies Inc.</span>
+                    <span>© {{ date('Y') }} SpaceSeeks Technologies Inc.</span>
                     <a href="{{ route('user.home') }}" class="hover:text-white transition flex items-center gap-1">
                         <i class="fas fa-arrow-left text-[10px]"></i> Main Website
                     </a>
@@ -75,6 +67,15 @@
             <div class="w-full">
                 
                 <div class="mb-6">
+                    <div class="md:hidden mb-4">
+                        <a href="{{ route('user.home') }}" class="inline-block">
+                            <img src="{{ asset('images/spaceseeks-logo.png') }}" alt="SpaceSeeks" class="h-8 w-auto object-contain">
+                        </a>
+                    </div>
+                    <div class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 border border-brand-100 text-brand text-xs font-bold uppercase tracking-wider mb-3">
+                        <span class="w-2 h-2 rounded-full bg-brand animate-pulse"></span>
+                        Broker Access Portal
+                    </div>
                     <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-1.5">Broker Sign In</h2>
                     <p class="text-xs md:text-sm text-gray-500">Access your property catalog and tenant bookings</p>
                 </div>
@@ -114,12 +115,12 @@
                                 type="text" 
                                 id="loginInput" 
                                 name="login" 
-                                value="vikram@broker.com" 
+                                value="" 
                                 required 
                                 minlength="3"
                                 maxlength="150"
                                 oninput="validateBrokerLoginInput()"
-                                placeholder="e.g. vikram@broker.com or 9876543210"
+                                placeholder="Enter Your Mail ID or Mobile No."
                                 class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:bg-white transition text-gray-800"
                             >
                         </div>
@@ -141,12 +142,12 @@
                                 type="password" 
                                 id="passwordField" 
                                 name="password" 
-                                value="broker123" 
+                                value="" 
                                 required 
                                 minlength="4"
                                 maxlength="100"
                                 oninput="validateBrokerPassword()"
-                                placeholder="Enter your password (min. 4 characters)"
+                                placeholder="Enter your password"
                                 class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-11 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:bg-white transition text-gray-800 font-mono"
                             >
                             <button type="button" onclick="togglePassword()" class="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer">
@@ -173,18 +174,6 @@
                         <i class="fas fa-sign-in-alt"></i> Sign In to Broker Portal
                     </button>
                 </form>
-
-                <!-- Quick Demo Autofill Chips -->
-                <div class="mt-6 pt-5 border-t border-gray-100">
-                    <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <i class="fas fa-bolt text-amber-500"></i> Quick Demo Autofill
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="autofillBroker('rajesh.sharma@staynest.com', 'broker123')" class="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-xs font-semibold text-gray-700 tap-effect transition flex items-center gap-1.5 cursor-pointer">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Rajesh Sharma (Bangalore)
-                        </button>
-                    </div>
-                </div>
 
                 <div class="mt-6 text-center text-xs text-gray-500">
                     Need a broker partner account? 
@@ -217,14 +206,14 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-gray-900">Reset Broker Password</h3>
-                        <p class="text-xs text-gray-500">Enter registered email or mobile to get OTP</p>
+                        <p class="text-xs text-gray-500">Enter registered email to get OTP</p>
                     </div>
                 </div>
 
                 <form onsubmit="handleBrokerForgotRequest(event)" class="space-y-4" novalidate>
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <label class="block text-xs font-semibold text-gray-700">Email or Mobile Number *</label>
+                            <label class="block text-xs font-semibold text-gray-700">Email ID *</label>
                             <span class="text-[10px] text-gray-400 font-semibold">3-150 chars</span>
                         </div>
                         <input 
@@ -233,7 +222,7 @@
                             required 
                             minlength="3" 
                             maxlength="150" 
-                            placeholder="Enter Email or Mobile Number"
+                            placeholder="Enter Email ID"
                             class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white text-gray-800"
                         >
                     </div>

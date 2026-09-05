@@ -259,7 +259,7 @@ class BrokerBookingController extends Controller
             ->latest('created_at')
             ->get();
 
-        $filename = 'staynest_bookings_' . date('Y-m-d_His') . '.csv';
+        $filename = 'spaceseeks_bookings_' . date('Y-m-d_His') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',

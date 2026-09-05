@@ -1,8 +1,8 @@
 @extends('user.layouts.app')
 
-@section('title', 'Privacy Policy - Zero Brokerage PG & Roommate Network | StayNest')
-@section('meta_description', 'Learn how StayNest protects your personal data, contact information, roommate matchmaking preferences, broker partner KYC documents, and bank records.')
-@section('meta_keywords', 'StayNest privacy policy, data security, student PG privacy, tenant KYC protection, broker KYC security')
+@section('title', 'Privacy Policy - Zero Brokerage PG & Roommate Network | SpaceSeeks')
+@section('meta_description', 'Learn how SpaceSeeks protects your personal data, contact information, roommate matchmaking preferences, broker partner KYC documents, and bank records.')
+@section('meta_keywords', 'SpaceSeeks privacy policy, data security, student PG privacy, tenant KYC protection, broker KYC security')
 @section('canonical', route('user.privacy'))
 @section('robots', 'index, follow, max-snippet:-1, max-image-preview:large')
 
@@ -11,8 +11,8 @@
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "Privacy Policy - StayNest",
-  "description": "Learn how StayNest protects your personal data, contact information, roommate matchmaking preferences, broker partner KYC documents, and bank records.",
+  "name": "Privacy Policy - SpaceSeeks",
+  "description": "Learn how SpaceSeeks protects your personal data, contact information, roommate matchmaking preferences, broker partner KYC documents, and bank records.",
   "url": "{{ route('user.privacy') }}"
 }
 </script>
@@ -72,7 +72,7 @@
                 Our Commitment to Your Privacy
             </h2>
             <p class="text-slate-600">
-                At <strong>StayNest</strong>, accessible from our official domain and mobile web applications across India (including Noida, Delhi NCR, and Bangalore), one of our core commitments is the complete confidentiality and security of our visitors, tenants, flatmates, and partner brokers. This Privacy Policy details what information is collected, how it is processed, and the measures we take to protect your privacy.
+                At <strong>SpaceSeeks</strong>, accessible from our official domain and mobile web applications across India (including Noida, Delhi NCR, and Bangalore), one of our core commitments is the complete confidentiality and security of our visitors, tenants, flatmates, and partner brokers. This Privacy Policy details what information is collected, how it is processed, and the measures we take to protect your privacy.
             </p>
         </section>
 
@@ -130,7 +130,7 @@
                     <i class="fas fa-shield-halved text-teal-700"></i> Encrypted KYC Vault & Anti-Tamper Locking
                 </div>
                 <p class="text-xs text-teal-900 leading-relaxed">
-                    All partner KYC documents uploaded to StayNest are stored in restricted server directories protected by firewall authentication. Once an administrator verifies and approves a document, it is <strong>strictly locked</strong> to prevent unauthorized alterations or identity substitution. Re-upload is only enabled when explicitly authorized by an administrator for compliance updates.
+                    All partner KYC documents uploaded to SpaceSeeks are stored in restricted server directories protected by firewall authentication. Once an administrator verifies and approves a document, it is <strong>strictly locked</strong> to prevent unauthorized alterations or identity substitution. Re-upload is only enabled when explicitly authorized by an administrator for compliance updates.
                 </p>
             </div>
         </section>
@@ -172,7 +172,7 @@
                     <i class="fas fa-shield-check text-emerald-600"></i> Strict Anti-Telemarketing Rule
                 </div>
                 <p class="text-xs text-emerald-800 leading-relaxed">
-                    StayNest does <strong>not</strong> sell, rent, or trade your phone number, email, or roommate listings to third-party telemarketers or external advertisers. Your contact details are only shared with a property host when you explicitly schedule a visit or initiate direct booking.
+                    SpaceSeeks does <strong>not</strong> sell, rent, or trade your phone number, email, or roommate listings to third-party telemarketers or external advertisers. Your contact details are only shared with a property host when you explicitly schedule a visit or initiate direct booking.
                 </p>
             </div>
         </section>
@@ -197,7 +197,7 @@
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Request permanent deletion of your account and records by writing to our grievance team at <strong>privacy@staynest.com</strong>.</span>
+                    <span>Request permanent deletion of your account and records by writing to our grievance team at <strong>privacy@spaceseeks.com</strong>.</span>
                 </li>
             </ul>
         </section>

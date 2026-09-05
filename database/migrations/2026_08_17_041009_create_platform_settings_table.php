@@ -25,8 +25,8 @@ return new class extends Migration
         // Insert initial default platform settings
         $defaults = [
             // General Settings
-            ['key' => 'platform_name', 'value' => 'StayNest', 'group' => 'general', 'type' => 'string'],
-            ['key' => 'support_email', 'value' => 'support@staynest.com', 'group' => 'general', 'type' => 'string'],
+            ['key' => 'platform_name', 'value' => 'SpaceSeeks', 'group' => 'general', 'type' => 'string'],
+            ['key' => 'support_email', 'value' => 'support@spaceseeks.com', 'group' => 'general', 'type' => 'string'],
             ['key' => 'support_phone', 'value' => '+91 98765 43210', 'group' => 'general', 'type' => 'string'],
             ['key' => 'platform_tagline', 'value' => 'Premium Verified Co-Living & PGs across India', 'group' => 'general', 'type' => 'string'],
             ['key' => 'platform_description', 'value' => 'Making PG and co-living simple, safe, and comfortable with zero brokerage and verified amenities across India.', 'group' => 'general', 'type' => 'string'],

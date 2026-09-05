@@ -36,10 +36,10 @@ class UserHomeController extends Controller
         });
 
         // Resolve user location coordinates for distance-based sorting (defaulting to Noida Sector 62: 28.6280, 77.3649)
-        $userLat = (float) ($request->query('lat') ?: $request->cookie('staynest_user_lat') ?: $request->cookie('user_cached_lat') ?: 28.6280);
-        $userLng = (float) ($request->query('lng') ?: $request->cookie('staynest_user_lng') ?: $request->cookie('user_cached_lng') ?: 77.3649);
+        $userLat = (float) ($request->query('lat') ?: $request->cookie('spaceseeks_user_lat') ?: $request->cookie('staynest_user_lat') ?: $request->cookie('user_cached_lat') ?: 28.6280);
+        $userLng = (float) ($request->query('lng') ?: $request->cookie('spaceseeks_user_lng') ?: $request->cookie('staynest_user_lng') ?: $request->cookie('user_cached_lng') ?: 77.3649);
 
-        $cityName = trim($request->query('city') ?: $request->cookie('staynest_city') ?: session('user_city', ''));
+        $cityName = trim($request->query('city') ?: $request->cookie('spaceseeks_city') ?: $request->cookie('staynest_city') ?: session('user_city', ''));
         if ($cityName && !$request->has('lat')) {
             $matchedCity = City::where('name', 'like', "%{$cityName}%")->first();
             if ($matchedCity && $matchedCity->latitude && $matchedCity->longitude) {
@@ -570,8 +570,8 @@ class UserHomeController extends Controller
         // 6. Calculate GPS Haversine distance for each property from user's current location
         $sessionLat = $request->hasSession() ? $request->session()->get('user_lat') : null;
         $sessionLng = $request->hasSession() ? $request->session()->get('user_lng') : null;
-        $reqUserLat = $request->query('lat') ?? $request->query('latitude') ?? $sessionLat ?? $request->cookie('staynest_user_lat');
-        $reqUserLng = $request->query('lng') ?? $request->query('longitude') ?? $sessionLng ?? $request->cookie('staynest_user_lng');
+        $reqUserLat = $request->query('lat') ?? $request->query('latitude') ?? $sessionLat ?? $request->cookie('spaceseeks_user_lat') ?? $request->cookie('staynest_user_lat');
+        $reqUserLng = $request->query('lng') ?? $request->query('longitude') ?? $sessionLng ?? $request->cookie('spaceseeks_user_lng') ?? $request->cookie('staynest_user_lng');
 
         // Fallback default coordinates (Noida/NCR coordinates: 28.6280, 77.3649)
         $userLat = (float)($reqUserLat ?: 28.6280);
@@ -811,7 +811,7 @@ class UserHomeController extends Controller
             return "Exact match not found for all strict constraints. Showing {$count} closest matching verified {$desc}:";
         }
 
-        return "Found {$count} verified {$desc} ranked by StayNest Match Score:";
+        return "Found {$count} verified {$desc} ranked by SpaceSeeks Match Score:";
     }
 
     /**

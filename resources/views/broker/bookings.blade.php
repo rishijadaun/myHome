@@ -1,6 +1,6 @@
 @extends('broker.layouts.app')
 
-@section('title', 'Tenant Bookings - StayNest Broker Portal')
+@section('title', 'Tenant Bookings - SpaceSeeks Broker Portal')
 
 @section('content')
 <!-- Header -->
@@ -207,7 +207,7 @@
                                     @endif
 
                                     @if($tenantPhone)
-                                        <a href="https://wa.me/91{{ $tenantPhone }}?text={{ urlencode('Hi ' . $tenantName . ', regarding your booking #' . $bk->booking_id . ' for ' . $propName . ' on StayNest.') }}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center tap-effect" title="WhatsApp Tenant">
+                                        <a href="https://wa.me/91{{ $tenantPhone }}?text={{ urlencode('Hi ' . $tenantName . ', regarding your booking #' . $bk->booking_id . ' for ' . $propName . ' on SpaceSeeks.') }}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center tap-effect" title="WhatsApp Tenant">
                                             <i class="fab fa-whatsapp text-sm"></i>
                                         </a>
                                     @endif
@@ -468,7 +468,7 @@
         <div class="flex items-start justify-between pb-4 border-b border-gray-200">
             <div>
                 <div class="flex items-center gap-1.5 text-brand font-black text-xl mb-0.5">
-                    <i class="fas fa-house-chimney"></i> StayNest
+                    <i class="fas fa-house-chimney"></i> SpaceSeeks
                 </div>
                 <p class="text-[10px] text-gray-500">Property Host Booking Voucher</p>
             </div>
@@ -553,15 +553,36 @@
     }
 
     async function submitApproveBrokerBooking(bookingId) {
+        const currentCsrf = (typeof window.getBrokerCsrfToken === 'function' ? window.getBrokerCsrfToken() : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'));
+
         try {
             const response = await fetch(`/broker/bookings/${bookingId}/approve`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
+                    'X-CSRF-TOKEN': currentCsrf
+                },
+                body: JSON.stringify({
+                    _token: currentCsrf
+                })
             });
+
+            if (response.status === 419) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Session Expired',
+                        text: 'Your security session has expired. Refreshing the page...',
+                        icon: 'warning',
+                        confirmButtonColor: '#4bb59d'
+                    }).then(() => window.location.reload());
+                } else {
+                    alert('Session expired. Refreshing page...');
+                    window.location.reload();
+                }
+                return;
+            }
 
             const data = await response.json();
             if (data.success) {
@@ -632,16 +653,37 @@
     }
 
     async function submitRejectBrokerBooking(bookingId, reason) {
+        const currentCsrf = (typeof window.getBrokerCsrfToken === 'function' ? window.getBrokerCsrfToken() : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'));
+
         try {
             const response = await fetch(`/broker/bookings/${bookingId}/reject`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': currentCsrf
                 },
-                body: JSON.stringify({ reason: reason || 'Declined due to unavailability.' })
+                body: JSON.stringify({
+                    _token: currentCsrf,
+                    reason: reason || 'Declined due to unavailability.'
+                })
             });
+
+            if (response.status === 419) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Session Expired',
+                        text: 'Your security session has expired. Refreshing the page...',
+                        icon: 'warning',
+                        confirmButtonColor: '#4bb59d'
+                    }).then(() => window.location.reload());
+                } else {
+                    alert('Session expired. Refreshing page...');
+                    window.location.reload();
+                }
+                return;
+            }
 
             const data = await response.json();
             if (data.success) {
@@ -709,15 +751,36 @@
     }
 
     async function submitCompleteBrokerBooking(bookingId) {
+        const currentCsrf = (typeof window.getBrokerCsrfToken === 'function' ? window.getBrokerCsrfToken() : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'));
+
         try {
             const response = await fetch(`/broker/bookings/${bookingId}/complete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
+                    'X-CSRF-TOKEN': currentCsrf
+                },
+                body: JSON.stringify({
+                    _token: currentCsrf
+                })
             });
+
+            if (response.status === 419) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Session Expired',
+                        text: 'Your security session has expired. Refreshing the page...',
+                        icon: 'warning',
+                        confirmButtonColor: '#4bb59d'
+                    }).then(() => window.location.reload());
+                } else {
+                    alert('Session expired. Refreshing page...');
+                    window.location.reload();
+                }
+                return;
+            }
 
             const data = await response.json();
             if (data.success) {

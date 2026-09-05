@@ -36,7 +36,7 @@ class PropertySearchService
             return $this->getTrendingOverview($intent);
         }
 
-        // Check if user is asking about general Listing Types / Categories on StayNest
+        // Check if user is asking about general Listing Types / Categories on SpaceSeeks
         if (!empty($intent['is_listing_types_inquiry'])) {
             return $this->getListingTypesOverview($intent);
         }
@@ -190,7 +190,7 @@ class PropertySearchService
     }
 
     /**
-     * Provide comprehensive knowledge overview for all 3 StayNest Listing Types.
+     * Provide comprehensive knowledge overview for all 3 SpaceSeeks Listing Types.
      */
     public function getListingTypesOverview(array $intent = []): array
     {
@@ -264,7 +264,7 @@ class PropertySearchService
             ]
         ];
 
-        $summaryMessage = "StayNest currently features **3 verified listing types** in our database with **100% Zero Brokerage**:\n\n" .
+        $summaryMessage = "SpaceSeeks currently features **3 verified listing types** in our database with **100% Zero Brokerage**:\n\n" .
             "1. **PG & Hostels** ({$pgCount}+ Stays): Managed rooms with Food, WiFi, AC & Housekeeping for students & professionals.\n" .
             "2. **Flats & Houses** ({$flatCount}+ Properties): 1/2/3 BHK Furnished & Semi-Furnished Apartments & Villas.\n" .
             "3. **Commercial** ({$commercialCount}+ Spaces): Prime Office Cabins, Retail Shops, Showrooms & Coworking spaces.\n\n" .
@@ -300,7 +300,7 @@ class PropertySearchService
             $title = 'Commercial Spaces';
             $icon = 'shop';
             $slugs = ['commercial', 'office', 'shop', 'commercial-space'];
-            $description = "StayNest offers verified **Commercial Spaces** including Corporate Office Cabins, Retail Ground-Floor Shops, Main Road Showrooms, and Co-working Desks. All commercial listings are 100% verified with direct owner contacts and zero brokerage fees.";
+            $description = "SpaceSeeks offers verified **Commercial Spaces** including Corporate Office Cabins, Retail Ground-Floor Shops, Main Road Showrooms, and Co-working Desks. All commercial listings are 100% verified with direct owner contacts and zero brokerage fees.";
             $features = [
                 '🏢 Private Office Cabins & Ready-to-use Workstations',
                 '🏪 Prime Ground-Floor Retail Shops & Showrooms',
@@ -314,7 +314,7 @@ class PropertySearchService
             $title = 'Flats & Houses';
             $icon = 'city';
             $slugs = ['flat', 'apartment', 'house', 'villa', 'flat-apartment'];
-            $description = "StayNest features verified **Flats, Apartments & Independent Houses** ranging from compact 1 BHK studios to spacious 2 BHK, 3 BHK, and luxurious villas with complete privacy, gated society security, and direct landlord terms.";
+            $description = "SpaceSeeks features verified **Flats, Apartments & Independent Houses** ranging from compact 1 BHK studios to spacious 2 BHK, 3 BHK, and luxurious villas with complete privacy, gated society security, and direct landlord terms.";
             $features = [
                 '🛋️ Fully Furnished, Semi-Furnished & Unfurnished Units',
                 '🔒 24x7 Gated Society Security, CCTV & Lift Access',
@@ -328,7 +328,7 @@ class PropertySearchService
             $title = 'PG & Hostels';
             $icon = 'building-user';
             $slugs = ['pg-hostel', 'co-living', 'pg', 'hostel'];
-            $description = "StayNest's **PG & Hostels** provide fully managed co-living and student accommodations equipped with 3 daily meals, high-speed WiFi, air conditioning, daily housekeeping, power backup, and CCTV security.";
+            $description = "SpaceSeeks's **PG & Hostels** provide fully managed co-living and student accommodations equipped with 3 daily meals, high-speed WiFi, air conditioning, daily housekeeping, power backup, and CCTV security.";
             $features = [
                 '🍱 3 Times Daily Nutritious Food & Clean RO Water',
                 '📶 High-Speed WiFi & Air Conditioned (AC) Rooms',
@@ -362,7 +362,7 @@ class PropertySearchService
         $rankedProperties = $results->isNotEmpty() ? $this->rankingService->rank($results, $intent) : [];
 
         $count = count($rankedProperties);
-        $summaryMessage = "Here is everything you need to know about **{$title}** on StayNest:\n\n" .
+        $summaryMessage = "Here is everything you need to know about **{$title}** on SpaceSeeks:\n\n" .
             "{$description}\n\n" .
             "✨ **Key Highlights & Amenities:**\n" . implode("\n", array_map(fn($f) => "• {$f}", $features)) . "\n\n" .
             "👥 **Best Suited For:** {$bestFor}\n" .
@@ -529,7 +529,7 @@ class PropertySearchService
             ]
         ];
 
-        $summaryMessage = "Here are today's **🔥 Top Trending Searches & Verified Stays** on StayNest! Tap any trending query below to see live verified matches:";
+        $summaryMessage = "Here are today's **🔥 Top Trending Searches & Verified Stays** on SpaceSeeks! Tap any trending query below to see live verified matches:";
 
         return [
             'success' => true,
@@ -893,6 +893,6 @@ class PropertySearchService
         $queryDesc = implode(' ', $parts);
         if (empty($queryDesc)) $queryDesc = $typeLabel;
 
-        return "I found {$totalMatches} verified {$queryDesc} with high StayNest match scores in our database:";
+        return "I found {$totalMatches} verified {$queryDesc} with high SpaceSeeks match scores in our database:";
     }
 }

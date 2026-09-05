@@ -1,7 +1,7 @@
 @extends('user.layouts.app')
 
-@section('title', 'My Bookings - India\'s Trusted Zero Brokerage PG Network | StayNest')
-@section('meta_description', 'View and manage your PG and co-living stay reservations on StayNest with direct property owner confirmation and official receipts.')
+@section('title', 'My Bookings - India\'s Trusted Zero Brokerage PG Network | SpaceSeeks')
+@section('meta_description', 'View and manage your PG and co-living stay reservations on SpaceSeeks with direct property owner confirmation and official receipts.')
 @section('canonical', route('user.bookings'))
 @section('robots', 'noindex, nofollow')
 
@@ -207,7 +207,7 @@
                             </button>
 
                             <!-- WhatsApp Chat with Host -->
-                            <a href="https://wa.me/91{{ $ownerPhone }}?text={{ urlencode('Hi ' . $ownerName . ', regarding my booking #' . $bk->booking_id . ' for ' . $propName . ' on StayNest. Please confirm check-in details.') }}" target="_blank" class="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-2xl transition tap-effect shadow-xs flex items-center justify-center gap-1.5">
+                            <a href="https://wa.me/91{{ $ownerPhone }}?text={{ urlencode('Hi ' . $ownerName . ', regarding my booking #' . $bk->booking_id . ' for ' . $propName . ' on SpaceSeeks. Please confirm check-in details.') }}" target="_blank" class="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-2xl transition tap-effect shadow-xs flex items-center justify-center gap-1.5">
                                 <i class="fab fa-whatsapp text-sm"></i>
                                 <span>Chat Host</span>
                             </a>
@@ -511,7 +511,7 @@
                         <i class="fas fa-ban"></i>
                     </div>
                     <h3 class="text-base sm:text-lg font-black text-gray-900">No Cancelled Requests</h3>
-                    <p class="text-xs text-gray-500 max-w-md mx-auto">You have no cancelled or declined booking requests on StayNest.</p>
+                    <p class="text-xs text-gray-500 max-w-md mx-auto">You have no cancelled or declined booking requests on SpaceSeeks.</p>
                 </div>
             @endforelse
         </div>
@@ -528,7 +528,7 @@
                 <i class="fas fa-search"></i> Explore All PGs
             </a>
             <a href="{{ route('user.contact') }}" class="bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-sm text-white font-semibold px-7 py-3 rounded-2xl tap-effect transition text-xs sm:text-sm border border-white/30 flex items-center justify-center gap-2">
-                <i class="fas fa-headset"></i> StayNest Support
+                <i class="fas fa-headset"></i> SpaceSeeks Support
             </a>
         </div>
     </div>
@@ -547,7 +547,7 @@
         <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
             <div>
                 <h3 class="text-base sm:text-lg font-black text-gray-900" id="modalBookingIdText">Booking Details</h3>
-                <p class="text-[11px] text-gray-500">Official StayNest Booking Confirmation Record</p>
+                <p class="text-[11px] text-gray-500">Official SpaceSeeks Booking Confirmation Record</p>
             </div>
             <button onclick="closeBookingDetailsModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition cursor-pointer" title="Close">
                 <i class="fas fa-times text-xs"></i>
@@ -616,7 +616,7 @@
                     <span class="font-bold text-gray-900" id="modalDeposit"></span>
                 </div>
                 <div class="flex justify-between text-gray-600">
-                    <span>StayNest Booking Fee:</span>
+                    <span>SpaceSeeks Booking Fee:</span>
                     <span class="font-bold text-emerald-600">FREE (₹0)</span>
                 </div>
                 <div class="border-t border-gray-200 pt-1.5 flex justify-between font-black text-xs sm:text-sm text-brand-dark">
@@ -651,7 +651,7 @@
         <div class="flex items-start justify-between pb-4 border-b border-gray-200 mb-4">
             <div>
                 <div class="flex items-center gap-1.5 text-brand font-black text-xl mb-1">
-                    <i class="fas fa-house-chimney"></i> StayNest
+                    <i class="fas fa-house-chimney"></i> SpaceSeeks
                 </div>
                 <p class="text-[10px] text-gray-500">Booking Confirmation &amp; Invoice</p>
             </div>
@@ -692,7 +692,7 @@
                     <span class="font-bold text-gray-900" id="invDeposit"></span>
                 </div>
                 <div class="flex justify-between text-gray-600">
-                    <span>StayNest Service Charges:</span>
+                    <span>SpaceSeeks Service Charges:</span>
                     <span class="font-bold text-emerald-600">₹0 (Free)</span>
                 </div>
                 <div class="border-t border-gray-200 pt-2 flex justify-between font-black text-sm text-gray-900">
@@ -775,7 +775,7 @@
         document.getElementById('modalStatus').textContent = ds.status;
 
         document.getElementById('modalHostName').textContent = ds.hostName;
-        document.getElementById('modalHostPhone').textContent = ds.hostPhone ? `+91 ${ds.hostPhone}` : 'Contact via StayNest';
+        document.getElementById('modalHostPhone').textContent = ds.hostPhone ? `+91 ${ds.hostPhone}` : 'Contact via SpaceSeeks';
         document.getElementById('modalCallLink').href = `tel:${ds.hostPhone}`;
         document.getElementById('modalWhatsappLink').href = `https://wa.me/91${ds.hostPhone}?text=${encodeURIComponent('Hi ' + ds.hostName + ', regarding my booking #' + ds.bookingId + ' for ' + ds.propName)}`;
 

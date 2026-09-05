@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Manage All Bookings - StayNest Admin')
+@section('title', 'Manage All Bookings - SpaceSeeks Admin')
 
 @section('content')
 <!-- Header -->

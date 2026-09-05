@@ -6,25 +6,31 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon & Web Manifest -->
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#4bb59d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SpaceSeeks">
 
     <!-- SEO Meta Tags -->
-    <title>@yield('title', 'Explore PGs, Flats & Flatmates Near You on Interactive Map | StayNest')</title>
+    <title>@yield('title', 'Explore PGs, Flats & Flatmates Near You on Interactive Map | SpaceSeeks')</title>
     <meta name="description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, flats, commercial spaces, and verified flatmates on an interactive GPS map with zero brokerage.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'explore near me, PG near me, flatmate near me, find PG on map, interactive PG map, flats near me, StayNest map')">
+    <meta name="keywords" content="@yield('meta_keywords', 'explore near me, PG near me, flatmate near me, find PG on map, interactive PG map, flats near me, SpaceSeeks map')">
     <meta name="robots" content="@yield('robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1')">
     <link rel="canonical" href="@yield('canonical', url()->current())">
-    <meta name="author" content="StayNest Technologies">
+    <meta name="author" content="SpaceSeeks Technologies">
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:locale" content="en_IN">
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:title" content="@yield('title', 'Explore PGs, Flats & Flatmates Near You on Interactive Map | StayNest')">
+    <meta property="og:title" content="@yield('title', 'Explore PGs, Flats & Flatmates Near You on Interactive Map | SpaceSeeks')">
     <meta property="og:description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, flats, commercial spaces, and verified flatmates on an interactive GPS map with zero brokerage.')">
     <meta property="og:url" content="@yield('canonical', url()->current())">
-    <meta property="og:site_name" content="StayNest">
+    <meta property="og:site_name" content="SpaceSeeks">
     <meta property="og:image" content="@yield('meta_image', asset('images/app-banner.png'))">
     <meta property="og:image:secure_url" content="@yield('meta_image', asset('images/app-banner.png'))">
     <meta property="og:image:width" content="1200">
@@ -33,17 +39,17 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'Explore PGs Near You on Interactive Map | StayNest')">
+    <meta name="twitter:title" content="@yield('title', 'Explore PGs Near You on Interactive Map | SpaceSeeks')">
     <meta name="twitter:description" content="@yield('meta_description', 'Discover verified paying guest (PG) accommodations, hostels, and co-living spaces on an interactive GPS map with zero brokerage.')">
     <meta name="twitter:image" content="@yield('meta_image', asset('images/app-banner.png'))">
-    <meta name="twitter:site" content="@StayNestIndia">
+    <meta name="twitter:site" content="@SpaceSeeksIndia">
 
     <!-- Mobile Theme Color -->
     <meta name="theme-color" content="#4bb59d">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="StayNest">
+    <meta name="apple-mobile-web-app-title" content="SpaceSeeks">
 
     <!-- Dynamic Schema.org JSON-LD Structured Data -->
     @stack('schema')
@@ -113,7 +119,7 @@
         window.installPwaApp = async function(platform = 'auto') {
             window.triggerHaptic(20);
             if (window.isPwaStandalone()) {
-                alert('StayNest is already installed on your device!');
+                alert('SpaceSeeks is already installed on your device!');
                 return;
             }
             if (deferredPrompt) {
@@ -151,7 +157,7 @@
                 if (directBox) directBox.classList.remove('hidden');
                 if (iosBox) iosBox.classList.add('hidden');
                 if (androidBox) androidBox.classList.add('hidden');
-                if (modalBtnText) modalBtnText.innerText = 'Install StayNest App';
+                if (modalBtnText) modalBtnText.innerText = 'Install SpaceSeeks App';
             }
             modal.classList.remove('hidden');
             modal.classList.add('flex');

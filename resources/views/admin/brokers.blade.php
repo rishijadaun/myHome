@@ -520,7 +520,7 @@
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Official Email *</label>
-                            <input type="email" name="email" required placeholder="e.g. sanya.rm@staynest.com" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand">
+                            <input type="email" name="email" required placeholder="e.g. sanya.rm@spaceseeks.com" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand">
                         </div>
                     </div>
 

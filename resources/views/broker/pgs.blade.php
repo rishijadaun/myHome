@@ -586,7 +586,7 @@
 
 @push('scripts')
 <script>
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+    const csrfToken = (typeof window.getBrokerCsrfToken === 'function' ? window.getBrokerCsrfToken() : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'));
 
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
@@ -608,26 +608,35 @@
             tIconBox.className = 'w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0';
             tIcon.className = 'fas fa-check';
         } else {
-            tIconBox.className = 'w-8 h-8 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0';
-            tIcon.className = 'fas fa-exclamation-triangle';
+            tIconBox.className = 'w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0';
+            tIcon.className = 'fas fa-exclamation';
         }
 
-        toast.classList.remove('hidden', 'translate-y-2');
+        toast.classList.remove('hidden', 'translate-y-4', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
         setTimeout(() => {
-            toast.classList.add('hidden', 'translate-y-2');
+            toast.classList.add('translate-y-4', 'opacity-0');
+            setTimeout(() => toast.classList.add('hidden'), 300);
         }, 3500);
     }
 
     // 1-Click Listing Status Toggle Handler
     async function toggleListingStatus(propertyId, checkboxElem = null) {
+        const token = (typeof window.getBrokerCsrfToken === 'function' ? window.getBrokerCsrfToken() : csrfToken);
+
         try {
             const resp = await fetch(`/broker/pgs/${propertyId}/toggle-status`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                }
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    _token: token
+                })
             });
 
             const data = await resp.json();

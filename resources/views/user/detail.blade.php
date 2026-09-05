@@ -107,21 +107,21 @@
     }
     
     if ($isSale) {
-        $propSeoTitle = $propName . ' - Property For Sale in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ' . $salePriceDisplay . ' | StayNest';
-        $propSeoDesc = 'Buy ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ' . $salePriceDisplay . ', ' . $propRating . '★ rating. Clear title, verified legal documentation & site visit.';
-        $propSeoKeywords = $propName . ', Property For Sale in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', Buy Property, StayNest';
+        $propSeoTitle = $propName . ' - Property For Sale in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ' . $salePriceDisplay . ' | SpaceSeeks';
+        $propSeoDesc = 'Buy ' . $propName . ' in ' . $propLocation . ' on SpaceSeeks. Zero brokerage, ' . $salePriceDisplay . ', ' . $propRating . '★ rating. Clear title, verified legal documentation & site visit.';
+        $propSeoKeywords = $propName . ', Property For Sale in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', Buy Property, SpaceSeeks';
     } elseif ($isCommercial) {
-        $propSeoTitle = $propName . ' - Commercial Space in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
-        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
-        $propSeoKeywords = $propName . ', Commercial Space in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', StayNest';
+        $propSeoTitle = $propName . ' - Commercial Space in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | SpaceSeeks';
+        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on SpaceSeeks. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
+        $propSeoKeywords = $propName . ', Commercial Space in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', SpaceSeeks';
     } elseif ($isFlat) {
-        $propSeoTitle = $propName . ' - Flat & House Rental in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
-        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
-        $propSeoKeywords = $propName . ', Flat for Rent in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', StayNest';
+        $propSeoTitle = $propName . ' - Flat & House Rental in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | SpaceSeeks';
+        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on SpaceSeeks. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
+        $propSeoKeywords = $propName . ', Flat for Rent in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', SpaceSeeks';
     } else {
-        $propSeoTitle = $propName . ' - ' . ucfirst($property->gender_preference ?? 'Co-living') . ' PG in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | StayNest';
-        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on StayNest. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
-        $propSeoKeywords = $propName . ', PG in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', StayNest';
+        $propSeoTitle = $propName . ' - ' . ucfirst($property->gender_preference ?? 'Co-living') . ' PG in ' . ($property->area->name ?? '') . ', ' . ($property->city->name ?? 'India') . ' | ₹' . $propRent . '/mo | SpaceSeeks';
+        $propSeoDesc = 'Book ' . $propName . ' in ' . $propLocation . ' on SpaceSeeks. Zero brokerage, ₹' . $propRent . '/month, ' . $propRating . '★ rating. Modern amenities, verified biometric security & instant booking.';
+        $propSeoKeywords = $propName . ', PG in ' . ($property->area->name ?? '') . ', in ' . ($property->city->name ?? '') . ', SpaceSeeks';
     }
     $propSeoImage = $property->display_image_url ?? ($propImages->first()->image_url ?? asset('images/favicon.png'));
     $propCanonical = route('user.detail', ['slug' => $property->slug ?: $property->id]);
@@ -1577,7 +1577,7 @@
                 </div>
                 <div>
                     <h3 class="text-base sm:text-lg font-black text-gray-900">Report Listing / Feedback</h3>
-                    <p class="text-[11px] text-gray-500">Help us maintain verified, quality stays on StayNest</p>
+                    <p class="text-[11px] text-gray-500">Help us maintain verified, quality stays on SpaceSeeks</p>
                 </div>
             </div>
             <button onclick="closeReportModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition">
@@ -1987,7 +1987,7 @@
                             <span class="font-bold text-gray-900" id="summaryDepositText">₹{{ number_format($property->security_deposit ?: 0) }}</span>
                         </div>
                         <div class="flex justify-between items-center text-gray-600">
-                            <span>StayNest Service Fee:</span>
+                            <span>SpaceSeeks Service Fee:</span>
                             <span class="font-bold text-emerald-700">₹0 (FREE)</span>
                         </div>
                         <div class="border-t border-emerald-200/80 pt-2 flex justify-between items-center font-black text-sm text-brand-dark">
@@ -2577,7 +2577,7 @@
     }
 
     function shareToTwitter() {
-        const title = "{{ addslashes($propName) }} - Verified PG & Co-Living Stay on StayNest";
+        const title = "{{ addslashes($propName) }} - Verified PG & Co-Living Stay on SpaceSeeks";
         const url = window.location.href;
         const shareUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url);
         window.open(shareUrl, '_blank', 'width=600,height=450,scrollbars=yes');
@@ -2590,7 +2590,7 @@
     }
 
     function shareToWhatsApp() {
-        const title = "Check out {{ addslashes($propName) }} (₹{{ $propRent }}/mo) on StayNest:";
+        const title = "Check out {{ addslashes($propName) }} (₹{{ $propRent }}/mo) on SpaceSeeks:";
         const url = window.location.href;
         const shareUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(title + '\n' + url);
         window.open(shareUrl, '_blank');
@@ -2613,7 +2613,7 @@
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     title: 'Sign In Required',
-                    text: 'Please sign in or create an account on StayNest to book this stay.',
+                    text: 'Please sign in or create an account on SpaceSeeks to book this stay.',
                     icon: 'info',
                     showCancelButton: true,
                     confirmButtonColor: '#4bb59d',
@@ -2626,7 +2626,7 @@
                     }
                 });
             } else {
-                if (confirm('Please sign in or create an account on StayNest to book this stay.')) {
+                if (confirm('Please sign in or create an account on SpaceSeeks to book this stay.')) {
                     window.location.href = "{{ route('user.login') }}";
                 }
             }
@@ -2890,8 +2890,8 @@
     function openShareModal() {
         if (typeof window.nativeShare === 'function') {
             window.nativeShare(
-                '{{ addslashes($propName) }} - StayNest',
-                'Check out {{ addslashes($propName) }} in {{ addslashes($propLocation) }} starting at ₹{{ $propRent }}/mo on StayNest with zero brokerage!',
+                '{{ addslashes($propName) }} - SpaceSeeks',
+                'Check out {{ addslashes($propName) }} in {{ addslashes($propLocation) }} starting at ₹{{ $propRent }}/mo on SpaceSeeks with zero brokerage!',
                 '{{ url()->current() }}'
             );
         }

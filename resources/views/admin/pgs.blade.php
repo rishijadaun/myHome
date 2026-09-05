@@ -392,17 +392,29 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        @if($properties->hasPages())
-            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-                <div class="text-xs text-gray-500">
-                    Showing <span class="font-bold text-gray-900">{{ $properties->firstItem() }}</span> to <span class="font-bold text-gray-900">{{ $properties->lastItem() }}</span> of <span class="font-bold text-gray-900">{{ $properties->total() }}</span> properties
-                </div>
-                <div>
-                    {{ $properties->links() }}
+        <!-- Table Pagination Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                @if($properties->total() > 0)
+                    <span>Showing <strong class="text-gray-900 font-bold">{{ $properties->firstItem() ?? 1 }}</strong> to <strong class="text-gray-900 font-bold">{{ $properties->lastItem() ?? $properties->total() }}</strong> of <strong class="text-gray-900 font-bold">{{ $properties->total() }}</strong> properties</span>
+                @else
+                    <span>Showing <strong class="text-gray-900 font-bold">0</strong> properties</span>
+                @endif
+
+                <div class="flex items-center gap-1.5 pl-2 border-l border-gray-200">
+                    <span class="text-gray-400">Rows per page:</span>
+                    <select onchange="changePerPage(this.value)" class="bg-white border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand cursor-pointer">
+                        @foreach([10, 15, 25, 50, 100] as $size)
+                            <option value="{{ $size }}" {{ request('per_page', 15) == $size ? 'selected' : '' }}>{{ $size }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
-        @endif
+
+            <div class="flex items-center gap-2">
+                {{ $properties->links('vendor.pagination.custom') }}
+            </div>
+        </div>
     </div>
 
     <!-- Mobile Cards View -->
@@ -526,6 +538,26 @@
                 <div class="text-sm font-semibold text-gray-600">No properties found</div>
             </div>
         @endforelse
+
+        <!-- Mobile Pagination Footer -->
+        @if($properties->total() > 0)
+            <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-xs space-y-3">
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>Page <strong class="text-gray-900 font-bold">{{ $properties->currentPage() }}</strong> of <strong class="text-gray-900 font-bold">{{ $properties->lastPage() }}</strong> ({{ $properties->total() }} total)</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-gray-400">Rows:</span>
+                        <select onchange="changePerPage(this.value)" class="bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg px-2 py-1 cursor-pointer">
+                            @foreach([10, 15, 25, 50] as $size)
+                                <option value="{{ $size }}" {{ request('per_page', 15) == $size ? 'selected' : '' }}>{{ $size }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-gray-100 flex justify-center">
+                    {{ $properties->links('vendor.pagination.custom') }}
+                </div>
+            </div>
+        @endif
     </div>
 
 </div>
@@ -1097,6 +1129,14 @@
             console.error(err);
             bodyEl.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Failed to load property details.</div>`;
         }
+    }
+
+    // Dynamic Per Page Rows Handler
+    function changePerPage(perPage) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
     }
 </script>
 @endpush

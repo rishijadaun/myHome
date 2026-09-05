@@ -410,7 +410,7 @@
             <input type="hidden" id="resetPasswordUserId" name="user_id">
             <div>
                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">New Password *</label>
-                <input type="text" id="resetNewPasswordInput" name="new_password" required minlength="6" value="StayNest@2026" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 font-mono">
+                <input type="text" id="resetNewPasswordInput" name="new_password" required minlength="6" value="SpaceSeeks@2026" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 font-mono">
             </div>
 
             <div class="flex gap-2 pt-2">
@@ -570,7 +570,7 @@
     function openResetPasswordModal(userId, userName) {
         document.getElementById('resetPasswordUserId').value = userId;
         document.getElementById('resetPasswordUserName').textContent = `For ${userName}`;
-        document.getElementById('resetNewPasswordInput').value = 'StayNest@2026';
+        document.getElementById('resetNewPasswordInput').value = 'SpaceSeeks@2026';
         openModal('adminResetPasswordModal');
     }
 

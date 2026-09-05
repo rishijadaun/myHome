@@ -266,7 +266,7 @@
                                         $cleanPhone = preg_replace('/[^0-9]/', '', $inquiry->phone);
                                         if (strlen($cleanPhone) === 10) { $cleanPhone = '91' . $cleanPhone; }
                                     @endphp
-                                    <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hello ' . $inquiry->name . ', thank you for contacting StayNest.') }}" target="_blank" class="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 transition tap-effect" title="Chat on WhatsApp">
+                                    <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode('Hello ' . $inquiry->name . ', thank you for contacting SpaceSeeks.') }}" target="_blank" class="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 transition tap-effect" title="Chat on WhatsApp">
                                         <i class="fab fa-whatsapp text-xs"></i>
                                     </a>
 
@@ -496,11 +496,11 @@
 
             // Update Reach out buttons
             document.getElementById('modalCallBtn').href = `tel:${d.phone}`;
-            document.getElementById('modalMailBtn').href = `mailto:${d.email}?subject=StayNest%20Support%20Follow-up%20(Inquiry%20%23${d.id})`;
+            document.getElementById('modalMailBtn').href = `mailto:${d.email}?subject=SpaceSeeks%20Support%20Follow-up%20(Inquiry%20%23${d.id})`;
             
             let cleanNum = d.phone.replace(/[^0-9]/g, '');
             if (cleanNum.length === 10) cleanNum = '91' + cleanNum;
-            document.getElementById('modalWhatsAppBtn').href = `https://wa.me/${cleanNum}?text=Hello%20${encodeURIComponent(d.name)},%20thank%20you%20for%20contacting%20StayNest.%20We%20received%20your%20inquiry%20regarding:%20${encodeURIComponent(d.message.substring(0, 50))}...`;
+            document.getElementById('modalWhatsAppBtn').href = `https://wa.me/${cleanNum}?text=Hello%20${encodeURIComponent(d.name)},%20thank%20you%20for%20contacting%20SpaceSeeks.%20We%20received%20your%20inquiry%20regarding:%20${encodeURIComponent(d.message.substring(0, 50))}...`;
 
             document.getElementById('viewModal').classList.remove('hidden');
         } catch (e) {

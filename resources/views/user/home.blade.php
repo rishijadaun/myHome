@@ -1,8 +1,8 @@
 @extends('user.layouts.app')
 
-@section('title', 'StayNest - Find 100% Verified PGs & Co-Living Spaces in India | Zero Brokerage')
+@section('title', 'SpaceSeeks - Find 100% Verified PGs & Co-Living Spaces in India | Zero Brokerage')
 @section('meta_description', 'Search & book 1,200+ verified PGs, luxury hostels, and co-living rooms in Bangalore, Noida, Delhi, Mumbai, Pune, and Gurgaon. Zero brokerage, free WiFi, meals & biometric security.')
-@section('meta_keywords', 'PG near me, Paying Guest Bangalore, Paying Guest Noida, Boys PG, Girls PG, Co-living Hostels, Zero Brokerage PG, StayNest India')
+@section('meta_keywords', 'PG near me, Paying Guest Bangalore, Paying Guest Noida, Boys PG, Girls PG, Co-living Hostels, Zero Brokerage PG, SpaceSeeks India')
 @section('canonical', route('user.home'))
 
 @push('schema')
@@ -13,16 +13,16 @@
     {
       "@type": "Organization",
       "@id": "{{ route('user.home') }}/#organization",
-      "name": "StayNest",
+      "name": "SpaceSeeks",
       "url": "{{ route('user.home') }}",
       "logo": {
         "@type": "ImageObject",
         "url": "{{ asset('images/favicon.png') }}"
       },
       "sameAs": [
-        "https://www.facebook.com/staynest",
-        "https://twitter.com/staynest",
-        "https://www.instagram.com/staynest"
+        "https://www.facebook.com/spaceseeks",
+        "https://twitter.com/spaceseeks",
+        "https://www.instagram.com/spaceseeks"
       ],
       "contactPoint": {
         "@type": "ContactPoint",
@@ -36,7 +36,7 @@
       "@type": "WebSite",
       "@id": "{{ route('user.home') }}/#website",
       "url": "{{ route('user.home') }}",
-      "name": "StayNest",
+      "name": "SpaceSeeks",
       "description": "Find verified PGs, flats, and co-living spaces with zero brokerage across India.",
       "publisher": {
         "@id": "{{ route('user.home') }}/#organization"
@@ -53,7 +53,7 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "How does StayNest verify properties?",
+          "name": "How does SpaceSeeks verify properties?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Every PG, Flat, and Commercial Space undergoes on-site physical verification, landlord checks, biometric security assessment, and hygiene inspections before receiving the Verified badge."
@@ -61,10 +61,10 @@
         },
         {
           "@type": "Question",
-          "name": "Is there any brokerage fee on StayNest?",
+          "name": "Is there any brokerage fee on SpaceSeeks?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. StayNest operates on a 100% Zero Brokerage model. You connect directly with verified property owners and managers with zero hidden fees."
+            "text": "No. SpaceSeeks operates on a 100% Zero Brokerage model. You connect directly with verified property owners and managers with zero hidden fees."
           }
         },
         {
@@ -2529,7 +2529,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-gradient-to-br from-brand-light/60 via-white to-white rounded-3xl border border-brand-100 p-6 sm:p-10 shadow-sm">
                 <div class="text-center mb-8">
-                    <p class="text-xs font-bold text-brand uppercase tracking-widest mb-1.5">StayNest Promise</p>
+                    <p class="text-xs font-bold text-brand uppercase tracking-widest mb-1.5">SpaceSeeks Promise</p>
                     <h2 class="text-xl sm:text-3xl font-black text-gray-900">Why 50,000+ Choose Us</h2>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
@@ -2575,7 +2575,7 @@
         </div>
     </section>
 
-    <!-- StayNest Mobile App Section (Dual Smartphone Mockup Presentation) -->
+    <!-- SpaceSeeks Mobile App Section (Dual Smartphone Mockup Presentation) -->
    <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
     <div class="bg-white rounded-3xl border border-gray-900/10 relative overflow-hidden shadow-sm">
         <div class="grid lg:grid-cols-2 items-stretch">
@@ -2583,7 +2583,7 @@
             <!-- Left: Copy & App Store Badges -->
             <div class="p-8 sm:p-10 md:p-12 flex flex-col justify-center text-center lg:text-left order-2 lg:order-1">
                 <span class="inline-flex items-center gap-1.5 self-center lg:self-start px-3.5 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider mb-4 border border-brand/20 w-fit">
-                    <i class="fas fa-mobile-screen-button"></i> StayNest Mobile App
+                    <i class="fas fa-mobile-screen-button"></i> SpaceSeeks Mobile App
                 </span>
                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 tracking-tight leading-tight">
                     Find your room. Find your people.
@@ -2622,7 +2622,7 @@
                 <div class="absolute -left-10 -bottom-16 w-64 h-64 bg-teal-500/25 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div class="relative group w-full select-none">
-                    <img src="{{ file_exists(public_path('images/app-image.jpg')) ? asset('images/app-image.png') : asset('images/app-image.webp') }}" alt="StayNest Mobile App Dual Screen Preview" loading="lazy" decoding="async" class="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)] transition duration-500 group-hover:scale-[1.02]">
+                    <img src="{{ file_exists(public_path('images/app-image.jpg')) ? asset('images/app-image.png') : asset('images/app-image.webp') }}" alt="SpaceSeeks Mobile App Dual Screen Preview" loading="lazy" decoding="async" class="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)] transition duration-500 group-hover:scale-[1.02]">
                 </div>
             </div>
 

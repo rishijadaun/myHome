@@ -35,7 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Request $request) {
-            if ($request->is('api/*') || $request->expectsJson()) {
+            if ($request->is('api/*') || $request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthenticated. Please provide a valid Bearer token.',
@@ -43,6 +43,15 @@ return Application::configure(basePath: dirname(__DIR__))
                         'auth' => ['You are not logged in or your session has expired.']
                     ]
                 ], 401);
+            }
+        });
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson() || $request->ajax() || $request->isJson()) {
+                return response()->json([
+                    'success' => false,
+                    'csrf_error' => true,
+                    'message' => 'Your security session has expired. Please refresh the page and try again.'
+                ], 419);
             }
         });
     })->create();

@@ -116,7 +116,7 @@ class AdminController extends Controller
                 'user_id' => $property->broker_id,
                 'user_type' => 'broker',
                 'title' => 'Property Approved & Published 🎉',
-                'message' => "Your listing \"{$property->name}\" has been approved and is now live on StayNest.",
+                'message' => "Your listing \"{$property->name}\" has been approved and is now live on SpaceSeeks.",
                 'type' => 'property_approved',
                 'is_read' => 0,
                 'action_url' => '/broker/pgs',

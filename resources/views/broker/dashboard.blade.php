@@ -166,7 +166,7 @@
         <div class="absolute -right-12 -top-12 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
         <div class="relative z-10">
             <h3 class="text-xl md:text-2xl font-extrabold">Have a new PG property or flat to list?</h3>
-            <p class="text-white/80 text-xs md:text-sm mt-1.5 max-w-xl leading-relaxed">Reach thousands of student and working professional tenants in your area with zero listing fees on StayNest.</p>
+            <p class="text-white/80 text-xs md:text-sm mt-1.5 max-w-xl leading-relaxed">Reach thousands of student and working professional tenants in your area with zero listing fees on SpaceSeeks.</p>
         </div>
         <div class="flex flex-wrap gap-3 relative z-10 shrink-0">
             <a href="{{ route('broker.pgs') }}" class="bg-white text-brand px-5 py-3 rounded-xl font-bold text-sm tap-effect shadow-md hover:bg-gray-50 transition flex items-center gap-1.5 cursor-pointer">
@@ -442,16 +442,29 @@
     async function handleApproveBooking(bookingId, tenantName) {
         if (!confirm(`Confirm and approve booking request for ${tenantName}?`)) return;
 
+        const currentCsrf = (typeof window.getBrokerCsrfToken === 'function' ? window.getBrokerCsrfToken() : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'));
+
         try {
             const res = await fetch(`/broker/bookings/${bookingId}/approve`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                     'Authorization': apiToken ? `Bearer ${apiToken}` : '',
-                    'X-CSRF-TOKEN': csrfToken
-                }
+                    'X-CSRF-TOKEN': currentCsrf
+                },
+                body: JSON.stringify({
+                    _token: currentCsrf
+                })
             });
+
+            if (res.status === 419) {
+                showBrokerToast('Security session expired. Refreshing page...', 'error');
+                setTimeout(() => window.location.reload(), 1200);
+                return;
+            }
+
             const data = await res.json();
 
             if (res.ok && data.success) {
@@ -468,7 +481,10 @@
 
     // 1-Click Reject Booking
     async function handleRejectBooking(bookingId, tenantName) {
-        if (!confirm(`Decline booking request for ${tenantName}?`)) return;
+        const reason = prompt(`Decline booking request for ${tenantName}? Reason for decline:`, 'No beds available for requested dates.');
+        if (reason === null) return;
+
+        const currentCsrf = (typeof window.getBrokerCsrfToken === 'function' ? window.getBrokerCsrfToken() : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'));
 
         try {
             const res = await fetch(`/broker/bookings/${bookingId}/reject`, {
@@ -476,10 +492,22 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                     'Authorization': apiToken ? `Bearer ${apiToken}` : '',
-                    'X-CSRF-TOKEN': csrfToken
-                }
+                    'X-CSRF-TOKEN': currentCsrf
+                },
+                body: JSON.stringify({
+                    _token: currentCsrf,
+                    reason: reason || 'Declined by owner.'
+                })
             });
+
+            if (res.status === 419) {
+                showBrokerToast('Security session expired. Refreshing page...', 'error');
+                setTimeout(() => window.location.reload(), 1200);
+                return;
+            }
+
             const data = await res.json();
 
             if (res.ok && data.success) {

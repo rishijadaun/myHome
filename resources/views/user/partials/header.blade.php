@@ -38,10 +38,10 @@
             <button type="button" onclick="dismissTopAppBanner(event)" class="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 text-gray-300 hover:text-white flex items-center justify-center text-[11px] flex-shrink-0 transition-transform cursor-pointer" title="Close for 1 month" aria-label="Close download banner">
                 <i class="fas fa-times"></i>
             </button>
-            <img src="{{ asset('images/favicon.png') }}" alt="StayNest App" class="w-8 h-8 rounded-xl shadow-xs flex-shrink-0 object-cover border border-white/15">
+            <img src="{{ asset('images/favicon.png') }}" alt="SpaceSeeks App" class="w-8 h-8 rounded-xl shadow-xs flex-shrink-0 object-cover border border-white/15">
             <div class="min-w-0">
                 <div class="flex items-center gap-1.5 leading-tight">
-                    <span class="text-xs font-black text-white tracking-tight truncate">StayNest App</span>
+                    <span class="text-xs font-black text-white tracking-tight truncate">SpaceSeeks App</span>
                     <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1 py-0.2 rounded font-bold">FREE</span>
                 </div>
                 <p class="text-[10px] text-gray-300 truncate">⭐ 4.8 • Fast PG & Flat Discovery</p>
@@ -57,7 +57,7 @@
             <div onclick="openGlobalLocationModal()" class="flex-1 min-w-0 flex items-center gap-2 cursor-pointer tap-effect" id="headerMobileLocationLink" title="Select or view current location">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5 mb-0.5">
-                        <span class="text-lg font-bold text-gray-900">StayNest</span>
+                        <span class="text-lg font-bold text-gray-900">SpaceSeeks</span>
                         <i class="fas fa-chevron-down text-xs text-brand"></i>
                     </div>
                     <p class="text-xs text-gray-600 truncate font-semibold" id="headerMobileLocationText">
@@ -114,11 +114,8 @@
     <div class="max-w-7xl mx-auto px-6">
         <div class="flex justify-between items-center h-20">
             <div class="flex items-center gap-12">
-                <a href="{{ route('user.home') }}" class="flex items-center gap-2 cursor-pointer">
-                    <div class="w-10 h-10 bg-gradient-to-br from-brand to-brand-dark rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand/30">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <span class="font-bold text-2xl text-gray-900 tracking-tight">Stay<span class="gradient-text">Nest</span></span>
+                <a href="{{ route('user.home') }}" class="flex items-center cursor-pointer transition hover:opacity-90" title="SpaceSeeks Home">
+                    <img src="{{ asset('images/spaceseeks-logo.png') }}" alt="SpaceSeeks" class="h-10 sm:h-11 w-auto object-contain">
                 </a>
 
                 <!-- Desktop Live Location Badge -->

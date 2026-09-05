@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', '500 - Server Error | StayNest')
+@section('title', '500 - Server Error | SpaceSeeks')
 @section('robots', 'noindex, nofollow')
 
 @section('content')

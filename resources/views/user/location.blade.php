@@ -1,8 +1,8 @@
 @extends('user.layouts.map')
 
-@section('title', 'Explore PGs, Flats & Flatmates Near You on Map | StayNest')
-@section('meta_description', 'Discover verified PGs, hostels, shared flats, commercial spaces, and verified flatmates near you on an interactive GPS map. Filter by budget, gender, amenities & connect with zero brokerage on StayNest.')
-@section('meta_keywords', 'explore near me, find PG near me, flatmate near me, roommates near me, flats near me on map, interactive PG map, PG locator India, student housing, StayNest map')
+@section('title', 'Explore PGs, Flats & Flatmates Near You on Map | SpaceSeeks')
+@section('meta_description', 'Discover verified PGs, hostels, shared flats, commercial spaces, and verified flatmates near you on an interactive GPS map. Filter by budget, gender, amenities & connect with zero brokerage on SpaceSeeks.')
+@section('meta_keywords', 'explore near me, find PG near me, flatmate near me, roommates near me, flats near me on map, interactive PG map, PG locator India, student housing, SpaceSeeks map')
 @section('canonical', route('user.location'))
 @section('og_type', 'website')
 

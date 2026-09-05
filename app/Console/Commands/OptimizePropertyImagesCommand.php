@@ -29,7 +29,7 @@ class OptimizePropertyImagesCommand extends Command
     {
         $isDryRun = $this->option('dry-run');
 
-        $this->info("🚀 Starting StayNest Property Image Optimization Engine...");
+        $this->info("🚀 Starting SpaceSeeks Property Image Optimization Engine...");
         if ($isDryRun) {
             $this->warn("⚠️ DRY-RUN MODE: Files will not be modified or converted.");
         }

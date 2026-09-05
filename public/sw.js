@@ -1,9 +1,12 @@
-// StayNest Progressive Web App (PWA) Service Worker
-const CACHE_NAME = 'staynest-pwa-v2';
+// SpaceSeeks Progressive Web App (PWA) Service Worker
+const CACHE_NAME = 'spaceseeks-pwa-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
-  '/images/favicon.png'
+  '/images/favicon.png',
+  '/images/spaceseeks-logo.png',
+  '/images/icon-192.png',
+  '/images/apple-touch-icon.png'
 ];
 
 // Install Event - Pre-cache core shell
@@ -40,10 +43,14 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // For static assets (images, fonts, scripts), use Cache First
+  // Allow Vite build assets and scripts to load directly via browser module loader (prevents cross-world mismatch)
+  if (url.pathname.startsWith('/build/') || event.request.destination === 'script') {
+    return;
+  }
+
+  // For static assets (images, fonts, styles), use Cache First
   if (
     url.pathname.startsWith('/images/') ||
-    url.pathname.startsWith('/build/') ||
     url.hostname.includes('fonts.gstatic.com') ||
     url.hostname.includes('cdnjs.cloudflare.com')
   ) {
@@ -67,19 +74,21 @@ self.addEventListener('fetch', (event) => {
   }
 
   // For HTML navigation pages, use Network First, fallback to cache
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            try {
-              cache.put(event.request, responseClone);
-            } catch(e) {}
-          });
-        }
-        return networkResponse;
-      })
-      .catch(() => caches.match(event.request))
-  );
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              try {
+                cache.put(event.request, responseClone);
+              } catch(e) {}
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  }
 });

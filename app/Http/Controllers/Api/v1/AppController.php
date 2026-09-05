@@ -18,17 +18,17 @@ class AppController extends Controller
     public function checkUpdate(Request $request)
     {
         return $this->success('App status fetched', [
-            'app_name' => 'StayNest - PG & Co-Living',
-            'package_name' => 'com.staynest.app',
+            'app_name' => 'SpaceSeeks - PG, Flat & Co-Living',
+            'package_name' => 'com.spaceseeks.app',
             'latest_version' => '1.0.4',
             'min_version' => '1.0.0',
             'force_update' => false,
             'maintenance_mode' => false,
-            'play_store_url' => 'https://play.google.com/store/apps/details?id=com.staynest.app',
+            'play_store_url' => 'https://play.google.com/store/apps/details?id=com.spaceseeks.app',
             'support_contact' => [
                 'phone' => '+91 98765 43210',
                 'whatsapp' => '+91 98765 43210',
-                'email' => 'support@staynest.com',
+                'email' => 'support@spaceseeks.com',
             ],
             'changelog' => [
                 '• Added Smart AI Stay Matcher Assistant',

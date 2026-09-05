@@ -1,6 +1,6 @@
 @extends('broker.layouts.app')
 
-@section('title', 'Broker Profile & Settings - StayNest')
+@section('title', 'Broker Profile & Settings - SpaceSeeks')
 
 @section('content')
 @php
@@ -52,7 +52,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Partner Profile & Settings</h1>
     </div>
     <div class="flex items-center gap-4">
-        <a href="https://wa.me/919876543210?text={{ urlencode('Hi StayNest Support, I am partner broker: ' . $brokerName . ' (ID: ' . substr($broker->id, 0, 8) . '). I need assistance.') }}" target="_blank" class="bg-brand-50 hover:bg-brand-100 text-brand-dark px-4 py-2 rounded-xl text-xs font-bold tap-effect flex items-center gap-2 border border-brand-100 transition">
+        <a href="https://wa.me/919876543210?text={{ urlencode('Hi SpaceSeeks Support, I am partner broker: ' . $brokerName . ' (ID: ' . substr($broker->id, 0, 8) . '). I need assistance.') }}" target="_blank" class="bg-brand-50 hover:bg-brand-100 text-brand-dark px-4 py-2 rounded-xl text-xs font-bold tap-effect flex items-center gap-2 border border-brand-100 transition">
             <i class="fab fa-whatsapp text-sm"></i> Helpdesk Support
         </a>
         <a href="{{ route('broker.dashboard') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-xs font-semibold tap-effect flex items-center gap-1.5 transition">
@@ -231,7 +231,7 @@
                     <div class="flex items-center justify-between border-b border-gray-100 pb-4">
                         <div>
                             <h3 class="text-lg font-bold text-gray-900">Personal & Business Information</h3>
-                            <p class="text-xs text-gray-500">Details displayed to potential tenants and partners on StayNest</p>
+                            <p class="text-xs text-gray-500">Details displayed to potential tenants and partners on SpaceSeeks</p>
                         </div>
                         <span class="text-xs font-semibold text-brand bg-brand-50 px-3 py-1 rounded-full border border-brand-100">Live Sync</span>
                     </div>
@@ -567,7 +567,7 @@
                     <div class="flex items-center justify-between border-b border-gray-100 pb-4">
                         <div>
                             <h3 class="text-lg font-bold text-gray-900">Communication & Notification Preferences</h3>
-                            <p class="text-xs text-gray-500">Configure how and when StayNest sends you live alerts and updates</p>
+                            <p class="text-xs text-gray-500">Configure how and when SpaceSeeks sends you live alerts and updates</p>
                         </div>
                         <span class="text-xs font-semibold text-brand bg-brand-50 px-3 py-1 rounded-full border border-brand-100">Instant Save</span>
                     </div>
@@ -639,7 +639,7 @@
                     <div class="flex items-center justify-between border-b border-gray-100 pb-4">
                         <div>
                             <h3 class="text-lg font-bold text-gray-900">Account Security & Password</h3>
-                            <p class="text-xs text-gray-500">Keep your StayNest partner account secure with a strong password</p>
+                            <p class="text-xs text-gray-500">Keep your SpaceSeeks partner account secure with a strong password</p>
                         </div>
                         <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Encrypted</span>
                     </div>
@@ -751,7 +751,7 @@
                 $rmZone = $assignedRm?->zone ?? 'North Zone (Noida & Delhi NCR)';
                 $rmPhone = $assignedRm?->phone ?? '+91 98765 43210';
                 $rmWhatsapp = $assignedRm?->whatsapp_number ?? '919876543210';
-                $rmEmail = $assignedRm?->email ?? 'partners@staynest.com';
+                $rmEmail = $assignedRm?->email ?? 'partners@spaceseeks.com';
                 $rmWorkingHours = $assignedRm?->working_hours ?? 'Mon - Sat: 9:00 AM - 7:30 PM';
                 $rmAvatar = $assignedRm?->avatar_url ?? null;
             @endphp
@@ -788,7 +788,7 @@
                 </div>
 
                 <div class="space-y-2 pt-1">
-                    <a href="https://wa.me/{{ $rmWhatsapp }}?text={{ urlencode('Hi ' . $rmName . ', I am partner broker: ' . $brokerName . ' (Broker ID: ' . substr($broker->id, 0, 8) . ', Email: ' . $broker->email . '). I need assistance with my StayNest properties.') }}" target="_blank" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-xl text-xs tap-effect shadow-md shadow-brand/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                    <a href="https://wa.me/{{ $rmWhatsapp }}?text={{ urlencode('Hi ' . $rmName . ', I am partner broker: ' . $brokerName . ' (Broker ID: ' . substr($broker->id, 0, 8) . ', Email: ' . $broker->email . '). I need assistance with my SpaceSeeks properties.') }}" target="_blank" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-xl text-xs tap-effect shadow-md shadow-brand/20 transition flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fab fa-whatsapp text-sm"></i> Chat on WhatsApp
                     </a>
                     <div class="grid grid-cols-2 gap-2">

@@ -6,17 +6,23 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon & Web Manifest -->
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#4bb59d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SpaceSeeks">
 
     <!-- SEO Meta Tags -->
-    <title>@yield('title', 'StayNest - Best Paying Guest & Co-Living PG Discovery Network in India')</title>
-    <meta name="description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage. Explore amenities, high-speed WiFi, food options, and instant direct host booking on StayNest.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'PG near me, Paying Guest, Co-living spaces, Boys PG, Girls PG, Luxury Hostels, Bangalore PG, Noida PG, Delhi PG, StayNest')">
+    <title>@yield('title', 'SpaceSeeks - Best Paying Guest & Co-Living PG Discovery Network in India')</title>
+    <meta name="description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage. Explore amenities, high-speed WiFi, food options, and instant direct host booking on SpaceSeeks.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'PG near me, Paying Guest, Co-living spaces, Boys PG, Girls PG, Luxury Hostels, Bangalore PG, Noida PG, Delhi PG, SpaceSeeks')">
     <meta name="robots" content="@yield('robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1')">
     <link rel="canonical" href="@yield('canonical', url()->current())">
-    <meta name="author" content="StayNest Technologies">
+    <meta name="author" content="SpaceSeeks Technologies">
     <meta name="geo.region" content="IN">
     <meta name="geo.placename" content="India">
     <meta name="rating" content="general">
@@ -26,24 +32,24 @@
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:locale" content="en_IN">
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:title" content="@yield('title', 'StayNest - Find Your Perfect PG')">
-    <meta property="og:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on StayNest.')">
+    <meta property="og:title" content="@yield('title', 'SpaceSeeks - Find Your Perfect PG')">
+    <meta property="og:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on SpaceSeeks.')">
     <meta property="og:url" content="@yield('canonical', url()->current())">
-    <meta property="og:site_name" content="StayNest">
+    <meta property="og:site_name" content="SpaceSeeks">
     <meta property="og:image" content="@yield('meta_image', asset('images/app-banner.png'))">
     <meta property="og:image:secure_url" content="@yield('meta_image', asset('images/app-banner.png'))">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/png">
-    <meta property="og:image:alt" content="StayNest - Verified PG & Co-Living Spaces">
+    <meta property="og:image:alt" content="SpaceSeeks - Verified PG & Co-Living Spaces">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'StayNest - Find Your Perfect PG')">
-    <meta name="twitter:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on StayNest.')">
+    <meta name="twitter:title" content="@yield('title', 'SpaceSeeks - Find Your Perfect PG')">
+    <meta name="twitter:description" content="@yield('meta_description', 'Discover 100% verified PGs, hostels, and co-living spaces across India with zero brokerage on SpaceSeeks.')">
     <meta name="twitter:image" content="@yield('meta_image', asset('images/app-banner.png'))">
-    <meta name="twitter:site" content="@StayNestIndia">
-    <meta name="twitter:creator" content="@StayNestIndia">
+    <meta name="twitter:site" content="@SpaceSeeksIndia">
+    <meta name="twitter:creator" content="@SpaceSeeksIndia">
 
 
     <!-- Mobile Theme Color -->
@@ -51,7 +57,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="StayNest">
+    <meta name="apple-mobile-web-app-title" content="SpaceSeeks">
 
     <!-- Dynamic Schema.org JSON-LD Structured Data -->
     @stack('schema')
@@ -156,7 +162,7 @@
                         <i class="fas fa-home"></i>
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold leading-tight">Install StayNest App</h4>
+                        <h4 class="text-xs font-bold leading-tight">Install SpaceSeeks App</h4>
                         <p class="text-[11px] text-gray-300">Fast, zero-brokerage PG search on your phone</p>
                     </div>
                 </div>
@@ -198,8 +204,8 @@
             const shareUrl = url || window.location.href;
             if (navigator.share) {
                 navigator.share({
-                    title: title || 'StayNest - Verified PG & Co-Living',
-                    text: text || 'Check out this verified PG stay on StayNest with zero brokerage!',
+                    title: title || 'SpaceSeeks - Verified PG & Co-Living',
+                    text: text || 'Check out this verified PG stay on SpaceSeeks with zero brokerage!',
                     url: shareUrl
                 }).catch(() => {});
             } else if (navigator.clipboard) {
@@ -260,12 +266,12 @@
                     Swal.fire({
                         icon: 'success',
                         title: 'App Already Installed!',
-                        text: 'You are currently using the official StayNest app on your device.',
+                        text: 'You are currently using the official SpaceSeeks app on your device.',
                         confirmButtonColor: '#4bb59d',
                         confirmButtonText: 'Great!'
                     });
                 } else {
-                    alert('StayNest is already installed on your device!');
+                    alert('SpaceSeeks is already installed on your device!');
                 }
                 return;
             }
@@ -281,7 +287,7 @@
                                 toast: true,
                                 position: 'top-end',
                                 icon: 'success',
-                                title: 'Installing StayNest App...',
+                                title: 'Installing SpaceSeeks App...',
                                 showConfirmButton: false,
                                 timer: 2500
                             });
@@ -324,7 +330,7 @@
                 if (directBox) directBox.classList.remove('hidden');
                 if (iosBox) iosBox.classList.add('hidden');
                 if (androidBox) androidBox.classList.add('hidden');
-                if (modalBtnText) modalBtnText.innerText = 'Install StayNest App';
+                if (modalBtnText) modalBtnText.innerText = 'Install SpaceSeeks App';
             }
 
             modal.classList.remove('hidden');

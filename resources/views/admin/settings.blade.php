@@ -14,7 +14,7 @@
 <header class="hidden lg:flex bg-white border-b border-gray-100 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Platform Configuration & Settings</h1>
-        <p class="text-sm text-gray-500">Manage global StayNest platform rules, commission margins, payment gateways and admin profile</p>
+        <p class="text-sm text-gray-500">Manage global SpaceSeeks platform rules, commission margins, payment gateways and admin profile</p>
     </div>
 </header>
 
@@ -57,11 +57,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Platform Name *</label>
-                    <input type="text" name="platform_name" value="{{ $settings['platform_name'] ?? 'StayNest' }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
+                    <input type="text" name="platform_name" value="{{ $settings['platform_name'] ?? 'SpaceSeeks' }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Support Email *</label>
-                    <input type="email" name="support_email" value="{{ $settings['support_email'] ?? 'support@staynest.com' }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
+                    <input type="email" name="support_email" value="{{ $settings['support_email'] ?? 'support@spaceseeks.com' }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Support Helpline Phone *</label>
@@ -221,7 +221,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">First Name *</label>
-                    <input type="text" name="first_name" value="{{ $adminUser?->profile?->first_name ?? 'StayNest' }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
+                    <input type="text" name="first_name" value="{{ $adminUser?->profile?->first_name ?? 'SpaceSeeks' }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Last Name</label>

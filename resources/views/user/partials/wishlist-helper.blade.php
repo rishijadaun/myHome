@@ -49,20 +49,40 @@
 
     window.getUserWishlistStorageKey = function() {
         let userKey = 'guest';
-        const userStr = localStorage.getItem('staynest_user');
-        if (userStr) {
-            try {
-                const u = JSON.parse(userStr);
-                userKey = u.id || u.email || 'authenticated_user';
-            } catch(e) {}
-        }
+        @auth
+            userKey = 'user_{{ Auth::id() }}';
+        @else
+            const userStr = localStorage.getItem('staynest_user');
+            if (userStr) {
+                try {
+                    const u = JSON.parse(userStr);
+                    userKey = u.id ? ('user_' + u.id) : (u.email || 'guest');
+                } catch(e) {}
+            }
+        @endauth
         return 'staynest_saved_stays_' + userKey;
     };
 
     window.getSavedProperties = function() {
         const key = getUserWishlistStorageKey();
         try {
-            return JSON.parse(localStorage.getItem(key)) || [];
+            let list = JSON.parse(localStorage.getItem(key)) || [];
+            if (Array.isArray(list)) {
+                const cleaned = list.filter(item => {
+                    if (!item) return false;
+                    const id = String(item.id || '');
+                    if (id.startsWith('pg_sunrise') || id.startsWith('pg_aura') || item.title === 'Sunrise Premium PG' || item.title === "Aura Women's Stay") {
+                        return false;
+                    }
+                    return true;
+                });
+                if (cleaned.length !== list.length) {
+                    localStorage.setItem(key, JSON.stringify(cleaned));
+                    list = cleaned;
+                }
+                return list;
+            }
+            return [];
         } catch(e) {
             return [];
         }
@@ -70,7 +90,7 @@
 
     window.savePropertiesToStorage = function(list) {
         const key = getUserWishlistStorageKey();
-        localStorage.setItem(key, JSON.stringify(list));
+        localStorage.setItem(key, JSON.stringify(list || []));
         updateWishlistBadgeCounts();
     };
 

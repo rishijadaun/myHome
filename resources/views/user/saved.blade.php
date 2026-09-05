@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'Saved Properties - StayNest')
+@section('title', 'Saved Properties - SpaceSeeks')
 @section('robots', 'noindex, nofollow')
 
 @section('content')
@@ -106,60 +106,48 @@
 
         // Check if user is logged in
         if (!isUserLoggedIn()) {
-            lockedBox.classList.remove('hidden');
-            emptyBox.classList.add('hidden');
-            listContainer.classList.add('hidden');
-            countBadge.innerText = 'Locked';
+            if (lockedBox) lockedBox.classList.remove('hidden');
+            if (emptyBox) emptyBox.classList.add('hidden');
+            if (listContainer) listContainer.classList.add('hidden');
+            if (countBadge) countBadge.innerText = 'Locked';
             return;
         }
 
-        lockedBox.classList.add('hidden');
+        if (lockedBox) lockedBox.classList.add('hidden');
         let savedList = getSavedProperties();
 
-        // Fallback default sample wishlist if freshly logged in
-        if (!savedList || savedList.length === 0) {
-            savedList = [
-                {
-                    id: 'pg_sunrise_1',
-                    title: 'Sunrise Premium PG',
-                    type: 'BOYS',
-                    typeColor: 'bg-blue-50 text-blue-600',
-                    location: 'Sector 62, Noida',
-                    dist: '0.4 km away',
-                    price: '₹8,500',
-                    rating: '4.8',
-                    reviews: '120',
-                    badge: 'Verified',
-                    image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-                },
-                {
-                    id: 'pg_aura_2',
-                    title: "Aura Women's Stay",
-                    type: 'GIRLS',
-                    typeColor: 'bg-pink-50 text-pink-600',
-                    location: 'Indiranagar, Bangalore',
-                    dist: '0.5 km away',
-                    price: '₹9,999',
-                    rating: '4.9',
-                    reviews: '98',
-                    badge: 'Verified',
-                    image: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
+        // Auto-clean any legacy mock fallback properties (pg_sunrise_1, pg_aura_2) from storage
+        if (Array.isArray(savedList)) {
+            const cleanedList = savedList.filter(item => {
+                if (!item) return false;
+                const id = String(item.id || '');
+                if (id.startsWith('pg_sunrise') || id.startsWith('pg_aura') || item.title === 'Sunrise Premium PG' || item.title === "Aura Women's Stay") {
+                    return false;
                 }
-            ];
-            savePropertiesToStorage(savedList);
+                return true;
+            });
+
+            if (cleanedList.length !== savedList.length) {
+                savedList = cleanedList;
+                savePropertiesToStorage(savedList);
+            }
+        } else {
+            savedList = [];
         }
 
-        countBadge.innerText = `${savedList.length} Stays`;
+        if (countBadge) countBadge.innerText = `${savedList.length} Stays`;
 
-        if (savedList.length === 0) {
-            emptyBox.classList.remove('hidden');
-            listContainer.classList.add('hidden');
+        if (!savedList || savedList.length === 0) {
+            if (emptyBox) emptyBox.classList.remove('hidden');
+            if (listContainer) listContainer.classList.add('hidden');
             return;
         }
 
-        emptyBox.classList.add('hidden');
-        listContainer.classList.remove('hidden');
-        listContainer.innerHTML = '';
+        if (emptyBox) emptyBox.classList.add('hidden');
+        if (listContainer) {
+            listContainer.classList.remove('hidden');
+            listContainer.innerHTML = '';
+        }
 
         savedList.forEach(pg => {
             const card = document.createElement('div');
@@ -168,13 +156,18 @@
 
             const slugVal = pg.slug || (pg.title ? pg.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : pg.id);
             const detailUrl = `/detail/${slugVal}`;
-            const isSale = (pg.type && pg.type.toLowerCase().includes('sale')) || (pg.price && (pg.price.includes('Cr') || pg.price.includes('Lac') || pg.price.includes('Lakh')));
+            const isSale = (pg.type && pg.type.toLowerCase().includes('sale')) || (pg.price && (String(pg.price).includes('Cr') || String(pg.price).includes('Lac') || String(pg.price).includes('Lakh')));
             
+            let priceDisplay = pg.price || '';
+            if (priceDisplay && !priceDisplay.startsWith('₹') && !priceDisplay.includes('₹')) {
+                priceDisplay = '₹' + priceDisplay;
+            }
+
             card.innerHTML = `
                 <div class="relative h-44 overflow-hidden">
-                    <img src="${pg.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=600&q=80'}" alt="${pg.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="${pg.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=600&q=80'}" alt="${pg.title || 'Property'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=600&q=80'">
                     <span class="absolute top-2.5 left-2.5 ${isSale ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black uppercase' : 'bg-brand text-white font-bold'} text-[10px] px-2.5 py-0.5 rounded-full shadow-sm">
-                        ${isSale ? '<i class="fas fa-tag mr-1 text-[9px]"></i> For Sale' : (pg.type || 'StayNest')}
+                        ${isSale ? '<i class="fas fa-tag mr-1 text-[9px]"></i> For Sale' : (pg.type || 'SpaceSeeks')}
                     </span>
                     <button type="button" onclick="removeSavedItem('${pg.id}', this)" class="absolute top-2.5 right-2.5 w-7 h-7 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 hover:text-gray-400 shadow-sm transition tap-effect" title="Remove from wishlist">
                         <i class="fas fa-heart text-xs"></i>
@@ -187,7 +180,7 @@
                 <div class="p-4 flex flex-col flex-1 justify-between">
                     <div>
                         <div class="flex justify-between items-center gap-1 mb-1">
-                            <h3 class="font-bold text-base text-gray-900 truncate">${pg.title}</h3>
+                            <h3 class="font-bold text-base text-gray-900 truncate">${pg.title || 'Property'}</h3>
                             <span class="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold px-1.5 py-0.5 rounded flex items-center gap-1 flex-shrink-0">
                                 <i class="fas fa-check-circle text-[8px]"></i> Verified
                             </span>
@@ -200,7 +193,7 @@
                     <div class="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
                         <div>
                             <span class="text-[9px] text-gray-400 block font-semibold leading-none">${isSale ? 'Price' : 'Starting from'}</span>
-                            <span class="text-base font-black text-gray-900">${pg.price || '₹8,500'}${isSale ? '' : '<span class="text-[10px] font-normal text-gray-500">/mo</span>'}</span>
+                            <span class="text-base font-black text-gray-900">${priceDisplay || '₹8,500'}${isSale ? '' : '<span class="text-[10px] font-normal text-gray-500">/mo</span>'}</span>
                         </div>
                         <a href="${detailUrl}" class="bg-gradient-to-r from-brand to-brand-dark hover:shadow-md hover:shadow-brand/20 text-white text-xs font-bold px-4 py-2 rounded-xl transition tap-effect no-underline">
                             View Details
@@ -214,9 +207,9 @@
 
     function removeSavedItem(id, btn) {
         let savedList = getSavedProperties();
-        const card = document.getElementById(`savedCard_${id}`) || btn.closest('.saved-item');
+        const card = document.getElementById(`savedCard_${id}`) || (btn ? btn.closest('.saved-item') : null);
         
-        savedList = savedList.filter(item => item.id !== id);
+        savedList = savedList.filter(item => item && String(item.id) !== String(id));
         savePropertiesToStorage(savedList);
 
         if (card) {
@@ -225,16 +218,20 @@
             setTimeout(() => {
                 card.remove();
                 const countBadge = document.getElementById('savedCountBadge');
-                countBadge.innerText = `${savedList.length} Stays`;
+                if (countBadge) countBadge.innerText = `${savedList.length} Stays`;
 
                 if (savedList.length === 0) {
-                    document.getElementById('savedEmptyState').classList.remove('hidden');
-                    document.getElementById('savedListContainer').classList.add('hidden');
+                    const emptyBox = document.getElementById('savedEmptyState');
+                    const listContainer = document.getElementById('savedListContainer');
+                    if (emptyBox) emptyBox.classList.remove('hidden');
+                    if (listContainer) listContainer.classList.add('hidden');
                 }
             }, 250);
         }
 
-        showWishlistToast('Removed from Wishlist', 'Property removed from your saved stays.', false);
+        if (typeof showWishlistToast === 'function') {
+            showWishlistToast('Removed from Wishlist', 'Property removed from your saved stays.', false);
+        }
     }
 </script>
 @endpush

@@ -134,7 +134,7 @@ class FreshDatabaseSeeder extends Seeder
             'first_name' => 'Rajesh',
             'last_name' => 'Sharma',
             'avatar_url' => 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&auto=format&fit=crop&q=80',
-            'company_name' => 'StayNest Premium Stays & Co-Living',
+            'company_name' => 'SpaceSeeks Premium Stays & Co-Living',
             'bio' => 'Experienced PG & Co-living space partner managing premium student and executive stays across India.',
             'preferences' => json_encode([
                 'operating_city' => 'Delhi NCR / Bangalore',
@@ -216,7 +216,7 @@ class FreshDatabaseSeeder extends Seeder
         ]);
         UserProfile::create([
             'user_id' => $adminId,
-            'first_name' => 'StayNest',
+            'first_name' => 'SpaceSeeks',
             'last_name' => 'Admin',
             'is_active' => 1,
         ]);

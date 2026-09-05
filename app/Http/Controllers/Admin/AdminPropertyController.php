@@ -155,8 +155,12 @@ class AdminPropertyController extends Controller
             }
         }
 
-        // 4. Paginated Results
-        $properties = $query->latest()->paginate(15)->withQueryString();
+        // 4. Paginated Results with dynamic Per Page
+        $perPage = (int) $request->query('per_page', 15);
+        if ($perPage < 5 || $perPage > 100) {
+            $perPage = 15;
+        }
+        $properties = $query->latest()->paginate($perPage)->withQueryString();
 
         $recommendedCount = Property::where(function ($q) {
             $q->where('is_recommended', 1)->orWhere('featured', 1);
@@ -275,7 +279,7 @@ class AdminPropertyController extends Controller
             'user_id' => $validated['broker_id'],
             'user_type' => 'broker',
             'title' => 'Property Added by Admin 🎉',
-            'message' => "Your listing \"{$property->name}\" has been published on StayNest.",
+            'message' => "Your listing \"{$property->name}\" has been published on SpaceSeeks.",
             'type' => 'property_added',
             'is_read' => 0,
             'action_url' => '/broker/pgs',

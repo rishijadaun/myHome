@@ -17,7 +17,7 @@
     <button type="button" 
             onclick="toggleAiChat()" 
             class="pointer-events-auto relative group flex items-center gap-2.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-brand hover:from-purple-700 hover:to-teal-700 text-white px-4 py-2.5 rounded-full shadow-2xl border border-white/30 tap-effect transition-all duration-300 hover:scale-105 hover:shadow-purple-500/40"
-            title="Ask StayNest Smart AI">
+            title="Ask SpaceSeeks Smart AI">
         <!-- Glowing Pulse Ping -->
         <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
@@ -51,7 +51,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-1.5">
-                        <h3 class="font-bold text-sm sm:text-base leading-tight">StayNest AI Assistant</h3>
+                        <h3 class="font-bold text-sm sm:text-base leading-tight">SpaceSeeks AI Assistant</h3>
                         <!-- <span class="bg-yellow-400/25 text-yellow-300 text-[9px] font-extrabold px-1.5 py-0.2 rounded border border-yellow-400/30">MATCH ENGINE v5</span> -->
                     </div>
                     <p class="text-[11px] text-purple-200/80">Conversational Property Search &amp; Match Scoring</p>
@@ -72,7 +72,7 @@
             <!-- <button type="button" onclick="askAiPrompt('Show me trending searches')" class="text-[11px] font-black bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white px-3 py-1 rounded-lg shadow-xs whitespace-nowrap tap-effect flex items-center gap-1">
                 <i class="fas fa-fire text-yellow-300 animate-pulse"></i> 🔥 Trending Searches
             </button> -->
-            <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-[11px] font-bold bg-white text-purple-700 hover:text-purple-900 hover:border-purple-400 px-2.5 py-1 rounded-lg border border-purple-200 shadow-xs whitespace-nowrap tap-effect">
+            <button type="button" onclick="askAiPrompt('Tell me about all listing types on SpaceSeeks')" class="text-[11px] font-bold bg-white text-purple-700 hover:text-purple-900 hover:border-purple-400 px-2.5 py-1 rounded-lg border border-purple-200 shadow-xs whitespace-nowrap tap-effect">
                 ✨ Explore All
             </button>
             <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-[11px] font-bold bg-white text-emerald-700 hover:text-emerald-900 hover:border-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-200 shadow-xs whitespace-nowrap tap-effect">
@@ -101,7 +101,7 @@
                     <i class="fas fa-robot"></i>
                 </div>
                 <div class="bg-white p-4 rounded-2xl rounded-tl-sm border border-gray-100 shadow-xs text-xs text-gray-800 space-y-2.5">
-                    <p class="font-bold text-gray-900 text-sm">Hello! I am your StayNest AI Concierge 👋</p>
+                    <p class="font-bold text-gray-900 text-sm">Hello! I am your SpaceSeeks AI Concierge 👋</p>
                     <!-- <p class="leading-relaxed text-gray-700">Tell me in English or Hindi what you're looking for, or explore our <strong>verified listing types &amp; live trending searches</strong> across India:</p> -->
                     <div class="pt-1 flex flex-wrap gap-1.5 text-[10px]">
                         <button type="button" onclick="askAiPrompt('Show me trending searches')" class="bg-gradient-to-r from-orange-50 to-rose-50 text-orange-700 font-extrabold px-2.5 py-1 rounded-lg border border-orange-200/80 hover:bg-orange-100 transition tap-effect flex items-center gap-1">
@@ -126,7 +126,7 @@
                 <!-- <div>
                     <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
                         <span class="flex items-center gap-1"><i class="fas fa-layer-group text-purple-600"></i> Explore Listing Types</span>
-                        <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-[10px] font-bold text-purple-600 hover:underline">All Types &rarr;</button>
+                        <button type="button" onclick="askAiPrompt('Tell me about all listing types on SpaceSeeks')" class="text-[10px] font-bold text-purple-600 hover:underline">All Types &rarr;</button>
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
                         <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-left bg-emerald-50/60 hover:bg-emerald-100 hover:text-emerald-900 p-2 rounded-xl border border-emerald-200/70 text-[11px] font-bold text-emerald-800 transition flex items-center justify-between">
@@ -192,7 +192,7 @@
             </form>
             <div class="flex items-center justify-between text-[10px] text-gray-400 mt-2 px-1">
                 <span><i class="fas fa-shield-halved text-brand"></i> 100% Zero Brokerage Real Listings</span>
-                <span>Powered by StayNest AI Intelligence</span>
+                <span>Powered by SpaceSeeks AI Intelligence</span>
             </div>
         </div>
 
@@ -285,7 +285,7 @@ function clearAiChat() {
                 <i class="fas fa-robot"></i>
             </div>
             <div class="bg-white p-4 rounded-2xl rounded-tl-sm border border-gray-100 shadow-xs text-xs text-gray-800 space-y-2.5">
-                <p class="font-bold text-gray-900 text-sm">Hello! I am your StayNest AI Concierge 👋</p>
+                <p class="font-bold text-gray-900 text-sm">Hello! I am your SpaceSeeks AI Concierge 👋</p>
                 <p class="leading-relaxed text-gray-700">Tell me in English or Hindi what you're looking for, or explore our <strong>verified listing types &amp; live trending searches</strong> across India:</p>
                 <div class="pt-1 flex flex-wrap gap-1.5 text-[10px]">
                     <button type="button" onclick="askAiPrompt('Show me trending searches')" class="bg-gradient-to-r from-orange-50 to-rose-50 text-orange-700 font-extrabold px-2.5 py-1 rounded-lg border border-orange-200/80 hover:bg-orange-100 transition tap-effect flex items-center gap-1">
@@ -307,7 +307,7 @@ function clearAiChat() {
             <div>
                 <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
                     <span class="flex items-center gap-1"><i class="fas fa-layer-group text-purple-600"></i> Explore Listing Types</span>
-                    <button type="button" onclick="askAiPrompt('Tell me about all listing types on StayNest')" class="text-[10px] font-bold text-purple-600 hover:underline">All Types &rarr;</button>
+                    <button type="button" onclick="askAiPrompt('Tell me about all listing types on SpaceSeeks')" class="text-[10px] font-bold text-purple-600 hover:underline">All Types &rarr;</button>
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
                     <button type="button" onclick="askAiPrompt('Show me verified PG & Hostels')" class="text-left bg-emerald-50/60 hover:bg-emerald-100 hover:text-emerald-900 p-2 rounded-xl border border-emerald-200/70 text-[11px] font-bold text-emerald-800 transition flex items-center justify-between">
@@ -767,7 +767,7 @@ function renderAiResponse(data) {
                                     <span class="absolute top-2 left-2 ${p.tag_meta?.solid_badge || 'bg-emerald-500 text-white'} text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                                         ${p.tag_meta?.label || 'Verified'}
                                     </span>
-                                    <!-- StayNest Match % Badge -->
+                                    <!-- SpaceSeeks Match % Badge -->
                                     <span class="absolute top-2 right-2 bg-emerald-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
                                         <i class="fas fa-bolt text-yellow-300 text-[8px]"></i> ${p.match_score}% Match
                                     </span>
@@ -862,7 +862,7 @@ function renderAiResponse(data) {
                     <i class="fas fa-wand-magic-sparkles text-purple-600"></i> ${data.total_matches > 0 ? 'Verified Matches' : 'Search Result'}
                 </span>
                 <span class="text-[9px] ${data.total_matches > 0 ? 'text-purple-700 bg-purple-50 border-purple-200' : 'text-amber-700 bg-amber-50 border-amber-200'} border px-2 py-0.5 rounded font-bold">
-                    ${data.total_matches > 0 ? 'StayNest Match AI' : '0 Results'}
+                    ${data.total_matches > 0 ? 'SpaceSeeks Match AI' : '0 Results'}
                 </span>
             </div>
             ${filtersHtml}

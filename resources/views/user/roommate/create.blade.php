@@ -15,8 +15,8 @@
     $profileTagline = $user?->profile?->tagline ?: (($user?->profile?->gender ? ucfirst($user->profile->gender) : 'Tenant') . ' · ' . ($user?->profile?->occupation ?? 'Working Professional'));
 @endphp
 
-@section('title', ($isEditMode ? 'Edit Available Room Listing' : 'Find Flatmate or Roommate') . ' — StayNest')
-@section('meta_description', 'Post your available room or shared flat on StayNest. Connect directly with verified flatmates with zero brokerage.')
+@section('title', ($isEditMode ? 'Edit Available Room Listing' : 'Find Flatmate or Roommate') . ' — SpaceSeeks')
+@section('meta_description', 'Post your available room or shared flat on SpaceSeeks. Connect directly with verified flatmates with zero brokerage.')
 @section('canonical', route('user.roommate.create'))
 @section('robots', 'noindex, nofollow')
 

@@ -47,7 +47,7 @@
         @if(!empty($page['image']))
         <image:image>
             <image:loc>{{ htmlspecialchars($page['image'], ENT_XML1, 'UTF-8') }}</image:loc>
-            <image:title>{{ htmlspecialchars($page['title'] ?? 'Verified Property on StayNest', ENT_XML1, 'UTF-8') }}</image:title>
+            <image:title>{{ htmlspecialchars($page['title'] ?? 'Verified Property on SpaceSeeks', ENT_XML1, 'UTF-8') }}</image:title>
         </image:image>
         @endif
     </url>
@@ -64,7 +64,7 @@
         @if(!empty($page['image']))
         <image:image>
             <image:loc>{{ htmlspecialchars($page['image'], ENT_XML1, 'UTF-8') }}</image:loc>
-            <image:title>{{ htmlspecialchars($page['title'] ?? 'Verified Flatmate Listing on StayNest', ENT_XML1, 'UTF-8') }}</image:title>
+            <image:title>{{ htmlspecialchars($page['title'] ?? 'Verified Flatmate Listing on SpaceSeeks', ENT_XML1, 'UTF-8') }}</image:title>
         </image:image>
         @endif
     </url>

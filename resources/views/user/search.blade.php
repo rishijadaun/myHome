@@ -19,45 +19,45 @@
     if ($searchArea && $searchCity) {
         $locStr = ucfirst($searchArea) . ', ' . ucfirst($searchCity);
         if ($isSale) {
-            $seoSearchTitle = "Properties For Sale in {$locStr} — Buy Verified Real Estate | StayNest";
-            $seoSearchDesc = "Explore verified houses, flats, and plots for sale in {$locStr} with 0% brokerage, clear title verification & direct owner contact on StayNest.";
+            $seoSearchTitle = "Properties For Sale in {$locStr} — Buy Verified Real Estate | SpaceSeeks";
+            $seoSearchDesc = "Explore verified houses, flats, and plots for sale in {$locStr} with 0% brokerage, clear title verification & direct owner contact on SpaceSeeks.";
         } elseif ($isCommercial) {
-            $seoSearchTitle = "Commercial Spaces & Shops in {$locStr} — Rent Office Space | StayNest";
-            $seoSearchDesc = "Browse 100% verified commercial offices, retail shops, and co-working spaces in {$locStr} with zero brokerage on StayNest.";
+            $seoSearchTitle = "Commercial Spaces & Shops in {$locStr} — Rent Office Space | SpaceSeeks";
+            $seoSearchDesc = "Browse 100% verified commercial offices, retail shops, and co-working spaces in {$locStr} with zero brokerage on SpaceSeeks.";
         } elseif ($isFlat) {
-            $seoSearchTitle = "Flats & Apartments for Rent in {$locStr} — 1, 2, 3 BHK | StayNest";
+            $seoSearchTitle = "Flats & Apartments for Rent in {$locStr} — 1, 2, 3 BHK | SpaceSeeks";
             $seoSearchDesc = "Explore verified rental flats, apartments, and independent houses in {$locStr} with zero brokerage, modern amenities & direct landlord booking.";
         } else {
-            $seoSearchTitle = "PG in {$locStr} - Best Boys, Girls & Co-Living | StayNest";
+            $seoSearchTitle = "PG in {$locStr} - Best Boys, Girls & Co-Living | SpaceSeeks";
             $seoSearchDesc = "Explore 100% verified PGs and co-living stays in {$locStr} starting from ₹5,000/mo. Zero brokerage, WiFi, meals & biometric security.";
         }
     } elseif ($searchCity) {
         $cName = ucfirst($searchCity);
         if ($isSale) {
-            $seoSearchTitle = "Properties For Sale in {$cName} — Buy Verified Houses & Flats | StayNest";
-            $seoSearchDesc = "Search verified residential & commercial properties for sale in {$cName}. Zero brokerage, clear documentation & site visits on StayNest.";
+            $seoSearchTitle = "Properties For Sale in {$cName} — Buy Verified Houses & Flats | SpaceSeeks";
+            $seoSearchDesc = "Search verified residential & commercial properties for sale in {$cName}. Zero brokerage, clear documentation & site visits on SpaceSeeks.";
         } elseif ($isCommercial) {
-            $seoSearchTitle = "Commercial Spaces & Offices for Rent in {$cName} | StayNest";
-            $seoSearchDesc = "Find verified commercial properties, shops, and office spaces for rent in {$cName} with zero brokerage on StayNest.";
+            $seoSearchTitle = "Commercial Spaces & Offices for Rent in {$cName} | SpaceSeeks";
+            $seoSearchDesc = "Find verified commercial properties, shops, and office spaces for rent in {$cName} with zero brokerage on SpaceSeeks.";
         } elseif ($isFlat) {
-            $seoSearchTitle = "Flats & Apartments for Rent in {$cName} — Zero Brokerage | StayNest";
-            $seoSearchDesc = "Discover 100% verified 1 BHK, 2 BHK, and 3 BHK rental flats & apartments in {$cName} with zero brokerage on StayNest.";
+            $seoSearchTitle = "Flats & Apartments for Rent in {$cName} — Zero Brokerage | SpaceSeeks";
+            $seoSearchDesc = "Discover 100% verified 1 BHK, 2 BHK, and 3 BHK rental flats & apartments in {$cName} with zero brokerage on SpaceSeeks.";
         } else {
-            $seoSearchTitle = "PG in {$cName} - Best Boys, Girls & Luxury Co-Living Stays | StayNest";
-            $seoSearchDesc = "Explore verified PGs and hostels in {$cName} starting from ₹5,000/mo. Zero brokerage, free WiFi, daily meals & biometric security. Compare rooms on StayNest.";
+            $seoSearchTitle = "PG in {$cName} - Best Boys, Girls & Luxury Co-Living Stays | SpaceSeeks";
+            $seoSearchDesc = "Explore verified PGs and hostels in {$cName} starting from ₹5,000/mo. Zero brokerage, free WiFi, daily meals & biometric security. Compare rooms on SpaceSeeks.";
         }
     } elseif ($searchQ) {
-        $seoSearchTitle = 'Search Results for "' . e($searchQ) . '" - Verified Stays & PGs | StayNest';
-        $seoSearchDesc = 'Browse top matching accommodations, verified PGs, flats, and commercial spaces for "' . e($searchQ) . '" with zero brokerage on StayNest.';
+        $seoSearchTitle = 'Search Results for "' . e($searchQ) . '" - Verified Stays & PGs | SpaceSeeks';
+        $seoSearchDesc = 'Browse top matching accommodations, verified PGs, flats, and commercial spaces for "' . e($searchQ) . '" with zero brokerage on SpaceSeeks.';
     } elseif ($searchGender) {
-        $seoSearchTitle = ucfirst($searchGender) . ' PG Accommodations - Verified Hostels & Stays | StayNest';
-        $seoSearchDesc = 'Find top-rated ' . strtolower($searchGender) . ' PGs and co-living stays across major Indian cities with zero brokerage on StayNest.';
+        $seoSearchTitle = ucfirst($searchGender) . ' PG Accommodations - Verified Hostels & Stays | SpaceSeeks';
+        $seoSearchDesc = 'Find top-rated ' . strtolower($searchGender) . ' PGs and co-living stays across major Indian cities with zero brokerage on SpaceSeeks.';
     } else {
-        $seoSearchTitle = 'Find PG, Flats & Stays Near You - 100% Verified | Zero Brokerage | StayNest';
-        $seoSearchDesc = 'Discover 1,200+ verified PGs, luxury hostels, rental flats, and co-living spaces across Bangalore, Noida, Delhi, Mumbai, Pune, and Gurgaon on StayNest.';
+        $seoSearchTitle = 'Find PG, Flats & Stays Near You - 100% Verified | Zero Brokerage | SpaceSeeks';
+        $seoSearchDesc = 'Discover 1,200+ verified PGs, luxury hostels, rental flats, and co-living spaces across Bangalore, Noida, Delhi, Mumbai, Pune, and Gurgaon on SpaceSeeks.';
     }
     
-    $seoSearchKeywords = "{$categoryName} in " . ($searchArea ? $searchArea . ' ' : '') . ($searchCity ?: 'India') . ", paying guest, verified rental flats, boys PG, girls PG, co-living spaces, StayNest";
+    $seoSearchKeywords = "{$categoryName} in " . ($searchArea ? $searchArea . ' ' : '') . ($searchCity ?: 'India') . ", paying guest, verified rental flats, boys PG, girls PG, co-living spaces, SpaceSeeks";
     
     // Canonical URL resolution
     if ($searchCity) {
@@ -101,7 +101,7 @@
       "isPartOf": {
         "@type": "WebSite",
         "@id": "{{ route('user.home') }}#website",
-        "name": "StayNest",
+        "name": "SpaceSeeks",
         "url": "{{ route('user.home') }}"
       }
     },
@@ -299,7 +299,7 @@
                             <i class="fas fa-wand-magic-sparkles"></i>
                         </div>
                         <div>
-                            <h4 class="text-xs sm:text-sm font-bold text-gray-900 leading-tight">StayNest AI Smart Search Engine</h4>
+                            <h4 class="text-xs sm:text-sm font-bold text-gray-900 leading-tight">SpaceSeeks AI Smart Search Engine</h4>
                             <p class="text-[11px] text-gray-500">{{ $summaryMessage }}</p>
                         </div>
                     </div>
@@ -367,7 +367,7 @@
                     <label class="block text-xs font-semibold text-gray-700 mb-2">Sorting</label>
                     <select id="desktopSortFilter" onchange="applyDesktopFilterChange()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-all appearance-none cursor-pointer">
                         <option value="distance-asc" {{ ($sort ?? 'distance-asc') === 'distance-asc' || request('near_me') ? 'selected' : '' }}>📍 Distance: Low to High (Default)</option>
-                        <option value="recommended" {{ ($sort ?? '') === 'recommended' && !request('near_me') ? 'selected' : '' }}>✨ StayNest Recommended</option>
+                        <option value="recommended" {{ ($sort ?? '') === 'recommended' && !request('near_me') ? 'selected' : '' }}>✨ SpaceSeeks Recommended</option>
                         <option value="price-asc" {{ ($sort ?? '') === 'price-asc' ? 'selected' : '' }}>💰 Price: Low to High</option>
                         <option value="price-desc" {{ ($sort ?? '') === 'price-desc' ? 'selected' : '' }}>💎 Price: High to Low</option>
                         <option value="rating" {{ ($sort ?? '') === 'rating' ? 'selected' : '' }}>⭐ Top Rated</option>
@@ -735,7 +735,7 @@
                         <p class="text-xs sm:text-sm font-bold text-gray-900">+91 98765 43210</p>
                     </div>
                 </a>
-                <a href="https://wa.me/919876543210?text=Hi%20StayNest%20Team%2C%20I%20am%20looking%20for%20a%20PG%20in%20{{ urlencode($selectedArea ?? ($selectedCity ?? 'India')) }}" target="_blank" class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl hover:border-emerald-500 transition shadow-xs no-underline">
+                <a href="https://wa.me/919876543210?text=Hi%20SpaceSeeks%20Team%2C%20I%20am%20looking%20for%20a%20PG%20in%20{{ urlencode($selectedArea ?? ($selectedCity ?? 'India')) }}" target="_blank" class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl hover:border-emerald-500 transition shadow-xs no-underline">
                     <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base flex-shrink-0">
                         <i class="fab fa-whatsapp"></i>
                     </div>

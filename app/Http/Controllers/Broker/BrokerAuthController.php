@@ -121,9 +121,9 @@ class BrokerAuthController extends Controller
             ]);
 
             $statusMsg = match ($user->status) {
-                'pending_verification' => 'Your partner broker account is pending verification and approval by StayNest Admin.',
-                'rejected' => 'Your partner broker registration was rejected. Please contact StayNest partner desk.',
-                'suspended' => 'Your partner broker account has been suspended by administrator. Please contact StayNest support.',
+                'pending_verification' => 'Your partner broker account is pending verification and approval by SpaceSeeks Admin.',
+                'rejected' => 'Your partner broker registration was rejected. Please contact SpaceSeeks partner desk.',
+                'suspended' => 'Your partner broker account has been suspended by administrator. Please contact SpaceSeeks support.',
                 default => 'Your broker account is currently inactive. Only active partner accounts are permitted to log in.',
             };
 

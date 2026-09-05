@@ -155,7 +155,7 @@ class AdminContactController extends Controller
 
         $query->latest('created_at');
 
-        $fileName = 'StayNest_Contact_Inquiries_' . Carbon::now()->format('Y-m-d_His') . '.csv';
+        $fileName = 'SpaceSeeks_Contact_Inquiries_' . Carbon::now()->format('Y-m-d_His') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',

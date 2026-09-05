@@ -152,3 +152,7 @@ git config --global user.email "imrishi6@gmail.com"
  cd /home/u262177735/domains/home.devpluss.com/public_html
  composer install --no-dev --optimize-autoloader
  -------------------------------------
+ssh: ssh -p 65002 u262177735@82.112.229.245
+---------------
+  cd /home/u262177735/domains/spaceseeks.com/public_html
+ composer install --no-dev --optimize-autoloader

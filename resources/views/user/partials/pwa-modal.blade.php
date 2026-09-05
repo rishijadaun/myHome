@@ -9,10 +9,10 @@
 
         <!-- App Identity Card -->
         <div class="flex items-center gap-3.5 pb-5 border-b border-gray-100">
-            <img src="/images/favicon.png" alt="StayNest App" class="w-14 h-14 rounded-2xl shadow-md border border-gray-100 p-1 bg-white object-contain flex-shrink-0">
+            <img src="{{ asset('images/spaceseeks-icon.png') }}" alt="SpaceSeeks App" class="w-14 h-14 rounded-2xl shadow-md border border-gray-100 p-1 bg-white object-contain flex-shrink-0">
             <div>
                 <div class="flex items-center gap-1.5">
-                    <h3 class="text-lg font-black text-gray-900">StayNest</h3>
+                    <h3 class="text-lg font-black text-gray-900">SpaceSeeks</h3>
                     <span class="bg-brand-50 text-brand text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-brand/20">Official PWA</span>
                 </div>
                 <p class="text-xs text-gray-500 mt-0.5">Zero Brokerage PG &amp; Flat Discovery App</p>
@@ -30,11 +30,11 @@
             <!-- Standard One-Click PWA Trigger (When supported) -->
             <div id="pwaDirectTriggerBox" class="space-y-3">
                 <p class="text-xs text-gray-600 leading-relaxed">
-                    Install StayNest directly on your device. Enjoy fast booking, offline access, instant notifications, and zero storage hassle.
+                    Install SpaceSeeks directly on your device. Enjoy fast booking, offline access, instant notifications, and zero storage hassle.
                 </p>
                 <button type="button" id="pwaModalInstallBtn" onclick="triggerPwaPromptDirectly()" class="w-full bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-brand text-white font-extrabold text-sm py-3.5 px-5 rounded-2xl shadow-lg shadow-brand/30 hover:shadow-xl transition tap-effect flex items-center justify-center gap-2 cursor-pointer">
                     <i class="fas fa-download text-base"></i>
-                    <span id="pwaModalBtnText">Install StayNest App Now</span>
+                    <span id="pwaModalBtnText">Install SpaceSeeks App Now</span>
                 </button>
             </div>
 

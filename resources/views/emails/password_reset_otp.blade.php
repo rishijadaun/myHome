@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>StayNest Password Reset Code</title>
+    <title>SpaceSeeks Password Reset Code</title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -31,7 +31,7 @@
 
     <!-- Preheader Text -->
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-        Your StayNest password reset code is {{ $otp }}. Use this 6-digit code to reset your account password.
+        Your SpaceSeeks password reset code is {{ $otp }}. Use this 6-digit code to reset your account password.
     </div>
 
     <!-- Main Wrapper Table -->
@@ -52,7 +52,7 @@
                                             🏠
                                         </div>
                                         <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.2;">
-                                            StayNest
+                                            SpaceSeeks
                                         </h1>
                                         <p style="margin: 4px 0 0 0; font-size: 12px; color: #ccfbf1; font-weight: 500; letter-spacing: 0.5px;">
                                             Account Security & Recovery
@@ -72,7 +72,7 @@
                             </p>
 
                             <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 22px; color: #475569;">
-                                We received a request to reset the password for your <strong>StayNest</strong> account. Please enter the 6-digit verification code below to set a new password:
+                                We received a request to reset the password for your <strong>SpaceSeeks</strong> account. Please enter the 6-digit verification code below to set a new password:
                             </p>
 
                             <!-- OTP Box -->
@@ -103,7 +103,7 @@
 
                             <p style="margin: 0; font-size: 13px; line-height: 20px; color: #64748b;">
                                 Warm regards,<br />
-                                <strong style="color: #1e293b;">Team StayNest</strong><br />
+                                <strong style="color: #1e293b;">Team SpaceSeeks</strong><br />
                                 <span style="font-size: 11px; color: #94a3b8;">Support: <a href="mailto:{{ config('mail.from.address') }}" style="color: #0f766e; text-decoration: none;">{{ config('mail.from.address') }}</a></span>
                             </p>
 
@@ -114,7 +114,7 @@
                     <tr>
                         <td align="center" style="background-color: #f1f5f9; padding: 20px 24px; border-top: 1px solid #e2e8f0;">
                             <p style="margin: 0 0 6px 0; font-size: 11px; color: #64748b;">
-                                © {{ date('Y') }} <a href="{{ config('app.url') }}" style="color: #0f766e; text-decoration: none; font-weight: 600;">StayNest</a>. All rights reserved.
+                                © {{ date('Y') }} <a href="{{ config('app.url') }}" style="color: #0f766e; text-decoration: none; font-weight: 600;">SpaceSeeks</a>. All rights reserved.
                             </p>
                             <p style="margin: 0; font-size: 10px; color: #94a3b8;">
                                 You are receiving this automated transactional email because a password recovery request was triggered for your account.

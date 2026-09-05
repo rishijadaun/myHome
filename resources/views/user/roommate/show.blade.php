@@ -9,8 +9,8 @@
     $occupationText = ucfirst(str_replace('_', ' ', $post->occupation_type ?? 'working_professional'));
     $furnishingText = ucfirst(str_replace('_', ' ', $post->furnishing ?? 'furnished'));
     
-    $seoShowTitle = $post->poster_name . ' — ' . $bhkLabel . ' Flatmate in ' . $post->city . ' | Zero Brokerage | StayNest';
-    $seoShowDesc = 'Connect with ' . $post->poster_name . ' (' . ($post->poster_age ? $post->poster_age . ' yrs, ' : '') . $occupationText . ') for ' . $bhkLabel . ' in ' . $locationText . '. Rent: ' . $post->budget_range . '. Zero brokerage on StayNest.';
+    $seoShowTitle = $post->poster_name . ' — ' . $bhkLabel . ' Flatmate in ' . $post->city . ' | Zero Brokerage | SpaceSeeks';
+    $seoShowDesc = 'Connect with ' . $post->poster_name . ' (' . ($post->poster_age ? $post->poster_age . ' yrs, ' : '') . $occupationText . ') for ' . $bhkLabel . ' in ' . $locationText . '. Rent: ' . $post->budget_range . '. Zero brokerage on SpaceSeeks.';
     $seoKeywords = $post->poster_name . ', ' . $bhkLabel . ' in ' . $post->city . ', flatmate in ' . $post->city . ', roommate ' . $locationText . ', zero brokerage flatmate';
     $seoImage = $post->poster_avatar_url ?: asset('images/favicon.png');
     $canonicalUrl = route('user.roommate.show', $post->slug);
@@ -713,7 +713,7 @@
                         <i class="fas fa-shield-halved text-amber-600 text-sm"></i> Safety &amp; Trust Guidelines
                     </div>
                     <p class="text-[11px] text-amber-800 leading-relaxed font-medium">
-                        Always schedule flat visits during daytime. Never transfer any advance deposit or token money before inspecting the room and verifying tenancy agreements in person. StayNest is a 100% zero brokerage community.
+                        Always schedule flat visits during daytime. Never transfer any advance deposit or token money before inspecting the room and verifying tenancy agreements in person. SpaceSeeks is a 100% zero brokerage community.
                     </p>
                 </div>
             </div>

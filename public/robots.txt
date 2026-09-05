@@ -35,5 +35,5 @@ Disallow: /list-property/edit/*
 Disallow: /list-property?edit_id=*
 
 # XML Sitemap
-Sitemap: https://staynest.com/sitemap.xml
+Sitemap: https://spaceseeks.com/sitemap.xml
 

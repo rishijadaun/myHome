@@ -6,51 +6,51 @@
     if ($currentPath === 'add-pg') {
         $pageHeading = 'Add PG Free Online';
         $pageHighlight = 'with Zero Brokerage';
-        $pageTitle = 'Add PG Free - Post Your PG Online with Zero Brokerage | StayNest';
-        $pageDesc = 'Add your PG or hostel on StayNest for FREE. Reach 50,000+ verified students and working professionals with zero brokerage fees. 24h fast verification.';
-        $pageKeywords = 'add PG free, add PG online, post PG free, PG owner registration, zero brokerage PG listing, list hostel free, StayNest';
+        $pageTitle = 'Add PG Free - Post Your PG Online with Zero Brokerage | SpaceSeeks';
+        $pageDesc = 'Add your PG or hostel on SpaceSeeks for FREE. Reach 50,000+ verified students and working professionals with zero brokerage fees. 24h fast verification.';
+        $pageKeywords = 'add PG free, add PG online, post PG free, PG owner registration, zero brokerage PG listing, list hostel free, SpaceSeeks';
         $defaultTypeSlug = 'pg-hostel';
     } elseif ($currentPath === 'list-pg-free') {
         $pageHeading = 'List PG Free Online';
         $pageHighlight = 'Zero Brokerage Host Listing';
-        $pageTitle = 'List PG Free - Post Paying Guest & Hostel with Zero Brokerage | StayNest';
-        $pageDesc = 'List your paying guest accommodation, hostel, or co-living stay on StayNest for free. Get direct phone and WhatsApp inquiries from verified tenants.';
-        $pageKeywords = 'list PG free, list PG online, post PG free, free PG listing, list hostel free, StayNest PG listing';
+        $pageTitle = 'List PG Free - Post Paying Guest & Hostel with Zero Brokerage | SpaceSeeks';
+        $pageDesc = 'List your paying guest accommodation, hostel, or co-living stay on SpaceSeeks for free. Get direct phone and WhatsApp inquiries from verified tenants.';
+        $pageKeywords = 'list PG free, list PG online, post PG free, free PG listing, list hostel free, SpaceSeeks PG listing';
         $defaultTypeSlug = 'pg-hostel';
     } elseif ($currentPath === 'post-your-property' || $currentPath === 'list-your-property') {
         $pageHeading = 'List Your Property Free';
         $pageHighlight = 'Direct Landlord Listing';
-        $pageTitle = 'List Your Property Free - Post PG, Flat & Commercial Space | StayNest';
-        $pageDesc = 'Post your property online for free on StayNest. List PGs, residential flats, builder floors, and commercial shops with 0% brokerage forever.';
+        $pageTitle = 'List Your Property Free - Post PG, Flat & Commercial Space | SpaceSeeks';
+        $pageDesc = 'Post your property online for free on SpaceSeeks. List PGs, residential flats, builder floors, and commercial shops with 0% brokerage forever.';
         $pageKeywords = 'list your property,rent your property faster, list your property free, post your property online, landlord property listing, zero brokerage property listing';
         $defaultTypeSlug = 'pg-hostel';
     } elseif ($currentPath === 'post-property' || $currentPath === 'post-property-free') {
         $pageHeading = 'Post Property Free';
         $pageHighlight = 'Reach 50,000+ Verified Tenants';
-        $pageTitle = 'Post Property Free - List PG, Flat & Commercial Space Online | StayNest';
+        $pageTitle = 'Post Property Free - List PG, Flat & Commercial Space Online | SpaceSeeks';
         $pageDesc = 'Post your rental property online for free. Connect directly with students, IT professionals, and families looking for rent with zero middleman commissions.';
-        $pageKeywords = 'post property free, post property online, free rental property post, landlord registration, StayNest property listing';
+        $pageKeywords = 'post property free, post property online, free rental property post, landlord registration, SpaceSeeks property listing';
         $defaultTypeSlug = 'pg-hostel';
     } elseif ($currentPath === 'add-property') {
         $pageHeading = 'Add Property Online Free';
         $pageHighlight = 'Zero Brokerage Direct Listing';
-        $pageTitle = 'Add Property Free - Post PG, Flat & Commercial Space Online | StayNest';
+        $pageTitle = 'Add Property Free - Post PG, Flat & Commercial Space Online | SpaceSeeks';
         $pageDesc = 'Add your property to India\'s fastest growing verified rental discovery network. Zero listing fees, verified leads, instant 24h approval.';
-        $pageKeywords = 'add property free, add property online, post property for rent, zero brokerage listing, StayNest';
+        $pageKeywords = 'add property free, add property online, post property for rent, zero brokerage listing, SpaceSeeks';
         $defaultTypeSlug = 'pg-hostel';
     } elseif ($currentPath === 'post-flat') {
         $pageHeading = 'Post Flat & Apartment Free';
         $pageHighlight = 'For Rent with Zero Brokerage';
-        $pageTitle = 'Post Flat Free - Rent 1BHK, 2BHK, 3BHK & Villas Online | StayNest';
-        $pageDesc = 'Post your residential flat, apartment, villa, or builder floor for rent on StayNest with zero brokerage. Reach families and working bachelors directly.';
+        $pageTitle = 'Post Flat Free - Rent 1BHK, 2BHK, 3BHK & Villas Online | SpaceSeeks';
+        $pageDesc = 'Post your residential flat, apartment, villa, or builder floor for rent on SpaceSeeks with zero brokerage. Reach families and working bachelors directly.';
         $pageKeywords = 'post flat free, list flat for rent, rent apartment online, 1BHK flat for rent, 2BHK flat for rent, zero brokerage flat listing';
         $defaultTypeSlug = 'flat-apartment';
     } else {
         $pageHeading = 'List Your Property & PG';
-        $pageHighlight = 'on StayNest Free';
-        $pageTitle = 'List Your Property Free - Post PG, Hostel, Flat & Commercial Space Online | Zero Brokerage | StayNest';
-        $pageDesc = 'List PG, Hostel, Flat & Commercial property for rent on StayNest for FREE. Post property online, reach 50,000+ verified tenants with 0% brokerage. Instant direct tenant calls & 24h verification.';
-        $pageKeywords = 'list PG free, list your property, post your property, post property free, add PG online, post flat for rent, list hostel free, post commercial space, zero brokerage property listing, StayNest landlord registration, add property free India, PG owner registration';
+        $pageHighlight = 'on SpaceSeeks Free';
+        $pageTitle = 'List Your Property Free - Post PG, Hostel, Flat & Commercial Space Online | Zero Brokerage | SpaceSeeks';
+        $pageDesc = 'List PG, Hostel, Flat & Commercial property for rent on SpaceSeeks for FREE. Post property online, reach 50,000+ verified tenants with 0% brokerage. Instant direct tenant calls & 24h verification.';
+        $pageKeywords = 'list PG free, list your property, post your property, post property free, add PG online, post flat for rent, list hostel free, post commercial space, zero brokerage property listing, SpaceSeeks landlord registration, add property free India, PG owner registration';
         $defaultTypeSlug = 'pg-hostel';
     }
 @endphp
@@ -69,12 +69,12 @@
     {
       "@type": "Service",
       "@id": "{{ route('user.list-property') }}#service",
-      "name": "StayNest Zero Brokerage Property Listing Service",
+      "name": "SpaceSeeks Zero Brokerage Property Listing Service",
       "serviceType": "Real Estate Rental & PG Listing Service",
       "description": "Free platform for property owners, landlords, and PG managers to post paying guest accommodations, hostels, flats, and commercial properties with zero brokerage fees.",
       "provider": {
         "@type": "Organization",
-        "name": "StayNest",
+        "name": "SpaceSeeks",
         "url": "{{ route('user.home') }}",
         "logo": "{{ asset('images/favicon.png') }}"
       },
@@ -90,7 +90,7 @@
     {
       "@type": "HowTo",
       "@id": "{{ route('user.list-property') }}#howto",
-      "name": "How to List Your PG or Property on StayNest in 3 Steps",
+      "name": "How to List Your PG or Property on SpaceSeeks in 3 Steps",
       "description": "Quick guide on posting your PG, flat, or commercial space online with zero brokerage.",
       "totalTime": "PT3M",
       "step": [
@@ -120,10 +120,10 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Is it really 100% free to list a PG or property on StayNest?",
+          "name": "Is it really 100% free to list a PG or property on SpaceSeeks?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes! Listing your PG, hostel, flat, or commercial space on StayNest is completely free with zero listing fees and zero broker commissions."
+            "text": "Yes! Listing your PG, hostel, flat, or commercial space on SpaceSeeks is completely free with zero listing fees and zero broker commissions."
           }
         },
         {
@@ -147,7 +147,7 @@
           "name": "Can I post flats, apartments, and commercial offices too?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Absolutely. StayNest supports PGs, co-living hostels, 1BHK, 2BHK, 3BHK flats, independent houses, and commercial retail or office spaces."
+            "text": "Absolutely. SpaceSeeks supports PGs, co-living hostels, 1BHK, 2BHK, 3BHK flats, independent houses, and commercial retail or office spaces."
           }
         }
       ]
@@ -438,7 +438,7 @@
                             <div class="flex items-center justify-between mb-3">
                                 <div>
                                     <h2 class="text-lg sm:text-xl font-bold text-gray-900">Property Category *</h2>
-                                    <p class="text-xs sm:text-sm text-gray-500">Pick what category of property you are listing. Sell or rent your property faster with StayNest.</p>
+                                    <p class="text-xs sm:text-sm text-gray-500">Pick what category of property you are listing. Sell or rent your property faster with SpaceSeeks.</p>
                                 </div>
                             </div>
 
@@ -1397,7 +1397,7 @@
                                                 <span>Auto-Filled from Logged In Profile</span>
                                                 <span class="bg-emerald-200 text-emerald-950 text-[9px] px-2 py-0.5 rounded-full font-black">ACTIVE</span>
                                             </div>
-                                            <div class="text-xs font-bold text-gray-900 mt-0.5">{{ $authName ?: 'StayNest Member' }} &bull; {{ $authPhone ?: $authEmail }}</div>
+                                            <div class="text-xs font-bold text-gray-900 mt-0.5">{{ $authName ?: 'SpaceSeeks Member' }} &bull; {{ $authPhone ?: $authEmail }}</div>
                                         </div>
                                     </div>
                                     <span class="text-xs text-emerald-700 font-semibold hidden sm:flex items-center gap-1">
@@ -1511,7 +1511,7 @@
                             <i class="fas fa-shield-check text-amber-600 text-xl mt-0.5"></i>
                             <div class="text-xs text-amber-900 space-y-1">
                                 <div class="font-bold text-sm text-amber-950">Review &  Approval Workflow</div>
-                                <div>Upon submission, your listing will be reviewed by the StayNest admin team within 24 hours to ensure quality and prevent spam. Once verified, it will be instantly published live to thousands of searchers.</div>
+                                <div>Upon submission, your listing will be reviewed by the SpaceSeeks admin team within 24 hours to ensure quality and prevent spam. Once verified, it will be instantly published live to thousands of searchers.</div>
                             </div>
                         </div>
 
@@ -1599,7 +1599,7 @@
             <div class="space-y-4">
                 <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                     <h4 class="font-bold text-sm text-gray-900 mb-1">How much does it cost to list a PG or Property?</h4>
-                    <p class="text-xs text-gray-600">Listing on StayNest is 100% free with zero commission or brokerage fees. You keep 100% of your rent.</p>
+                    <p class="text-xs text-gray-600">Listing on SpaceSeeks is 100% free with zero commission or brokerage fees. You keep 100% of your rent.</p>
                 </div>
                 <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                     <h4 class="font-bold text-sm text-gray-900 mb-1">What happens after I submit my listing?</h4>
@@ -1804,12 +1804,12 @@
                     </a>
                 @else
                     <a href="{{ route('user.home') }}" class="block w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition">
-                        Explore StayNest
+                        Explore SpaceSeeks
                     </a>
                 @endif
             @else
                 <a href="{{ route('user.home') }}" class="block w-full bg-gradient-to-r from-brand to-brand-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 hover:shadow-xl transition">
-                    Explore StayNest
+                    Explore SpaceSeeks
                 </a>
             @endauth
             <button onclick="document.getElementById('successModal').classList.add('hidden'); window.location.href = '{{ url('/list-property') }}';" class="w-full bg-gray-100 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-200 transition text-sm">
@@ -1826,7 +1826,7 @@
     <section class="bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm">
         <div class="text-center max-w-3xl mx-auto mb-10">
             <span class="bg-brand-light text-brand text-xs font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider">Owner & Landlord Benefits</span>
-            <h2 class="text-2xl sm:text-4xl font-extrabold text-gray-900 mt-3 tracking-tight">Why Post Your Property on <span class="gradient-text">StayNest</span>?</h2>
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-gray-900 mt-3 tracking-tight">Why Post Your Property on <span class="gradient-text">SpaceSeeks</span>?</h2>
             <p class="text-xs sm:text-sm text-gray-500 mt-2">Connect directly with 50,000+ verified students and working professionals looking for immediate move-in.</p>
         </div>
 
@@ -1910,7 +1910,7 @@
         </div>
     </section>
 
-    <!-- 3. What You Can List on StayNest -->
+    <!-- 3. What You Can List on SpaceSeeks -->
     <section class="bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm">
         <div class="text-center max-w-2xl mx-auto mb-8">
             <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Property Types You Can List for Free</h2>
@@ -1961,16 +1961,16 @@
         <div class="text-center max-w-2xl mx-auto mb-8">
             <span class="bg-brand-light text-brand text-xs font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider">Got Questions?</span>
             <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2.5">Landlord &amp; PG Owner FAQs</h2>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">Everything you need to know about listing your property on StayNest.</p>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Everything you need to know about listing your property on SpaceSeeks.</p>
         </div>
 
         <div class="max-w-3xl mx-auto space-y-4 text-xs sm:text-sm">
             <details class="group bg-gray-50 rounded-2xl p-4 sm:p-5 border border-gray-200/80 transition" open>
                 <summary class="font-bold text-gray-900 cursor-pointer flex items-center justify-between gap-2 list-none">
-                    <span>How much does it cost to list my PG or property on StayNest?</span>
+                    <span>How much does it cost to list my PG or property on SpaceSeeks?</span>
                     <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
                 </summary>
-                <p class="text-gray-600 mt-3 leading-relaxed">It is <strong>100% FREE</strong> to list your PG, hostel, flat, or commercial space on StayNest. We do not charge any listing registration fees or take any commissions from your rental bookings.</p>
+                <p class="text-gray-600 mt-3 leading-relaxed">It is <strong>100% FREE</strong> to list your PG, hostel, flat, or commercial space on SpaceSeeks. We do not charge any listing registration fees or take any commissions from your rental bookings.</p>
             </details>
 
             <details class="group bg-gray-50 rounded-2xl p-4 sm:p-5 border border-gray-200/80 transition">
@@ -3687,7 +3687,7 @@
         // Update hero banner and submit buttons for Edit Mode
         const bannerTitle = document.querySelector('#listPropertyHeroBanner h1');
         if (bannerTitle) {
-            bannerTitle.innerHTML = `Edit Your Property Listing on <span class="text-brand-light">StayNest</span>`;
+            bannerTitle.innerHTML = `Edit Your Property Listing on <span class="text-brand-light">SpaceSeeks</span>`;
         }
 
         const submitBtn = document.getElementById('submitBtn');

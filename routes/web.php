@@ -197,11 +197,14 @@ Route::name('user.')->group(function () {
     Route::get('/find-roommate/{slug}/messages', [RoommateController::class, 'getMessages'])->name('roommate.messages');
     Route::post('/find-roommate/{slug}/message', [RoommateController::class, 'sendMessage'])->name('roommate.message');
     Route::post('/find-roommate/{slug}/chat/bot-reply', [RoommateController::class, 'getBotReply'])->name('roommate.botReply');
-    // Also accept /flatmate, /flatmates, /roommate, /roommates as SEO alias redirects
+    // Also accept /flatmate, /flatmates, /roommate, /roommates, /find-flatmates as SEO alias redirects
     Route::get('/flatmate', fn() => redirect()->route('user.roommate.index', [], 301));
     Route::get('/flatmates', fn() => redirect()->route('user.roommate.index', [], 301));
     Route::get('/roommate', fn() => redirect()->route('user.roommate.index', [], 301));
     Route::get('/roommates', fn() => redirect()->route('user.roommate.index', [], 301));
+    Route::get('/find-flatmate', fn() => redirect()->route('user.roommate.index', [], 301));
+    Route::get('/find-flatmates', fn() => redirect()->route('user.roommate.index', [], 301));
+    Route::get('/find-roommates', fn() => redirect()->route('user.roommate.index', [], 301));
     // ──────────────────────────────────────────────────────────────────
 
     Route::view('/saved', 'user.saved')->name('saved');
@@ -256,8 +259,9 @@ Route::name('user.')->group(function () {
         $user->load(['profile', 'roommatePost', 'roles', 'wallet']);
         $roommatePost = $user->roommatePost;
         $isTenant = $user->isTenant();
+        $bookingsCount = \App\Models\Booking::where('user_id', $user->id)->count();
 
-        return view('user.profile', compact('user', 'roommatePost', 'isTenant'));
+        return view('user.profile', compact('user', 'roommatePost', 'isTenant', 'bookingsCount'));
     })->name('profile');
     Route::post('/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('profile.avatar');
     Route::post('/profile/update', [UserProfileController::class, 'updateProfile'])->name('profile.update');

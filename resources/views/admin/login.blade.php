@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#4bb59d">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Admin Login - StayNest Control Center</title>
+    <title>Admin Login - SpaceSeeks Control Center</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,17 +37,11 @@
         
         <!-- Brand Header Badge -->
         <div class="text-center mb-6">
-            <a href="{{ route('user.home') }}" class="inline-flex items-center gap-2.5 px-4 py-2 bg-white/10 hover:bg-white/15 border border-white/15 rounded-full text-white text-xs font-semibold backdrop-blur-md transition tap-effect mb-4 shadow-lg shadow-black/20">
-                <i class="fas fa-home text-brand"></i>
-                <span>StayNest Platform</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-brand"></span>
-                <span class="text-gray-300 font-normal">v2.4</span>
+            <a href="{{ route('user.home') }}" class="inline-block bg-white/95 px-5 py-2.5 rounded-2xl shadow-xl hover:scale-105 transition tap-effect mb-4" title="SpaceSeeks Home">
+                <img src="{{ asset('images/spaceseeks-logo.png') }}" alt="SpaceSeeks" class="h-9 w-auto object-contain">
             </a>
-            <div class="w-16 h-16 bg-gradient-to-br from-brand via-brand-600 to-brand-700 rounded-2xl flex items-center justify-center text-white text-2xl mx-auto shadow-xl shadow-brand/25 ring-4 ring-brand/20 mb-3.5 transform transition hover:rotate-6">
-                <i class="fas fa-shield-halved"></i>
-            </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Admin Console</h1>
-            <!-- <p class="text-xs text-gray-400 mt-1 font-medium">Authorized administrative credentials required</p> -->
+            <!-- <p class="text-xs text-teal-300 font-semibold tracking-wider uppercase mt-1">Authorized Control Center</p> -->
         </div>
 
         <!-- Main Card -->
@@ -91,12 +88,12 @@
                             type="email" 
                             id="adminEmail" 
                             name="email" 
-                            value="{{ old('email', 'admin@staynest.com') }}" 
+                            value="" 
                             required 
                             minlength="5"
                             maxlength="150"
                             autocomplete="email"
-                            placeholder="admin@staynest.com"
+                            placeholder="Enter Email ID"
                             oninput="validateEmailField()"
                             class="w-full bg-gray-50/80 border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand focus:bg-white transition"
                         >
@@ -117,7 +114,7 @@
                             type="password" 
                             id="adminPassword" 
                             name="password" 
-                            value="admin123" 
+                            value="" 
                             required 
                             minlength="4"
                             maxlength="100"
@@ -160,28 +157,6 @@
                     </button>
                 </div>
             </form>
-
-            <!-- Quick Demo Credentials Box -->
-            <div class="mt-6 pt-5 border-t border-gray-100">
-                <button 
-                    type="button" 
-                    onclick="fillDemoCredentials()" 
-                    class="w-full group bg-slate-50 hover:bg-brand-50/70 border border-slate-200 hover:border-brand-200/80 rounded-xl p-3 text-left transition tap-effect flex items-center justify-between"
-                >
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-7 h-7 rounded-lg bg-slate-200 group-hover:bg-brand text-slate-600 group-hover:text-white flex items-center justify-center text-xs transition">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">Demo Super Admin</div>
-                            <div class="text-xs font-mono text-gray-800 font-bold truncate">admin@staynest.com &bull; admin123</div>
-                        </div>
-                    </div>
-                    <span class="text-[11px] font-bold text-brand group-hover:translate-x-0.5 transition shrink-0 ml-2">
-                        Auto-Fill <i class="fas fa-bolt text-[10px]"></i>
-                    </span>
-                </button>
-            </div>
         </div>
 
         <!-- Footer Links -->
@@ -200,7 +175,7 @@
                 </a>
             </div>
             <div class="text-[11px] text-gray-400">
-                &copy; {{ date('Y') }} StayNest Technologies Ltd. All rights reserved.
+                &copy; {{ date('Y') }} SpaceSeeks Technologies Ltd. All rights reserved.
             </div>
         </div>
 

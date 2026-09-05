@@ -23,7 +23,7 @@ return [
     | Content Security Policy (CSP)
     |--------------------------------------------------------------------------
     |
-    | Production-ready Content Security Policy tailored for StayNest.
+    | Production-ready Content Security Policy tailored for SpaceSeeks.
     | Accommodates Vite, Google Fonts, Leaflet maps, FontAwesome, and Google SSO.
     |
     */

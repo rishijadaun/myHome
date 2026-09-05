@@ -1,8 +1,8 @@
 @extends('user.layouts.app')
 
-@section('title', 'Terms & Conditions of Service - Zero Brokerage PG & Roommate Network | StayNest')
-@section('meta_description', 'Read StayNest Terms and Conditions, platform usage policies, verified PG listing rules, roommate community safety guidelines, and broker partner settlement policies.')
-@section('meta_keywords', 'StayNest terms of service, tenant agreement, PG booking policies, host cancellation policy, roommate safety rules, broker KYC terms')
+@section('title', 'Terms & Conditions of Service - Zero Brokerage PG & Roommate Network | SpaceSeeks')
+@section('meta_description', 'Read SpaceSeeks Terms and Conditions, platform usage policies, verified PG listing rules, roommate community safety guidelines, and broker partner settlement policies.')
+@section('meta_keywords', 'SpaceSeeks terms of service, tenant agreement, PG booking policies, host cancellation policy, roommate safety rules, broker KYC terms')
 @section('canonical', route('user.terms'))
 @section('robots', 'index, follow, max-snippet:-1, max-image-preview:large')
 
@@ -11,8 +11,8 @@
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "Terms of Service - StayNest",
-  "description": "Read StayNest Terms and Conditions, platform usage policies, verified PG listing rules, roommate community safety guidelines, and broker partner settlement policies.",
+  "name": "Terms of Service - SpaceSeeks",
+  "description": "Read SpaceSeeks Terms and Conditions, platform usage policies, verified PG listing rules, roommate community safety guidelines, and broker partner settlement policies.",
   "url": "{{ route('user.terms') }}"
 }
 </script>
@@ -27,7 +27,7 @@
             <i class="fas fa-file-contract"></i>
         </div>
         <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Terms & Conditions</h1>
-        <p class="text-slate-500 text-xs md:text-sm">Last updated: September 2026 • Effective immediately across all StayNest services</p>
+        <p class="text-slate-500 text-xs md:text-sm">Last updated: September 2026 • Effective immediately across all SpaceSeeks services</p>
         
         <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs font-semibold">
             <span class="bg-brand-50 text-brand px-3 py-1 rounded-full border border-brand-100"><i class="fas fa-check-circle mr-1"></i> Zero Brokerage</span>
@@ -47,10 +47,10 @@
                 Agreement to Terms & Platform Scope
             </h2>
             <p class="text-slate-600">
-                By accessing, browsing, or using the <strong>StayNest</strong> web application, mobile interfaces, or related services, you confirm that you have read, understood, and agreed to be legally bound by these Terms and Conditions and our Privacy Policy.
+                By accessing, browsing, or using the <strong>SpaceSeeks</strong> web application, mobile interfaces, or related services, you confirm that you have read, understood, and agreed to be legally bound by these Terms and Conditions and our Privacy Policy.
             </p>
             <p class="text-slate-600">
-                StayNest operates as a technology discovery and facilitation platform connecting paying guest (PG) seekers, hostel residents, and co-living tenants directly with verified property owners, caretakers, and verified broker partners across India (including Noida, Delhi NCR, and Bangalore).
+                SpaceSeeks operates as a technology discovery and facilitation platform connecting paying guest (PG) seekers, hostel residents, and co-living tenants directly with verified property owners, caretakers, and verified broker partners across India (including Noida, Delhi NCR, and Bangalore).
             </p>
         </section>
 
@@ -61,7 +61,7 @@
                 User & Tenant Account Eligibility
             </h2>
             <p class="text-slate-600">
-                To register an account or initiate bookings on StayNest, you must be at least 18 years old or have parental/guardian authorization. When registering, you agree to:
+                To register an account or initiate bookings on SpaceSeeks, you must be at least 18 years old or have parental/guardian authorization. When registering, you agree to:
             </p>
             <ul class="space-y-2 text-slate-600 pl-2">
                 <li class="flex items-start gap-2">
@@ -74,7 +74,7 @@
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span>Promptly report any suspected security breaches or unauthorized use to StayNest support.</span>
+                    <span>Promptly report any suspected security breaches or unauthorized use to SpaceSeeks support.</span>
                 </li>
             </ul>
         </section>
@@ -90,7 +90,7 @@
                     <i class="fas fa-handshake text-brand"></i> Zero Brokerage Guarantee for Tenants
                 </div>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    StayNest does <strong>not</strong> charge any brokerage fees, commissions, or placement surcharges from prospective tenants. Inquiries, visits, and tenancy contracts are arranged directly between the resident and the verified property host/owner.
+                    SpaceSeeks does <strong>not</strong> charge any brokerage fees, commissions, or placement surcharges from prospective tenants. Inquiries, visits, and tenancy contracts are arranged directly between the resident and the verified property host/owner.
                 </p>
             </div>
         </section>
@@ -102,7 +102,7 @@
                 Partner Broker & Host KYC Compliance Rules
             </h2>
             <p class="text-slate-600">
-                Property brokers and PG managers listing inventory on StayNest must adhere to regulatory compliance:
+                Property brokers and PG managers listing inventory on SpaceSeeks must adhere to regulatory compliance:
             </p>
             <ul class="space-y-2 text-slate-600 pl-2">
                 <li class="flex items-start gap-2">
@@ -154,7 +154,7 @@
             <ul class="space-y-2 text-slate-600 pl-2">
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>
-                    <span><strong>Daily Automated Settlements:</strong> Rent collected digitally via StayNest is deposited directly into the verified broker’s bank account within 24–48 hours of receipt.</span>
+                    <span><strong>Daily Automated Settlements:</strong> Rent collected digitally via SpaceSeeks is deposited directly into the verified broker’s bank account within 24–48 hours of receipt.</span>
                 </li>
                 <li class="flex items-start gap-2">
                     <i class="fas fa-check text-brand mt-1 text-xs flex-shrink-0"></i>

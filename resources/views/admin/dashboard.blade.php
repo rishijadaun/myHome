@@ -7,7 +7,7 @@
 <header class="hidden lg:flex bg-white border-b border-gray-100 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Admin Overview Dashboard</h1>
-        <p class="text-sm text-gray-500">Welcome back, {{ Auth::user()->profile->first_name ?? 'Super Admin' }}! Real-time analytics across StayNest.</p>
+        <p class="text-sm text-gray-500">Welcome back, {{ Auth::user()->profile->first_name ?? 'Super Admin' }}! Real-time analytics across SpaceSeeks.</p>
     </div>
     <div class="flex items-center gap-4">
         <!-- Date Badge -->

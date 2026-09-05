@@ -395,7 +395,7 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> GPS ACTIVE
                                 </span>
                             </div>
-                            <div id="userAddressDisplay" class="text-xs font-bold text-slate-800 leading-tight line-clamp-2 cursor-pointer hover:text-brand transition" onclick="goToMyLocation()">Detecting your location...</div>
+                            <div id="userAddressDisplay" class="text-xs font-bold text-slate-800 leading-tight line-clamp-2 cursor-pointer hover:text-brand transition" onclick="goToMyLocation()">Detecting your live location...</div>
                             
                             <!-- Switch buttons -->
                             <div class="flex items-center gap-2 mt-2 pt-1.5 border-t border-red-100/80">
@@ -1689,13 +1689,16 @@
                     userAddress = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
                 }
             } catch (err) { 
-                userAddress = `Near Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+                userAddress = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
             }
 
             try {
                 localStorage.setItem('user_cached_lat', lat);
                 localStorage.setItem('user_cached_lng', lng);
                 localStorage.setItem('user_cached_address', userAddress);
+                localStorage.setItem('staynest_user_lat', lat);
+                localStorage.setItem('staynest_user_lng', lng);
+                localStorage.setItem('staynest_user_location_name', userAddress);
             } catch(e) {}
 
             const addressEl = document.getElementById('userAddressDisplay');
@@ -1796,8 +1799,11 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     async (pos) => {
-                        userLocation = [pos.coords.latitude, pos.coords.longitude];
-                        await fetchUserAddress(pos.coords.latitude, pos.coords.longitude);
+                        let lat = pos.coords.latitude;
+                        let lng = pos.coords.longitude;
+
+                        userLocation = [lat, lng];
+                        await fetchUserAddress(lat, lng);
                         if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> GPS ACTIVE`;
                         renderUserMarker();
                         highlightUserRadius(userLocation[0], userLocation[1], currentSearchRadiusKm);
@@ -1811,23 +1817,17 @@
                         const savedAddr = getSavedProfileAddress();
                         if (savedAddr) {
                             useProfileHomeAddress();
+                        } else if (rawDatabaseProperties && rawDatabaseProperties.length > 0) {
+                            const p0 = rawDatabaseProperties[0];
+                            userLocation = [p0.lat, p0.lng];
+                            renderUserMarker();
+                            generatePGsForRegion(p0.lat, p0.lng, p0.city || 'Nearby');
+                            map.flyTo(userLocation, 13, { duration: 1.2 });
                         } else {
-                            if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> EXPLORE`;
-                            if (typeLabel) typeLabel.textContent = 'Nearby Stays';
-                            const addrEl = document.getElementById('userAddressDisplay');
-                            if (addrEl) addrEl.textContent = 'Search city or locality above, or enable GPS.';
-                            if (rawDatabaseProperties && rawDatabaseProperties.length > 0) {
-                                const p0 = rawDatabaseProperties[0];
-                                userLocation = [p0.lat, p0.lng];
-                                renderUserMarker();
-                                generatePGsForRegion(p0.lat, p0.lng, p0.city || 'Nearby');
-                                map.flyTo(userLocation, 13, { duration: 1.2 });
-                            } else {
-                                focusIndiaMap();
-                            }
+                            focusIndiaMap();
                         }
                     },
-                    { timeout: 8000, enableHighAccuracy: true, maximumAge: 0 }
+                    { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 }
                 );
             } else {
                 const savedAddr = getSavedProfileAddress();
@@ -1846,24 +1846,26 @@
 
         function initUserLocation() {
             const savedAddr = getSavedProfileAddress();
+
             if (savedAddr) {
                 useProfileHomeAddress();
             } else {
-                const cachedLat = parseFloat(localStorage.getItem('user_cached_lat'));
-                const cachedLng = parseFloat(localStorage.getItem('user_cached_lng'));
-                const cachedAddr = localStorage.getItem('user_cached_address');
+                let cachedLat = parseFloat(localStorage.getItem('user_cached_lat') || localStorage.getItem('staynest_user_lat'));
+                let cachedLng = parseFloat(localStorage.getItem('user_cached_lng') || localStorage.getItem('staynest_user_lng'));
+                let cachedAddr = localStorage.getItem('user_cached_address') || localStorage.getItem('staynest_user_location_name');
+
                 if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0 && cachedAddr) {
                     userLocation = [cachedLat, cachedLng];
                     userAddress = cachedAddr;
                     const addrEl = document.getElementById('userAddressDisplay');
                     if (addrEl) addrEl.textContent = userAddress;
                     const typeLabel = document.getElementById('addressTypeLabel');
-                    if (typeLabel) typeLabel.textContent = 'Recent Location';
+                    if (typeLabel) typeLabel.textContent = 'Current Area';
                     const badge = document.getElementById('gpsLiveBadge');
-                    if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> RECENT`;
+                    if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> ACTIVE`;
                     renderUserMarker();
                     highlightUserRadius(userLocation[0], userLocation[1], currentSearchRadiusKm);
-                    generatePGsForRegion(userLocation[0], userLocation[1], "Recent Location");
+                    generatePGsForRegion(userLocation[0], userLocation[1], "Nearby Stays");
                     map.flyTo(userLocation, 14, { duration: 1.2 });
                 } else {
                     useDeviceGPS();

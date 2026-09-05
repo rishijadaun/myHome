@@ -70,6 +70,20 @@
         "addressRegion": "{{ addslashes($post->city) }}",
         "addressCountry": "IN"
       }
+    },
+    {
+      "@type": "Accommodation",
+      "@id": "{{ $canonicalUrl }}#accommodation",
+      "name": "{{ addslashes($seoShowTitle) }}",
+      "description": "{{ addslashes($seoShowDesc) }}",
+      "url": "{{ $canonicalUrl }}",
+      "offers": {
+        "@type": "Offer",
+        "price": "{{ (int)($post->budget_max ?: ($post->budget_min ?: 0)) }}",
+        "priceCurrency": "INR",
+        "availability": "https://schema.org/InStock",
+        "url": "{{ $canonicalUrl }}"
+      }
     }
   ]
 }

@@ -53,6 +53,9 @@ export default {
                     dark: '#23239c',
                 },
             },
+            maxWidth: {
+                '7xl': '100rem',
+            },
             boxShadow: {
                 sheet: '0 -4px 24px rgba(0, 0, 0, 0.12)',
             },

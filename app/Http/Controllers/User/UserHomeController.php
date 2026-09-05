@@ -527,8 +527,8 @@ class UserHomeController extends Controller
             }
         }
 
-        // 5. Fetch & Rank properties
-        $rawResults = $query->get();
+        // 5. Fetch & Rank properties (Safely capped at 200 items to prevent memory exhaustion)
+        $rawResults = $query->take(200)->get();
         $isFallback = false;
 
         // If no results found with strict area/budget, fallback gracefully to broaden search in the same city/region

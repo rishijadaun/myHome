@@ -159,23 +159,50 @@ class SitemapController extends Controller
                 }
             }
 
-            // 3. Popular Locality / Area Landing Pages (e.g. /pg-in-noida/sector-62)
+            // 3. Popular Locality / Area Landing Pages (PGs, Flats, Commercial, Sale)
             $areas = Area::where('is_active', 1)->with('city')->get();
             $areaPages = [];
             foreach ($areas as $area) {
                 $cityName = $area->city ? strtolower(trim(preg_replace('/\s*\(.*?\)\s*/', '', $area->city->slug ?: $area->city->name))) : '';
                 $areaSlug = strtolower(trim($area->slug ?: $area->name));
                 
-                $areaUrl = $cityName 
-                    ? route('user.seo.city-area', ['city' => $cityName, 'area' => $areaSlug])
-                    : route('user.search', ['area' => $areaSlug]);
-                
-                $areaPages[] = [
-                    'url' => $areaUrl,
-                    'lastmod' => now()->toAtomString(),
-                    'changefreq' => 'weekly',
-                    'priority' => '0.80'
-                ];
+                if ($cityName && $areaSlug) {
+                    // PG Area URL
+                    $areaPages[] = [
+                        'url' => route('user.seo.city-area', ['city' => $cityName, 'area' => $areaSlug]),
+                        'lastmod' => now()->toAtomString(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.85'
+                    ];
+                    // Flat Area URL
+                    $areaPages[] = [
+                        'url' => route('user.seo.flats', ['city' => $cityName, 'area' => $areaSlug]),
+                        'lastmod' => now()->toAtomString(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.85'
+                    ];
+                    // Commercial Area URL
+                    $areaPages[] = [
+                        'url' => route('user.seo.commercial', ['city' => $cityName, 'area' => $areaSlug]),
+                        'lastmod' => now()->toAtomString(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.80'
+                    ];
+                    // Sale Area URL
+                    $areaPages[] = [
+                        'url' => route('user.seo.sale', ['city' => $cityName, 'area' => $areaSlug]),
+                        'lastmod' => now()->toAtomString(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.80'
+                    ];
+                } else {
+                    $areaPages[] = [
+                        'url' => route('user.search', ['area' => $areaSlug]),
+                        'lastmod' => now()->toAtomString(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.75'
+                    ];
+                }
             }
 
             // 4. Dynamic active, verified property detail pages

@@ -4,32 +4,74 @@
     $searchArea = request('area');
     $searchQ = request('q') ?? request('search');
     $searchGender = request('gender');
-    $searchType = request('type') ?? request('property_type');
-    $hasDeepFilters = request()->hasAny(['budget', 'min_price', 'max_price', 'ac', 'food', 'wifi', 'security', 'q', 'search', 'sort', 'lat', 'lng']);
+    $searchType = strtolower(request('type') ?? request('property_type') ?? '');
+    $isSale = request('ad_type') === 'sale' || request()->routeIs('user.seo.sale');
+    $isFlat = $searchType === 'flat-apartment' || in_array($searchType, ['flat', 'apartment', 'house']) || request()->routeIs('user.seo.flats');
+    $isCommercial = $searchType === 'commercial' || in_array($searchType, ['shop', 'office', 'retail']) || request()->routeIs('user.seo.commercial');
     
+    // Check if URL has facet filter parameters that should prevent indexing duplicate URLs
+    $hasFacetFilters = request()->hasAny(['budget', 'min_price', 'max_price', 'ac', 'food', 'wifi', 'security', 'sort', 'lat', 'lng', 'q', 'search']);
+
+    $categoryName = $isSale ? 'Properties For Sale' : ($isCommercial ? 'Commercial Spaces' : ($isFlat ? 'Flats & Apartments' : 'PGs & Co-Living'));
+    $categorySingular = $isSale ? 'Property For Sale' : ($isCommercial ? 'Commercial Space' : ($isFlat ? 'Flat / House' : 'PG'));
+
     // Dynamic SEO Titles and Descriptions
     if ($searchArea && $searchCity) {
-        $seoSearchTitle = 'PG in ' . ucfirst($searchArea) . ', ' . ucfirst($searchCity) . ' - Best Boys, Girls & Co-Living | StayNest';
-        $seoSearchDesc = 'Explore 100% verified PGs and co-living stays in ' . ucfirst($searchArea) . ', ' . ucfirst($searchCity) . ' starting from ₹5,000/mo. Zero brokerage, WiFi, meals & biometric security.';
+        $locStr = ucfirst($searchArea) . ', ' . ucfirst($searchCity);
+        if ($isSale) {
+            $seoSearchTitle = "Properties For Sale in {$locStr} — Buy Verified Real Estate | StayNest";
+            $seoSearchDesc = "Explore verified houses, flats, and plots for sale in {$locStr} with 0% brokerage, clear title verification & direct owner contact on StayNest.";
+        } elseif ($isCommercial) {
+            $seoSearchTitle = "Commercial Spaces & Shops in {$locStr} — Rent Office Space | StayNest";
+            $seoSearchDesc = "Browse 100% verified commercial offices, retail shops, and co-working spaces in {$locStr} with zero brokerage on StayNest.";
+        } elseif ($isFlat) {
+            $seoSearchTitle = "Flats & Apartments for Rent in {$locStr} — 1, 2, 3 BHK | StayNest";
+            $seoSearchDesc = "Explore verified rental flats, apartments, and independent houses in {$locStr} with zero brokerage, modern amenities & direct landlord booking.";
+        } else {
+            $seoSearchTitle = "PG in {$locStr} - Best Boys, Girls & Co-Living | StayNest";
+            $seoSearchDesc = "Explore 100% verified PGs and co-living stays in {$locStr} starting from ₹5,000/mo. Zero brokerage, WiFi, meals & biometric security.";
+        }
     } elseif ($searchCity) {
-        $seoSearchTitle = 'PG in ' . ucfirst($searchCity) . ' - Best Boys, Girls & Luxury Co-Living Stays | StayNest';
-        $seoSearchDesc = 'Explore verified PGs and hostels in ' . ucfirst($searchCity) . ' starting from ₹5,000/mo. Zero brokerage, free WiFi, daily meals & biometric security. Compare rooms on StayNest.';
+        $cName = ucfirst($searchCity);
+        if ($isSale) {
+            $seoSearchTitle = "Properties For Sale in {$cName} — Buy Verified Houses & Flats | StayNest";
+            $seoSearchDesc = "Search verified residential & commercial properties for sale in {$cName}. Zero brokerage, clear documentation & site visits on StayNest.";
+        } elseif ($isCommercial) {
+            $seoSearchTitle = "Commercial Spaces & Offices for Rent in {$cName} | StayNest";
+            $seoSearchDesc = "Find verified commercial properties, shops, and office spaces for rent in {$cName} with zero brokerage on StayNest.";
+        } elseif ($isFlat) {
+            $seoSearchTitle = "Flats & Apartments for Rent in {$cName} — Zero Brokerage | StayNest";
+            $seoSearchDesc = "Discover 100% verified 1 BHK, 2 BHK, and 3 BHK rental flats & apartments in {$cName} with zero brokerage on StayNest.";
+        } else {
+            $seoSearchTitle = "PG in {$cName} - Best Boys, Girls & Luxury Co-Living Stays | StayNest";
+            $seoSearchDesc = "Explore verified PGs and hostels in {$cName} starting from ₹5,000/mo. Zero brokerage, free WiFi, daily meals & biometric security. Compare rooms on StayNest.";
+        }
     } elseif ($searchQ) {
-        $seoSearchTitle = 'Search Results for "' . e($searchQ) . '" - Verified PGs & Hostels | StayNest';
-        $seoSearchDesc = 'Browse top matching PG accommodations and student co-living spaces for "' . e($searchQ) . '" with zero brokerage on StayNest.';
+        $seoSearchTitle = 'Search Results for "' . e($searchQ) . '" - Verified Stays & PGs | StayNest';
+        $seoSearchDesc = 'Browse top matching accommodations, verified PGs, flats, and commercial spaces for "' . e($searchQ) . '" with zero brokerage on StayNest.';
     } elseif ($searchGender) {
         $seoSearchTitle = ucfirst($searchGender) . ' PG Accommodations - Verified Hostels & Stays | StayNest';
         $seoSearchDesc = 'Find top-rated ' . strtolower($searchGender) . ' PGs and co-living stays across major Indian cities with zero brokerage on StayNest.';
     } else {
-        $seoSearchTitle = 'Find PG Near You - 1,200+ Verified Boys, Girls & Co-Living Stays | StayNest';
-        $seoSearchDesc = 'Discover 1,200+ verified PGs, luxury hostels, and co-living spaces across Bangalore, Noida, Delhi, Mumbai, Pune, and Gurgaon. Zero brokerage, instant booking on StayNest.';
+        $seoSearchTitle = 'Find PG, Flats & Stays Near You - 100% Verified | Zero Brokerage | StayNest';
+        $seoSearchDesc = 'Discover 1,200+ verified PGs, luxury hostels, rental flats, and co-living spaces across Bangalore, Noida, Delhi, Mumbai, Pune, and Gurgaon on StayNest.';
     }
     
-    $seoSearchKeywords = 'PG in ' . ($searchArea ? $searchArea . ' ' : '') . ($searchCity ?: 'India') . ', paying guest, boys PG, girls PG, co-living spaces, luxury hostels, StayNest';
+    $seoSearchKeywords = "{$categoryName} in " . ($searchArea ? $searchArea . ' ' : '') . ($searchCity ?: 'India') . ", paying guest, verified rental flats, boys PG, girls PG, co-living spaces, StayNest";
+    
+    // Canonical URL resolution
     if ($searchCity) {
-        $canonicalUrl = $searchArea 
-            ? route('user.seo.city-area', ['city' => strtolower($searchCity), 'area' => strtolower($searchArea)])
-            : route('user.seo.city-area', ['city' => strtolower($searchCity)]);
+        $cityParam = strtolower($searchCity);
+        $areaParam = $searchArea ? strtolower($searchArea) : null;
+        if ($isSale) {
+            $canonicalUrl = $areaParam ? route('user.seo.sale', ['city' => $cityParam, 'area' => $areaParam]) : route('user.seo.sale', ['city' => $cityParam]);
+        } elseif ($isCommercial) {
+            $canonicalUrl = $areaParam ? route('user.seo.commercial', ['city' => $cityParam, 'area' => $areaParam]) : route('user.seo.commercial', ['city' => $cityParam]);
+        } elseif ($isFlat) {
+            $canonicalUrl = $areaParam ? route('user.seo.flats', ['city' => $cityParam, 'area' => $areaParam]) : route('user.seo.flats', ['city' => $cityParam]);
+        } else {
+            $canonicalUrl = $areaParam ? route('user.seo.city-area', ['city' => $cityParam, 'area' => $areaParam]) : route('user.seo.city-area', ['city' => $cityParam]);
+        }
     } else {
         $canonicalUrl = route('user.search');
     }
@@ -39,7 +81,7 @@
 @section('meta_description', $seoSearchDesc)
 @section('meta_keywords', $seoSearchKeywords)
 @section('canonical', $canonicalUrl)
-@if($hasDeepFilters && !empty($searchQ))
+@if($hasFacetFilters && !empty($searchQ))
     @section('robots', 'noindex, follow')
 @else
     @section('robots', 'index, follow, max-snippet:-1, max-image-preview:large')
@@ -76,20 +118,20 @@
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "Search PGs",
-          "item": "{{ route('user.search') }}"
+          "name": "{{ $categoryName }}",
+          "item": "{{ $canonicalUrl }}"
         }@if(!empty($searchCity)),
         {
           "@type": "ListItem",
           "position": 3,
-          "name": "PG in {{ ucfirst($searchCity) }}",
-          "item": "{{ route('user.seo.city-area', ['city' => strtolower($searchCity)]) }}"
+          "name": "{{ $categorySingular }} in {{ ucfirst($searchCity) }}",
+          "item": "{{ $canonicalUrl }}"
         }@endif @if(!empty($searchArea)),
         {
           "@type": "ListItem",
           "position": 4,
           "name": "{{ ucfirst($searchArea) }}",
-          "item": "{{ route('user.seo.city-area', ['city' => strtolower($searchCity), 'area' => strtolower($searchArea)]) }}"
+          "item": "{{ $canonicalUrl }}"
         }@endif
       ]
     },
@@ -1102,7 +1144,7 @@
     }
 
     function getEffectiveUserCoordinates() {
-        // 1. If user has a saved / profile address (like Sector 62, Noida), prioritize it
+        // 1. If user has a saved / profile address, prioritize it
         const isAddressLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
         const savedAddrStr = localStorage.getItem('staynest_default_address');
         
@@ -1112,54 +1154,56 @@
                 if (parsed.lat && parsed.lng) {
                     return { lat: parseFloat(parsed.lat), lng: parseFloat(parsed.lng), isLocked: true };
                 }
-                const fullStr = ((parsed.line1 || '') + ' ' + (parsed.line2 || '')).toLowerCase();
-                if (fullStr.includes('noida') || fullStr.includes('sector 62') || fullStr.includes('201309')) {
-                    return { lat: 28.6280, lng: 77.3649, isLocked: true };
-                } else if (fullStr.includes('bangalore') || fullStr.includes('bengaluru') || fullStr.includes('indiranagar')) {
-                    return { lat: 12.9716, lng: 77.5946, isLocked: true };
-                } else if (fullStr.includes('delhi') || fullStr.includes('south ex')) {
-                    return { lat: 28.5742, lng: 77.2242, isLocked: true };
-                }
             } catch(e) {}
         }
 
-        // 2. Check cached coordinates if locked
+        // 2. Check dynamically cached coordinates
         const cachedLat = parseFloat(localStorage.getItem('staynest_user_lat') || localStorage.getItem('user_cached_lat'));
         const cachedLng = parseFloat(localStorage.getItem('staynest_user_lng') || localStorage.getItem('user_cached_lng'));
-        if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0 && cachedLng !== 0 && isAddressLocked) {
-            return { lat: cachedLat, lng: cachedLng, isLocked: true };
+        
+        if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0 && cachedLng !== 0) {
+            return { lat: cachedLat, lng: cachedLng, isLocked: isAddressLocked };
         }
 
-        // 3. Default fallback to Noida Sector 62
-        return { lat: 28.6280, lng: 77.3649, isLocked: false };
+        return null;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         const eff = getEffectiveUserCoordinates();
-        updateSearchDistances(eff.lat, eff.lng);
-
-        // If user has locked their address in profile, DO NOT let desktop ISP network glitch flip it to Delhi!
-        if (eff.isLocked) {
-            return;
+        if (eff) {
+            updateSearchDistances(eff.lat, eff.lng);
         }
 
-        // 2. Request live visit GPS location
+        // Dynamic listener when user selects/changes location anywhere (e.g. Header Location Modal)
+        window.addEventListener('staynestLocationUpdated', function(e) {
+            if (e.detail && e.detail.lat && e.detail.lng) {
+                updateSearchDistances(e.detail.lat, e.detail.lng);
+            }
+        });
+
+        // 2. Request live fresh device GPS location
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function(pos) {
                     if (pos && pos.coords) {
-                        const accuracy = pos.coords.accuracy || 1000;
-                        if (accuracy <= 1500) {
-                            updateSearchDistances(pos.coords.latitude, pos.coords.longitude);
+                        const accuracy = pos.coords.accuracy || 999999;
+                        const isLocLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
+                        const hasSavedAddr = !!localStorage.getItem('staynest_default_address');
+
+                        // If user has locked/saved location and accuracy is coarse (desktop Delhi IP gateway), do not overwrite
+                        if (accuracy > 500 && (isLocLocked || hasSavedAddr)) {
+                            return;
                         }
+
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        updateSearchDistances(lat, lng);
                     }
                 },
                 function(err) {
-                    const curLat = parseFloat(localStorage.getItem('staynest_user_lat')) || 28.6280;
-                    const curLng = parseFloat(localStorage.getItem('staynest_user_lng')) || 77.3649;
-                    updateSearchDistances(curLat, curLng);
+                    // Fallback to cached on denial
                 },
-                { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         }
     });

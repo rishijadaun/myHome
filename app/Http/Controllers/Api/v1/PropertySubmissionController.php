@@ -454,25 +454,25 @@ class PropertySubmissionController extends Controller
                 'created_by' => $authUser ? $authUser->id : $assignedBrokerId,
             ]);
 
-            // 6. Attach Amenities
+            // 6. Attach Amenities (Optimized single-query in-memory matching)
             if (!empty($validated['amenities']) && is_array($validated['amenities'])) {
+                $allAmenities = Amenity::where('is_active', 1)->get();
                 $amenityIds = [];
                 foreach ($validated['amenities'] as $item) {
                     $slugOrName = str_replace('_', '-', strtolower(trim($item)));
-                    $amenity = Amenity::where('slug', $slugOrName)->orWhere('slug', $item)->first();
-                    if (!$amenity && Str::isUuid($item)) {
-                        $amenity = Amenity::where('id', $item)->first();
-                    }
-                    if (!$amenity) {
-                        $amenity = Amenity::whereRaw('LOWER(name) = ?', [strtolower(trim($item))])->first();
-                    }
+                    $amenity = $allAmenities->first(function ($a) use ($item, $slugOrName) {
+                        return $a->slug === $slugOrName 
+                            || $a->slug === $item 
+                            || ($a->id === $item && Str::isUuid($item)) 
+                            || strtolower(trim($a->name)) === strtolower(trim($item));
+                    });
                     if (!$amenity) {
                         if ($slugOrName === 'fridge' || $slugOrName === 'refrigerator') {
-                            $amenity = Amenity::whereIn('slug', ['refrigerator', 'fridge'])->first();
+                            $amenity = $allAmenities->first(fn($a) => in_array($a->slug, ['refrigerator', 'fridge']));
                         } elseif ($slugOrName === 'parking') {
-                            $amenity = Amenity::where('slug', 'parking')->first();
+                            $amenity = $allAmenities->first(fn($a) => $a->slug === 'parking');
                         } elseif ($slugOrName === 'ac' || $slugOrName === 'air-conditioner' || $slugOrName === 'air-conditioning') {
-                            $amenity = Amenity::where('slug', 'ac')->first();
+                            $amenity = $allAmenities->first(fn($a) => $a->slug === 'ac');
                         }
                     }
 
@@ -857,25 +857,25 @@ class PropertySubmissionController extends Controller
 
             $property->save();
 
-            // Sync Amenities
+            // Sync Amenities (Optimized single-query in-memory matching)
             if (isset($validated['amenities']) && is_array($validated['amenities'])) {
+                $allAmenities = Amenity::where('is_active', 1)->get();
                 $amenityIds = [];
                 foreach ($validated['amenities'] as $item) {
                     $slugOrName = str_replace('_', '-', strtolower(trim($item)));
-                    $amenity = Amenity::where('slug', $slugOrName)->orWhere('slug', $item)->first();
-                    if (!$amenity && Str::isUuid($item)) {
-                        $amenity = Amenity::where('id', $item)->first();
-                    }
-                    if (!$amenity) {
-                        $amenity = Amenity::whereRaw('LOWER(name) = ?', [strtolower(trim($item))])->first();
-                    }
+                    $amenity = $allAmenities->first(function ($a) use ($item, $slugOrName) {
+                        return $a->slug === $slugOrName 
+                            || $a->slug === $item 
+                            || ($a->id === $item && Str::isUuid($item)) 
+                            || strtolower(trim($a->name)) === strtolower(trim($item));
+                    });
                     if (!$amenity) {
                         if ($slugOrName === 'fridge' || $slugOrName === 'refrigerator') {
-                            $amenity = Amenity::whereIn('slug', ['refrigerator', 'fridge'])->first();
+                            $amenity = $allAmenities->first(fn($a) => in_array($a->slug, ['refrigerator', 'fridge']));
                         } elseif ($slugOrName === 'parking') {
-                            $amenity = Amenity::where('slug', 'parking')->first();
+                            $amenity = $allAmenities->first(fn($a) => $a->slug === 'parking');
                         } elseif ($slugOrName === 'ac' || $slugOrName === 'air-conditioner' || $slugOrName === 'air-conditioning') {
-                            $amenity = Amenity::where('slug', 'ac')->first();
+                            $amenity = $allAmenities->first(fn($a) => $a->slug === 'ac');
                         }
                     }
 

@@ -2,6 +2,9 @@ User-agent: *
 Allow: /
 Allow: /search
 Allow: /pg-in-
+Allow: /flats-in-
+Allow: /commercial-in-
+Allow: /properties-for-sale-in-
 Allow: /explore-near-me
 Allow: /find-roommate
 Allow: /detail/
@@ -10,8 +13,8 @@ Allow: /about-us
 Allow: /contact-us
 Allow: /list-property
 Allow: /pricing
-Allow: /terms
-Allow: /privacy
+Allow: /terms-of-service
+Allow: /privacy-policy
 Allow: /sitemap.xml
 Allow: /images/
 Allow: /build/

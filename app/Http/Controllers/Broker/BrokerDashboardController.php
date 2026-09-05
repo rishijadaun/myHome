@@ -131,7 +131,7 @@ class BrokerDashboardController extends Controller
     }
 
     /**
-     * Helper to compute dynamic chart points.
+     * Helper to compute dynamic chart points using single optimized aggregate query.
      */
     private function generateChartMetrics(string $brokerId, string $period): array
     {
@@ -139,36 +139,54 @@ class BrokerDashboardController extends Controller
         $bookings = [];
 
         if ($period === '30days') {
+            $startDate = Carbon::now()->subDays(29)->startOfDay();
+            $rawCounts = Booking::where('broker_id', $brokerId)
+                ->where('created_at', '>=', $startDate)
+                ->selectRaw('DATE(created_at) as date_key, COUNT(*) as aggregate')
+                ->groupBy('date_key')
+                ->pluck('aggregate', 'date_key');
+
             for ($i = 29; $i >= 0; $i -= 3) {
                 $date = Carbon::now()->subDays($i);
                 $labels[] = $date->format('M d');
                 
-                $count = Booking::where('broker_id', $brokerId)
-                    ->whereDate('created_at', '<=', $date->toDateString())
-                    ->whereDate('created_at', '>=', $date->copy()->subDays(2)->toDateString())
-                    ->count();
-                $bookings[] = $count > 0 ? $count : rand(1, 4);
+                // Aggregate counts for the 3-day bucket
+                $bucketSum = 0;
+                for ($d = 0; $d <= 2; $d++) {
+                    $dKey = $date->copy()->subDays($d)->toDateString();
+                    $bucketSum += (int) ($rawCounts[$dKey] ?? 0);
+                }
+                $bookings[] = $bucketSum > 0 ? $bucketSum : rand(1, 4);
             }
         } elseif ($period === 'year') {
+            $startDate = Carbon::now()->subMonths(11)->startOfMonth();
+            $rawCounts = Booking::where('broker_id', $brokerId)
+                ->where('created_at', '>=', $startDate)
+                ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month_key, COUNT(*) as aggregate')
+                ->groupBy('month_key')
+                ->pluck('aggregate', 'month_key');
+
             for ($i = 11; $i >= 0; $i--) {
                 $date = Carbon::now()->subMonths($i);
                 $labels[] = $date->format('M Y');
-
-                $count = Booking::where('broker_id', $brokerId)
-                    ->whereMonth('created_at', $date->month)
-                    ->whereYear('created_at', $date->year)
-                    ->count();
+                $monthKey = $date->format('Y-m');
+                $count = (int) ($rawCounts[$monthKey] ?? 0);
                 $bookings[] = $count > 0 ? $count : rand(4, 15);
             }
         } else {
             // Default 7 days
+            $startDate = Carbon::now()->subDays(6)->startOfDay();
+            $rawCounts = Booking::where('broker_id', $brokerId)
+                ->where('created_at', '>=', $startDate)
+                ->selectRaw('DATE(created_at) as date_key, COUNT(*) as aggregate')
+                ->groupBy('date_key')
+                ->pluck('aggregate', 'date_key');
+
             for ($i = 6; $i >= 0; $i--) {
                 $date = Carbon::now()->subDays($i);
                 $labels[] = $date->format('D');
-
-                $count = Booking::where('broker_id', $brokerId)
-                    ->whereDate('created_at', $date->toDateString())
-                    ->count();
+                $dateKey = $date->toDateString();
+                $count = (int) ($rawCounts[$dateKey] ?? 0);
                 $bookings[] = $count > 0 ? $count : rand(1, 3);
             }
         }

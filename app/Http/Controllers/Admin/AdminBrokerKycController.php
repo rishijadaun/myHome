@@ -21,9 +21,9 @@ class AdminBrokerKycController extends Controller
     {
         $brokerRole = Role::where('slug', 'broker')->first();
 
-        // 1. Calculate live KYC metric counts
+        // 1. Calculate live KYC metric counts (Lightweight query without heavy property & city relations)
         $allBrokers = $brokerRole 
-            ? $brokerRole->users()->with(['profile', 'relationshipManager', 'properties.city'])->get()
+            ? $brokerRole->users()->select('users.id', 'users.status', 'users.kyc_verified_at')->with('profile:id,user_id,preferences')->get()
             : collect([]);
 
         $totalBrokers = $allBrokers->count();

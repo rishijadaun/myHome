@@ -2943,7 +2943,7 @@ function updateAllDistances(userLat, userLng) {
 }
 
 function getEffectiveUserCoordinates() {
-    // 1. If user has a saved / profile address (like Sector 62, Noida), prioritize it
+    // 1. If user has a saved / profile address, prioritize it
     const isAddressLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
     const savedAddrStr = localStorage.getItem('staynest_default_address');
     
@@ -2953,55 +2953,56 @@ function getEffectiveUserCoordinates() {
             if (parsed.lat && parsed.lng) {
                 return { lat: parseFloat(parsed.lat), lng: parseFloat(parsed.lng), isLocked: true };
             }
-            const fullStr = ((parsed.line1 || '') + ' ' + (parsed.line2 || '')).toLowerCase();
-            if (fullStr.includes('noida') || fullStr.includes('sector 62') || fullStr.includes('201309')) {
-                return { lat: 28.6280, lng: 77.3649, isLocked: true };
-            } else if (fullStr.includes('bangalore') || fullStr.includes('bengaluru') || fullStr.includes('indiranagar')) {
-                return { lat: 12.9716, lng: 77.5946, isLocked: true };
-            } else if (fullStr.includes('delhi') || fullStr.includes('south ex')) {
-                return { lat: 28.5742, lng: 77.2242, isLocked: true };
-            }
         } catch(e) {}
     }
 
-    // 2. Check cached coordinates if locked
+    // 2. Check dynamically cached coordinates
     const cachedLat = parseFloat(localStorage.getItem('staynest_user_lat') || localStorage.getItem('user_cached_lat'));
     const cachedLng = parseFloat(localStorage.getItem('staynest_user_lng') || localStorage.getItem('user_cached_lng'));
-    if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0 && cachedLng !== 0 && isAddressLocked) {
-        return { lat: cachedLat, lng: cachedLng, isLocked: true };
+    
+    if (!isNaN(cachedLat) && !isNaN(cachedLng) && cachedLat !== 0 && cachedLng !== 0) {
+        return { lat: cachedLat, lng: cachedLng, isLocked: isAddressLocked };
     }
 
-    // 3. Default fallback to Noida Sector 62 (prevents Delhi network/ISP routing glitches)
-    return { lat: 28.6280, lng: 77.3649, isLocked: false };
+    return null;
 }
 
 function initNearMeGeolocation() {
     const eff = getEffectiveUserCoordinates();
-    updateAllDistances(eff.lat, eff.lng);
-
-    // If user has locked their address in profile, DO NOT let desktop ISP network glitch flip it to Delhi!
-    if (eff.isLocked) {
-        return;
+    if (eff) {
+        updateAllDistances(eff.lat, eff.lng);
     }
 
-    // If user is guest / not locked, use live device GPS
+    // Dynamic listener when user selects/changes location anywhere (e.g. Header Location Modal)
+    window.addEventListener('staynestLocationUpdated', function(e) {
+        if (e.detail && e.detail.lat && e.detail.lng) {
+            updateAllDistances(e.detail.lat, e.detail.lng);
+        }
+    });
+
+    // Live device GPS with fresh high-accuracy hardware reading
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             function(pos) {
                 if (pos && pos.coords) {
-                    const accuracy = pos.coords.accuracy || 1000;
-                    // Only apply if accuracy is high (< 1500m) to prevent rough ISP gateway misplacement
-                    if (accuracy <= 1500) {
-                        updateAllDistances(pos.coords.latitude, pos.coords.longitude);
+                    const accuracy = pos.coords.accuracy || 999999;
+                    const isLocLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
+                    const hasSavedAddr = !!localStorage.getItem('staynest_default_address');
+
+                    // If user has locked/saved location and accuracy is coarse (desktop Delhi IP gateway), do not overwrite
+                    if (accuracy > 500 && (isLocLocked || hasSavedAddr)) {
+                        return;
                     }
+
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    updateAllDistances(lat, lng);
                 }
             },
             function(err) {
-                const curLat = parseFloat(localStorage.getItem('staynest_user_lat')) || 28.6280;
-                const curLng = parseFloat(localStorage.getItem('staynest_user_lng')) || 77.3649;
-                updateAllDistances(curLat, curLng);
+                // Keep existing cached if permission denied
             },
-            { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
     }
 }

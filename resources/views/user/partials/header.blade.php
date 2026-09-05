@@ -54,17 +54,17 @@
 
     <div class="px-4 py-3">
         <div class="flex items-center justify-between">
-            <a href="{{ route('user.location') }}" class="flex-1 min-w-0 flex items-center gap-2" id="headerMobileLocationLink" title="Select or view current location">
+            <div onclick="openGlobalLocationModal()" class="flex-1 min-w-0 flex items-center gap-2 cursor-pointer tap-effect" id="headerMobileLocationLink" title="Select or view current location">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5 mb-0.5">
                         <span class="text-lg font-bold text-gray-900">StayNest</span>
-                        <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                        <i class="fas fa-chevron-down text-xs text-brand"></i>
                     </div>
-                    <p class="text-xs text-gray-500 truncate" id="headerMobileLocationText">
+                    <p class="text-xs text-gray-600 truncate font-semibold" id="headerMobileLocationText">
                         <i class="fas fa-map-marker-alt text-brand text-[10px] mr-1"></i><span id="headerUserLiveLocationText">Detecting location...</span>
                     </p>
                 </div>
-            </a>
+            </div>
 
             <div class="flex items-center gap-2 ml-3">
                 <a href="{{ route('user.saved') }}" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center tap-effect shadow-xs" title="Saved">
@@ -122,11 +122,11 @@
                 </a>
 
                 <!-- Desktop Live Location Badge -->
-                <a href="{{ route('user.location') }}" class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 hover:bg-brand-light border border-gray-200 hover:border-brand/40 transition text-xs text-gray-700 hover:text-brand max-w-[220px]" title="Change Location on Map">
+                <button type="button" onclick="openGlobalLocationModal()" class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 hover:bg-brand-light border border-gray-200 hover:border-brand/40 transition text-xs text-gray-700 hover:text-brand max-w-[220px] text-left cursor-pointer" title="Select or Change Location">
                     <i class="fas fa-location-dot text-brand text-xs flex-shrink-0 animate-pulse"></i>
                     <span class="truncate font-semibold" id="deskUserLiveLocationText">Detecting location...</span>
                     <i class="fas fa-chevron-down text-[9px] text-gray-400 flex-shrink-0"></i>
-                </a>
+                </button>
                 <nav class="flex space-x-8">
                     <a href="{{ route('user.home') }}" class="{{ request()->routeIs('user.home') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Home</a>
                     <a href="{{ route('user.search') }}" class="{{ request()->routeIs('user.search') ? 'text-brand font-semibold border-b-2 border-brand' : 'text-gray-600 hover:text-brand font-medium' }} transition text-sm py-2">Find Property</a>
@@ -381,20 +381,436 @@
 
     document.addEventListener('DOMContentLoaded', checkTopAppBanner);
     window.addEventListener('resize', checkTopAppBanner);
+</script>
 
+<!-- ========================================================================= -->
+<!-- GLOBAL LOCATION SELECTOR MODAL (Swiggy/Zepto style) -->
+<!-- ========================================================================= -->
+<div id="globalLocationModal" class="fixed inset-0 z-[100] hidden items-end md:items-center justify-center p-0 md:p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300" aria-modal="true" role="dialog">
+    <div class="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] md:max-h-[85vh] animate-in fade-in slide-in-from-bottom duration-300">
+        
+        <!-- Modal Header -->
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center">
+                    <i class="fas fa-location-dot text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-tight">Choose your location</h3>
+                    <p class="text-[11px] text-gray-500">Find stays near your preferred area</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeGlobalLocationModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer" aria-label="Close Modal">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="p-4 border-b border-gray-100 bg-white">
+            <div class="relative flex items-center">
+                <i class="fas fa-search absolute left-3.5 text-gray-400 text-xs"></i>
+                <input type="text" id="globalLocSearchInput" oninput="handleGlobalLocSearchInput(this.value)" placeholder="Search locality, sector, city (e.g. Noida Sector 62)" class="w-full pl-9 pr-8 py-2.5 bg-gray-50 hover:bg-gray-100/80 focus:bg-white border border-gray-200 focus:border-brand rounded-xl text-xs md:text-sm font-medium text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/20 transition">
+                <button type="button" id="globalLocClearBtn" onclick="clearGlobalLocSearch()" class="hidden absolute right-3 text-gray-400 hover:text-gray-600 cursor-pointer">
+                    <i class="fas fa-times-circle text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body (Scrollable) -->
+        <div class="overflow-y-auto p-4 space-y-4 flex-1 overscroll-contain" id="globalLocModalBody">
+            
+            <!-- Live Search Results Container (Hidden by default, shown when searching) -->
+            <div id="globalLocSearchResultsContainer" class="hidden space-y-2">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1 flex items-center justify-between">
+                    <span>Search Results</span>
+                    <span id="globalLocSearchSpinner" class="hidden text-brand text-xs"><i class="fas fa-spinner fa-spin"></i></span>
+                </div>
+                <div id="globalLocSearchResults" class="space-y-1.5">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Use Live GPS Button -->
+            <button type="button" id="globalLocGpsBtn" onclick="detectLiveGpsFromModal()" class="w-full flex items-center gap-3.5 p-3 rounded-2xl bg-gradient-to-r from-brand/5 to-brand/10 hover:from-brand/15 hover:to-brand/20 border border-brand/20 transition group text-left cursor-pointer">
+                <div class="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-brand/20 group-hover:scale-105 transition-transform" id="globalLocGpsIconWrapper">
+                    <i class="fas fa-crosshairs text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-xs md:text-sm text-gray-900 group-hover:text-brand transition flex items-center gap-1.5">
+                        <span id="globalLocGpsBtnText">Use Current GPS Location</span>
+                        <span class="text-[9px] bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.2 rounded">LIVE</span>
+                    </div>
+                    <p class="text-[11px] text-gray-500 truncate" id="globalLocGpsSubText">Auto-detect using device location</p>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-gray-400 group-hover:text-brand group-hover:translate-x-0.5 transition"></i>
+            </button>
+
+            <!-- Saved Addresses Section (if user has any saved) -->
+            <div id="globalLocSavedAddrSection" class="hidden space-y-2">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Saved Addresses</div>
+                <div id="globalLocSavedAddrList" class="space-y-1.5">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Popular Localities & Cities -->
+            <div class="space-y-2.5">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Popular Localities & Hubs</div>
+                <div class="flex flex-wrap gap-1.5">
+                    <button type="button" onclick="selectGlobalLocation('Sector 62, Noida', 28.6280, 77.3649, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Sector 62, Noida
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Sector 18, Noida', 28.5708, 77.3260, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Sector 18, Noida
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Pari Chowk, Greater Noida', 28.4744, 77.5030, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Pari Chowk, Gr Noida
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Connaught Place, New Delhi', 28.6315, 77.2167, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Connaught Place, Delhi
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('South Extension, New Delhi', 28.5742, 77.2242, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 South Ext, Delhi
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Cyber City, Gurugram', 28.4906, 77.0898, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Cyber City, Gurugram
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Indirapuram, Ghaziabad', 28.6385, 77.3712, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Indirapuram, Ghaziabad
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Koramangala, Bengaluru', 12.9352, 77.6245, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Koramangala, Bengaluru
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Indiranagar, Bengaluru', 12.9784, 77.6408, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Indiranagar, Bengaluru
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('HSR Layout, Bengaluru', 12.9121, 77.6446, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 HSR Layout, Bengaluru
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Powai, Mumbai', 19.1176, 72.9060, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Powai, Mumbai
+                    </button>
+                    <button type="button" onclick="selectGlobalLocation('Hinjawadi, Pune', 18.5913, 73.7389, true)" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-brand hover:text-white border border-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer">
+                        📍 Hinjawadi, Pune
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Map Link -->
+            <div class="pt-2 border-t border-gray-100">
+                <a href="{{ route('user.location') }}" onclick="closeGlobalLocationModal()" class="w-full py-2.5 px-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 flex items-center justify-between text-xs font-bold text-gray-700 hover:text-brand transition">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-map-marked-alt text-brand"></i>
+                        <span>Open Interactive Live Map</span>
+                    </span>
+                    <i class="fas fa-arrow-right text-[10px] text-gray-400"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
     // =========================================================================
-    // Dynamic Live User Geolocation & Address Detection for Header
+    // Global Location Modal & Geolocation Engine
     // =========================================================================
-    (function() {
-        function updateHeaderLocationDisplay(locationName) {
-            if (!locationName) return;
-            const mobLabel = document.getElementById('headerUserLiveLocationText');
-            const deskLabel = document.getElementById('deskUserLiveLocationText');
-            if (mobLabel) mobLabel.textContent = locationName;
-            if (deskLabel) deskLabel.textContent = locationName;
+    function updateHeaderLocationDisplay(locationName) {
+        if (!locationName) return;
+        const mobLabel = document.getElementById('headerUserLiveLocationText');
+        const deskLabel = document.getElementById('deskUserLiveLocationText');
+        if (mobLabel) mobLabel.textContent = locationName;
+        if (deskLabel) deskLabel.textContent = locationName;
+    }
+
+    function openGlobalLocationModal() {
+        const modal = document.getElementById('globalLocationModal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        loadSavedAddressesInModal();
+        
+        // Auto focus search input on desktop
+        if (window.innerWidth >= 768) {
+            setTimeout(() => {
+                const inp = document.getElementById('globalLocSearchInput');
+                if (inp) inp.focus();
+            }, 100);
+        }
+    }
+
+    function closeGlobalLocationModal() {
+        const modal = document.getElementById('globalLocationModal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    // Close on backdrop click
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('globalLocationModal');
+        if (modal && e.target === modal) {
+            closeGlobalLocationModal();
+        }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeGlobalLocationModal();
+        }
+    });
+
+    function selectGlobalLocation(name, lat, lng, isLocked = true) {
+        if (!name || isNaN(lat) || isNaN(lng)) return;
+
+        localStorage.setItem('staynest_user_location_name', name);
+        localStorage.setItem('staynest_user_lat', lat);
+        localStorage.setItem('staynest_user_lng', lng);
+        localStorage.setItem('user_cached_lat', lat);
+        localStorage.setItem('user_cached_lng', lng);
+        localStorage.setItem('user_cached_address', name);
+        if (isLocked) {
+            localStorage.setItem('staynest_user_address_locked', 'true');
         }
 
-        // 1. Initial Fast Render from Cached Location or Saved Address
+        // Set cookies for server-side sorting (30 days)
+        document.cookie = `staynest_user_lat=${lat}; path=/; max-age=${30 * 86400}; SameSite=Lax`;
+        document.cookie = `staynest_user_lng=${lng}; path=/; max-age=${30 * 86400}; SameSite=Lax`;
+
+        // Update header UI
+        updateHeaderLocationDisplay(name);
+
+        // Dispatch global custom event for page listeners (home, search, etc.)
+        window.dispatchEvent(new CustomEvent('staynestLocationUpdated', {
+            detail: { name, lat: parseFloat(lat), lng: parseFloat(lng) }
+        }));
+
+        closeGlobalLocationModal();
+    }
+
+    function loadSavedAddressesInModal() {
+        const section = document.getElementById('globalLocSavedAddrSection');
+        const list = document.getElementById('globalLocSavedAddrList');
+        if (!section || !list) return;
+
+        let saved = [];
+        try {
+            const raw = localStorage.getItem('staynest_default_address');
+            if (raw) saved.push(JSON.parse(raw));
+        } catch(e) {}
+
+        try {
+            const multi = JSON.parse(localStorage.getItem('staynest_saved_addresses') || '[]');
+            if (Array.isArray(multi)) {
+                multi.forEach(item => {
+                    if (!saved.some(s => s.line1 === item.line1 && s.line2 === item.line2)) {
+                        saved.push(item);
+                    }
+                });
+            }
+        } catch(e) {}
+
+        if (saved.length > 0) {
+            section.classList.remove('hidden');
+            list.innerHTML = saved.map((addr) => {
+                const tag = (addr.tag || 'HOME').toUpperCase();
+                const title = addr.line1 || addr.tag || 'Saved Address';
+                const sub = addr.line2 || addr.fullAddress || '';
+                const lat = addr.lat || 28.6280;
+                const lng = addr.lng || 77.3649;
+                return `
+                    <button type="button" onclick="selectGlobalLocation('${escapeHtml(title + ', ' + sub)}', ${lat}, ${lng}, true)" class="w-full flex items-center gap-3 p-2.5 rounded-xl bg-gray-50 hover:bg-brand/10 border border-gray-200 transition text-left cursor-pointer group">
+                        <div class="w-8 h-8 rounded-lg bg-gray-200/80 text-gray-700 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                            <i class="fas ${tag === 'HOME' ? 'fa-home' : (tag === 'WORK' ? 'fa-briefcase' : 'fa-location-dot')}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs font-bold text-gray-900 truncate">${escapeHtml(title)} <span class="text-[9px] bg-gray-200 text-gray-700 px-1 py-0.2 rounded font-semibold ml-1">${escapeHtml(tag)}</span></div>
+                            <div class="text-[10px] text-gray-500 truncate">${escapeHtml(sub)}</div>
+                        </div>
+                        <i class="fas fa-check text-xs text-brand opacity-0 group-hover:opacity-100 transition"></i>
+                    </button>
+                `;
+            }).join('');
+        } else {
+            section.classList.add('hidden');
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // ----------------- Live GPS Detection from Modal -----------------
+    function detectLiveGpsFromModal() {
+        const btnText = document.getElementById('globalLocGpsBtnText');
+        const subText = document.getElementById('globalLocGpsSubText');
+        const iconWrapper = document.getElementById('globalLocGpsIconWrapper');
+
+        if (btnText) btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting GPS...';
+        if (subText) subText.textContent = 'Requesting hardware coordinates...';
+        if (iconWrapper) iconWrapper.className = 'w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 animate-pulse';
+
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            resetGpsBtn();
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async function(pos) {
+                if (pos && pos.coords) {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    if (subText) subText.textContent = 'Resolving address...';
+
+                    // Reverse geocode
+                    let resolvedName = await reverseGeocodeLiveCoords(lat, lng);
+                    if (!resolvedName) {
+                        resolvedName = `Live Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                    }
+
+                    selectGlobalLocation(resolvedName, lat, lng, false);
+                    resetGpsBtn();
+                }
+            },
+            function(err) {
+                let msg = 'Unable to fetch location.';
+                if (err.code === 1) msg = 'Location permission denied. Please allow GPS access.';
+                else if (err.code === 2) msg = 'Location unavailable. Please select your area below.';
+                else if (err.code === 3) msg = 'Location request timed out.';
+                alert(msg);
+                resetGpsBtn();
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    }
+
+    function resetGpsBtn() {
+        const btnText = document.getElementById('globalLocGpsBtnText');
+        const subText = document.getElementById('globalLocGpsSubText');
+        const iconWrapper = document.getElementById('globalLocGpsIconWrapper');
+        if (btnText) btnText.textContent = 'Use Current GPS Location';
+        if (subText) subText.textContent = 'Auto-detect using device location';
+        if (iconWrapper) iconWrapper.className = 'w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-brand/20';
+    }
+
+    // ----------------- Live Reverse Geocoding Helper -----------------
+    async function reverseGeocodeLiveCoords(lat, lng) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`, {
+                signal: controller.signal,
+                headers: { 'Accept': 'application/json' }
+            });
+            clearTimeout(timeoutId);
+
+            if (res.ok) {
+                const data = await res.json();
+                const addr = data.address || {};
+                const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.road || addr.village || addr.town || addr.city_district || '';
+                const city = addr.city || addr.state_district || addr.county || addr.town || '';
+                const state = addr.state || '';
+
+                let formatted = '';
+                if (locality && city) formatted = `${locality}, ${city}`;
+                else if (city) formatted = state ? `${city}, ${state}` : city;
+                else if (locality) formatted = locality;
+                else if (data.display_name) {
+                    formatted = data.display_name.split(',').slice(0, 2).join(',').trim();
+                }
+                if (formatted) return formatted;
+            }
+        } catch(e) {}
+
+        // Fallback to BigDataCloud
+        try {
+            const bdcRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
+            if (bdcRes.ok) {
+                const bdcData = await bdcRes.json();
+                const loc = bdcData.locality || bdcData.city || '';
+                const sub = bdcData.principalSubdivision || '';
+                if (loc) return sub ? `${loc}, ${sub}` : loc;
+            }
+        } catch(e) {}
+
+        return null;
+    }
+
+    // ----------------- Live Search Input Autocomplete -----------------
+    let globalLocSearchTimer = null;
+    function handleGlobalLocSearchInput(val) {
+        const clearBtn = document.getElementById('globalLocClearBtn');
+        const resContainer = document.getElementById('globalLocSearchResultsContainer');
+        const resList = document.getElementById('globalLocSearchResults');
+        const spinner = document.getElementById('globalLocSearchSpinner');
+
+        if (!val || val.trim().length === 0) {
+            if (clearBtn) clearBtn.classList.add('hidden');
+            if (resContainer) resContainer.classList.add('hidden');
+            return;
+        }
+
+        if (clearBtn) clearBtn.classList.remove('hidden');
+        if (resContainer) resContainer.classList.remove('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+
+        clearTimeout(globalLocSearchTimer);
+        globalLocSearchTimer = setTimeout(async () => {
+            try {
+                const query = val.trim();
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=6&addressdetails=1`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (spinner) spinner.classList.add('hidden');
+
+                if (response.ok) {
+                    const items = await response.json();
+                    if (!items || items.length === 0) {
+                        resList.innerHTML = `<div class="p-3 text-center text-xs text-gray-500 bg-gray-50 rounded-xl">No localities found matching "${query}". Try another area.</div>`;
+                        return;
+                    }
+
+                    resList.innerHTML = items.map(item => {
+                        const displayName = item.display_name;
+                        const parts = displayName.split(',');
+                        const mainTitle = parts.slice(0, 2).join(',').trim();
+                        const subTitle = parts.slice(2).join(',').trim();
+                        const lat = parseFloat(item.lat);
+                        const lng = parseFloat(item.lon);
+
+                        return `
+                            <button type="button" onclick="selectGlobalLocation('${escapeHtml(mainTitle)}', ${lat}, ${lng}, true)" class="w-full flex items-start gap-2.5 p-2.5 rounded-xl bg-gray-50 hover:bg-brand/10 border border-gray-200 transition text-left cursor-pointer group">
+                                <div class="w-7 h-7 rounded-lg bg-brand/10 text-brand flex items-center justify-center flex-shrink-0 text-xs mt-0.5 group-hover:bg-brand group-hover:text-white transition">
+                                    <i class="fas fa-map-pin"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-gray-900 group-hover:text-brand transition truncate">${escapeHtml(mainTitle)}</div>
+                                    <div class="text-[10px] text-gray-500 truncate">${escapeHtml(subTitle)}</div>
+                                </div>
+                            </button>
+                        `;
+                    }).join('');
+                }
+            } catch(e) {
+                if (spinner) spinner.classList.add('hidden');
+            }
+        }, 300);
+    }
+
+    function clearGlobalLocSearch() {
+        const inp = document.getElementById('globalLocSearchInput');
+        if (inp) {
+            inp.value = '';
+            handleGlobalLocSearchInput('');
+            inp.focus();
+        }
+    }
+
+    // ----------------- Initial Load & Background GPS Precision Guard -----------------
+    (function() {
         const savedAddrStr = localStorage.getItem('staynest_default_address');
         const cachedLocName = localStorage.getItem('staynest_user_location_name');
         const isLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
@@ -404,88 +820,42 @@
         } else if (savedAddrStr) {
             try {
                 const parsed = JSON.parse(savedAddrStr);
-                const line = parsed.line2 || parsed.line1 || '';
-                if (line) {
-                    updateHeaderLocationDisplay(line);
-                }
-            } catch(e) {}
-        } else {
-            updateHeaderLocationDisplay('Sector 62, Noida, Delhi NCR');
-        }
-
-        // 2. Reverse Geocoding with Nominatim & BigDataCloud fallback
-        async function reverseGeocodeLiveCoords(lat, lng) {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4000);
-                
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`, {
-                    signal: controller.signal,
-                    headers: { 'Accept': 'application/json' }
-                });
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const addr = data.address || {};
-                    const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.road || addr.village || addr.town || addr.city_district || '';
-                    const city = addr.city || addr.state_district || addr.county || '';
-                    const state = addr.state || '';
-
-                    let formatted = '';
-                    if (locality && city) {
-                        formatted = `${locality}, ${city}`;
-                    } else if (city) {
-                        formatted = state ? `${city}, ${state}` : city;
-                    } else if (locality) {
-                        formatted = locality;
-                    } else if (data.display_name) {
-                        const parts = data.display_name.split(',');
-                        formatted = parts.slice(0, 2).join(',').trim();
-                    }
-
-                    if (formatted) {
-                        localStorage.setItem('staynest_user_location_name', formatted);
-                        localStorage.setItem('staynest_user_lat', lat);
-                        localStorage.setItem('staynest_user_lng', lng);
-                        updateHeaderLocationDisplay(formatted);
-                        return;
-                    }
-                }
-            } catch(e) {}
-
-            // Fallback to BigDataCloud
-            try {
-                const bdcRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
-                if (bdcRes.ok) {
-                    const bdcData = await bdcRes.json();
-                    const loc = bdcData.locality || bdcData.city || '';
-                    const sub = bdcData.principalSubdivision || '';
-                    const bdcFormatted = loc ? (sub ? `${loc}, ${sub}` : loc) : '';
-                    if (bdcFormatted) {
-                        localStorage.setItem('staynest_user_location_name', bdcFormatted);
-                        localStorage.setItem('staynest_user_lat', lat);
-                        localStorage.setItem('staynest_user_lng', lng);
-                        updateHeaderLocationDisplay(bdcFormatted);
-                    }
-                }
+                const line = parsed.line2 || parsed.line1 || parsed.fullAddress || '';
+                if (line) updateHeaderLocationDisplay(line);
             } catch(e) {}
         }
 
-        // 3. Live Browser GPS Geolocation Auto-Detection
-        if (navigator.geolocation && !isLocked) {
+        // Live Device GPS Precision Guard
+        // Coarse desktop ISP IP (accuracy > 500m) will NEVER overwrite a user's chosen location!
+        if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                function(position) {
+                async function(position) {
                     if (position && position.coords) {
+                        const accuracy = position.coords.accuracy || 999999;
+                        const hasCurrentLoc = !!localStorage.getItem('staynest_user_location_name');
+                        const isLocLocked = localStorage.getItem('staynest_user_address_locked') === 'true';
+
+                        // If user already has a locked/chosen location or if accuracy is coarse (desktop Delhi IP gateway), DO NOT overwrite
+                        if (accuracy > 500 && (isLocLocked || hasCurrentLoc || savedAddrStr)) {
+                            return;
+                        }
+
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
-                        reverseGeocodeLiveCoords(lat, lng);
+                        const formatted = await reverseGeocodeLiveCoords(lat, lng);
+                        if (formatted) {
+                            localStorage.setItem('staynest_user_location_name', formatted);
+                            localStorage.setItem('staynest_user_lat', lat);
+                            localStorage.setItem('staynest_user_lng', lng);
+                            localStorage.setItem('user_cached_lat', lat);
+                            localStorage.setItem('user_cached_lng', lng);
+                            localStorage.setItem('user_cached_address', formatted);
+                            updateHeaderLocationDisplay(formatted);
+                        }
                     }
                 },
-                function(err) {
-                    // Keep existing cached location or default on denial
-                },
-                { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 }
+                function(err) {},
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         }
     })();

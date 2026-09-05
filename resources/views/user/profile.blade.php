@@ -1513,7 +1513,7 @@ function detectCurrentLocation() {
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
+            async (pos) => {
                 btn.innerHTML = '<i class="fas fa-check"></i> Located!';
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
@@ -1528,13 +1528,35 @@ function detectCurrentLocation() {
                     localStorage.setItem('user_cached_lng', lng);
                 } catch(e) {}
 
-                showToast('GPS Location Detected', 'Coordinates fetched. Please enter your building/street details.');
+                // Reverse geocode to autofill fields if empty
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        const addr = data.address || {};
+                        const streetInput = document.getElementById('addrStreet');
+                        const pinInput = document.getElementById('addrPincode');
+                        const landmarkInput = document.getElementById('addrLandmark');
+
+                        if (streetInput && !streetInput.value.trim()) {
+                            streetInput.value = addr.suburb || addr.neighbourhood || addr.road || addr.residential || '';
+                        }
+                        if (pinInput && !pinInput.value.trim() && addr.postcode) {
+                            pinInput.value = addr.postcode;
+                        }
+                        if (landmarkInput && !landmarkInput.value.trim()) {
+                            landmarkInput.value = addr.amenity || addr.shop || '';
+                        }
+                    }
+                } catch(e) {}
+
+                showToast('GPS Location Detected 🎯', 'Coordinates fetched. Please enter your building/street details.');
             },
             (err) => {
                 btn.innerHTML = 'Locate Me 🎯';
                 status.innerText = 'Unable to detect GPS. Please fill address manually.';
             },
-            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
     } else {
         btn.innerHTML = 'Locate Me 🎯';
@@ -1551,39 +1573,41 @@ function handleSaveAddress(e) {
     const landmark = document.getElementById('addrLandmark').value.trim();
     const pincode = document.getElementById('addrPincode').value.trim();
 
-    // Determine exact coordinates based on address text / city
-    let userLat = parseFloat(localStorage.getItem('staynest_user_lat')) || 28.6280;
-    let userLng = parseFloat(localStorage.getItem('staynest_user_lng')) || 77.3649;
+    // Use current dynamic coordinates
+    let userLat = parseFloat(localStorage.getItem('staynest_user_lat') || localStorage.getItem('user_cached_lat'));
+    let userLng = parseFloat(localStorage.getItem('staynest_user_lng') || localStorage.getItem('user_cached_lng'));
 
-    const fullAddrStr = `${house} ${bldg} ${street} ${landmark} ${pincode}`.toLowerCase();
-    if (fullAddrStr.includes('bangalore') || fullAddrStr.includes('bengaluru') || fullAddrStr.includes('indiranagar') || pincode.startsWith('560')) {
-        userLat = 12.9716;
-        userLng = 77.5946;
-    } else if (fullAddrStr.includes('delhi') || fullAddrStr.includes('south ex') || fullAddrStr.includes('saket') || pincode.startsWith('110')) {
-        userLat = 28.6139;
-        userLng = 77.2090;
-    } else if (fullAddrStr.includes('gurugram') || fullAddrStr.includes('gurgaon') || pincode.startsWith('122')) {
-        userLat = 28.4595;
-        userLng = 77.0266;
-    }
+    const fullAddrDisplay = `${house}${bldg ? ', ' + bldg : ''}, ${street}${landmark ? ', ' + landmark : ''}${pincode ? ' - ' + pincode : ''}`;
 
     const savedAddr = {
         tag: tag,
         line1: `${house}${bldg ? ', ' + bldg : ''}`,
         line2: `${street}${landmark ? ', ' + landmark : ''}${pincode ? ' - ' + pincode : ''}`,
-        lat: userLat,
-        lng: userLng
+        fullAddress: fullAddrDisplay,
+        lat: userLat || null,
+        lng: userLng || null
     };
 
     localStorage.setItem('staynest_default_address', JSON.stringify(savedAddr));
-    localStorage.setItem('staynest_user_lat', userLat);
-    localStorage.setItem('staynest_user_lng', userLng);
+    if (userLat) localStorage.setItem('staynest_user_lat', userLat);
+    if (userLng) localStorage.setItem('staynest_user_lng', userLng);
+    localStorage.setItem('staynest_user_location_name', savedAddr.line2 || fullAddrDisplay);
     localStorage.setItem('staynest_user_address_locked', 'true');
-    localStorage.setItem('user_cached_lat', userLat);
-    localStorage.setItem('user_cached_lng', userLng);
-    localStorage.setItem('user_cached_address', `${house}, ${bldg}, ${street}, ${pincode}`);
+    if (userLat) localStorage.setItem('user_cached_lat', userLat);
+    if (userLng) localStorage.setItem('user_cached_lng', userLng);
+    localStorage.setItem('user_cached_address', fullAddrDisplay);
     localStorage.setItem('user_cached_area', street || '');
     localStorage.setItem('user_cached_pin', pincode);
+
+    if (userLat && userLng) {
+        document.cookie = `staynest_user_lat=${userLat}; path=/; max-age=${30 * 86400}; SameSite=Lax`;
+        document.cookie = `staynest_user_lng=${userLng}; path=/; max-age=${30 * 86400}; SameSite=Lax`;
+    }
+
+    // Dispatch global event for header and active pages
+    window.dispatchEvent(new CustomEvent('staynestLocationUpdated', {
+        detail: { name: savedAddr.line2 || fullAddrDisplay, lat: userLat, lng: userLng }
+    }));
 
     renderSavedAddress(savedAddr);
     closeAddressModal();

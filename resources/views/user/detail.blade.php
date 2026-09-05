@@ -477,6 +477,9 @@
         </div>
     </div>
 
+    <!-- ================= ADVERTISEMENT BANNER ================= -->
+    @include('user.partials.ad-banner')
+
     <!-- ================= 2. MAIN DETAILS & SIDEBAR ================= -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         

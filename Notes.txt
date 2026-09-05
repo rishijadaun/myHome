@@ -1,1 +1,55 @@
 php artisan tinker --execute="App\Models\User::where('email', 'admin@staynest.com')->update(['password_hash' => Illuminate\Support\Facades\Hash::make('Rishi@123')]);"
+
+
+
+
+    Connect to hosting through SSH .
+    Go to your Laravel project root:
+
+Copy
+
+cd domains/spaceseeks.com/public_html
+pwd
+ls
+
+The folder should contain composer.json.
+
+    Check Composer:
+
+Copy
+
+composer2 --version
+
+If that command is unavailable, try:
+Copy
+
+composer --version
+
+    Install Laravel dependencies:
+
+Copy
+
+composer2 install --no-dev --optimize-autoloader
+
+If your project specifically requires a local Composer file, download Composer and run the installer commands one by one:
+
+Composer installation commands
+
+Running Composer installation
+
+Then run:
+Copy
+
+php ./composer.phar install --no-dev --optimize-autoloader
+
+
+Live server par Laravel ko public/build folder chahiye hota hai. Maine local machine me yeh folder already generate kar diya hai.
+
+📋 Step-by-Step Fix (Hostinger File Manager):
+Apne Computer me is folder ko dekhiye:
+
+Path: d:\gitProject\public\build
+Is build folder ke andar do cheezein hain:
+manifest.json file
+assets/ folder (jisme saari compiled .css aur .js files hain)
+

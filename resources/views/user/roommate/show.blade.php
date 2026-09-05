@@ -212,6 +212,9 @@
             </div>
         </div>
 
+        <!-- Advertisement Banner -->
+        @include('user.partials.ad-banner')
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8" id="roommateDetailContent">
 
             {{-- ════════════════════ LEFT / MAIN CONTENT COLUMN ════════════════════ --}}

@@ -1,56 +1,24 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1:3308
--- Generation Time: Sep 05, 2026 at 06:18 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- One-Click Fast Import Compatible Dump for Hostinger / MariaDB / MySQL
 
+SET FOREIGN_KEY_CHECKS = 0;
+SET UNIQUE_CHECKS = 0;
+SET AUTOCOMMIT = 0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
 SET time_zone = "+00:00";
-
+START TRANSACTION;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- Database: `staynest_db`
---
-
-DELIMITER $$
---
--- Procedures
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_audit_log` (IN `p_table_name` VARCHAR(100), IN `p_record_id` CHAR(36), IN `p_action` VARCHAR(10), IN `p_old_values` JSON, IN `p_new_values` JSON, IN `p_performed_by` CHAR(36), IN `p_ip_address` VARCHAR(45))   BEGIN
-    INSERT INTO audit_logs (table_name, record_id, action, old_values, new_values, performed_by, ip_address)
-    VALUES (p_table_name, p_record_id, p_action, p_old_values, p_new_values, p_performed_by, p_ip_address);
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_primary_role` (IN `p_user_id` CHAR(36))   BEGIN
-    SELECT r.* FROM user_roles ur
-    JOIN roles r ON ur.role_id = r.id
-    WHERE ur.user_id = p_user_id AND ur.is_primary = 1 AND ur.is_active = 1;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_has_permission` (IN `p_user_id` CHAR(36), IN `p_permission_slug` VARCHAR(120), OUT `p_result` TINYINT(1))   BEGIN
-    SELECT EXISTS(
-        SELECT 1 FROM vw_user_permissions
-        WHERE user_id = p_user_id AND permission_slug = p_permission_slug
-    ) INTO p_result;
-END$$
-
-DELIMITER ;
-
 -- --------------------------------------------------------
 
---
 -- Table structure for table `amenities`
 --
 
+DROP TABLE IF EXISTS `amenities`;
 CREATE TABLE `amenities` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -95,6 +63,7 @@ INSERT INTO `amenities` (`id`, `name`, `slug`, `icon`, `category`, `is_active`, 
 -- Table structure for table `api_tokens`
 --
 
+DROP TABLE IF EXISTS `api_tokens`;
 CREATE TABLE `api_tokens` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `user_id` char(36) NOT NULL,
@@ -120,6 +89,7 @@ CREATE TABLE `api_tokens` (
 -- Table structure for table `areas`
 --
 
+DROP TABLE IF EXISTS `areas`;
 CREATE TABLE `areas` (
   `id` char(36) NOT NULL,
   `city_id` char(36) NOT NULL,
@@ -215,6 +185,7 @@ INSERT INTO `areas` (`id`, `city_id`, `name`, `slug`, `pincode`, `latitude`, `lo
 -- Table structure for table `audit_logs`
 --
 
+DROP TABLE IF EXISTS `audit_logs`;
 CREATE TABLE `audit_logs` (
   `id` char(36) NOT NULL,
   `table_name` varchar(100) NOT NULL,
@@ -233,6 +204,7 @@ CREATE TABLE `audit_logs` (
 -- Table structure for table `beds`
 --
 
+DROP TABLE IF EXISTS `beds`;
 CREATE TABLE `beds` (
   `id` char(36) NOT NULL,
   `room_id` char(36) NOT NULL,
@@ -342,6 +314,7 @@ INSERT INTO `beds` (`id`, `room_id`, `bed_number`, `bed_type`, `status`, `is_act
 -- Table structure for table `bed_types`
 --
 
+DROP TABLE IF EXISTS `bed_types`;
 CREATE TABLE `bed_types` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `name` varchar(100) NOT NULL,
@@ -361,6 +334,7 @@ CREATE TABLE `bed_types` (
 -- Table structure for table `blocks`
 --
 
+DROP TABLE IF EXISTS `blocks`;
 CREATE TABLE `blocks` (
   `id` char(36) NOT NULL,
   `property_id` char(36) NOT NULL,
@@ -434,6 +408,7 @@ INSERT INTO `blocks` (`id`, `property_id`, `name`, `is_active`, `version`, `crea
 -- Table structure for table `bookings`
 --
 
+DROP TABLE IF EXISTS `bookings`;
 CREATE TABLE `bookings` (
   `id` char(36) NOT NULL,
   `booking_id` varchar(20) NOT NULL,
@@ -485,6 +460,7 @@ INSERT INTO `bookings` (`id`, `booking_id`, `user_id`, `tenant_name`, `tenant_ph
 -- Table structure for table `booking_history`
 --
 
+DROP TABLE IF EXISTS `booking_history`;
 CREATE TABLE `booking_history` (
   `id` char(36) NOT NULL,
   `booking_id` char(36) NOT NULL,
@@ -501,6 +477,7 @@ CREATE TABLE `booking_history` (
 -- Table structure for table `broker_payouts`
 --
 
+DROP TABLE IF EXISTS `broker_payouts`;
 CREATE TABLE `broker_payouts` (
   `id` char(36) NOT NULL,
   `payout_id` varchar(20) NOT NULL,
@@ -523,6 +500,7 @@ CREATE TABLE `broker_payouts` (
 -- Table structure for table `cache`
 --
 
+DROP TABLE IF EXISTS `cache`;
 CREATE TABLE `cache` (
   `key` varchar(255) NOT NULL,
   `value` mediumtext NOT NULL,
@@ -552,6 +530,7 @@ INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
 -- Table structure for table `cache_locks`
 --
 
+DROP TABLE IF EXISTS `cache_locks`;
 CREATE TABLE `cache_locks` (
   `key` varchar(255) NOT NULL,
   `owner` varchar(255) NOT NULL,
@@ -564,6 +543,7 @@ CREATE TABLE `cache_locks` (
 -- Table structure for table `cities`
 --
 
+DROP TABLE IF EXISTS `cities`;
 CREATE TABLE `cities` (
   `id` char(36) NOT NULL,
   `state_id` char(36) NOT NULL,
@@ -678,6 +658,7 @@ INSERT INTO `cities` (`id`, `state_id`, `name`, `slug`, `latitude`, `longitude`,
 -- Table structure for table `complaints`
 --
 
+DROP TABLE IF EXISTS `complaints`;
 CREATE TABLE `complaints` (
   `id` char(36) NOT NULL,
   `complaint_id` varchar(20) NOT NULL,
@@ -703,6 +684,7 @@ CREATE TABLE `complaints` (
 -- Table structure for table `complaint_images`
 --
 
+DROP TABLE IF EXISTS `complaint_images`;
 CREATE TABLE `complaint_images` (
   `id` char(36) NOT NULL,
   `complaint_id` char(36) NOT NULL,
@@ -716,6 +698,7 @@ CREATE TABLE `complaint_images` (
 -- Table structure for table `contact_inquiries`
 --
 
+DROP TABLE IF EXISTS `contact_inquiries`;
 CREATE TABLE `contact_inquiries` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(150) NOT NULL,
@@ -745,6 +728,7 @@ INSERT INTO `contact_inquiries` (`id`, `name`, `email`, `phone`, `user_type`, `c
 -- Table structure for table `countries`
 --
 
+DROP TABLE IF EXISTS `countries`;
 CREATE TABLE `countries` (
   `id` char(36) NOT NULL,
   `code` varchar(3) NOT NULL,
@@ -772,6 +756,7 @@ INSERT INTO `countries` (`id`, `code`, `code2`, `name`, `phone_code`, `currency_
 -- Table structure for table `currencies`
 --
 
+DROP TABLE IF EXISTS `currencies`;
 CREATE TABLE `currencies` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -799,6 +784,7 @@ INSERT INTO `currencies` (`id`, `name`, `code`, `symbol`, `decimal_places`, `is_
 -- Table structure for table `daily_property_stats`
 --
 
+DROP TABLE IF EXISTS `daily_property_stats`;
 CREATE TABLE `daily_property_stats` (
   `date` date NOT NULL,
   `property_id` char(36) NOT NULL,
@@ -815,6 +801,7 @@ CREATE TABLE `daily_property_stats` (
 -- Table structure for table `document_types`
 --
 
+DROP TABLE IF EXISTS `document_types`;
 CREATE TABLE `document_types` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -834,6 +821,7 @@ CREATE TABLE `document_types` (
 -- Table structure for table `document_verifications`
 --
 
+DROP TABLE IF EXISTS `document_verifications`;
 CREATE TABLE `document_verifications` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `document_id` char(36) NOT NULL,
@@ -854,6 +842,7 @@ CREATE TABLE `document_verifications` (
 -- Table structure for table `failed_jobs`
 --
 
+DROP TABLE IF EXISTS `failed_jobs`;
 CREATE TABLE `failed_jobs` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `uuid` varchar(255) NOT NULL,
@@ -870,6 +859,7 @@ CREATE TABLE `failed_jobs` (
 -- Table structure for table `floors`
 --
 
+DROP TABLE IF EXISTS `floors`;
 CREATE TABLE `floors` (
   `id` char(36) NOT NULL,
   `block_id` char(36) NOT NULL,
@@ -944,6 +934,7 @@ INSERT INTO `floors` (`id`, `block_id`, `floor_number`, `name`, `is_active`, `ve
 -- Table structure for table `genders`
 --
 
+DROP TABLE IF EXISTS `genders`;
 CREATE TABLE `genders` (
   `id` char(36) NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -971,6 +962,7 @@ INSERT INTO `genders` (`id`, `name`, `slug`, `code`, `is_active`, `version`, `cr
 -- Table structure for table `invoices`
 --
 
+DROP TABLE IF EXISTS `invoices`;
 CREATE TABLE `invoices` (
   `id` char(36) NOT NULL,
   `invoice_number` varchar(50) NOT NULL,
@@ -998,6 +990,7 @@ CREATE TABLE `invoices` (
 -- Table structure for table `jobs`
 --
 
+DROP TABLE IF EXISTS `jobs`;
 CREATE TABLE `jobs` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `queue` varchar(255) NOT NULL,
@@ -1014,6 +1007,7 @@ CREATE TABLE `jobs` (
 -- Table structure for table `job_batches`
 --
 
+DROP TABLE IF EXISTS `job_batches`;
 CREATE TABLE `job_batches` (
   `id` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -1033,6 +1027,7 @@ CREATE TABLE `job_batches` (
 -- Table structure for table `languages`
 --
 
+DROP TABLE IF EXISTS `languages`;
 CREATE TABLE `languages` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -1052,6 +1047,7 @@ CREATE TABLE `languages` (
 -- Table structure for table `leases`
 --
 
+DROP TABLE IF EXISTS `leases`;
 CREATE TABLE `leases` (
   `id` char(36) NOT NULL,
   `booking_id` char(36) NOT NULL,
@@ -1076,6 +1072,7 @@ CREATE TABLE `leases` (
 -- Table structure for table `login_history`
 --
 
+DROP TABLE IF EXISTS `login_history`;
 CREATE TABLE `login_history` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `user_id` char(36) NOT NULL,
@@ -1114,6 +1111,7 @@ INSERT INTO `login_history` (`id`, `user_id`, `login_at`, `logout_at`, `ip_addre
 -- Table structure for table `migrations`
 --
 
+DROP TABLE IF EXISTS `migrations`;
 CREATE TABLE `migrations` (
   `id` int(10) UNSIGNED NOT NULL,
   `migration` varchar(255) NOT NULL,
@@ -1151,6 +1149,7 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 -- Table structure for table `notifications`
 --
 
+DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE `notifications` (
   `id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
@@ -1238,6 +1237,7 @@ INSERT INTO `notifications` (`id`, `user_id`, `user_type`, `title`, `message`, `
 -- Table structure for table `occupations`
 --
 
+DROP TABLE IF EXISTS `occupations`;
 CREATE TABLE `occupations` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -1256,6 +1256,7 @@ CREATE TABLE `occupations` (
 -- Table structure for table `organizations`
 --
 
+DROP TABLE IF EXISTS `organizations`;
 CREATE TABLE `organizations` (
   `id` char(36) NOT NULL,
   `name` varchar(200) NOT NULL,
@@ -1278,6 +1279,7 @@ CREATE TABLE `organizations` (
 -- Table structure for table `organization_settings`
 --
 
+DROP TABLE IF EXISTS `organization_settings`;
 CREATE TABLE `organization_settings` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `organization_id` char(36) NOT NULL,
@@ -1300,6 +1302,7 @@ CREATE TABLE `organization_settings` (
 -- Table structure for table `organization_users`
 --
 
+DROP TABLE IF EXISTS `organization_users`;
 CREATE TABLE `organization_users` (
   `id` char(36) NOT NULL,
   `organization_id` char(36) NOT NULL,
@@ -1321,6 +1324,7 @@ CREATE TABLE `organization_users` (
 -- Table structure for table `otp_verifications`
 --
 
+DROP TABLE IF EXISTS `otp_verifications`;
 CREATE TABLE `otp_verifications` (
   `id` char(36) NOT NULL,
   `user_id` char(36) DEFAULT NULL,
@@ -1346,6 +1350,7 @@ CREATE TABLE `otp_verifications` (
 -- Table structure for table `password_history`
 --
 
+DROP TABLE IF EXISTS `password_history`;
 CREATE TABLE `password_history` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `user_id` char(36) NOT NULL,
@@ -1361,6 +1366,7 @@ CREATE TABLE `password_history` (
 -- Table structure for table `password_reset_tokens`
 --
 
+DROP TABLE IF EXISTS `password_reset_tokens`;
 CREATE TABLE `password_reset_tokens` (
   `email` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
@@ -1381,6 +1387,7 @@ INSERT INTO `password_reset_tokens` (`email`, `token`, `created_at`) VALUES
 -- Table structure for table `payments`
 --
 
+DROP TABLE IF EXISTS `payments`;
 CREATE TABLE `payments` (
   `id` char(36) NOT NULL,
   `payment_id` varchar(30) NOT NULL,
@@ -1407,6 +1414,7 @@ CREATE TABLE `payments` (
 -- Table structure for table `permissions`
 --
 
+DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -1433,6 +1441,7 @@ INSERT INTO `permissions` (`id`, `name`, `slug`, `module`, `is_active`, `version
 -- Table structure for table `personal_access_tokens`
 --
 
+DROP TABLE IF EXISTS `personal_access_tokens`;
 CREATE TABLE `personal_access_tokens` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `tokenable_type` varchar(255) NOT NULL,
@@ -1478,6 +1487,7 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 -- Table structure for table `platform_settings`
 --
 
+DROP TABLE IF EXISTS `platform_settings`;
 CREATE TABLE `platform_settings` (
   `id` char(36) NOT NULL,
   `key` varchar(100) NOT NULL,
@@ -1518,6 +1528,7 @@ INSERT INTO `platform_settings` (`id`, `key`, `value`, `group`, `type`, `created
 -- Table structure for table `properties`
 --
 
+DROP TABLE IF EXISTS `properties`;
 CREATE TABLE `properties` (
   `id` char(36) NOT NULL,
   `organization_id` char(36) DEFAULT NULL,
@@ -1633,6 +1644,7 @@ INSERT INTO `properties` (`id`, `organization_id`, `broker_id`, `city_id`, `area
 -- Table structure for table `property_amenities`
 --
 
+DROP TABLE IF EXISTS `property_amenities`;
 CREATE TABLE `property_amenities` (
   `id` char(36) NOT NULL,
   `property_id` char(36) NOT NULL,
@@ -2089,6 +2101,7 @@ INSERT INTO `property_amenities` (`id`, `property_id`, `amenity_id`, `created_at
 -- Table structure for table `property_images`
 --
 
+DROP TABLE IF EXISTS `property_images`;
 CREATE TABLE `property_images` (
   `id` char(36) NOT NULL,
   `property_id` char(36) NOT NULL,
@@ -2348,6 +2361,7 @@ INSERT INTO `property_images` (`id`, `property_id`, `image_url`, `image_type`, `
 -- Table structure for table `property_reports`
 --
 
+DROP TABLE IF EXISTS `property_reports`;
 CREATE TABLE `property_reports` (
   `id` char(36) NOT NULL,
   `property_id` char(36) NOT NULL,
@@ -2370,6 +2384,7 @@ CREATE TABLE `property_reports` (
 -- Table structure for table `property_rules`
 --
 
+DROP TABLE IF EXISTS `property_rules`;
 CREATE TABLE `property_rules` (
   `id` char(36) NOT NULL,
   `property_id` char(36) NOT NULL,
@@ -2623,6 +2638,7 @@ INSERT INTO `property_rules` (`id`, `property_id`, `rule_text`, `rule_type`, `is
 -- Table structure for table `property_types`
 --
 
+DROP TABLE IF EXISTS `property_types`;
 CREATE TABLE `property_types` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -2652,6 +2668,7 @@ INSERT INTO `property_types` (`id`, `name`, `slug`, `is_active`, `version`, `cre
 -- Table structure for table `property_visits`
 --
 
+DROP TABLE IF EXISTS `property_visits`;
 CREATE TABLE `property_visits` (
   `id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
@@ -2669,6 +2686,7 @@ CREATE TABLE `property_visits` (
 -- Table structure for table `refresh_tokens`
 --
 
+DROP TABLE IF EXISTS `refresh_tokens`;
 CREATE TABLE `refresh_tokens` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `user_id` char(36) NOT NULL,
@@ -2693,6 +2711,7 @@ CREATE TABLE `refresh_tokens` (
 -- Table structure for table `refunds`
 --
 
+DROP TABLE IF EXISTS `refunds`;
 CREATE TABLE `refunds` (
   `id` char(36) NOT NULL,
   `payment_id` char(36) NOT NULL,
@@ -2709,6 +2728,7 @@ CREATE TABLE `refunds` (
 -- Table structure for table `relationship_managers`
 --
 
+DROP TABLE IF EXISTS `relationship_managers`;
 CREATE TABLE `relationship_managers` (
   `id` char(36) NOT NULL,
   `name` varchar(120) NOT NULL,
@@ -2748,6 +2768,7 @@ INSERT INTO `relationship_managers` (`id`, `name`, `email`, `phone`, `whatsapp_n
 -- Table structure for table `reviews`
 --
 
+DROP TABLE IF EXISTS `reviews`;
 CREATE TABLE `reviews` (
   `id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
@@ -2802,6 +2823,7 @@ INSERT INTO `reviews` (`id`, `user_id`, `property_id`, `booking_id`, `rating`, `
 -- Table structure for table `roles`
 --
 
+DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles` (
   `id` char(36) NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -2831,6 +2853,7 @@ INSERT INTO `roles` (`id`, `name`, `slug`, `level`, `is_system`, `is_active`, `v
 -- Table structure for table `role_permissions`
 --
 
+DROP TABLE IF EXISTS `role_permissions`;
 CREATE TABLE `role_permissions` (
   `id` char(36) NOT NULL,
   `role_id` char(36) NOT NULL,
@@ -2845,6 +2868,7 @@ CREATE TABLE `role_permissions` (
 -- Table structure for table `roommate_messages`
 --
 
+DROP TABLE IF EXISTS `roommate_messages`;
 CREATE TABLE `roommate_messages` (
   `id` char(36) NOT NULL,
   `roommate_post_id` char(36) NOT NULL,
@@ -2866,6 +2890,7 @@ CREATE TABLE `roommate_messages` (
 -- Table structure for table `roommate_posts`
 --
 
+DROP TABLE IF EXISTS `roommate_posts`;
 CREATE TABLE `roommate_posts` (
   `id` char(36) NOT NULL,
   `user_id` varchar(36) NOT NULL,
@@ -2928,6 +2953,7 @@ INSERT INTO `roommate_posts` (`id`, `user_id`, `title`, `slug`, `post_type`, `ci
 -- Table structure for table `rooms`
 --
 
+DROP TABLE IF EXISTS `rooms`;
 CREATE TABLE `rooms` (
   `id` char(36) NOT NULL,
   `floor_id` char(36) NOT NULL,
@@ -3040,6 +3066,7 @@ INSERT INTO `rooms` (`id`, `floor_id`, `room_type_id`, `room_number`, `total_bed
 -- Table structure for table `room_types`
 --
 
+DROP TABLE IF EXISTS `room_types`;
 CREATE TABLE `room_types` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -3068,6 +3095,7 @@ INSERT INTO `room_types` (`id`, `name`, `slug`, `max_occupancy`, `is_active`, `v
 -- Table structure for table `sessions`
 --
 
+DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
   `id` varchar(255) NOT NULL,
   `user_id` varchar(36) DEFAULT NULL,
@@ -3106,6 +3134,7 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 -- Table structure for table `states`
 --
 
+DROP TABLE IF EXISTS `states`;
 CREATE TABLE `states` (
   `id` char(36) NOT NULL,
   `country_id` char(36) NOT NULL,
@@ -3152,6 +3181,7 @@ INSERT INTO `states` (`id`, `country_id`, `code`, `name`, `type`, `is_active`, `
 -- Table structure for table `timezones`
 --
 
+DROP TABLE IF EXISTS `timezones`;
 CREATE TABLE `timezones` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -3169,6 +3199,7 @@ CREATE TABLE `timezones` (
 -- Table structure for table `users`
 --
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` char(36) NOT NULL,
   `email` varchar(150) DEFAULT NULL,
@@ -3220,6 +3251,7 @@ INSERT INTO `users` (`id`, `email`, `google_id`, `auth_provider`, `phone`, `pass
 -- Table structure for table `user_activity_logs`
 --
 
+DROP TABLE IF EXISTS `user_activity_logs`;
 CREATE TABLE `user_activity_logs` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `user_id` char(36) NOT NULL,
@@ -3238,6 +3270,7 @@ CREATE TABLE `user_activity_logs` (
 -- Table structure for table `user_addresses`
 --
 
+DROP TABLE IF EXISTS `user_addresses`;
 CREATE TABLE `user_addresses` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `user_id` char(36) NOT NULL,
@@ -3272,6 +3305,7 @@ CREATE TABLE `user_addresses` (
 -- Table structure for table `user_devices`
 --
 
+DROP TABLE IF EXISTS `user_devices`;
 CREATE TABLE `user_devices` (
   `id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
@@ -3295,6 +3329,7 @@ CREATE TABLE `user_devices` (
 -- Table structure for table `user_documents`
 --
 
+DROP TABLE IF EXISTS `user_documents`;
 CREATE TABLE `user_documents` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `user_id` char(36) NOT NULL,
@@ -3325,6 +3360,7 @@ CREATE TABLE `user_documents` (
 -- Table structure for table `user_profiles`
 --
 
+DROP TABLE IF EXISTS `user_profiles`;
 CREATE TABLE `user_profiles` (
   `user_id` char(36) NOT NULL,
   `first_name` varchar(100) NOT NULL,
@@ -3380,6 +3416,7 @@ INSERT INTO `user_profiles` (`user_id`, `first_name`, `last_name`, `avatar_url`,
 -- Table structure for table `user_roles`
 --
 
+DROP TABLE IF EXISTS `user_roles`;
 CREATE TABLE `user_roles` (
   `id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
@@ -3419,6 +3456,7 @@ INSERT INTO `user_roles` (`id`, `user_id`, `role_id`, `is_primary`, `expires_at`
 -- Table structure for table `user_sessions`
 --
 
+DROP TABLE IF EXISTS `user_sessions`;
 CREATE TABLE `user_sessions` (
   `id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
@@ -3446,6 +3484,7 @@ CREATE TABLE `user_sessions` (
 -- Table structure for table `verification_history`
 --
 
+DROP TABLE IF EXISTS `verification_history`;
 CREATE TABLE `verification_history` (
   `id` char(36) NOT NULL DEFAULT uuid(),
   `document_id` char(36) NOT NULL,
@@ -3459,65 +3498,19 @@ CREATE TABLE `verification_history` (
 
 -- --------------------------------------------------------
 
---
--- Stand-in structure for view `vw_active_properties`
--- (See below for the actual view)
---
-CREATE TABLE `vw_active_properties` (
-`id` char(36)
-,`name` varchar(200)
-,`slug` varchar(220)
-,`monthly_rent` decimal(10,2)
-,`rating` decimal(3,2)
-,`status` enum('active','inactive','draft')
-,`city_name` varchar(100)
-,`area_name` varchar(150)
-,`broker_name` varchar(200)
-);
+
 
 -- --------------------------------------------------------
 
---
--- Stand-in structure for view `vw_location_hierarchy`
--- (See below for the actual view)
---
-CREATE TABLE `vw_location_hierarchy` (
-);
+
 
 -- --------------------------------------------------------
 
---
--- Stand-in structure for view `vw_user_full_profile`
--- (See below for the actual view)
---
-CREATE TABLE `vw_user_full_profile` (
-`id` char(36)
-,`email` varchar(150)
-,`phone` varchar(20)
-,`status` enum('active','inactive','suspended','pending_verification','deleted')
-,`first_name` varchar(100)
-,`last_name` varchar(100)
-,`full_name` varchar(200)
-,`avatar_url` varchar(500)
-,`gender` varchar(50)
-,`occupation` varchar(100)
-);
+
 
 -- --------------------------------------------------------
 
---
--- Stand-in structure for view `vw_user_permissions`
--- (See below for the actual view)
---
-CREATE TABLE `vw_user_permissions` (
-`user_id` char(36)
-,`email` varchar(150)
-,`role_slug` varchar(60)
-,`role_level` int(11)
-,`permission_slug` varchar(120)
-,`module` varchar(50)
-,`is_primary` tinyint(1)
-);
+
 
 -- --------------------------------------------------------
 
@@ -3525,6 +3518,7 @@ CREATE TABLE `vw_user_permissions` (
 -- Table structure for table `wallets`
 --
 
+DROP TABLE IF EXISTS `wallets`;
 CREATE TABLE `wallets` (
   `id` char(36) NOT NULL,
   `user_id` char(36) NOT NULL,
@@ -3561,6 +3555,7 @@ INSERT INTO `wallets` (`id`, `user_id`, `balance`, `currency_code`, `is_active`,
 -- Table structure for table `wallet_transactions`
 --
 
+DROP TABLE IF EXISTS `wallet_transactions`;
 CREATE TABLE `wallet_transactions` (
   `id` char(36) NOT NULL,
   `wallet_id` char(36) NOT NULL,
@@ -3578,36 +3573,71 @@ CREATE TABLE `wallet_transactions` (
 --
 -- Structure for view `vw_active_properties`
 --
+DROP VIEW IF EXISTS `vw_active_properties`;
 DROP TABLE IF EXISTS `vw_active_properties`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_active_properties`  AS SELECT `p`.`id` AS `id`, `p`.`name` AS `name`, `p`.`slug` AS `slug`, `p`.`monthly_rent` AS `monthly_rent`, `p`.`rating` AS `rating`, `p`.`status` AS `status`, `c`.`name` AS `city_name`, `a`.`name` AS `area_name`, `u`.`full_name` AS `broker_name` FROM (((`properties` `p` join `cities` `c` on(`p`.`city_id` = `c`.`id`)) join `areas` `a` on(`p`.`area_id` = `a`.`id`)) join `user_profiles` `u` on(`p`.`broker_id` = `u`.`user_id`)) WHERE `p`.`deleted_at` is null AND `p`.`status` = 'active' ;
+CREATE OR REPLACE VIEW `vw_active_properties` AS 
+SELECT `p`.`id` AS `id`, `p`.`name` AS `name`, `p`.`slug` AS `slug`, `p`.`monthly_rent` AS `monthly_rent`, `p`.`rating` AS `rating`, `p`.`status` AS `status`, `c`.`name` AS `city_name`, `a`.`name` AS `area_name`, `u`.`full_name` AS `broker_name` 
+FROM (((`properties` `p` 
+    JOIN `cities` `c` ON(`p`.`city_id` = `c`.`id`)) 
+    JOIN `areas` `a` ON(`p`.`area_id` = `a`.`id`)) 
+    JOIN `user_profiles` `u` ON(`p`.`broker_id` = `u`.`user_id`)) 
+WHERE `p`.`deleted_at` IS NULL AND `p`.`status` = 'active';
 
 -- --------------------------------------------------------
 
 --
 -- Structure for view `vw_location_hierarchy`
 --
+DROP VIEW IF EXISTS `vw_location_hierarchy`;
 DROP TABLE IF EXISTS `vw_location_hierarchy`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_location_hierarchy`  AS SELECT `co`.`id` AS `country_id`, `co`.`name` AS `country_name`, `co`.`code` AS `country_code`, `s`.`id` AS `state_id`, `s`.`name` AS `state_name`, `s`.`code` AS `state_code`, `ci`.`id` AS `city_id`, `ci`.`name` AS `city_name`, `ci`.`slug` AS `city_slug`, `ci`.`is_metro` AS `is_metro`, `ci`.`is_tier1` AS `is_tier1`, `ci`.`district` AS `district`, `ci`.`zone` AS `zone`, `ci`.`google_place_id` AS `google_place_id`, `ci`.`osm_id` AS `osm_id`, `ci`.`geohash` AS `geohash`, `ar`.`id` AS `area_id`, `ar`.`name` AS `area_name`, `ar`.`slug` AS `area_slug`, `ar`.`pincode` AS `pincode`, `ar`.`taluka` AS `taluka`, `ar`.`ward` AS `ward`, `ar`.`zone` AS `area_zone`, `ar`.`google_place_id` AS `area_google_place_id` FROM (((`countries` `co` join `states` `s` on(`s`.`country_id` = `co`.`id` and `s`.`deleted_at` is null)) join `cities` `ci` on(`ci`.`state_id` = `s`.`id` and `ci`.`deleted_at` is null)) left join `areas` `ar` on(`ar`.`city_id` = `ci`.`id` and `ar`.`deleted_at` is null)) WHERE `co`.`deleted_at` is null AND `co`.`is_active` = 1 ;
+CREATE OR REPLACE VIEW `vw_location_hierarchy` AS 
+SELECT 
+    `co`.`id` AS `country_id`, `co`.`name` AS `country_name`, `co`.`code` AS `country_code`, 
+    `s`.`id` AS `state_id`, `s`.`name` AS `state_name`, `s`.`code` AS `state_code`, 
+    `ci`.`id` AS `city_id`, `ci`.`name` AS `city_name`, `ci`.`slug` AS `city_slug`, 
+    `ci`.`is_metro` AS `is_metro`, `ci`.`is_tier1` AS `is_tier1`, `ci`.`district` AS `district`, 
+    `ci`.`google_place_id` AS `google_place_id`, `ci`.`geohash` AS `geohash`, 
+    `ar`.`id` AS `area_id`, `ar`.`name` AS `area_name`, `ar`.`slug` AS `area_slug`, `ar`.`pincode` AS `pincode` 
+FROM (((`countries` `co` 
+    JOIN `states` `s` ON(`s`.`country_id` = `co`.`id` AND `s`.`deleted_at` IS NULL)) 
+    JOIN `cities` `ci` ON(`ci`.`state_id` = `s`.`id` AND `ci`.`deleted_at` IS NULL)) 
+    LEFT JOIN `areas` `ar` ON(`ar`.`city_id` = `ci`.`id` AND `ar`.`deleted_at` IS NULL)) 
+WHERE `co`.`deleted_at` IS NULL AND `co`.`is_active` = 1;
 
 -- --------------------------------------------------------
 
 --
 -- Structure for view `vw_user_full_profile`
 --
+DROP VIEW IF EXISTS `vw_user_full_profile`;
 DROP TABLE IF EXISTS `vw_user_full_profile`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_user_full_profile`  AS SELECT `u`.`id` AS `id`, `u`.`email` AS `email`, `u`.`phone` AS `phone`, `u`.`status` AS `status`, `p`.`first_name` AS `first_name`, `p`.`last_name` AS `last_name`, `p`.`full_name` AS `full_name`, `p`.`avatar_url` AS `avatar_url`, `g`.`name` AS `gender`, `o`.`name` AS `occupation` FROM (((`users` `u` left join `user_profiles` `p` on(`u`.`id` = `p`.`user_id` and `p`.`deleted_at` is null)) left join `genders` `g` on(`p`.`gender_id` = `g`.`id`)) left join `occupations` `o` on(`p`.`occupation_id` = `o`.`id`)) WHERE `u`.`deleted_at` is null AND `u`.`is_active` = 1 ;
+CREATE OR REPLACE VIEW `vw_user_full_profile` AS 
+SELECT `u`.`id` AS `id`, `u`.`email` AS `email`, `u`.`phone` AS `phone`, `u`.`status` AS `status`, `p`.`first_name` AS `first_name`, `p`.`last_name` AS `last_name`, `p`.`full_name` AS `full_name`, `p`.`avatar_url` AS `avatar_url`, `g`.`name` AS `gender`, `o`.`name` AS `occupation` 
+FROM (((`users` `u` 
+    LEFT JOIN `user_profiles` `p` ON(`u`.`id` = `p`.`user_id` AND `p`.`deleted_at` IS NULL)) 
+    LEFT JOIN `genders` `g` ON(`p`.`gender_id` = `g`.`id`)) 
+    LEFT JOIN `occupations` `o` ON(`p`.`occupation_id` = `o`.`id`)) 
+WHERE `u`.`deleted_at` IS NULL AND `u`.`is_active` = 1;
 
 -- --------------------------------------------------------
 
 --
 -- Structure for view `vw_user_permissions`
 --
+DROP VIEW IF EXISTS `vw_user_permissions`;
 DROP TABLE IF EXISTS `vw_user_permissions`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_user_permissions`  AS SELECT `ur`.`user_id` AS `user_id`, `u`.`email` AS `email`, `r`.`slug` AS `role_slug`, `r`.`level` AS `role_level`, `p`.`slug` AS `permission_slug`, `p`.`module` AS `module`, `ur`.`is_primary` AS `is_primary` FROM ((((`user_roles` `ur` join `users` `u` on(`ur`.`user_id` = `u`.`id` and `u`.`deleted_at` is null)) join `roles` `r` on(`ur`.`role_id` = `r`.`id` and `r`.`deleted_at` is null)) join `role_permissions` `rp` on(`r`.`id` = `rp`.`role_id`)) join `permissions` `p` on(`rp`.`permission_id` = `p`.`id` and `p`.`deleted_at` is null)) WHERE `ur`.`is_active` = 1 AND (`ur`.`expires_at` is null OR `ur`.`expires_at` > current_timestamp()) AND `r`.`is_active` = 1 AND `p`.`is_active` = 1 ;
+CREATE OR REPLACE VIEW `vw_user_permissions` AS 
+SELECT `ur`.`user_id` AS `user_id`, `u`.`email` AS `email`, `r`.`slug` AS `role_slug`, `r`.`level` AS `role_level`, `p`.`slug` AS `permission_slug`, `p`.`module` AS `module`, `ur`.`is_primary` AS `is_primary` 
+FROM ((((`user_roles` `ur` 
+    JOIN `users` `u` ON(`ur`.`user_id` = `u`.`id` AND `u`.`deleted_at` IS NULL)) 
+    JOIN `roles` `r` ON(`ur`.`role_id` = `r`.`id` AND `r`.`deleted_at` IS NULL)) 
+    JOIN `role_permissions` `rp` ON(`r`.`id` = `rp`.`role_id`)) 
+    JOIN `permissions` `p` ON(`rp`.`permission_id` = `p`.`id` AND `p`.`deleted_at` IS NULL)) 
+WHERE `ur`.`is_active` = 1 AND (`ur`.`expires_at` IS NULL OR `ur`.`expires_at` > current_timestamp()) AND `r`.`is_active` = 1 AND `p`.`is_active` = 1;
 
 --
 -- Indexes for dumped tables
@@ -4581,7 +4611,11 @@ ALTER TABLE `wallets`
 --
 ALTER TABLE `wallet_transactions`
   ADD CONSTRAINT `wallet_transactions_ibfk_1` FOREIGN KEY (`wallet_id`) REFERENCES `wallets` (`id`) ON DELETE CASCADE;
+
 COMMIT;
+SET FOREIGN_KEY_CHECKS = 1;
+SET UNIQUE_CHECKS = 1;
+SET AUTOCOMMIT = 1;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

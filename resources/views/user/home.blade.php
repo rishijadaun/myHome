@@ -389,7 +389,7 @@
                                                 </span>
                                             </div>
                                             <h1 class="text-xl sm:text-3xl md:text-4xl font-black leading-tight mb-1.5 text-white">
-                                                Find Verified PGs & Co-Living in India <span style="color:#7eebd4">| Zero Brokerage</span>
+                                               Find Verified PGs, Flatmates & Co-Living Spaces in India <span style="color:#7eebd4"> SpaceSeek</span>
                                             </h1>
                                             <p class="text-xs sm:text-sm text-white/70 mb-3 max-w-md line-clamp-2">Book directly with verified owners — WiFi, 3 Meals & 24/7 Security included.</p>
                                             <div class="flex flex-wrap gap-2.5">
@@ -2576,59 +2576,59 @@
     </section>
 
     <!-- SpaceSeeks Mobile App Section (Dual Smartphone Mockup Presentation) -->
-   <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
-    <div class="bg-white rounded-3xl border border-gray-900/10 relative overflow-hidden shadow-sm">
-        <div class="grid lg:grid-cols-2 items-stretch">
+    <section class="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16">
+        <div class="bg-white rounded-3xl border border-gray-900/10 relative overflow-hidden shadow-sm">
+            <div class="grid lg:grid-cols-2 items-stretch">
 
-            <!-- Left: Copy & App Store Badges -->
-            <div class="p-8 sm:p-10 md:p-12 flex flex-col justify-center text-center lg:text-left order-2 lg:order-1">
-                <span class="inline-flex items-center gap-1.5 self-center lg:self-start px-3.5 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider mb-4 border border-brand/20 w-fit">
-                    <i class="fas fa-mobile-screen-button"></i> SpaceSeeks Mobile App
-                </span>
-                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 tracking-tight leading-tight">
-                    Find your room. Find your people.
-                </h2>
-                <p class="text-gray-600 mb-7 sm:mb-8 text-sm sm:text-base lg:text-lg leading-relaxed max-w-md mx-auto lg:mx-0">
-                    Search, shortlist &amp; book verified PGs, discover compatible flatmates with zero brokerage, and manage your stay seamlessly on the go.
-                </p>
+                <!-- Left: Copy & App Store Badges -->
+                <div class="p-8 sm:p-10 md:p-12 flex flex-col justify-center text-center lg:text-left order-2 lg:order-1">
+                    <span class="inline-flex items-center gap-1.5 self-center lg:self-start px-3.5 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider mb-4 border border-brand/20 w-fit">
+                        <i class="fas fa-mobile-screen-button"></i> SpaceSeeks Mobile App
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 tracking-tight leading-tight">
+                        Find your room. Find your people.
+                    </h2>
+                    <p class="text-gray-600 mb-7 sm:mb-8 text-sm sm:text-base lg:text-lg leading-relaxed max-w-md mx-auto lg:mx-0">
+                        Search, shortlist &amp; book verified PGs, discover compatible flatmates with zero brokerage, and manage your stay seamlessly on the go.
+                    </p>
 
-                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-7 sm:mb-8">
-                    <button type="button" onclick="installPwaApp('android')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
-                        <i class="fab fa-google-play text-2xl sm:text-3xl"></i>
-                        <div class="text-left">
-                            <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">GET IT ON</div>
-                            <div class="text-xs sm:text-sm md:text-base font-bold">Google Play</div>
-                        </div>
-                    </button>
-                    <button type="button" onclick="installPwaApp('ios')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
-                        <i class="fab fa-apple text-2xl sm:text-3xl text-white"></i>
-                        <div class="text-left">
-                            <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">Download on the</div>
-                            <div class="text-xs sm:text-sm md:text-base font-bold">App Store</div>
-                        </div>
-                    </button>
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-7 sm:mb-8">
+                        <button type="button" onclick="installPwaApp('android')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
+                            <i class="fab fa-google-play text-2xl sm:text-3xl"></i>
+                            <div class="text-left">
+                                <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">GET IT ON</div>
+                                <div class="text-xs sm:text-sm md:text-base font-bold">Google Play</div>
+                            </div>
+                        </button>
+                        <button type="button" onclick="installPwaApp('ios')" class="bg-gray-900 text-white px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl flex items-center gap-3 hover:bg-gray-800 transition tap-effect shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200 cursor-pointer">
+                            <i class="fab fa-apple text-2xl sm:text-3xl text-white"></i>
+                            <div class="text-left">
+                                <div class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400">Download on the</div>
+                                <div class="text-xs sm:text-sm md:text-base font-bold">App Store</div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 pt-5 border-t border-gray-100 text-xs text-gray-500 font-semibold">
+                        <span class="flex items-center gap-1.5"><i class="fas fa-star text-amber-400"></i> 4.9★ App Rating</span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-users text-purple-600"></i> Flatmate Matching</span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-shield-halved text-brand"></i> 100% Verified</span>
+                    </div>
                 </div>
 
-                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 pt-5 border-t border-gray-100 text-xs text-gray-500 font-semibold">
-                    <span class="flex items-center gap-1.5"><i class="fas fa-star text-amber-400"></i> 4.9★ App Rating</span>
-                    <span class="flex items-center gap-1.5"><i class="fas fa-users text-purple-600"></i> Flatmate Matching</span>
-                    <span class="flex items-center gap-1.5"><i class="fas fa-shield-halved text-brand"></i> 100% Verified</span>
+                <!-- Right: Dual Smartphone Mockup, on its own tinted panel -->
+                <div class="relative order-1 lg:order-2 bg-white flex items-center justify-center px-0 py-10 sm:py-12 lg:py-0 overflow-hidden">
+                    <div class="absolute -right-16 -top-16 w-72 h-72 bg-brand/25 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -left-10 -bottom-16 w-64 h-64 bg-teal-500/25 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="relative group w-full select-none">
+                        <img src="{{ asset('images/app-image.png') }}" alt="SpaceSeeks Mobile App Dual Screen Preview" loading="lazy" decoding="async" class="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)] transition duration-500 group-hover:scale-[1.02]">
+                    </div>
                 </div>
+
             </div>
-
-            <!-- Right: Dual Smartphone Mockup, on its own tinted panel -->
-            <div class="relative order-1 lg:order-2 bg-white flex items-center justify-center px-0 py-10 sm:py-12 lg:py-0 overflow-hidden">
-                <div class="absolute -right-16 -top-16 w-72 h-72 bg-brand/25 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -left-10 -bottom-16 w-64 h-64 bg-teal-500/25 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="relative group w-full select-none">
-                    <img src="{{ file_exists(public_path('images/app-image.jpg')) ? asset('images/app-image.png') : asset('images/app-image.webp') }}" alt="SpaceSeeks Mobile App Dual Screen Preview" loading="lazy" decoding="async" class="relative z-10 w-full h-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)] transition duration-500 group-hover:scale-[1.02]">
-                </div>
-            </div>
-
         </div>
-    </div>
-</section>
+    </section>
    
 </div>
 @endsection
